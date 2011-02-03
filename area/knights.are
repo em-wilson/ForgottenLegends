@@ -1,0 +1,73 @@
+#AREADATA
+Name Knight Clan Hall~
+Builders Chibiusa~
+VNUMs 13800 13899
+Credits {Clans}         Knights Clan Hall~
+Security 1
+Flags A 
+End
+
+
+
+#MOBILES
+#0
+
+
+
+#OBJECTS
+#0
+
+
+
+#ROOMS
+#13800
+Common Room of the Knight Clan Hall~
+You are in the common room of the Knight Clan Hall.  A fireplace on one
+wall has a small fire crackling in it.  You warm your hands on it and then
+look around some more.  The Knight Clan Hall is built inside an old castle. 
+The castle was was once used during war, but was abandoned a long time ago. 
+The knights of Thera decided to use it.  
+~
+0 0 0
+D0
+~
+~
+0 0 13801
+D2
+~
+~
+0 0 3315
+C knights~
+S
+#13801
+Knights clan Shop~
+~
+0 0 0
+D2
+~
+~
+0 0 13800
+S
+#0
+
+
+
+#SPECIALS
+S
+
+
+
+#RESETS
+S
+
+
+
+#SHOPS
+0
+
+
+
+#MOBPROGS
+#0
+
+#$

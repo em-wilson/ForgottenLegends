@@ -1,0 +1,81 @@
+#AREADATA
+Name Demise Hall~
+Builders Chibiusa~
+VNUMs 13900 13999
+Credits {Clans}         Demise Clan Hall~
+Security 1
+Flags A 
+End
+
+
+
+#MOBILES
+#0
+
+
+
+#OBJECTS
+#0
+
+
+
+#ROOMS
+#13900
+Demise Hall~
+~
+0 8 0
+D1
+~
+~
+0 0 13902
+D2
+~
+~
+0 0 8901
+D3
+~
+~
+0 0 13901
+C demise~
+S
+#13901
+The Mists~
+~
+0 8 0
+D1
+~
+~
+0 0 13900
+S
+#13902
+Training Room~
+~
+0 8 0
+D3
+~
+~
+0 0 13900
+S
+#0
+
+
+
+#SPECIALS
+S
+
+
+
+#RESETS
+S
+
+
+
+#SHOPS
+0
+
+
+
+#MOBPROGS
+#0
+
+#$

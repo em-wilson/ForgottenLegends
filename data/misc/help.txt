@@ -1,0 +1,711 @@
+[11751] Blizzard: thief magic
+[ 1818] Damian: vnum
+[14101] Snipe: deposit
+[14101] Snipe: donate
+[ 3334] Moira: banknote
+[ 3334] Moira: bank note
+[ 3014] Wyndsoar: cedit
+[ 3700] Darkus: remort
+[ 3700] Darkus: class
+[ 3700] Darkus: classes
+[ 3759] Darkus: stats
+[ 3016] Darkus: quest
+[ 3054] Darkus: donate
+[ 3054] Beloq: breath
+[    0] Carab: archer default
+[  603] Moira: phase
+[11820] ChibiUsa: weapon_dicew
+[ 3758] Krom: imp
+[ 3054] Blackston: reclas
+[16090] Ravage: multi
+[16090] Ravage: multiplay
+[16090] Ravage: policy
+[ 3700] Cyeani: multiclass
+[ 3700] Cyeani: remort
+[ 3700] Cyeani: classes
+[ 3722] Cyeani: display
+[13901] Koryon: hall
+[13901] Koryon: hall
+[ 3741] Lupa: adept
+[ 3714] Obsidion: remort
+[  698] Snipe: dual
+[ 9422] Obsidion: damage
+[ 3054] Obsidion: avatar
+[ 3054] Obsidion: remort
+[ 3054] Obsidion: players
+[ 3054] Obsidion: damage
+[11812] Blizzard: makeclan
+[ 7912] Moira: age
+[ 7912] Moira: hours
+[    0] Wedsaz: skaven
+[    0] Wedsaz: radiation
+[    0] Wedsaz: radiation breath
+[ 3757] Lomus: quest
+[ 3716] Lomus: newbie
+[ 3721] Lomus: damage
+[ 3054] Lomus: changes
+[ 7912] Moira: worth
+[    0] Natas: skaven
+[ 1828] Damian: copy
+[ 1828] Damian: echo
+[ 1828] Damian: gecho
+[ 1828] Damian: mp
+[ 1828] Damian: mob program
+[ 3054] Ravage: ques
+[ 3054] Ravage: quest
+[ 1828] Damian: trigger
+[ 7912] Moira: editor
+[ 3054] Islef: finger
+[ 1832] Damian: gocial
+[ 3700] Rudra: bite
+[ 3700] Rudra: remort
+[ 3700] Rudra: class
+[ 3700] Rudra: monk
+[ 3700] Rudra: ava
+[ 3054] RajinCajun: class
+[ 3054] RajinCajun: archer
+[ 3054] Saber: demise
+[10419] RajinCajun: classes
+[ 9424] Lola: circle
+[ 3700] Gath: quest
+[ 8854] Rosalie: dig
+[ 9634] RajinCajun: crecall
+[14101] RajinCajun: donate
+[14101] RajinCajun: guard
+[ 8804] Rosalie: mob_hp
+[ 8804] Rosalie: mob_h
+[ 8804] Rosalie: mp
+[ 8804] Rosalie: mp
+[14104] RajinCajun: deposit
+[14104] RajinCajun: idea
+[ 3015] Islef: inform
+[ 3050] Islef: convert
+[  602] RajinCajun: damage
+[ 7911] Moira: quote
+[14101] RajinCajun: idea
+[ 3054] RajinCajun: track
+[ 3001] RajinCajun: hunt
+[14104] RajinCajun: guard
+[ 3001] Surpathiy: hassan
+[ 3721] Vermil: reroll
+[ 3721] Vermil: tier
+[ 3721] Vermil: class
+[    0] Deinthanis: thief magicks
+[    0] Deinthanis: thief magicks
+[    0] Deinthanis: thief magicks
+[    0] Sokaku: dracian
+[    0] Cort: wereflok
+[ 3700] Cort: morph
+[ 3054] Islef: reclass
+[ 3054] Islef: combine
+[ 1828] Islef: outcast
+[ 3700] Banon: remort
+[ 3054] Saber: reclass
+[ 3054] Islef: points
+[ 1809] Islef: reclass
+[14101] Moira: hours
+[ 3011] Islef: outcast
+[ 3716] Inaeo: morph
+[ 3720] Inaeo: voodoo
+[ 3712] Inaeo: bite
+[ 3712] Inaeo: wwolf
+[ 3001] Akbar: chibiusa
+[ 3001] Akbar: outcast
+[ 3716] Akbar: mp
+[ 3716] Akbar: multipla
+[ 3714] Akbar: skill all
+[    0] Wulanan: breath
+[ 3700] Wulanan: archer
+[ 3758] Wulanan: dracoian
+[ 3737] Wulanan: damage
+[ 9157] Yashin: reclass
+[ 3023] Ober: remort
+[ 3023] Ober: hero
+[ 3700] Akbar: reclass
+[ 7911] Moira: reclass
+[    3] Moira: thief magicks
+[    3] Moira: learned
+[    3] Moira: learned
+[ 7911] Moira: flag
+[ 7911] Moira: flags
+[ 3721] Sunfire: mort
+[ 3721] Sunfire: remort
+[ 3721] Sunfire: class
+[ 3721] Sunfire: clans
+[ 3734] Sunfire: archer
+[    0] Kral: archer
+[ 3700] Kral: reclass
+[ 3700] Kral: reclass
+[ 3700] Kral: reclass
+[ 3700] Kral: c lass
+[ 3700] Kral: class
+[ 3700] Kral: hero
+[ 3759] Kral: attr
+[ 3758] Kral: wis
+[ 3715] Kral: arch
+[ 3715] Kral: archer
+[ 3713] Kral: channel
+[ 6605] Kral: damage
+[ 6604] Wrex: multi
+[ 6604] Wrex: multiplay
+[ 4000] Wrex: dual
+[ 4000] Wrex: replay
+[ 3011] Wrex: loner
+[ 3050] Wrex: dex
+[ 9515] Wrex: roge
+[ 9515] Wrex: rogue
+[ 9515] Wrex: archer
+[ 3054] Wrex: thief m
+[ 9621] Wrex: archer
+[ 7107] Wrex: track
+[ 3001] Wrex: idle
+[ 3054] Wrex: nuc
+[ 3054] Wrex: nuclear
+[ 3054] Wrex: radiation
+[ 3054] Wrex: nuke
+[ 3014] Wrex: demise
+[ 3757] McKendric: morph
+[ 3054] Wrex: reclass
+[16080] Ober: damage
+[ 9634] Ober: reclass
+[ 3011] Wrex: nw
+[ 3054] Ober: reclass
+[ 3054] Ober: bomb
+[ 3054] Ober: archer
+[ 3054] Ober: demise
+[ 3001] Ober: reclass
+[ 3054] Ober: outcast
+[ 3054] Ober: archer
+[ 3054] Wrex: archer
+[ 9506] Ober: www
+[ 9254] Wrex: free
+[ 3746] Wertle: reclass
+[ 9217] Wrex: rod
+[ 9216] Wrex: rod
+[ 3013] Wrex: zone
+[ 3050] Wrex: archer def
+[ 9526] Wrex: ranger
+[ 9526] Wrex: ranger
+[ 9514] Wrex: ranger
+[ 9514] Wrex: ranger
+[ 3025] Wrex: lre
+[ 9544] Wrex: aid
+[10415] Wrex: change
+[ 3054] Wrex: chase
+[ 3054] Avram: history
+[ 3054] Islef: reclass
+[ 3050] Islef: archer default
+[ 3050] Islef: archer default
+[ 3050] Islef: archer
+[ 3050] Islef: default
+[ 3050] Durnik: moira
+[    3] Durnik: archer default
+[    3] Durnik: default
+[ 3054] Polonius: archer
+[ 3054] Polonius: paladin
+[ 3054] Polonius: ranger
+[  329] Polonius: hunt
+[  329] Polonius: ranger default
+[ 3001] Wrex: hunt
+[    0] Barag: mooses
+[ 7911] Moira: spam
+[ 9562] Wrex: eqwuip
+[ 3005] Wrex: house
+[ 3005] Wrex: join
+[10415] Wrex: damage
+[ 5281] Islef: cost
+[ 3054] Taru: reclass
+[ 3054] Taru: heroes
+[    0] Stardeo: thief mag
+[ 3700] Stardeo: stat
+[ 3757] Stardeo: stat
+[ 3014] Wrex: reclass
+[ 3005] Wrex: reclass
+[ 3005] Wrex: joi
+[ 9646] Polonius: druis default
+[ 9646] Polonius: druid default
+[ 3054] Wrex: auction
+[ 3054] Wrex: chan
+[ 3034] Moira: diamond
+[ 3034] Moira: diamonds
+[11722] Braddock: imp
+[11725] Braddock: asave
+[11725] Braddock: sedit
+[16221] Durnik: hunt
+[ 3054] Wrex: psio
+[ 3054] Wrex: psi
+[14200] Braddock: flags
+[14210] Braddock: indoors
+[ 3001] Braddock: switch
+[10477] Moira: corpse
+[14205] Braddock: object
+[    0] Wathrac: skaven
+[    0] Wathrac: archer default
+[ 3054] Wrex: mul
+[ 3054] Wrex: poli
+[11722] Wrex: vorpal
+[14200] Braddock: long
+[14200] Braddock: container
+[ 3758] Zarkias: wis
+[ 3758] Zarkias: attrib
+[ 3758] Zarkias: stat
+[ 3758] Zarkias: draconian stats
+[ 3712] Zarkias: remort
+[ 3712] Zarkias: reclass
+[ 3721] Zarkias: reclass
+[ 3054] Zarkias: guild
+[ 3050] Zarkias: creative
+[ 3054] Wrex: mpa
+[ 3054] Wrex: world
+[ 3054] Wrex: world
+[  916] Kral: nuclear
+[  916] Kral: nuke
+[ 3001] Wrex: reclass
+[ 4025] Wrex: enchant item
+[ 7912] Moira: flags
+[ 7912] Moira: flag
+[ 7912] Moira: classes
+[ 7912] Moira: class
+[ 7912] Moira: murder
+[ 3700] Corinth: multi
+[14235] Braddock: direction
+[ 3759] Gideon: piss
+[ 3054] Wrex: mak
+[ 9021] Wulf: world
+[ 3759] Gossimer: morph
+[ 3712] Gossimer: class
+[ 3712] Gossimer: archer
+[ 3002] Gossimer: factory
+[ 4000] Gossimer: mine
+[ 3002] Gossimer: reclass
+[ 3054] Polonius: multiplay
+[ 3050] Wertle: magicks
+[ 3050] Wertle: thief magicks
+[ 3054] Runi: multi
+[ 3011] Gossimer: arrow
+[ 3054] Islef: outcast
+[    0] BloodWolf: wereflok
+[    0] DragonMaster: wear wolf
+[    0] DragonMaster: thief magicks
+[    0] DarkWolf: thief magicks
+[ 3054] Mevla: reclass
+[ 3054] Mevla: classes
+[ 3054] Mevla: archer
+[ 3054] Mevla: ranger
+[ 1890] Damian: noswim
+[ 1806] Damian: min
+[ 3712] DarkWolf: demise
+[ 3720] DarkWolf: morph
+[ 3758] DarkWolf: recalss
+[ 3758] DarkWolf: reclass
+[ 3054] Gossimer: thal
+[ 9650] Gossimer: guar
+[ 3715] Grachi: bite
+[ 3758] Cracmar: ststs
+[ 3712] Cracmar: topic
+[ 3716] Cracmar: occ
+[ 3315] Grachi: quest
+[ 3020] Grachi: drag
+[ 3020] Grachi: breath
+[ 3759] Blex: morph
+[ 3759] Blex: morph
+[14104] Moira: balance
+[ 3150] Grachi: music
+[ 3050] Grachi: maj
+[ 3050] Grachi: thief majiks
+[ 3050] Grachi: thief magicjs
+[ 3050] Grachi: thief magicks
+[ 3050] Grachi: magicks
+[ 3050] Grachi: magick
+[ 3015] Runi: fix
+[ 3001] Cracmar: occ
+[ 3570] Cracmar: monster
+[ 3024] Kwell: midgaard
+[ 3712] Merzbow: damage
+[ 3054] Merzbow: donation
+[ 3054] Merzbow: donate
+[ 1503] Kwell: damage
+[ 3054] Merzbow: quest
+[16221] Durnik: reclass
+[ 3267] Durnik: reclass
+[11790] Durnik: ranger
+[ 3050] Merzbow: wis
+[ 1509] Merzbow: damage
+[    3] Durnik: theif magicks
+[ 3014] Moira: armorclass
+[ 3001] Kwell: angel
+[    0] Xenor: archer
+[ 3001] Kwell: chann
+[ 3001] Kwell: cann
+[ 3001] Kwell: chann
+[ 3001] Kwell: chan
+[ 3721] Juno: bite
+[ 3001] Grachi: high
+[ 3732] Drael: reclass
+[ 3732] Drael: reclass
+[ 3733] Drael: bite
+[ 3054] Juno: reclass
+[ 3054] Runi: drag
+[ 3054] Runi: chan
+[ 3001] Runi: black
+[    1] Avram: makeclan
+[14101] RajinCajun: research
+[    1] Saber: outcast
+[ 7911] Moira: sharp
+[ 6502] Flarg: crystal
+[ 3054] Flarg: tax
+[ 3001] Flarg: demise
+[ 3054] Flarg: loner
+[ 3054] Grachi: dragon
+[ 3725] Grachi: bronze
+[ 3054] Grachi: dex
+[ 3054] Grachi: stat
+[  319] Grachi: her
+[  319] Grachi: dui
+[ 3713] Angos: piss
+[ 3001] Angos: guild
+[ 3001] Angos: invoker
+[ 3001] Angos: recrea
+[ 3001] Angos: rer
+[ 3001] Angos: recast
+[ 3001] Angos: recreate
+[ 3001] Angos: revoke
+[ 3054] Grachi: scribe
+[ 3054] Grachi: ranger
+[ 3054] Grachi: class
+[ 3721] Torak: *
+[ 3012] Kwell: fallebn
+[ 3054] Kazdar: reclass
+[ 3054] Kazdar: remort
+[ 3054] Kazdar: clas
+[ 3054] Kazdar: class
+[ 3054] Merzbow: regen
+[ 3001] Kazdar: web
+[ 3049] Cracmar: loot
+[ 3045] Cracmar: corpse
+[ 3054] Cracmar: corpse
+[ 3054] Gossimer: dy
+[ 3054] Gossimer: clanlist
+[ 3054] Cracmar: bag
+[ 3018] Ravage: locations
+[ 3023] Cracmar: wis
+[ 3054] Wertle: reclass
+[ 3054] Wertle: hero
+[ 3054] Wertle: remort
+[ 3029] Moira: locate objext
+[16077] Avram: quest
+[    0] Bing: thief ma
+[    0] Bing: thief magicks
+[ 3054] Grachi: multi
+[    0] Elwin: deg
+[ 3759] Elwin: morph
+[ 3054] Methos: tier
+[ 3054] Methos: reclass
+[ 3054] Methos: class
+[ 3054] Methos: classes
+[ 3054] Moira: know allign
+[ 3054] Talos: reclass
+[ 3054] Talos: reclass
+[ 3054] Talos: remort
+[ 3716] Harbringer: reclass
+[ 3020] Cracmar: ring
+[10409] Wrex: house
+[ 3054] Methos: clanlist
+[ 3054] Methos: clan list
+[    0] Runi: skaven
+[11705] Blizzard: reclass
+[ 3700] Yara: newbie info
+[ 3700] Thorin: newbie info
+[ 3721] Thorin: clans
+[ 3054] Thorin: wiztalk
+[ 3050] Durnik: theif magicks
+[14514] Damian: clist
+[ 3014] Cenedra: morph
+[ 3758] Taran: dex
+[ 3714] Taran: communication
+[ 7911] Zachari: morph
+[ 3047] Blade: mota
+[ 3700] Blade: points
+[ 3710] Blade: blob
+[ 3710] Blade: enemies
+[ 3710] Blade: fight
+[ 3710] Blade: battle
+[    0] Bahumaut: archer default
+[    0] Bahumaut: archer
+[ 3054] Grachi: dragon
+[ 3054] Grachi: chap
+[ 3054] Runi: psi
+[ 3054] Runi: join
+[ 3054] Runi: jo
+[ 3054] Runi: job
+[ 3054] Runi: jobs
+[ 3054] Runi: chest
+[ 3054] Runi: cheat
+[    0] Kord: archer
+[    0] Kord: archr
+[ 3730] Blade: nw
+[ 3739] Blade: junk
+[ 3021] Blade: guild
+[ 3015] Blade: jerkin
+[ 3015] Blade: container
+[ 3700] Bask: morph
+[ 3700] Bask: morph
+[ 3741] Bask: morphing
+[ 3010] Bahumaut: hallge
+[ 3010] Ravage: hunt
+[ 3015] Ravage: ranger
+[ 3015] Ravage: hunt
+[ 3054] Ravage: clam
+[    0] Delita: mditation
+[ 3725] Delita: magic missle
+[ 3014] Blade: bask
+[  668] Levethan: gag
+[ 2162] Blade: demis
+[ 2162] Blade: demise
+[ 3101] Levethan: join pk
+[ 3051] Levethan: tieup
+[ 3262] Levethan: combine items
+[ 3262] Levethan: combine
+[ 3020] Levethan: join
+[ 3005] Bahumaut: arena
+[ 3005] Bahumaut: areana
+[ 3005] Bahumaut: arena
+[ 3005] Levethan: join
+[ 3005] Levethan: join
+[ 3712] Sith: fight
+[ 3033] Cracmar: orb
+[ 3054] Runi: invok
+[ 3054] Islef: enchant weapons
+[ 3054] Runi: archer
+[ 9421] Runi: chu
+[ 6123] Runi: clas
+[ 3054] Runi: gore
+[ 3054] Runi: class
+[ 3054] Runi: class
+[ 3054] Runi: screen
+[ 3054] Runi: length
+[14602] Ravage: advancement
+[14602] Ravage: imms
+[14602] Ravage: advancement
+[14602] Ravage: immcommands
+[14602] Ravage: imms
+[14602] Ravage: purge
+[14602] Ravage: ed add
+[    0] Dawner: archer default
+[ 3757] Dawner: archer
+[    0] Sirus: thief magicks
+[ 3715] Sirus: archer
+[ 3054] Barak: stance
+[ 3054] Barak: legion
+[ 3054] Runi: arch
+[11031] Bullvai: damage
+[ 5553] Runi: ranger
+[ 5553] Runi: arch
+[ 3050] Runi: archer default
+[ 3050] Runi: arch
+[ 3600] Sonali: classes
+[ 3001] Runi: ice
+[11700] ChibiUsa: key
+[ 3054] Runi: clanlist
+[ 3029] Runi: bak
+[ 7725] Ravage: policy
+[14604] Ravage: policy
+[14604] Ravage: regulations
+[14604] Ravage: reg
+[ 3713] Sevener: channel
+[ 3713] Sevener: channels
+[ 3050] Runi: hunt
+[ 3758] Miko: int
+[ 3758] Miko: intelligence
+[ 3758] Miko: attr
+[ 3001] Runi: colors
+[    0] Miko: class
+[    0] Miko: ranger
+[    0] Miko: fighter
+[    0] Miko: priest
+[    0] Miko: priests
+[ 3758] Miko: wis
+[ 3758] Miko: attribute
+[ 3758] Miko: wisdom
+[ 3700] Miko: archer
+[ 3700] Miko: archer
+[ 3700] Miko: archers
+[ 3700] Miko: class
+[    0] Miko: archer default
+[ 3700] Miko: glaive
+[ 3758] Miko: attribute
+[ 3758] Miko: attributes
+[ 3758] Miko: wisdom
+[ 3759] Miko: morph
+[ 3712] Miko: kill
+[ 3717] Miko: secr
+[ 3717] Miko: doors
+[ 3713] Swiftfoot: channel
+[ 3009] Cracmar: quest
+[ 3759] Merlin: morph
+[ 3716] Merlin: fight
+[ 3021] Zinker: breath
+[ 3021] Zinker: bite
+[ 3054] Zinker: scan
+[ 3054] Zinker: piss
+[ 3001] Charlie: music
+[ 3001] Charlie: channeld
+[ 3001] Charlie: channels
+[16008] Durnik: ice cavern
+[ 3050] Zinker: const
+[ 1569] Zinker: talk
+[ 3054] Zinker: chapel
+[ 3700] Faes: archery
+[ 3001] Faes: nw
+[ 3005] Faes: remort
+[ 3054] Faes: archer
+[ 3054] Faes: ranger
+[ 3054] Faes: rangerskills
+[ 3015] Faes: damage
+[ 3054] Faes: arachnos
+[ 3054] Faes: piss
+[ 3758] Tanis: stats
+[ 3334] Tanis: rangers
+[ 3334] Tanis: ranger
+[ 3334] Tanis: archer
+[ 3054] Tanis: recreate
+[ 3054] Tanis: roleplay
+[14605] Ravage: purge
+[ 3734] Baerun: staff
+[ 3001] Jadmor: class
+[ 3001] Jadmor: archer
+[ 3716] Neeva: breath
+[ 3715] Neeva: damage
+[11837] ChibiUsa: upgrade
+[11837] ChibiUsa: upgrade
+[11837] ChibiUsa: hall
+[    1] Saber: make
+[    1] Saber: makeclan
+[11845] ChibiUsa: item_fountain
+[11845] ChibiUsa: liq
+[11845] ChibiUsa: item_fountain
+[11845] ChibiUsa: conta
+[11851] ChibiUsa: item_furniture
+[11837] ChibiUsa: store
+[11837] ChibiUsa: shop
+[11837] ChibiUsa: store
+[11837] ChibiUsa: shop
+[ 3334] Tanis: auction
+[ 3014] Tanis: steel
+[ 9509] Tanis: tip
+[ 9509] Tanis: nw
+[ 9509] Tanis: worth
+[ 9585] Tanis: quest
+[ 3054] Tanis: bomb
+[ 3054] Tanis: paladin
+[ 3054] Cracmar: sq
+[ 3054] Cracmar: pclan
+[14200] Braddock: sectors
+[14200] Braddock: flags
+[ 3054] Avram: mutiplaying
+[11837] ChibiUsa: bomb
+[11708] ChibiUsa: door
+[ 3054] Tanis: paladin
+[ 3054] Tanis: archer
+[ 3700] AlphaOmega: rulse
+[ 3758] Xabin: yrain
+[ 3050] Tanis: archer default
+[    0] Vice: thief magicks
+[ 3054] Tanis: serious
+[ 3710] Soma: damage
+[ 3759] Rakad: morph
+[ 3713] Rakad: guild
+[ 3015] Rakad: archer
+[ 3720] Rakad: cyberwarrior
+[14602] Ravage: purge
+[ 3054] Gamar: channel
+[ 3054] Gamar: channels
+[ 3054] Gamar: communication
+[ 3014] Conar: guild
+[ 9648] Scrono: staff
+[ 9648] Scrono: auction
+[ 3054] Gamar: direction
+[ 3054] Gamar: directions
+[ 5233] Arlandis: circle
+[ 3302] Scrono: quest
+[ 9517] Xabin: track
+[16136] Gamar: leveling
+[16294] Tanis: torment
+[16297] Scrono: earring
+[ 3053] Damian: scare
+[10456] Tanis: priest
+[10456] Tanis: cless
+[ 3054] Tanis: arena
+[ 3054] Gamar: thief magiks
+[16297] Scrono: dual
+[ 3054] Moira: dual wield
+[16312] Scrono: circle
+[ 7911] Moira: quiet
+[ 7911] Moira: quiet mode
+[14519] Damian: question
+[14519] Damian: quest
+[ 3054] Kalitor: wis
+[ 3054] Kalitor: wisdom
+[ 3054] Kalitor: stat
+[16232] Scrono: change
+[16232] Scrono: stoyr
+[16232] Scrono: pheonix
+[ 3054] Tasslehoff: critic
+[16229] Gamar: guil
+[16229] Gamar: guild
+[16231] Crac: storekeeper
+[16231] Crac: loner
+[ 3053] Moira: walk
+[ 3053] Moira: walking
+[ 7912] Moira: aim
+[ 3054] Gamar: clanmaking
+[ 3033] Crac: diease
+[ 3019] Goldwyn: precharge
+[16227] Scrono: join
+[ 3006] Gamar: diamond
+[ 3700] Matthew: piss
+[ 3714] Matthew: morph
+[ 9520] Matthew: clans
+[ 3006] Crac: clan member
+[16228] Kalitor: damage
+[16228] Kalitor: pdam
+[ 3054] Kalitor: hunt
+[11700] Saber: join
+[13800] Saber: clans
+[16088] Gamar: hunt
+[11700] Blizzard: demise
+[ 3054] Gamar: bomb
+[ 3054] Gamar: draconians
+[16078] Arlandis: paladin
+[16078] Arlandis: ranger
+[16078] Arlandis: class
+[16078] Arlandis: recalss
+[ 3700] Sahr: remort
+[ 3702] Sahr: quest
+[ 3702] Sahr: questcard
+[ 3702] Sahr: questcards
+[14101] Moira: finger
+[14101] Moira: murder
+[16236] Arlandis: dragon
+[16084] Kalitor: class
+[ 2226] Damian: remort
+[ 3054] Durnik: dual wield
+[16146] Cracmar: bank clan
+[16084] Avram: classes
+[16084] Avram: class
+[14101] Moira: dual wield
+[ 3050] Gamar: hunt
+[ 3200] Damian: hunt
+[ 3054] Gamar: ranger
+[ 3054] Gamar: archer
+[ 3050] Moira: thief magicks
+[16126] Kalitor: arean
+[16126] Kalitor: duel
+[ 7911] Moira: knights
+[ 3025] Zachari: dual
+[ 3759] Emid: morph
+[ 3001] Emid: quest
+[ 3001] Emid: adventure
+[ 3054] Emid: quest
+[ 3759] Dengarm: morph
+[ 3054] Moira: hours

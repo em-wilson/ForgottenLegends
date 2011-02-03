@@ -1,0 +1,1987 @@
+#AREADATA
+Name Ice Cavern~
+Builders Damian~
+VNUMs 1800 1899
+Credits {40-45} Damian  Ice Cavern~
+Security 1
+Flags A 
+End
+
+
+
+#MOBILES
+#1800
+ice creature~
+an ice creature~
+An ice creature is here, watching for intruders.
+~
+The ice creature appears to be human in appearance, but ice.  It is made
+up of large blocks of ice and is about as tall as one and ahalf average
+sized humans ontop of each other.  
+~
+human~
+ABFGT 0 -500 0
+39 4 10d10+1600 0d0+0 5d6+12 pound
+-1 -1 -1 -1
+CDI IR 0 HJ
+stand stand either 0
+0 ABC medium unknown
+F for AHMV
+F par DEFGHIJK
+#1801
+snow critter~
+a little critter~
+A little critter is here, moving around.
+~
+The little critter is small.  It pokes its head in and out of the snow.  
+~
+human~
+ACG 0 0 0
+38 3 10d10+1400 0d0+0 4d7+11 bite
+-1 -1 -1 -1
+0 0 I H
+stand stand either 0
+0 0 medium unknown
+F for AHMV
+F par ABCDEFGHIJK
+#1802
+ice creature warrior~
+an ice warrior~
+A warrior ice creature is here, defending his home.
+~
+The warrior ice creature is quite tall, it doesn't buldge as you try to
+pass it.  It's ready to die for it's home.  
+~
+human~
+ABFGT 0 0 0
+40 4 15d10+8500 0d0+0 4d8+13 none
+-1 -1 -1 -1
+0 0 I H
+stand stand male 2000
+0 0 medium unknown
+F for AHMV
+F par ABCDEFGHIJK
+#1803
+ice monster~
+the ice monster~
+An evil looking ice monster is here, breathing heavily, glaring at you.
+~
+The monster is large and very shaggy.  It has four legs and large claws. 
+It's eyes are blood red.  
+~
+dog~
+ABFG 0 0 0
+45 7 25d10+3100 0d0+0 6d6+16 claw
+0 0 0 0
+H I 0 0
+stand stand either 0
+AGV ACDEFHJKUV medium unknown
+#1804
+squirrel~
+the squirrel~
+A squirrel is here, eating an acorn.
+~
+The squirrel is the size of most ordinary squirrels.  It is black.  
+~
+dog~
+ACG 0 0 0
+3 2 3d6+34 0d0+0 1d4+0 bite
+0 0 0 1
+H 0 0 0
+stand stand none 0
+AGV ACDEFHJKUV small unknown
+#1805
+human warrior~
+a human warrior~
+A human warrior is here, trying to find a way out.
+~
+The human warrior is about as tall as most humans get.  He looks
+determined to escape the ice cavern.  
+~
+human~
+ACG 0 400 0
+43 6 25d10+2500 0d0+0 3d12+16 punch
+-1 -1 -1 -1
+CIN 0 0 0
+stand stand none 3000
+0 0 medium unknown
+F for AHMV
+F par ABCDEFGHIJK
+#1806
+mage sculpture~
+a mage sculpture~
+An ice sculpture of a mage is here.
+~
+The scuplture is supposed to look like a mage, and it does...  A little
+too much.  The sculpture is alive!  
+~
+human~
+ABGR 0 400 0
+42 5 25d10+2250 1d1+99 4d8+13 slap
+-1 -1 -1 -1
+0 0 0 0
+stand stand female 1000
+AHMV ABCDEFGHIJK medium unknown
+#1807
+jailor~
+a jailor~
+A jailer is here, glaring at you.
+~
+The jailor is another one of the ice creatures.  
+~
+human~
+ABCG 0 100 0
+40 5 15d10+1850 0d0+0 5d6+13 pound
+-1 -1 -1 -1
+0 0 0 0
+stand stand none 2000
+AHMV ABCDEFGHIJK medium unknown
+#1808
+ice citizen creature~
+a citizen~
+An icetroplis citizen is here, cowering from you.
+~
+The icetroplis citizen is made of ice.  
+~
+human~
+AG 0 300 0
+40 5 15d10+1850 0d0+0 5d6+13 pound
+-1 -1 -1 0
+0 I 0 0
+stand stand either 0
+AHMV ABCDEFGHIJK medium unknown
+#1809
+bat~
+a small bat~
+A small, hairy bat is here.
+~
+The bat is small and hairy.  
+~
+bat~
+ACFG TZ 0 0
+41 4 25d10+2000 0d0+0 4d8+14 bite
+-1 -1 -1 -1
+FH 0 0 S
+stand stand none 0
+AGV ACDEFHJKP medium unknown
+#1810
+baby ice griffon~
+a baby ice griffon~
+A baby ice griffon is here.
+~
+The ice griffon is white white small amounts of black.  It is like most
+griffons, except it lives in arctic places.  
+~
+song bird~
+ABCG T 1000 0
+44 6 25d10+2750 0d0+0 8d4+15 claw
+-1 -1 -1 -1
+FH 0 0 0
+stand stand either 1000
+AGW ACDEFHKP medium unknown
+#1811
+adult griffon~
+an adult griffon~
+An adult griffon is here, flying around.
+~
+The adult griffon is large and fierce looking.  It gives you a dangerous
+look, warning you to stay away from it's nest.  
+~
+song bird~
+AFGT T 1000 0
+46 7 25d10+3000 0d0+0 8d4+16 claw
+-1 -1 -1 -1
+FHI 0 0 0
+stand stand either 2500
+AGW ACDEFHKP medium unknown
+#1812
+albino bunny rabbit~
+an albino rabbit~
+An albino rabbit is here, enjoying the day.
+~
+The rabbit is albino, and can survive very well in arctic places, like
+the Ice Cavern.  
+~
+rabbit~
+AG 0 0 0
+43 4 25d10+2500 0d0+0 3d12+14 bite
+-1 -1 -1 -1
+FH 0 I 0
+stand stand none 0
+AGV ACDEFHJK medium unknown
+#1813
+mouse~
+a cute little mouse~
+A cute little mouse is here, trying to escape the ice cavern.
+~
+The mouse is small.  It has brown fur and a small, cute tail.  
+~
+dog~
+AG 0 0 0
+40 3 15d10+1850 0d0+0 0d0+0 bite
+-1 -1 -1 -1
+H 0 0 0
+stand stand none 0
+AGV ACDEFHJKUV medium unknown
+#1814
+cougar~
+a cougar~
+A cougar is here, looking for fresh game.
+~
+The cougar is wildcat.  It is fast and ferocious.  
+~
+cat~
+AG Z 0 0
+42 4 25d10+2250 0d0+0 4d8+13 claw
+-1 -1 -1 -1
+FH 0 0 0
+stand stand either 0
+AGV ACDEFHJKQUV medium unknown
+#1815
+fish~
+a fish~
+A fish is here, swimming around.
+~
+The fish is large and has rainbow scales.  
+~
+human~
+ABG 0 0 0
+43 5 10d10+1600 0d0+0 4d8+14 bite
+-1 -1 -1 -1
+0 0 0 0
+stand stand none 0
+AHMV ABCDEFGHJKQX medium unknown
+F par I
+#1816
+cobra~
+a cobra~
+A cobra is here, hissing violently.
+~
+The cobra is green.  It's marking show that it is poisonous.  It hisses
+violently, showing it's ready to attack.  
+~
+human~
+AG M -300 0
+43 4 25d10+2000 0d0+0 3d12+14 bite
+-1 -1 -1 -1
+0 0 0 0
+stand stand either 0
+0 0 medium unknown
+F for AHMV
+F par ABCDEFGHIJK
+#0
+
+
+
+#OBJECTS
+#1800
+ice sword~
+a brilliant sword of ice~
+A sword of ice is here, reflecting the sunlight.~
+metal ice~
+weapon 0 AN
+sword 4 8 slash B
+38 40 2500 P
+#1801
+ice bed~
+a bed made of ice~
+A bed made of ice is here.  It is very large, and very slippery!~
+ice~
+furniture 0 0
+B CEFGHI 0 0 0
+0 0 0 P
+#1803
+fur~
+shaggy fur~
+Some shaggy hair is here.~
+fur~
+armor 0 O
+B B B B 0
+45 15 3000 P
+A
+3 -1
+A
+4 -1
+A
+2 1
+A
+1 2
+#1804
+ice leather boots~
+a pair of ice coated leather boots~
+A pair of leather boots is here.~
+unknown~
+armor 0 AG
+AD AD AD BC 0
+40 15 1500 P
+#1805
+battle axe~
+a large battle axe~
+A large battle axe, designed for war, is here.~
+metal~
+weapon 0 AN
+axe 5 9 chop DF
+43 60 0 P
+#1806
+plate mail~
+a suit of plate mail~
+A suit of platemail lies here.~
+metal~
+armor 0 AD
+BD BD BD ABC 0
+43 50 5000 P
+#1807
+ice dagger~
+a sculpted dagger of ice~
+A scuplted dagger of ice is here.~
+unknown~
+weapon 0 AN
+dagger 6 6 stab 0
+42 30 7000 P
+#1808
+griffon's wings~
+a pair of a griffon's wings~
+A pair of a griffon's wings are here.~
+unknown~
+armor K AD
+BD BD BD ABC 0
+45 40 8000 P
+#1809
+cougar fur~
+cougar fur~
+The full fur of a cougar is here.~
+fur~
+treasure 0 AD
+0 0 0 0 0
+0 20 5000 P
+#1899
+portal~
+a personel portal~
+A private portal is here, stay out of it unless you're given permission!~
+unknown~
+portal 0 0
+0 0 0 DIJK 0
+0 0 0 P
+#0
+
+
+
+#ROOMS
+#1800
+Underground Cavern~
+You have entered an underground cavern.  You take a step, and then you
+fall.  This cavern is made up of ice, and there is no way back up!  You
+begin sliding down...  
+~
+0 0 0
+D5
+~
+~
+0 0 1801
+S
+#1801
+Undeground Cavern~
+and down....
+~
+0 0 0
+D5
+~
+~
+0 0 1802
+S
+#1802
+Ice Cavern~
+You are on solid ground.  You tap your foot on the ground and then
+realize it's not solid ground.  It's ice.  Most of what is visible to you is
+just ice.  
+~
+0 0 0
+D1
+~
+~
+0 0 1803
+S
+#1803
+Thin Ice~
+Crrraaaccckkk!  As you stepped on the ice it broke, you are now hanging
+by a what seems to be a frozen over branch, your hand is starting to slip,
+and there's no where to go but down.  
+~
+0 0 0
+D5
+~
+~
+0 0 1804
+S
+#1804
+Ice Cavern~
+You are in a large cavern of ice.  This cavern is a mixture of clear
+crystal ice, foggy ice, and white snow.  It is chilly in here.  
+~
+0 0 0
+D1
+~
+~
+0 0 1805
+S
+#1805
+Ice Cavern~
+You are inside a cavern of ice.  The cavern's halls do not appear
+natural.  It looks like someone made them!.  
+~
+0 0 0
+D2
+~
+~
+0 0 1806
+D3
+~
+~
+0 0 1804
+S
+#1806
+Ice Cavern~
+You are sliding through the Ice Cavern's corridors.  The corridors appear
+to have been constructed by someone and they appear very old.  The walls are
+smooth and pressing against them forces you to slip and fall onto the
+ground.  
+~
+0 0 0
+D0
+~
+~
+0 0 1805
+D2
+~
+~
+0 0 1807
+S
+#1807
+Ice Cavern~
+You are in the Ice Cavern.  All the corridors are made in the same style,
+tall, and circular in shape.  Everything is made of ice.  
+~
+0 0 0
+D0
+~
+~
+0 0 1806
+D2
+~
+~
+0 0 1808
+S
+#1808
+Ice Cavern~
+You are inside the Ice Cavern.  There appears to be a door to the south. 
+The door is visible by cracks in the wall forming an arch, and an icy
+handle.  
+~
+0 0 0
+D0
+~
+~
+0 0 1807
+D1
+~
+~
+0 0 1810
+D2
+~
+~
+1 0 1809
+D3
+~
+~
+0 0 1811
+S
+#1809
+Ice Room~
+You appear to be in someone's home.  This room has one bed, and various
+other furniture.  
+~
+0 0 0
+D0
+~
+~
+1 0 1808
+S
+#1810
+Ice Cavern~
+You are travelling in the Ice Cavern.  This cavern is made in a circular
+fasion, and is quite high.  
+~
+0 0 0
+D1
+~
+~
+0 0 1812
+D3
+~
+~
+0 0 1808
+S
+#1811
+An Ice Cafeteria~
+You are in what appears to be a cafeteria made out of ice.  There are
+tables all over the place and a menu.  
+~
+0 0 0
+E
+menu~
+Closed today!
+~
+D1
+~
+~
+0 0 1808
+S
+#1812
+Ice Cavern~
+You are in a cavern of ice.  The hallways are a circular shape, and it is
+easy to slide through them.  
+~
+0 0 0
+D3
+~
+~
+0 0 1810
+D5
+~
+~
+0 0 1813
+S
+#1813
+Sculpture Land~
+Hundreds of ice sculptures are all around, many representing castles or
+monsters.  The sculptures almost seem...  Alive!  To the west is an ice
+maze.  
+~
+0 0 0
+D3
+~
+~
+0 0 1814
+D4
+~
+~
+0 0 1812
+S
+#1814
+Entrance To The Ice Maze~
+You are inside an ice maze.  It seems a bit wierd in here.  You words
+scratched into the ice here: Beware!  What should be normal is not in here,
+and where you think you are going, you may not be.  
+~
+0 0 0
+D0
+~
+~
+0 0 1815
+D1
+~
+~
+0 0 1813
+D4
+~
+~
+0 0 1816
+S
+#1815
+Ice Maze~
+You are in an ice maze.  
+~
+0 0 0
+D2
+~
+~
+0 0 1814
+S
+#1816
+Ice Maze~
+You are in an ice maze.  
+~
+0 0 0
+D2
+~
+~
+0 0 1817
+D5
+~
+~
+0 0 1814
+S
+#1817
+Ice Maze~
+You are in an ice maze.  
+~
+0 0 0
+D0
+~
+~
+0 0 1816
+D3
+~
+~
+0 0 1818
+D4
+~
+~
+0 0 1817
+D5
+~
+~
+0 0 1817
+S
+#1818
+Ice Maze~
+You are in an ice maze.  
+~
+0 0 0
+D1
+~
+~
+0 0 1817
+D3
+~
+~
+0 0 1819
+S
+#1819
+Ice Maze~
+You are in an ice maze.  
+~
+0 0 0
+D0
+~
+~
+0 0 1820
+D1
+~
+~
+0 0 1818
+D2
+~
+~
+0 0 1821
+S
+#1820
+Ice Maze~
+You are in an ice maze.  
+~
+0 0 0
+D2
+~
+~
+0 0 1819
+S
+#1821
+Ice Maze~
+You are in an ice maze.  
+~
+0 0 0
+D0
+~
+~
+0 0 1819
+D5
+~
+~
+0 0 1822
+S
+#1822
+Ice Maze~
+You are in a maze of ice.  You are in an ice maze.  
+~
+0 0 0
+D0
+~
+~
+0 0 1822
+D2
+~
+~
+0 0 1822
+D3
+~
+~
+0 0 1823
+D4
+~
+~
+0 0 1821
+S
+#1823
+Exit/Entrance of the Ice Maze~
+You have successfully navigated the ice maze.  To the west, you can see a
+large, open cavern.  
+~
+0 0 0
+D1
+~
+~
+0 0 1822
+D3
+~
+~
+0 0 1824
+S
+#1824
+Large Cavern~
+You have entered a large chamber filled with snow and ice.  Far above you
+can see park filled with sculptures, and the beginning of the ice maze. 
+Here, there is a sign.  
+~
+0 0 0
+E
+sign~
+The sign says:
+ 
+Welcome to the Kingdom of the Ice People!
+~
+D1
+~
+~
+0 0 1823
+D3
+~
+~
+0 0 1825
+S
+#1825
+Ice Cavern~
+You are at the edge of a cliff, overlooking an ice city.  
+The way to the city is by climbing down the cliff.
+~
+0 0 0
+D1
+~
+~
+0 0 1824
+D5
+~
+~
+0 0 1826
+S
+#1826
+Cliff~
+You are at the edge of a cliff.  Below you, you can see a city of ice.  
+~
+0 0 0
+D4
+~
+~
+0 0 1825
+D5
+~
+~
+0 0 1827
+S
+#1827
+Bottom of Cliff~
+You are standing at the bottom of a cliff.  Above you is a view of the
+area.  To your westward direction is a large city, made of ice.  
+~
+0 0 0
+D3
+~
+~
+0 0 1828
+D4
+~
+~
+0 0 1826
+S
+#1828
+Entrance to Icetroplis~
+You are at the entrance to a magnificant city of ice.  All around you,
+the sounds of people can be heard, but all does not look too happy.  
+~
+0 0 0
+D1
+~
+~
+0 0 1827
+D3
+~
+~
+0 0 1829
+S
+#1829
+Ice City~
+You are in the mythical city of Icetroplis!  This city is filled with
+creatures of ice!  
+~
+0 0 0
+D0
+~
+~
+0 0 1830
+D1
+~
+~
+0 0 1828
+D2
+~
+~
+0 0 1831
+D3
+~
+~
+0 0 1832
+S
+#1830
+Jail House~
+You are in an ice creature's jailhouse.  There is no one in the jailcell
+right now.  
+~
+0 0 0
+D2
+~
+~
+0 0 1829
+S
+#1831
+Ice Hut~
+You are in a hut made out of ice.  
+~
+0 0 0
+D0
+~
+~
+0 0 1829
+S
+#1832
+Ice City~
+You are in Icetroplis, the city of the ice people.  Ice people wander
+around, watching you in confusion.  
+~
+0 0 0
+D0
+~
+~
+0 0 1838
+D1
+~
+~
+0 0 1829
+D2
+~
+~
+0 0 1834
+D3
+~
+~
+0 0 1833
+S
+#1833
+Ice City~
+You are at the the western wall of an ice city.  The city is built into
+the Ice Cavern.  Large buildings, made of ice, are all around you.  
+~
+0 0 0
+D1
+~
+~
+0 0 1832
+S
+#1834
+Ice City~
+You are walking in a city of ice creatures.  All about you are creatures
+of ice.  They call this cavern their home, and are confused about the
+intrusion.  
+~
+0 0 0
+D0
+~
+~
+0 0 1832
+D1
+~
+~
+0 0 1836
+D2
+~
+~
+0 0 1837
+D3
+~
+~
+0 0 1835
+S
+#1835
+Hut~
+You are inside someone's hut.  Various work tools are scattered around
+the hut, many broken, many worn down.  Whoever lives here is likely of the
+working class.  
+~
+0 0 0
+D1
+~
+~
+0 0 1834
+S
+#1836
+Hut~
+You are in an old, run down ice hut.  Alot of the ice has been chipped
+and scrapped off.  There is barely anything in here.  Whoever lives in the
+hut is likely poor.  
+~
+0 0 0
+D3
+~
+~
+0 0 1834
+S
+#1837
+Ice City~
+You are approaching the southern edge of the ice city.  Far to the south
+you can see a doorway in the ice wall.  
+~
+0 0 0
+D0
+~
+~
+0 0 1834
+D1
+~
+~
+0 0 1839
+D2
+~
+~
+0 0 1841
+D3
+~
+~
+0 0 1840
+S
+#1838
+Ice City~
+As you enter the room you see ice people on the large buildings above
+pushing debris in your path, making travelling that way impossible.  They do
+not want you to enter the city.  
+~
+0 0 0
+D2
+~
+~
+0 0 1832
+S
+#1839
+Guard Station~
+You are inside a guard station.  Here, ice guards watch for trouble.  
+~
+0 0 0
+D3
+~
+~
+0 0 1837
+S
+#1840
+Storage Yard~
+Here is where the ice people store their food.  All there is are ice
+food.  
+~
+0 0 0
+D1
+~
+~
+0 0 1837
+S
+#1841
+Southern Edge of the Ice City~
+You have reached the southern edge of the ice city.  There is not much on
+this edge of the city except huts, shacks, and other homes of the lower
+class.  
+~
+0 0 0
+D0
+~
+~
+0 0 1837
+D2
+~
+~
+0 0 1842
+S
+#1842
+Infront of the Hole in the Ice Wall~
+To your north is the large city of the ice people.  To the south is the
+wall surrounding the cavern, but this part has a doorway carved into it.  
+~
+0 0 0
+D0
+~
+~
+0 0 1841
+D2
+~
+~
+0 0 1843
+S
+#1843
+Ice Cavern~
+You are travelling through the southern wall of the ice cavern.  
+~
+0 0 0
+D0
+~
+~
+0 0 1842
+D2
+~
+~
+0 0 1844
+S
+#1844
+Ice Cavern~
+You are in a bright part of the Ice Cavern.  Far above you somewhere you
+can smell fresh air and you can see a bit of light.  You can hear the faint
+sound of a bird twirping in the distance.  An exit must be near!  
+~
+0 0 0
+D0
+~
+~
+0 0 1843
+D1
+~
+~
+0 0 1845
+D2
+~
+~
+0 0 1849
+S
+#1845
+Ice Tunnel~
+You are in a small tunnel in the Ice Cavern.  It is not very wide or
+tall, the farther you go, the lower you have to go.  
+~
+0 0 0
+D1
+~
+~
+0 0 1846
+D3
+~
+~
+0 0 1844
+S
+#1846
+Ice Tunnel~
+You are travelling through the ice tunnel.  You are now crawling on your
+hands and knees.  The tunnel is beginning to get bigger.  The signs of the
+surface are less noticeable now.  
+~
+0 0 0
+D1
+~
+~
+0 0 1847
+D3
+~
+~
+0 0 1845
+S
+#1847
+Cave~
+You are in the cave of some being.  You can hear breathing nearby.  It is
+coming in deep breaths.  In, out, in out.  It is getting closer.  
+~
+0 0 0
+D0
+~
+~
+0 0 1848
+D3
+~
+~
+0 0 1846
+S
+#1848
+Den~
+You are in the den of some kind of creature.  All around are bones and
+blood of past food.  
+~
+0 0 0
+D2
+~
+~
+0 0 1847
+S
+#1849
+Ice Tunnel~
+You are crouching down, travelling through a small tunnel.  To the south
+you can hear more signs of life.  Birds can be heard chirping more loudly.  
+~
+0 0 0
+D0
+~
+~
+0 0 1844
+D2
+~
+~
+0 0 1850
+S
+#1850
+Icy Mountain~
+You are at the bottom of an icy mountain in the Ice Cavern.  Far above,
+you can see some light entering the room.  There must be a way out in here
+somewhere.  
+~
+0 0 0
+D0
+~
+~
+0 0 1849
+D1
+~
+~
+0 0 1851
+S
+#1851
+Icy Mountain~
+You are at the bottom of the icy mountain.  On this side of the mountain,
+the ice has been worn down and is climable.  
+~
+0 0 0
+D3
+~
+~
+0 0 1850
+D4
+~
+~
+0 0 1852
+S
+#1852
+Climbing the Icy Mountain~
+You are climbing the icy mountain.  It is starting to get warmer, the
+closer you get to the light.  
+~
+0 0 0
+D1
+~
+~
+0 0 1853
+D3
+~
+~
+0 0 1855
+D5
+~
+~
+0 0 1851
+S
+#1853
+Ledge on the Icy Mountain~
+You are on a ledge on the icy mountain.  There may be a way up from here.  
+~
+0 0 0
+D3
+~
+~
+0 0 1852
+D4
+~
+~
+0 0 1854
+S
+#1854
+Icy Mountain~
+The ice is too slippery to climb up.  When you try, you slip and begin to
+slide down the mountain.  
+~
+0 0 0
+D5
+~
+~
+0 0 1853
+S
+#1855
+Ledge on the Icy Mountain~
+You are on a ledge on the icy mountain.  There doesn't seem to be anyway
+up.  But, there are some loose boulders here.  
+~
+0 0 0
+E
+boulders~
+There are some loose boulders here.  
+~
+D0
+~
+boulders~
+1 0 1856
+D1
+~
+~
+0 0 1852
+S
+#1856
+Ice Cave~
+There is no light in this cave.  The air smells stale.  
+~
+0 1 0
+D0
+~
+~
+0 0 1857
+D2
+~
+boulders~
+1 0 1855
+D3
+~
+~
+0 0 1861
+S
+#1857
+Ice Cave~
+You are still walking through the ice cave.  
+~
+0 1 0
+D0
+~
+~
+0 0 1859
+D1
+~
+~
+0 0 1858
+D2
+~
+~
+0 0 1856
+S
+#1858
+Dead End~
+You have arrived at a deadend in the Ice Cave.  
+~
+0 1 0
+D3
+~
+~
+0 0 1857
+S
+#1859
+Dead End~
+You have reached a dead end.  
+~
+0 1 0
+D2
+~
+~
+0 0 1857
+S
+#1861
+Ice Cave~
+You are travelling through the wet and slippery ice cave.  All around
+you, ice and snow are packed into the walls, and your light is reflected off
+of it, making beautiful glow.  
+~
+0 1 0
+D1
+~
+~
+0 0 1856
+D3
+~
+~
+0 0 1862
+S
+#1862
+Ice Cave~
+You are in the ice cave.  
+~
+0 1 0
+D0
+~
+~
+0 0 1863
+D1
+~
+~
+0 0 1861
+S
+#1863
+Ice Cave~
+You have arrived in a small cavern in the ice cave.  Small amounts of
+light come through some cracks in the wall.  
+~
+0 0 0
+D0
+~
+crack~
+1 0 1864
+D2
+~
+~
+0 0 1862
+S
+#1864
+Icy Mountain~
+You are on the northern side of the icy mountain.  There is a way up from
+here.  There are some cracks on the wall to the south.  
+~
+0 0 0
+D2
+~
+crack~
+1 0 1863
+D4
+~
+~
+0 0 1865
+S
+#1865
+Icy Mountain~
+You are travelling on an icy mountain.  You are on the northern side.  
+~
+0 0 0
+D1
+~
+~
+0 0 1866
+D5
+~
+~
+0 0 1864
+S
+#1866
+Icy Ledge~
+You are slip and fall, luckily, you grap onto the ledge in time and pull
+yourself up.  This mountain is very dangerous.  
+~
+0 0 0
+D3
+~
+~
+0 0 1865
+D4
+~
+~
+0 0 1867
+S
+#1867
+Icy Mountain~
+You are starting to near the top of the mountain.  High above you can see
+large birds flying about.  
+~
+0 0 0
+D2
+~
+~
+0 0 1868
+D5
+~
+~
+0 0 1866
+S
+#1868
+Icy Mountain~
+You are currently on the eastern side of the Icy Mountain.  
+~
+0 0 0
+D0
+~
+~
+0 0 1867
+D4
+~
+~
+0 0 1869
+S
+#1869
+Icy Mountain~
+You are nearing the peak of the mountain.  On the peak, you can see a
+nest.  
+~
+0 0 0
+D3
+~
+~
+0 0 1870
+D5
+~
+~
+0 0 1868
+S
+#1870
+Icy Mountain~
+You have climbed most of the mountain, only a bit more to go.  
+~
+0 0 0
+D1
+~
+~
+0 0 1869
+D4
+~
+~
+0 0 1871
+S
+#1871
+Icy Mountain~
+You are right below the peak of the mountain.  
+~
+0 0 0
+D4
+~
+~
+0 0 1872
+D5
+~
+~
+0 0 1870
+S
+#1872
+Icy Peak~
+You stop and take a deep breath.  You have finally reached the peak of
+the mountain.  Here you can see a large nest of some bird.  
+~
+0 0 0
+D1
+~
+~
+0 0 1873
+D5
+~
+~
+0 0 1871
+S
+#1873
+Icy Nest~
+You are inside of a bird's nest.  The nest is very large, same with the
+eggs.  It's a big bird that must have made this nest.  
+~
+0 0 0
+D0
+~
+~
+0 0 1874
+D1
+~
+~
+0 0 1876
+D3
+~
+~
+0 0 1872
+S
+#1874
+Icy Nest~
+You are still in the nest.  This nest is about 30 by 30 metres.  
+~
+0 0 0
+D1
+~
+~
+0 0 1875
+D2
+~
+~
+0 0 1873
+S
+#1875
+Icy Nest~
+You are in the north-eastern corner of the bird's nest.  This part of the nest is at the edge of the peak.  When you look over you can see all around.  The view is magnificant!
+~
+0 0 0
+D2
+~
+~
+0 0 1876
+D3
+~
+~
+0 0 1874
+S
+#1876
+Icy Nest~
+You are in the south-western part of the nest.  This nest is made up of
+all kinds of stuff.  It looks like anything that was found was used in it. 
+You can see straw, grass, snow, ice, even...  Bones.  
+~
+0 0 0
+D0
+~
+~
+0 0 1875
+D1
+~
+~
+0 0 1877
+D3
+~
+~
+0 0 1873
+S
+#1877
+Icy Bridge~
+A natural ice bridge leads from the top of the mountain to the hold in
+the side of the Ice Cavern's wall.  You are on the western side of the
+bridge.  From the bridge, you can see everything around you.  
+~
+0 0 0
+D1
+~
+~
+0 0 1878
+D3
+~
+~
+0 0 1876
+S
+#1878
+Icy Bridge~
+You are at the middile of the icy bridge.  
+~
+0 0 0
+D1
+~
+~
+0 0 1879
+D3
+~
+~
+0 0 1877
+S
+#1879
+Icy Bridge~
+You are on the eastern side of the icy bridge.  
+~
+0 0 0
+D1
+~
+~
+0 0 1880
+D3
+~
+~
+0 0 1878
+S
+#1880
+Crack in Wall~
+You are passing through the middile of a giant crack in the Ice Cavern's
+wall.  You can see the surface from here.  
+~
+0 0 0
+D1
+~
+~
+0 0 1881
+D3
+~
+~
+0 0 1879
+S
+#1881
+Surface Above the Ice Cavern~
+You are in the surface area above the ice cavern.  There are flowers all
+about, large pine trees.  There is no sign of any of the ice Cavern's snow
+and ice here.  
+~
+0 0 0
+D0
+~
+~
+0 0 1882
+D1
+~
+~
+0 0 1886
+S
+#1882
+Forested Hill~
+You are on the top of a forested hill.  All about you, there are trees,
+flowers, and other plants growing, growing, and growing.  
+~
+0 0 0
+D1
+~
+~
+0 0 1883
+D2
+~
+~
+0 0 1881
+S
+#1883
+Side of Hill~
+You are on the eastern side of the hill.  Down below, you can see a
+valley.  
+~
+0 0 0
+D3
+~
+~
+0 0 1882
+D5
+~
+~
+0 0 1884
+S
+#1884
+Valley~
+You are in a valley at the bottom of a hill.  This valley is covered with
+flowers of all types.  
+~
+0 0 0
+D1
+~
+~
+0 0 1889
+D2
+~
+~
+0 0 1885
+D4
+~
+~
+0 0 1883
+S
+#1885
+Northern Side of a Hill~
+You are on the northern side of a hill.  Above you, you can see the hill
+is very forested.  There are many plants.  
+~
+0 0 0
+D0
+~
+~
+0 0 1884
+D4
+~
+~
+0 0 1886
+S
+#1886
+Forested Hill~
+You are on the top of a forested hill.  Below you, a valley can be seen.  
+~
+0 0 0
+D1
+~
+~
+0 0 1887
+D2
+~
+~
+0 0 1895
+D3
+~
+~
+0 0 1881
+D5
+~
+~
+0 0 1885
+S
+#1887
+Forested Hill~
+You are on the top of a forested hill.  In a northwards direction, you
+can smell a watery area.  
+~
+0 0 0
+D0
+~
+~
+0 0 1888
+D2
+~
+~
+0 0 1894
+D3
+~
+~
+0 0 1886
+S
+#1888
+North Side of Hill~
+You are on the northern side of a hill.  The hill is forested heavily,
+and is difficult to see past.  Downwards, you can see a pond.  
+~
+0 0 0
+D2
+~
+~
+0 0 1887
+D5
+~
+~
+0 0 1889
+S
+#1889
+Pond~
+You are infront of a pond.  The pond looks cool and refreshing.  For the
+most part, the pond is clear and you can see the bottom.  The bottom is
+covered with water plants.  
+~
+0 0 0
+D0
+~
+~
+0 0 1890
+D3
+~
+~
+0 0 1884
+D4
+~
+~
+0 0 1888
+S
+#1890
+On the Pond~
+You are swimming in the pond.  The water is clear enough that you could
+dive.  
+~
+0 0 6
+D2
+~
+~
+0 0 1889
+D5
+~
+~
+0 0 1891
+S
+#1891
+Under The Pond's Surface~
+You are swimming under the pond's surface.  All around you, the water is
+nice and cool.  
+~
+0 0 6
+D4
+~
+~
+0 0 1890
+D5
+~
+~
+0 0 1892
+S
+#1892
+Deeper Under The Pond's Surface~
+You are really deep under the pond's surface.  It is getting darker and
+darker down here.  The plants seem to almost be moving...  Perhaps you
+should be careful.  
+~
+0 0 6
+D4
+~
+~
+0 0 1891
+D5
+~
+~
+0 0 1893
+S
+#1893
+Bottom of Pond~
+Panic!  One of the plants has grabbed onto you.  You can't move, and
+you're face is turning blue.  
+~
+0 4 6
+S
+#1894
+South of Forest Hill~
+You are on the southern edge of the forested hill.  There is nowhere
+south to go, due to the large walls of the ice cavern blocking your way.  
+~
+0 0 0
+D0
+~
+~
+0 0 1887
+D3
+~
+~
+0 0 1895
+S
+#1895
+South of Forested Hill~
+You are on the southern edge of a forested hill.  
+~
+0 0 0
+D0
+~
+~
+0 0 1886
+D1
+~
+~
+0 0 1894
+S
+#1896
+Forest Path~
+You are walking along a path in a forest.  The smell of flowers and other
+plants hangs in the air.  The path continues southwards.  
+~
+0 0 0
+D2
+~
+~
+0 0 1897
+D3
+~
+~
+0 0 302
+S
+#1897
+Forest Path~
+You are walking along a beautiful forest path.  Blossom trees are on both
+sides of the path, in full bloom.  Birds fly about, signing nice songs.  
+~
+0 0 0
+D0
+~
+~
+0 0 1896
+D2
+~
+~
+0 0 1898
+S
+#1898
+Forest Path~
+You are walking along a forest path.  Southwards, you can see a cave. 
+Icicles hang from the entrance.  
+~
+0 0 0
+D0
+~
+~
+0 0 1897
+D2
+~
+~
+0 0 1899
+S
+#1899
+Entrance To The Cave~
+You are at the entrance to some cave or cavern.  Cold mist is coming out
+of the cave, and icicles hang from the ceiling.  
+~
+0 0 0
+D0
+~
+~
+0 0 1898
+D2
+~
+~
+0 0 1800
+S
+#0
+
+
+
+#SPECIALS
+M 1802 spec_guard
+S
+
+
+
+#RESETS
+D 0 1855 0 1
+D 0 1856 2 1
+D 0 1863 0 1
+D 0 1864 2 1
+M 0 1813 15 1800 1
+M 0 1809 15 1800 1
+M 0 1813 15 1804 1
+M 0 1812 15 1804 1
+M 0 1800 30 1804 1
+E 0 1800 0 16
+M 0 1800 30 1806 1
+E 0 1800 0 16
+E 0 1804 0 8
+M 0 1800 30 1808 1
+E 0 1800 0 16
+O 0 1801 0 1809
+M 0 1812 15 1810 1
+M 0 1809 15 1810 1
+M 0 1805 1 1812 1
+E 0 1805 0 16
+E 0 1806 0 5
+M 0 1809 15 1813 1
+M 0 1806 1 1813 1
+E 0 1807 0 16
+M 0 1812 15 1814 1
+M 0 1813 15 1816 1
+M 0 1812 15 1816 1
+M 0 1809 15 1820 1
+M 0 1801 1 1820 1
+M 0 1802 5 1828 2
+M 0 1812 15 1830 1
+M 0 1807 1 1830 1
+M 0 1808 5 1831 1
+M 0 1809 15 1833 1
+M 0 1808 5 1835 1
+M 0 1808 5 1836 1
+M 0 1808 5 1838 1
+M 0 1813 15 1840 1
+M 0 1808 5 1840 1
+M 0 1802 5 1841 2
+M 0 1802 5 1841 2
+M 0 1812 15 1843 1
+M 0 1809 15 1844 1
+M 0 1809 15 1844 1
+M 0 1813 15 1847 1
+M 0 1803 1 1848 1
+E 0 1803 0 17
+M 0 1812 15 1850 1
+M 0 1812 15 1852 1
+M 0 1812 15 1853 1
+M 0 1813 15 1855 1
+M 0 1809 15 1864 1
+M 0 1812 15 1865 1
+M 0 1809 15 1870 1
+M 0 1813 15 1871 1
+M 0 1811 1 1873 1
+E 0 1808 0 5
+M 0 1810 4 1873 1
+M 0 1810 4 1874 1
+M 0 1810 4 1875 1
+M 0 1810 4 1876 1
+M 0 1813 15 1880 1
+M 0 1814 5 1881 1
+E 0 1809 0 5
+M 0 1815 10 1882 1
+M 0 1815 10 1883 1
+M 0 1814 5 1883 1
+E 0 1809 0 5
+M 0 1815 10 1884 1
+M 0 1813 15 1884 1
+M 0 1815 10 1885 1
+M 0 1814 5 1887 1
+E 0 1809 0 5
+M 0 1815 10 1889 1
+M 0 1815 4 1890 1
+M 0 1815 4 1891 1
+M 0 1815 4 1892 1
+M 0 1815 4 1893 1
+M 0 1815 10 1895 1
+M 0 1804 1 1896 1
+M 0 1813 15 1899 1
+S
+
+
+
+#SHOPS
+0
+
+
+
+#MOBPROGS
+#1800
+yell We're under attack, raise the alarm!
+pecho You hear, "Sir!  Yes!  Sir!" as runners run off to warn the city.
+~
+#0
+
+#$

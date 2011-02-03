@@ -1,0 +1,235 @@
+#AREADATA
+Name Fallen Clan Hall~
+Builders Chibiusa~
+VNUMs 14100 14199
+Credits {Clans}         Fallen Clan Hall~
+Security 1
+Flags A 
+End
+
+
+
+#MOBILES
+#14100
+Gunther~
+Gunther the red headed, red bearded, dwarf is here.~
+Gunther the red is here.
+~
+You see a short stocky dwarf with red hair and a scruffy red beard.  He
+almost appears drunk, and he smells of strong alcohol.  His face is smudged
+with char, and he appears to be missing an ear, and a few fingers, probably
+from an experiment gone bad.  
+~
+human~
+AB H 1000 0
+25 300 1d1+30000 1d1+30000 1d1+30000 slash
+-500 -500 -500 -500
+0 0 0 0
+stand stand male 0
+AHMV ABCDEFGHIJK medium unknown
+#14101
+smitty healer dwarf not so sane~
+Smitty, the not so sane dwarf~
+Smitty, the not so sane dwarf, is here chanting.
+~
+A small dwarf with dark black hair and a black beard, stands chanting in
+an arcane language.  White robes cover his body along with an emblem on the
+robe of a holy symbol of a hand with one finger raised, the middle finger. 
+He holds a stick in his hands with the same symbol carved onto it.  
+~
+dwarf~
+ABa J 1000 0
+25 0 10d61+400 0d0+0 0d0+0 none
+0 0 0 0
+0 0 LQ R
+stand stand male 10000
+AHMV ABCDEFGHIJK medium unknown
+#0
+
+
+
+#OBJECTS
+#14100
+steak potatoe~
+big steak and a small potato~
+You can't go bad with steak.~
+food~
+food 0 AO
+CE DF 0 0 0
+0 20 24 P
+A
+1 1
+A
+5 2
+#14101
+axe of retribution runed fallen the~
+{DRuned Axe of Retribution{x~
+The {DRuned Axe of Retribution{x is here.~
+unknown~
+weapon G AN
+axe 10 12 chop DH
+0 550 10000 P
+#14102
+artisian well springs intricate stone structure~
+an artisian well springs from an intricate stone structure in the middle of the room.~
+An artisian well springs from an intricate stone structure in the middle of the room.~
+unknown~
+fountain 0 P
+0 0 'water' 0 0
+0 0 0 P
+#0
+
+
+
+#ROOMS
+#14100
+Behind the Waterfall~
+Behind the waterfall is a well structured stone outcroping that acts like
+a porch of the main cave.  Despite being behind the waterfall, the
+architecture of the excavation is set in such a way that the only moisture
+comes from the mist of the falling water.  Northward leads into the enormous
+dimly lit tunnel.  
+~
+0 0 0
+D0
+~
+~
+0 0 14105
+D4
+~
+~
+0 0 5281
+C fallen~
+S
+#14101
+Gathering Room~
+This is an extremly large circular room.  The colour of the walls and
+pillars are golden, or so it appears, from the large torches on the walls. 
+The large pillars have intricate runes and writings on them, probably some
+form of history in an ancient long forgotten language.  There is a dome
+appearance to the ceiling, which has red rubies depicting large celestial
+beings.  Small archways are located to the west, north, east and south.  
+~
+0 0 0
+D0
+~
+~
+0 0 14102
+D1
+~
+~
+0 0 14103
+D2
+~
+~
+0 0 14106
+D3
+~
+~
+0 0 14104
+C fallen~
+S
+#14102
+Downward Slopeing Corridor~
+The golden light from the south seems to refract off the cave walls and
+beam down this corridor onto a large double door with emeralds embedded on
+it.  
+~
+0 0 0
+D2
+~
+~
+0 0 14101
+C fallen~
+S
+#14103
+Storage Area~
+Many small chests are laying around, all of which are fairly large. 
+Whether or not they are actually occupied with belongings of enemies or of
+own personal items is another story.  Westward a golden glow pours into the
+room adding a rich majestic effect to the treasure chests.  
+~
+0 0 0
+D3
+~
+~
+0 0 14101
+S
+#14104
+Supply Room~
+There is a rock table that seems to be for business transactions.  A
+small forge is in the back of the room for the requests of armor and
+weapons, as well as alchemy set for other useful items.  East takes you to a
+large golden glowing room.  
+~
+0 10 0
+D1
+~
+~
+0 0 14101
+C fallen~
+S
+#14105
+Tunnel Hallway~
+This portion of the large tunnel is directly north of the entrance.  The
+sounds of the water can be heard inside and almost give it a musical effect
+from the acoustics of the cave ceiling, the rest of the walls are rough. 
+Towards the north a faint glow can be seen.  
+~
+0 0 0
+D0
+~
+~
+0 0 14106
+D2
+~
+~
+0 0 14100
+S
+#14106
+Tunnel Hallway~
+Here the walls begin to smooth out, appearing almost like a flat slab of
+rock.  The ceiling corners are slightly curved but for the most part they
+are flat, giving the sense that you are in a large square tunnel.  Southward
+the faint sound of water echos, north a large intricate room is glowing with
+torches.  
+~
+0 0 0
+D0
+~
+~
+0 0 14101
+D2
+~
+~
+0 0 14105
+S
+#0
+
+
+
+#SPECIALS
+S
+
+
+
+#RESETS
+O 0 14102 0 14101
+M 0 14101 1 14101 1
+M 0 14100 1 14104 1
+G 0 14100 0
+G 0 14101 0
+S
+
+
+
+#SHOPS
+14100 0 0 0 0 0 200 100 0 23
+0
+
+
+
+#MOBPROGS
+#0
+
+#$

@@ -1,0 +1,5 @@
+This file takes care of upgrades for clans.  whever an imm debits from a
+clan they are encouraged to make a note of what the money is going into.
+[11791] ChibiUsa: 50K healersmitty
+[ 3334] Saber: 5k for room
+[ 3334] Saber: 5k for room

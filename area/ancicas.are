@@ -1,0 +1,153 @@
+#AREADATA
+Name New area~
+Builders Ravage~
+VNUMs 14600 14699
+Credits Ravage~
+Security 9
+Flags A 
+End
+
+
+
+#MOBILES
+#14600
+Gatehouse Guard~
+Ghost Guard~
+A ghost guard is floating here
+~
+The ghost guard is glowing brightly.  It doesn't seem to notice you, he
+just stares blankly into space.  
+~
+human~
+ABG 0 0 0
+45 45 25d10+3000 0d0+0 8d4+16 none
+2 2 2 2
+EFK 0 BC EFG
+stand stand none 0
+0 ABCDEFGHIJK medium unknown
+F for AHMV
+#0
+
+
+
+#OBJECTS
+#14600
+Gatehouse key~
+the gatehouse key~
+There is a giant rusty key here.~
+unknown~
+key 0 A
+0 0 0 0 0
+30 7 0 P
+#0
+
+
+
+#ROOMS
+#14600
+In a dark forest.~
+After a long journey you have ended up in the middle of nowhere.  A dark
+black forest surrounds you, you can't even figure out where you came in.  In
+the northern distance you can make out a castle type shape.  A wolf howls
+close by, the wind blows, the faint smell of smoke is in the air, you feel
+very uneasy.  
+-
+~
+0 1 3
+D0
+~
+~
+0 0 14601
+S
+#14601
+An ancient path~
+You have stumbled upon a very old path made of little light brown tiles. 
+The tiles are scattered everywhere, but as the path goes on, they reform a
+narrow path heading north.  The trees around this area of the forest are
+very tall and have titanic trunks.  You have stumbled upon a very old path
+made of little light brown tiles.  The tiles are scattered everywhere, but
+as the path goes on, they reform a narrow path heading north.  The trees
+around this area of the forest are very tall and have titanic trunks.  You
+also notice that the trees aren't so close together anymore.  
+~
+0 1 3
+D0
+~
+~
+0 0 14602
+D2
+~
+~
+0 0 14600
+S
+#14602
+An Ancient gatehouse.~
+As you follow the path, you notice that it leads up to a gatehouse.  A
+big rusty iron gate with a huge lock in the middle guards what lies on the
+other side.  Huge walls lead east and west of the gate.  Beside the gate you
+see two glowing forms holding spears guarding the gate.  You realize that
+these forms are ghosts!  There is a plaque on the right side of the wall.  
+~
+0 0 0
+D0
+~
+~
+0 0 14603
+D2
+~
+~
+0 0 14601
+S
+#14603
+Along the garden path.~
+After passing through the massive gates you end up in a dead garden. 
+Gnarled trees and empty flower beds surround the path.  What time of day it
+is you cannot tell, the trees hang so far overhead you cannot see the sky.  
+~
+0 1 3
+D0
+~
+~
+0 0 14604
+D2
+~
+~
+0 0 14602
+S
+#14604
+Before an ancient castle.~
+After walking through the dead garden, you find yourself in front 
+of a giant castle. The castle delapitated
+~
+0 0 0
+D2
+~
+~
+0 0 14603
+S
+#0
+
+
+
+#SPECIALS
+S
+
+
+
+#RESETS
+M 0 14600 2 14602 2
+M 0 14600 2 14602 2
+E 0 14600 0 9
+S
+
+
+
+#SHOPS
+0
+
+
+
+#MOBPROGS
+#0
+
+#$

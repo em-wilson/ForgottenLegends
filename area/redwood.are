@@ -1,0 +1,509 @@
+#AREADATA
+Name Redwood~
+Builders Damian~
+VNUMs 14500 14599
+Credits { TBA } Damian  Redwood Forest~
+Security 1
+Flags A 
+End
+
+
+
+#MOBILES
+#0
+
+
+
+#OBJECTS
+#0
+
+
+
+#ROOMS
+#14500
+Forest Path~
+A path between trees has been made by continued use, even though there is
+no man-made bath.  Large cedar trees, oak trees, pine trees, and many other
+types of trees are all around, but none are as plentiful here as the redwood
+tree, red cedar tree, and red spruce.  Many trees here produce a strange
+resin, which has stained most of the trees red, giving the forest the name
+Redwood.  It is unknown why the resin here does this, even though many toil
+to discover the secret.  
+~
+0 0 3
+D0
+~
+~
+0 0 14505
+D1
+~
+~
+0 0 14509
+D3
+~
+~
+0 0 14501
+S
+#14501
+Forest~
+The large amounts of plants fill your nostrils with the smell of fresh
+air.  You find yourself taking deep breathes, as the smell smells sweet and
+refreshing.  
+~
+0 0 3
+D0
+~
+~
+0 0 14504
+D1
+~
+~
+0 0 14500
+D3
+~
+~
+0 0 14502
+S
+#14502
+Forest Meadow~
+There is a small meadow in the forest here, where the forest's expansion
+has not yet reached.  
+~
+0 0 3
+D0
+~
+~
+0 0 14503
+D1
+~
+~
+0 0 14501
+S
+#14503
+Forest~
+Flowers are plentiful here since a meadow is so close to the south. 
+Large redwoods have left a clearing here by growing around a little hill.  
+~
+0 0 3
+D0
+~
+~
+0 0 14512
+D1
+~
+~
+0 0 14504
+D2
+~
+~
+0 0 14502
+S
+#14504
+Forest~
+The scent of fresh air circulates your lungs as your body feels to be
+more calm than it usually is.  
+~
+0 0 3
+D0
+~
+~
+0 0 14511
+D1
+~
+~
+0 0 14505
+D2
+~
+~
+0 0 14501
+D3
+~
+~
+0 0 14503
+S
+#14505
+Forest Path~
+Redwood Forest seems to not be growning onto this worn down path,
+allowing travellers easy access through the forest while still enjoying the
+delights of the Redwood forest.  
+~
+0 0 0
+D0
+~
+~
+0 0 14510
+D1
+~
+~
+0 0 14506
+D2
+~
+~
+0 0 14500
+D3
+~
+~
+0 0 14504
+S
+#14506
+Forest~
+The delightful smell of hunny lurks about, and it is likely that there is
+a bee hive nearby.  Bees fly by in search of more pollen constantly: ZZZZ.  
+~
+0 0 3
+D0
+~
+~
+0 0 14513
+D1
+~
+~
+0 0 14507
+D2
+~
+~
+0 0 14509
+D3
+~
+~
+0 0 14505
+S
+#14507
+Forest Clearing~
+The forest has made a bit of a clearing here due to a small hill. 
+Standing on the small hill, you still can't see too far into the forest. 
+All you can see though, is this forest is quite large.  
+~
+0 0 3
+D0
+~
+~
+0 0 14514
+D2
+~
+~
+0 0 14508
+D3
+~
+~
+0 0 14506
+S
+#14508
+Forest~
+A redwood has fallen over here and stretches quite far.  It's no wonder
+why it's so hard to see how big the forest is and where it ends.  
+~
+0 0 0
+D0
+~
+~
+0 0 14507
+D3
+~
+~
+0 0 14509
+S
+#14509
+Forest~
+This part of the forest is a bit hilly, and is a bit more tiring to
+traverse.  However, the sweet smell of hunny and fresh air fills convinces
+your body to want to keep moving.  
+~
+0 0 0
+D0
+~
+~
+0 0 14506
+D1
+~
+~
+0 0 14508
+D3
+~
+~
+0 0 14500
+S
+#14510
+Forest Path~
+The pine trees gently rock back and forth on both sides of the path as
+the wind passes by.  You can smell alot of pine needles and leaves.  
+~
+0 0 0
+D0
+~
+~
+0 0 14515
+D1
+~
+~
+0 0 14513
+D2
+~
+~
+0 0 14505
+D3
+~
+~
+0 0 14511
+S
+#14511
+Forest~
+There are quite a few flowers growing here, varing in white, blue, and
+red colours mostly.  You can hear the buzzes of bees as they work to get the
+pollen from the flowers.  
+~
+0 0 0
+D1
+~
+~
+0 0 14510
+D2
+~
+~
+0 0 14504
+D3
+~
+~
+0 0 14512
+S
+#14512
+Forest Pond~
+Here in the forest is a small pond.  It only looks about a metre tall. 
+You can see plants at the bottom of it.  
+~
+0 0 0
+D1
+~
+~
+0 0 14511
+D2
+~
+~
+0 0 14503
+S
+#14513
+Forest~
+The forest makes a slight downwards slope here.  Previous rains have
+turned this part of the forest into a large mudhole.  
+~
+0 0 0
+D1
+~
+~
+0 0 14514
+D2
+~
+~
+0 0 14506
+D3
+~
+~
+0 0 14510
+S
+#14514
+Forest~
+The forest is a bit warmer here than in the rest of the forest, since the
+sun can get through here better, since the trees are smaller over here.  
+~
+0 0 0
+D2
+~
+~
+0 0 14507
+D3
+~
+~
+0 0 14513
+S
+#14515
+Forest Path~
+You are travelling along a forest path.  Northwards, you can see signs of
+civilization.  You see smoke gently rising from various places, likely from
+chimmneys.  
+~
+0 0 3
+D0
+~
+~
+0 0 14516
+D2
+~
+~
+0 0 14510
+S
+#14516
+Forest Path~
+As you reach the top of a hill, you can see a village northwards.  It is
+small, but you notice many people walking around it, all friendly to each
+other.  
+~
+0 0 3
+D0
+~
+~
+0 0 14517
+D2
+~
+~
+0 0 14515
+S
+#14517
+Forest Path - Approaching the Village~
+You are close the the village now.  You can see it pretty well now.  The
+village is made up of alot of bricks, but there are some houses that use
+wood.  
+~
+0 0 0
+D0
+~
+~
+0 0 14518
+D2
+~
+~
+0 0 14516
+S
+#14518
+Redwood - Southern Edge~
+You have approached the southern edge of the town.  A sign here informs
+you that the town is called Redwood.  People walk about, chatting.  
+~
+0 0 0
+D0
+~
+~
+0 0 14519
+D1
+~
+~
+0 0 14520
+D2
+~
+~
+0 0 14517
+S
+#14519
+Redwood - Market Square~
+You are in Market Square of Redwood.  This village seems to home to many
+different people.  Humans are the most plentiful, but there are also
+dwarves, gnomes, and one or two of many other species.  People openly
+converse with each other happily.  
+~
+0 0 0
+D1
+~
+~
+0 0 14522
+D2
+~
+~
+0 0 14518
+D3
+~
+~
+0 0 14521
+S
+#14520
+Windmill~
+You are inside a large windmill.  A large circular column spins, spinning
+the the outside part of the windmill.  
+~
+0 0 0
+D3
+~
+~
+0 0 14518
+S
+#14521
+Produce Stand~
+You are in part of the market area that is covered by tarps.  Produce is
+sold here, and the tarp helps to keep the fruits and vegetables from drying
+up.  
+~
+0 0 0
+D1
+~
+~
+0 0 14519
+S
+#14522
+Dirt Road~
+A dirt road rests under your feet.  The dirt road has been well worn down
+by travellers and townfolk.  
+~
+0 0 0
+D0
+~
+~
+0 0 14523
+D1
+~
+~
+0 0 14524
+D3
+~
+~
+0 0 14519
+S
+#14523
+House~
+You are inside the house of a town citizen.  It is an nice size.  The
+house is made out of wood.  
+~
+0 0 0
+D2
+~
+~
+0 0 14522
+S
+#14524
+Dirt Road~
+The dirt road curves left and right.  It seems that it may have been
+orginaly built to avoid the trees.  
+~
+0 0 0
+D1
+~
+~
+0 0 14525
+D3
+~
+~
+0 0 14522
+S
+#14525
+Redwood Meadow~
+You are inside a meadow in the middle of the village.  The village is
+filled with wildlife and trees.  There is so much colours you senses reel. 
+The smells are amazing, the view is breathtaking, and the sounds of rabbits
+and other animals are peaceful.  
+~
+0 0 0
+D3
+~
+~
+0 0 14524
+S
+#0
+
+
+
+#SPECIALS
+S
+
+
+
+#RESETS
+S
+
+
+
+#SHOPS
+0
+
+
+
+#MOBPROGS
+#0
+
+#$

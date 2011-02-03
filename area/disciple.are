@@ -1,0 +1,178 @@
+#AREADATA
+Name Disciple Clan Hall~
+Builders Chibiusa~
+VNUMs 14000 14099
+Credits {Clans}         Disciples Clan Hall~
+Security 1
+End
+
+
+
+#MOBILES
+#14000
+Osiris~
+Osiris~
+The Lord of the Dead, Osiris stands here.
+~
+You see the well-muscled jackal headed Egyptian god of the Dead.
+~
+human~
+AB 0 0 0
+100 0 1d1+30000 1d1+30000 1d1+30000 none
+-300 -300 -300 -300
+0 0 0 0
+stand stand none 0
+0 0 medium unknown
+F for AHMV
+F par ABCDEFGHIJK
+#0
+
+
+
+#OBJECTS
+#14000
+platinum jewel chest large~
+a large platinum chest~
+A large platinum and jeweled chest lies here.~
+unknown~
+container 0 0
+0 AC 0 100000 0
+0 0 0 P
+#14001
+large throne~
+the throne~
+A cold, imposing, and stoic throne sits here.~
+unknown~
+furniture 0 0
+A 0 E BD BD
+0 0 0 P
+#0
+
+
+
+#ROOMS
+#14000
+Warning Pillars~
+Two partially unearthed pillars stand here in tribute to a lost
+civilization.  Strange that a lost civilization should be hidden east of
+Tiamat's lair.  The chamber is immensely vast.  Strange writings are
+partially hidden by the dirt piles.  All you can ascertain for certain is
+the omnious and dreadful feeling you get from this room.  Tiamat's lair lies
+to the west and another chamber lies to the north.  
+~
+0 0 0
+D0
+~
+~
+0 0 14001
+D3
+~
+~
+0 0 2231
+S
+#14001
+Entranceway of the Clan Disciples~
+Upon entering, you realize that this isn't a cavern but a well made
+entranceway.  Lit torches line the walls of this newly renovated stone
+marvel.  Expensive gilding and diamond encrusting covers various artwork and
+large silk tapestries elegantly drape the cold stonework.  On the floor is a
+massive sigil marking this place as property of Clan Disciples.  Below it
+lies the stark inscription, "Once A Disciple, Always A Disciple".  
+~
+0 8 0
+D0
+~
+~
+0 0 14002
+D2
+~
+~
+0 0 14000
+C disciples~
+S
+#14002
+Ancient Throne Room~
+You pass through a doorway that is lined with seemingly dark and occult
+symbols and enter what appears to be an ancient throne room.  In the center
+of the room stands a imposing throne, straightbacked and made of solid gold.
+A large jewel encrusted dragon rears from the top of the throne, menacing
+and life-like.  Still seated in the throne are the bones of the long dead
+king kept there to remind the Disciples of the price of being weak.  Next to
+the throne is a large platinum chest with a diamond dragon inset holding the
+sigil of the Clan Disciples.  
+~
+0 0 0
+D2
+~
+~
+0 0 14001
+D3
+~
+~
+0 0 14003
+D4
+~
+~
+0 0 14004
+S
+#14003
+War Room~
+The stuffed remains of extinct beasts and a large stone table are all
+that occupy this functional room.  No tapestries or statues are here to
+increase its aesthetics.  The only decoration in this room are maps of
+certain areas with strategic locations marked and charts and lists of
+business acquistions and ventures.  Around the table are 5 stone chairs to
+seat the five strongest members of Clan Disciples that will decide on Clan
+business.  This business can include anything from clan wars to trading and
+exploring possibilities.  
+~
+0 0 0
+D1
+~
+~
+0 0 14002
+S
+#14004
+Disciples' Armory~
+You enter a musty room filled with the smells of potions being brewed and
+iron being smelted.  Along the walls are shelves filled with items needed by
+every adventurer and some that aren't.  Armor, weapons, potions, or scroll,
+Osiris has what you need.  Osiris is a collector of rare weapons and armor. 
+All around with small nameplates you see famous equipment.  You see the
+mirrored shield of Theseus, Hades' helm, Mercury's winged sandals, Raganok's
+firelance, and even the legendary Excalibur.  As far as items go, Osiris has
+the Golden Fleece, Pandora's Box, and even the cloak, tainted with centaur
+blood that killed the mighty Hercules.  
+~
+0 0 0
+D5
+~
+~
+0 0 14002
+S
+#0
+
+
+
+#SPECIALS
+S
+
+
+
+#RESETS
+O 0 14000 0 14002
+O 0 14001 0 14002
+M 0 14000 1 14004 1
+S
+
+
+
+#SHOPS
+0
+
+
+
+#MOBPROGS
+#0
+
+#$

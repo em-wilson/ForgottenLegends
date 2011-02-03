@@ -1,0 +1,430 @@
+#AREADATA
+Name Kamire, Lost Paradise~
+Builders Damian~
+VNUMs 1800 1899
+Credits {10 15} Damian  Kamire, Lost Paradise~
+Security 1
+End
+
+
+
+#MOBILES
+#0
+
+
+
+#OBJECTS
+#0
+
+
+
+#ROOMS
+#1800
+Western Edge of Kamire~
+You are at the western side of Kamire.  The city, unlike many of the
+large cities, does not have walls, as it was once a peaceful town.  This
+town has been plagued by decades of war, leaving nothing but coldness in the
+hearts of those withen.  Main street is the east.  A sign is here, covered
+with mud.  
+~
+0 4 0
+E
+sign~
+Welcome to Kamire
+ 
+Note To Travellers: This city is in a state of war, entrance is not advised.
+~
+D1
+~
+~
+0 0 1801
+S
+#1801
+Main Street of Kamire~
+You are on the main street of Kamire.  Disciplined troops march the
+street, chanting war songs as they head towards battles.  Very few
+non-military people are on the streets, many instead have left the town or
+are afraid to leave their homes.  To the west, you can see the edge of the
+town, usually watched by guards, unless something is seriously wrong.  To
+the north you spot what appears to be a military barracks.  To the south you
+a hospital.  The street continues to the east.  
+~
+0 0 0
+D0
+~
+~
+0 0 1809
+D1
+~
+~
+0 0 1802
+D2
+~
+~
+0 0 1810
+D3
+~
+~
+0 0 1800
+S
+#1802
+Main Street of Kamire~
+You are walking along a street, which has been recently redesigned to be
+better for defence.  A wall runs on each side of the street, and guards walk
+along the top, likely in case anyone dangerous gets in.  The street
+continues east and west.  To the north is a fortress.  To the south is
+Kamire Road.  
+~
+0 0 0
+D0
+~
+~
+0 0 1813
+D1
+~
+~
+0 0 1803
+D2
+~
+~
+0 0 1805
+D3
+~
+~
+0 0 1801
+S
+#1803
+Main Street of Kamire~
+You are walking along the Main Street of Kamire.  Any non-military people
+on the street are herded along by the army to the nearest shelter.  The
+people moan about how life was good a long time ago and move on, used to
+being pushed around.  To the north is an abandoned church, and to the south
+is an armoury.  To the east is an edge of the town.  
+~
+0 0 0
+D0
+~
+~
+0 0 1811
+D1
+~
+~
+0 0 1804
+D2
+~
+~
+0 0 1812
+D3
+~
+~
+0 0 1802
+S
+#1804
+Eastern Edge of Kamire~
+You are at the eastern edge of a once beautiful city.  You can see that
+the city was once very large, but most of it has been blocked off.  While
+examining the city, you notice many soldiers marching about.  Many of the
+soldiers have wounds, and some are being carried on stretchers to the town. 
+Eastwards you can hear the screams of pain, death, and fear.  To the west is
+Kamire.  To the south, east, and north is the valley.  
+~
+0 0 0
+D1
+~
+~
+0 0 1818
+D2
+~
+~
+0 0 1821
+D3
+~
+~
+0 0 1803
+S
+#1805
+Kamire Road~
+You are on Kamire Road.  This appears to be where the citizens of the
+town live.  The houses appear to have been very quickly built, and not very
+fancy.  To the south, east, and west are houses.  To the north is Main
+Street.  
+~
+0 0 0
+D0
+~
+~
+0 0 1802
+D1
+~
+~
+0 0 1806
+D2
+~
+~
+0 0 1807
+D3
+~
+~
+0 0 1808
+S
+#1806
+House~
+You are inside a one room house.  This house seems to have been built
+just to sleep in, not for very much else.  To the west is Kamire Road.  
+~
+0 0 0
+D3
+~
+~
+0 0 1805
+S
+#1807
+House~
+You are inside a very cramped house.  This house wouldn't be a very
+comfortable place to live.  To the north is Kamire Road.  
+~
+0 0 0
+D0
+~
+~
+0 0 1805
+S
+#1808
+House~
+You are inside a tiny one room house.  No furniture except a bed and a
+chest can be found in here.  The chest is hidden well, and locked up tight. 
+~
+0 0 0
+D1
+~
+~
+0 0 1805
+S
+#1809
+Military Brracks~
+You are in a large barracks for the military.  Many cots have been set up
+here, each has one or two bags under it.  This is where the Kamire soldiers
+live.  To the south is Main Street.  
+~
+0 0 0
+D2
+~
+~
+0 0 1801
+S
+#1810
+Hospital~
+You are inside a large building.  Used primarly for injured soldiers, the
+citizens seem to be of second importance.  To the north is Main Street.  
+~
+0 0 0
+D0
+~
+~
+0 0 1801
+S
+#1811
+An Abandoned Church~
+You are inside an abandoned church.  Once this place was a very calm,
+peaceful enviroment, filled with priests and worshippers.  To the south is
+Main Street.  
+~
+0 0 0
+D2
+~
+~
+0 0 1803
+S
+#1812
+The Armoury~
+You are inside a well used armoury.  The hot fire blazes, constantly
+being used to make forge weapons.  To the north is Main Street.  
+~
+0 0 0
+D0
+~
+~
+0 0 1803
+S
+#1813
+Front Gates of the Kamire Fortress~
+You are standing at the front gates of a fortress used by the military. 
+Well defended, this fortress is possibly where the generals and high ranking
+officers work.  High above you are the walls of the fortess, manned by
+guards.  Heavy iron gates bar the way to the north.  To the south is Main
+Street.  
+~
+0 0 0
+D0
+~
+gate~
+1 0 1814
+D2
+~
+~
+0 0 1802
+S
+#1814
+Fortress Courtyard~
+You are in the courtyard of the Kamire Fortress.  Military officers work
+deep inside the fortress somewhere, while guards patrol the area.  To the
+east are the stables.  To the west is a guard post.  To the north is the
+main section of the fort.  
+~
+0 0 0
+D0
+~
+~
+0 0 1817
+D1
+~
+~
+0 0 1815
+D2
+~
+gate~
+1 0 1813
+D3
+~
+~
+0 0 1816
+S
+#1815
+The Stables~
+You are inside the stables.  The horses of the Kamire army are fed,
+watered, and giving shelter here.  To the west is the courtyard.  
+~
+0 0 0
+D3
+~
+~
+0 0 1814
+S
+#1816
+Guard Post~
+You are in a guard post.  This post is used by soldiers going on and off
+duty, they sign in so that the senior officers know who is where.  To the
+east is the courtyard.  
+~
+0 0 0
+D1
+~
+~
+0 0 1814
+S
+#1817
+Kamire Fortress~
+You are inside the main building of the Kamire Fortress.  This building
+is made out of stone.  Large square stones cover the ground, as a decorative
+floor.  To the south is the fortress courtyard.  
+~
+0 0 0
+D2
+~
+~
+0 0 1814
+S
+#1818
+Valley~
+You are in a large, open valley.  The valley has many hills, but even so
+you can see very far.  You notice a number of corpses around the valley,
+many have been stripped of all armor and weapons.  A few trees stand here
+and there, but you see many that have been chopped down.  To the west is a
+large city, which appears to be blocked off in many places.  The valley is
+in all other directions.  
+~
+0 0 0
+D1
+~
+~
+0 0 1819
+D2
+~
+~
+0 0 1820
+D3
+~
+~
+0 0 1804
+S
+#1819
+Valley~
+You are in a large open valley.  Large amounts of grassland is all about,
+and far to the north you see smoke from cooking fires.  Same with to the
+west.  You can go north, east, or west.  There is a pond to the south,
+blocking passage.  
+~
+0 0 0
+D3
+~
+~
+0 0 1818
+S
+#1820
+Southern Edge of the Valley~
+You are at the southern edge of the valley.  The only exits are north and
+west.  
+~
+0 0 0
+D0
+~
+~
+0 0 1818
+D3
+~
+~
+0 0 1821
+S
+#1821
+Southern Edge of the Valley~
+You are at the southern edge of the valley.  The exits are to the east
+and north.  
+~
+0 0 0
+D0
+~
+~
+0 0 1804
+D1
+~
+~
+0 0 1820
+S
+#1822
+Southern Edge of the Valley~
+You are at the southern edge of the valley.  This side of the valley
+doesn't appear to have been hit by battle, as all the plants seem ok.  You
+can go north, west, and east.  
+~
+0 4 0
+S
+#1823
+~
+~
+0 4 0
+S
+#0
+
+
+
+#SPECIALS
+S
+
+
+
+#RESETS
+D 0 1813 0 1
+D 0 1814 2 1
+S
+
+
+
+#SHOPS
+0
+
+
+
+#MOBPROGS
+#0
+
+#$

@@ -1,0 +1,3 @@
+[16124] Polonius: svirfneblin embassy is not connected to the rest of underdark
+[ 3054] Runi: enchant weapon keeps telling me that my dagger isn't a weapon...
+[ 3005] Runi: the shoot skill seems to be a bit messed up... I'm not sure why, but it always worked when I was shooting things in mudschool, but after that it doesn't
