@@ -89,7 +89,6 @@ typedef struct	mob_index_data		MOB_INDEX_DATA;
 typedef struct  web_index_data          WEB_INDEX_DATA;
 typedef struct	obj_data		OBJ_DATA;
 typedef struct	obj_index_data		OBJ_INDEX_DATA;
-typedef struct	pc_data			PC_DATA;
 typedef struct  gen_data		GEN_DATA;
 typedef struct	reset_data		RESET_DATA;
 typedef struct	room_index_data		ROOM_INDEX_DATA;
@@ -1490,6 +1489,7 @@ struct mem_data
 };
 
 #include "board.h"
+#include "pc_data.h"
 
 /*
  * One character (PC or NPC).
@@ -1611,39 +1611,6 @@ struct	char_data
 };
 
 
-
-/*
- * Data which only PC's have.
- */
-struct	pc_data
-{
-    PC_DATA *		next;
-    CLAN_DATA *		clan;
-    BUFFER * 		buffer;
-    bool		valid;
-    char *		pwd;
-    char *		bamfin;
-    char *		bamfout;
-    char *		title;
-    sh_int		perm_hit;
-    sh_int		perm_mana;
-    sh_int		perm_move;
-    sh_int		true_sex;
-    int			last_level;
-    sh_int		condition	[4];
-    sh_int		learned		[MAX_SKILL];
-    sh_int		sk_level	[MAX_SKILL];
-    sh_int		sk_rating	[MAX_SKILL];
-    bool		group_known	[MAX_GROUP];
-    sh_int		points;
-    bool              	confirm_delete;
-    char *		alias[MAX_ALIAS];
-    char * 		alias_sub[MAX_ALIAS];
-    int 		security;	/* OLC */ /* Builder security */
-    BOARD_DATA *        board;                  /* The current board        */
-    time_t              last_note[MAX_BOARD];   /* last note for the boards */
-    NOTE_DATA *         in_progress;
-};
 
 /* Data for generating characters -- only used during generation */
 struct gen_data

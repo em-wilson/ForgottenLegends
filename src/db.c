@@ -3171,9 +3171,7 @@ void do_dump( CHAR_DATA *ch, char *argument )
 	count, count * (sizeof(*fch)), count2, count2 * (sizeof(*fch)));
 
     /* pcdata */
-    count = 0;
-    for (pc = pcdata_free; pc != NULL; pc = pc->next)
-	count++; 
+    count = PC_DATA::active.size();
 
     fprintf(fp,"Pcdata	%4d (%8ld bytes), %2d free (%ld bytes)\n",
 	num_pcs, num_pcs * (sizeof(*pc)), count, count * (sizeof(*pc)));

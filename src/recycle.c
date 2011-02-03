@@ -353,8 +353,10 @@ void free_char (CHAR_DATA *ch)
     free_string(ch->prompt);
     free_string(ch->prefix);
 
-    if (ch->pcdata != NULL)
-    	free_pcdata(ch->pcdata);
+    if (ch->pcdata != NULL) {
+        delete ch->pcdata;
+        ch->pcdata = NULL;
+    }
 
     ch->next = char_free;
     char_free  = ch;
@@ -362,65 +364,6 @@ void free_char (CHAR_DATA *ch)
     INVALIDATE(ch);
     return;
 }
-
-PC_DATA *pcdata_free;
-
-PC_DATA *new_pcdata(void)
-{
-    int alias;
-
-    static PC_DATA pcdata_zero;
-    PC_DATA *pcdata;
-
-    if (pcdata_free == NULL)
-	pcdata = (PC_DATA *)alloc_perm(sizeof(*pcdata));
-    else
-    {
-	pcdata = pcdata_free;
-	pcdata_free = pcdata_free->next;
-    }
-
-    *pcdata = pcdata_zero;
-
-    for (alias = 0; alias < MAX_ALIAS; alias++)
-    {
-	pcdata->alias[alias] = NULL;
-	pcdata->alias_sub[alias] = NULL;
-    }
-
-    pcdata->buffer = new_buf();
-    
-    VALIDATE(pcdata);
-    return pcdata;
-}
-	
-
-void free_pcdata(PC_DATA *pcdata)
-{
-    int alias;
-
-    if (!IS_VALID(pcdata))
-	return;
-
-    free_string(pcdata->pwd);
-    free_string(pcdata->bamfin);
-    free_string(pcdata->bamfout);
-    free_string(pcdata->title);
-    free_buf(pcdata->buffer);
-    
-    for (alias = 0; alias < MAX_ALIAS; alias++)
-    {
-	free_string(pcdata->alias[alias]);
-	free_string(pcdata->alias_sub[alias]);
-    }
-    INVALIDATE(pcdata);
-    pcdata->next = pcdata_free;
-    pcdata_free = pcdata;
-
-    return;
-}
-
-	
 
 
 /* stuff for setting ids */
