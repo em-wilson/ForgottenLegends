@@ -120,7 +120,6 @@ const	struct	cmd_type	cmd_table	[] =
     { "examine",	do_examine,	POS_RESTING,	 0,  LOG_NORMAL, 1 },
 /*  { "groups",		do_groups,	POS_SLEEPING,	 0,  LOG_NORMAL, 1 }, */
     { "help",		do_help,	POS_DEAD,	 0,  LOG_NORMAL, 1 },
-    { "hunt",		do_hunt,	POS_RESTING,	 0,  LOG_NORMAL, 1 },
     { "morph",		do_morph,	POS_RESTING,	 0,  LOG_NORMAL, 1 },
     { "motd",		do_motd,	POS_DEAD,        0,  LOG_NORMAL, 1 },
     { "read",		do_read,	POS_RESTING,	 0,  LOG_NORMAL, 1 },

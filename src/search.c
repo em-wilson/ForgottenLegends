@@ -349,7 +349,7 @@ void who_html_update (void)
   for ( d = descriptor_list; d != NULL ; d = d->next )
   {
     CHAR_DATA *wch;
-    char const *class;
+    char const *class_name;
     char *race;
     
     if ( d->connected != CON_PLAYING)
@@ -360,20 +360,20 @@ void who_html_update (void)
     if ( wch->invis_level > 1 || wch->incog_level > 1)
 	continue;
 
-	class = class_table[wch->class].who_name;
+	class_name = class_table[wch->class_num].who_name;
 	switch ( wch->level )
 	{
 	default: break;
             {
-                case MAX_LEVEL - 0 : class = "IMP";     break;
-                case MAX_LEVEL - 1 : class = "CRE";     break;
-                case MAX_LEVEL - 2 : class = "SUP";     break;
-                case MAX_LEVEL - 3 : class = "DEI";     break;
-                case MAX_LEVEL - 4 : class = "GOD";     break;
-                case MAX_LEVEL - 5 : class = "IMM";     break;
-                case MAX_LEVEL - 6 : class = "DEM";     break;
-                case MAX_LEVEL - 7 : class = "ANG";     break;
-                case MAX_LEVEL - 8 : class = "AVA";     break;
+                case MAX_LEVEL - 0 : class_name = "IMP";     break;
+                case MAX_LEVEL - 1 : class_name = "CRE";     break;
+                case MAX_LEVEL - 2 : class_name = "SUP";     break;
+                case MAX_LEVEL - 3 : class_name = "DEI";     break;
+                case MAX_LEVEL - 4 : class_name = "GOD";     break;
+                case MAX_LEVEL - 5 : class_name = "IMM";     break;
+                case MAX_LEVEL - 6 : class_name = "DEM";     break;
+                case MAX_LEVEL - 7 : class_name = "ANG";     break;
+                case MAX_LEVEL - 8 : class_name = "AVA";     break;
             }
 	}
 
@@ -395,7 +395,7 @@ void who_html_update (void)
 	fprintf(fp, "<FONT COLOR=""#C0C0C0"">[<FONT_COLOR=""#FF0000"">");
 	fprintf(fp, "%2d ", wch->level );
 	fprintf(fp, "<FONT COLOR=""#808000"">%6s ", race );
-	fprintf(fp, "<FONT COLOR=""#FFFFFF"">%s<FONT COLOR=""#C0C0C0"">] ", class );
+	fprintf(fp, "<FONT COLOR=""#FFFFFF"">%s<FONT COLOR=""#C0C0C0"">] ", class_name );
 	fprintf(fp, "%s", wch->name);
 	buf[0] = '\0';
 	buf2 = str_dup(wch->pcdata->title);

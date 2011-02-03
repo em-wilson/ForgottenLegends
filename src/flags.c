@@ -45,7 +45,7 @@ void do_flag(CHAR_DATA *ch, char *argument)
     char arg1[MAX_INPUT_LENGTH],arg2[MAX_INPUT_LENGTH],arg3[MAX_INPUT_LENGTH];
     char word[MAX_INPUT_LENGTH];
     CHAR_DATA *victim;
-    long *flag, old = 0, new = 0, marked = 0, pos;
+    long *flag, old = 0, new_flag = 0, marked = 0, pos;
     char type;
     const struct flag_type *flag_table;
 
@@ -192,7 +192,7 @@ void do_flag(CHAR_DATA *ch, char *argument)
 	victim->zone = NULL;
 
 	if (type != '=')
-	    new = old;
+	    new_flag = old;
 
         /* mark the words */
         for (; ;)
@@ -216,7 +216,7 @@ void do_flag(CHAR_DATA *ch, char *argument)
 	{
 	    if (!flag_table[pos].settable && IS_SET(old,flag_table[pos].bit))
 	    {
-		SET_BIT(new,flag_table[pos].bit);
+		SET_BIT(new_flag,flag_table[pos].bit);
 		continue;
 	    }
 
@@ -226,20 +226,20 @@ void do_flag(CHAR_DATA *ch, char *argument)
 		{
 		    case '=':
 		    case '+':
-			SET_BIT(new,flag_table[pos].bit);
+			SET_BIT(new_flag,flag_table[pos].bit);
 			break;
 		    case '-':
-			REMOVE_BIT(new,flag_table[pos].bit);
+			REMOVE_BIT(new_flag,flag_table[pos].bit);
 			break;
 		    default:
-			if (IS_SET(new,flag_table[pos].bit))
-			    REMOVE_BIT(new,flag_table[pos].bit);
+			if (IS_SET(new_flag,flag_table[pos].bit))
+			    REMOVE_BIT(new_flag,flag_table[pos].bit);
 			else
-			    SET_BIT(new,flag_table[pos].bit);
+			    SET_BIT(new_flag,flag_table[pos].bit);
 		}
 	    }
 	}
-	*flag = new;
+	*flag = new_flag;
 	return;
     }
 }

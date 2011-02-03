@@ -18,6 +18,31 @@
 						
 #define BOARD_NOTFOUND -1 /* Error code from board_lookup() and board_number */
 
+/*
+ * Data structure for notes.
+ */
+class NOTE_DATA
+{
+public:
+    NOTE_DATA *	next;
+    bool 	valid;
+    sh_int	type;
+    char *	sender;
+    char *	date;
+    char *	to_list;
+    char *	subject;
+    char *	text;
+    time_t  	date_stamp;
+    time_t      expire;
+
+    NOTE_DATA();
+    ~NOTE_DATA();
+};
+
+
+
+
+
 /* Data about a board */
 struct board_data
 {
@@ -46,11 +71,9 @@ typedef struct board_data BOARD_DATA;
 
 extern BOARD_DATA boards[MAX_BOARD]; /* Declare */
 
-
 /* Prototypes */
 
 void finish_note (BOARD_DATA *board, NOTE_DATA *note); /* attach a note to a board */
-void free_note   (NOTE_DATA *note); /* deallocate memory used by a note */
 void load_boards (void); /* load all boards */
 int board_lookup (const char *name); /* Find a board with that name */
 bool is_note_to (CHAR_DATA *ch, NOTE_DATA *note); /* is tha note to ch? */

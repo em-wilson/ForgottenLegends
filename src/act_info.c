@@ -168,8 +168,8 @@ void show_list_to_char( OBJ_DATA *list, CHAR_DATA *ch, bool fShort, bool fShowNo
 	send_to_char("That is WAY too much junk, drop some of it!\n\r",ch);
 	return;
     }
-    prgpstrShow	= alloc_mem( count * sizeof(char *) );
-    prgnShow    = alloc_mem( count * sizeof(int)    );
+    prgpstrShow = new char*[count];
+    prgnShow = new int;
     nShow	= 0;
 
     /*
@@ -253,8 +253,8 @@ void show_list_to_char( OBJ_DATA *list, CHAR_DATA *ch, bool fShort, bool fShowNo
      * Clean up.
      */
     free_buf(output);
-    free_mem( prgpstrShow, count * sizeof(char *) );
-    free_mem( prgnShow,    count * sizeof(int)    );
+    delete [] prgpstrShow;
+    delete prgnShow;
 
     return;
 }
@@ -1460,7 +1460,7 @@ void do_score( CHAR_DATA *ch, char *argument )
     sprintf(buf, "Race: %s  Sex: %s  Class: %s",
 	race_table[ch->race].name,
 	ch->sex == 0 ? "sexless" : ch->sex == 1 ? "male" : "female",
- 	IS_NPC(ch) ? "mobile" : class_table[ch->class].name);
+ 	IS_NPC(ch) ? "mobile" : class_table[ch->class_num].name);
     send_to_char(buf,ch);
 	
     if (ch->race == race_lookup("draconian"))
@@ -1873,7 +1873,7 @@ void do_whois (CHAR_DATA *ch, char *argument)
     {
 	CHAR_DATA *wch;
         char *race;
-	char const *class;
+	char const *class_name;
 
  	if (d->connected != CON_PLAYING || !can_see(ch,d->character))
 	    continue;
@@ -1888,18 +1888,18 @@ void do_whois (CHAR_DATA *ch, char *argument)
 	    found = TRUE;
 	    
 	    /* work out the printing */
-	    class = class_table[wch->class].who_name;
+	    class_name = class_table[wch->class_num].who_name;
 	    switch(wch->level)
 	    {
-		case MAX_LEVEL - 0 : class = "IMP"; 	break;
-		case MAX_LEVEL - 1 : class = "CRE";	break;
-		case MAX_LEVEL - 2 : class = "SUP";	break;
-		case MAX_LEVEL - 3 : class = "DEI";	break;
-		case MAX_LEVEL - 4 : class = "GOD";	break;
-		case MAX_LEVEL - 5 : class = "IMM";	break;
-		case MAX_LEVEL - 6 : class = "DEM";	break;
-		case MAX_LEVEL - 7 : class = "ANG";	break;
-		case MAX_LEVEL - 8 : class = "AVA";	break;
+		case MAX_LEVEL - 0 : class_name = "IMP"; 	break;
+		case MAX_LEVEL - 1 : class_name = "CRE";	break;
+		case MAX_LEVEL - 2 : class_name = "SUP";	break;
+		case MAX_LEVEL - 3 : class_name = "DEI";	break;
+		case MAX_LEVEL - 4 : class_name = "GOD";	break;
+		case MAX_LEVEL - 5 : class_name = "IMM";	break;
+		case MAX_LEVEL - 6 : class_name = "DEM";	break;
+		case MAX_LEVEL - 7 : class_name = "ANG";	break;
+		case MAX_LEVEL - 8 : class_name = "AVA";	break;
 	    }
     
 	    race = str_dup(pc_race_table[wch->race].who_name);
@@ -1917,7 +1917,7 @@ void do_whois (CHAR_DATA *ch, char *argument)
 
 	    /* a little formatting */
 	    sprintf(buf, "{w[{R%2d {y%6s {W%s{w]{x %s%s%s%s%s%s%s%s\n\r",
-		wch->level, race, class,
+		wch->level, race, class_name,
 	     wch->incog_level >= LEVEL_HERO ? "(Incog) ": "",
  	     wch->invis_level >= LEVEL_HERO ? "(Wizi) " : "",
 	     IS_CLANNED(wch) && (IS_IMMORTAL(ch) || wch->pcdata->clan == ch->pcdata->clan || wch->in_room == ch->in_room) ? wch->pcdata->clan->whoname : "",
@@ -2058,7 +2058,7 @@ void do_who( CHAR_DATA *ch, char *argument )
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
         CHAR_DATA *wch;
-        char const *class;
+        char const *class_name;
 	char *race;
  
         /*
@@ -2076,7 +2076,7 @@ void do_who( CHAR_DATA *ch, char *argument )
         if ( wch->level < iLevelLower
         ||   wch->level > iLevelUpper
         || ( fImmortalOnly  && wch->level < LEVEL_IMMORTAL )
-        || ( fClassRestrict && !rgfClass[wch->class] )
+        || ( fClassRestrict && !rgfClass[wch->class_num] )
         || ( fRaceRestrict && !rgfRace[wch->race])
  	|| ( fClan && !IS_IMMORTAL(ch) &&
 		(!IS_CLANNED(wch) ||
@@ -2092,20 +2092,20 @@ void do_who( CHAR_DATA *ch, char *argument )
         /*
          * Figure out what to print for class.
 	 */
-	class = class_table[wch->class].who_name;
+	class_name = class_table[wch->class_num].who_name;
 	switch ( wch->level )
 	{
 	default: break;
             {
-                case MAX_LEVEL - 0 : class = "IMP";     break;
-                case MAX_LEVEL - 1 : class = "CRE";     break;
-                case MAX_LEVEL - 2 : class = "SUP";     break;
-                case MAX_LEVEL - 3 : class = "DEI";     break;
-                case MAX_LEVEL - 4 : class = "GOD";     break;
-                case MAX_LEVEL - 5 : class = "IMM";     break;
-                case MAX_LEVEL - 6 : class = "DEM";     break;
-                case MAX_LEVEL - 7 : class = "ANG";     break;
-                case MAX_LEVEL - 8 : class = "AVA";     break;
+                case MAX_LEVEL - 0 : class_name = "IMP";     break;
+                case MAX_LEVEL - 1 : class_name = "CRE";     break;
+                case MAX_LEVEL - 2 : class_name = "SUP";     break;
+                case MAX_LEVEL - 3 : class_name = "DEI";     break;
+                case MAX_LEVEL - 4 : class_name = "GOD";     break;
+                case MAX_LEVEL - 5 : class_name = "IMM";     break;
+                case MAX_LEVEL - 6 : class_name = "DEM";     break;
+                case MAX_LEVEL - 7 : class_name = "ANG";     break;
+                case MAX_LEVEL - 8 : class_name = "AVA";     break;
             }
 	}
 
@@ -2126,7 +2126,7 @@ void do_who( CHAR_DATA *ch, char *argument )
 	 * Format it up.
 	 */
 	sprintf( buf, "{w[{R%2d {y%6s {W%s{w]{x %s%s%s%s%s%s%s%s\n\r",
-	    wch->level, race, class,
+	    wch->level, race, class_name,
 	    wch->incog_level >= LEVEL_HERO ? "(Incog) " : "",
 	    wch->invis_level >= LEVEL_HERO ? "(Wizi) " : "",
 	    IS_CLANNED(wch) && (IS_IMMORTAL(ch) || wch->pcdata->clan == ch->pcdata->clan || wch->in_room == ch->in_room) ? wch->pcdata->clan->whoname : "",
@@ -2617,7 +2617,7 @@ void do_practice( CHAR_DATA *ch, char *argument )
 	    return;
 	}
 
-	adept = IS_NPC(ch) ? 100 : class_table[ch->class].skill_adept;
+	adept = IS_NPC(ch) ? 100 : class_table[ch->class_num].skill_adept;
 
 	if ( ch->pcdata->learned[sn] >= adept )
 	{

@@ -94,10 +94,10 @@ void do_gain(CHAR_DATA *ch, char *argument)
 		break;
 
 	    if (!ch->pcdata->group_known[gn]
-	    &&  group_table[gn].rating[ch->class] > 0)
+	    &&  group_table[gn].rating[ch->class_num] > 0)
 	    {
 		sprintf(buf,"%-18s %-5d ",
-		    group_table[gn].name,group_table[gn].rating[ch->class]);
+		    group_table[gn].name,group_table[gn].rating[ch->class_num]);
 		send_to_char(buf,ch);
 		if (++col % 3 == 0)
 		    send_to_char("\n\r",ch);
@@ -188,14 +188,14 @@ void do_gain(CHAR_DATA *ch, char *argument)
 	    return;
 	}
 
-	if (group_table[gn].rating[ch->class] <= 0)
+	if (group_table[gn].rating[ch->class_num] <= 0)
 	{
 	    act("$N tells you 'That group is beyond your powers.'",
 		ch,NULL,trainer,TO_CHAR);
 	    return;
 	}
 
-	if (ch->train < group_table[gn].rating[ch->class])
+	if (ch->train < group_table[gn].rating[ch->class_num])
 	{
 	    act("$N tells you 'You are not yet ready for that group.'",
 		ch,NULL,trainer,TO_CHAR);
@@ -206,7 +206,7 @@ void do_gain(CHAR_DATA *ch, char *argument)
 	gn_add(ch,gn);
 	act("$N trains you in the art of $t",
 	    ch,group_table[gn].name,trainer,TO_CHAR);
-	ch->train -= group_table[gn].rating[ch->class];
+	ch->train -= group_table[gn].rating[ch->class_num];
 	return;
     }
 
@@ -518,10 +518,10 @@ void list_group_costs(CHAR_DATA *ch)
 
         if (!ch->gen_data->group_chosen[gn] 
 	&&  !ch->pcdata->group_known[gn]
-	&&  group_table[gn].rating[ch->class] > 0)
+	&&  group_table[gn].rating[ch->class_num] > 0)
 	{
 	    sprintf(buf,"%-18s %-5d ",group_table[gn].name,
-				    group_table[gn].rating[ch->class]);
+				    group_table[gn].rating[ch->class_num]);
 	    send_to_char(buf,ch);
 	    if (++col % 3 == 0)
 		send_to_char("\n\r",ch);
@@ -585,10 +585,10 @@ void list_group_chosen(CHAR_DATA *ch)
             break;
  
         if (ch->gen_data->group_chosen[gn] 
-	&&  group_table[gn].rating[ch->class] > 0)
+	&&  group_table[gn].rating[ch->class_num] > 0)
         {
             sprintf(buf,"%-18s %-5d ",group_table[gn].name,
-                                    group_table[gn].rating[ch->class]);
+                                    group_table[gn].rating[ch->class_num]);
             send_to_char(buf,ch);
             if (++col % 3 == 0)
                 send_to_char("\n\r",ch);
@@ -684,7 +684,7 @@ bool parse_gen_groups(CHAR_DATA *ch,char *argument)
 		return TRUE;
 	    }
 
-	    if (group_table[gn].rating[ch->class] < 1)
+	    if (group_table[gn].rating[ch->class_num] < 1)
 	    {
 	  	send_to_char("That group is not available.\n\r",ch);
 	 	return TRUE;
@@ -693,9 +693,9 @@ bool parse_gen_groups(CHAR_DATA *ch,char *argument)
 	    sprintf(buf,"%s group added\n\r",group_table[gn].name);
 	    send_to_char(buf,ch);
 	    ch->gen_data->group_chosen[gn] = TRUE;
-	    ch->gen_data->points_chosen += group_table[gn].rating[ch->class];
+	    ch->gen_data->points_chosen += group_table[gn].rating[ch->class_num];
 	    gn_add(ch,gn);
-	    ch->pcdata->points += group_table[gn].rating[ch->class];
+	    ch->pcdata->points += group_table[gn].rating[ch->class_num];
 	    return TRUE;
 	}
 
@@ -743,14 +743,14 @@ bool parse_gen_groups(CHAR_DATA *ch,char *argument)
 	{
 	    send_to_char("Group dropped.\n\r",ch);
 	    ch->gen_data->group_chosen[gn] = FALSE;
-	    ch->gen_data->points_chosen -= group_table[gn].rating[ch->class];
+	    ch->gen_data->points_chosen -= group_table[gn].rating[ch->class_num];
 	    gn_remove(ch,gn);
 	    for (i = 0; i < MAX_GROUP; i++)
 	    {
 		if (ch->gen_data->group_chosen[gn])
 		    gn_add(ch,gn);
 	    }
-	    ch->pcdata->points -= group_table[gn].rating[ch->class];
+	    ch->pcdata->points -= group_table[gn].rating[ch->class_num];
 	    return TRUE;
 	}
 
@@ -1010,7 +1010,7 @@ void group_add( CHAR_DATA *ch, const char *name, bool deduct)
 	{
 	    ch->pcdata->group_known[gn] = TRUE;
 	    if (deduct)
-		ch->pcdata->points += group_table[gn].rating[ch->class];
+		ch->pcdata->points += group_table[gn].rating[ch->class_num];
 	}
 	gn_add(ch,gn); /* make sure all skills in the group are known */
     }
@@ -1058,7 +1058,7 @@ int skill_level( CHAR_DATA *ch, int sn )
 		if (IS_MAGE(ch))
 		    return 15;
 		else
-		    return skill_table[sn].skill_level[ch->class];
+		    return skill_table[sn].skill_level[ch->class_num];
 	    }
 
 	    /* Now we see a bite */
@@ -1141,7 +1141,7 @@ int skill_level( CHAR_DATA *ch, int sn )
 	    if (IS_MAGE(ch) || IS_CLERIC(ch))
 		return 20;
 	    else
-		return skill_table[sn].skill_level[ch->class];
+		return skill_table[sn].skill_level[ch->class_num];
 	}
 
 	if (!str_cmp(skill_table[sn].name, "hide"))
@@ -1149,7 +1149,7 @@ int skill_level( CHAR_DATA *ch, int sn )
 	    if (IS_MAGE(ch) || IS_CLERIC(ch))
 		return 30;
 	    else
-		return skill_table[sn].skill_level[ch->class];
+		return skill_table[sn].skill_level[ch->class_num];
 	}
     }
 
@@ -1161,7 +1161,7 @@ int skill_level( CHAR_DATA *ch, int sn )
 	    if (IS_MAGE(ch) || IS_CLERIC(ch) || IS_THIEF(ch))
 		return 40;
 	    else
-		return skill_table[sn].skill_level[ch->class];
+		return skill_table[sn].skill_level[ch->class_num];
 	}
     }
 
@@ -1173,12 +1173,12 @@ int skill_level( CHAR_DATA *ch, int sn )
 	    if (IS_MAGE(ch) || IS_CLERIC(ch) || IS_THIEF(ch))
 		return 4;
 	    else
-		return skill_table[sn].skill_level[ch->class];
+		return skill_table[sn].skill_level[ch->class_num];
 	}
     }
 
     /* Everything else is set to default */
-    return skill_table[sn].skill_level[ch->class];
+    return skill_table[sn].skill_level[ch->class_num];
 }
 
 
@@ -1199,7 +1199,7 @@ int skill_rating( CHAR_DATA *ch, int sn )
 		if (IS_MAGE(ch))
 		    return 4;
 		else
-		    return skill_table[sn].rating[ch->class];
+		    return skill_table[sn].rating[ch->class_num];
 	    }
 
 	    /* Now we see a bite */
@@ -1282,7 +1282,7 @@ int skill_rating( CHAR_DATA *ch, int sn )
 	    if (IS_MAGE(ch) || IS_CLERIC(ch))
 		return 3;
 	    else
-		return skill_table[sn].rating[ch->class];
+		return skill_table[sn].rating[ch->class_num];
 	}
 
 	if (!str_cmp(skill_table[sn].name, "hide"))
@@ -1290,7 +1290,7 @@ int skill_rating( CHAR_DATA *ch, int sn )
 	    if (IS_MAGE(ch) || IS_CLERIC(ch))
 		return 4;
 	    else
-		return skill_table[sn].rating[ch->class];
+		return skill_table[sn].rating[ch->class_num];
 	}
     }
 
@@ -1302,7 +1302,7 @@ int skill_rating( CHAR_DATA *ch, int sn )
 	    if (IS_MAGE(ch) || IS_CLERIC(ch) || IS_THIEF(ch))
 		return 6;
 	    else
-		return skill_table[sn].rating[ch->class];
+		return skill_table[sn].rating[ch->class_num];
 	}
     }
 
@@ -1314,10 +1314,10 @@ int skill_rating( CHAR_DATA *ch, int sn )
 	    if (IS_MAGE(ch) || IS_CLERIC(ch) || IS_THIEF(ch))
 		return 2;
 	    else
-		return skill_table[sn].rating[ch->class];
+		return skill_table[sn].rating[ch->class_num];
 	}
     }
 
     /* Everything else is set to default */
-    return skill_table[sn].rating[ch->class];
+    return skill_table[sn].rating[ch->class_num];
 }

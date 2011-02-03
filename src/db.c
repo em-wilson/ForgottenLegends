@@ -30,13 +30,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <time.h>
-#if defined(macintosh)
-#include <types.h>
-#else
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/resource.h>
-#endif
 
 #include "merc.h"
 #include "db.h"
@@ -56,7 +53,6 @@ extern	int	_filbuf		args( (FILE *) );
 long random();
 void srandom(unsigned int);
 */
-int getpid();
 time_t time(time_t *tloc);
 #endif
 
@@ -264,7 +260,7 @@ void boot_db()
      * Init some data space stuff.
      */
     {
-	if ( ( string_space = calloc( 1, MAX_STRING ) ) == NULL )
+	if ( ( string_space = (char *)calloc( 1, MAX_STRING ) ) == NULL )
 	{
 	    bug( "Boot_db: can't alloc %d string space.", MAX_STRING );
 	    exit( 1 );
@@ -439,7 +435,7 @@ void load_area( FILE *fp )
 {
     AREA_DATA *pArea;
 
-    pArea		= alloc_perm( sizeof(*pArea) );
+    pArea		= (AREA_DATA*)alloc_perm( sizeof(*pArea) );
 /*  pArea->reset_first	= NULL;
     pArea->reset_last	= NULL; */
     pArea->file_name	= fread_string(fp);
@@ -517,7 +513,7 @@ void new_load_area( FILE *fp )
     char      *word;
     bool      fMatch;
 
-    pArea               = alloc_perm( sizeof(*pArea) );
+    pArea               = (AREA_DATA*)alloc_perm( sizeof(*pArea) );
     pArea->age          = 15;
     pArea->nplayer      = 0;
     pArea->file_name     = str_dup( strArea );
@@ -532,7 +528,7 @@ void new_load_area( FILE *fp )
 
     for ( ; ; )
     {
-       word   = feof( fp ) ? "End" : fread_word( fp );
+       word   = feof( fp ) ? (char*)"End" : fread_word( fp );
        fMatch = FALSE;
 
        switch ( UPPER(word[0]) )
@@ -712,7 +708,7 @@ void load_old_mob( FILE *fp )
 	}
 	fBootDb = TRUE;
 
-	pMobIndex			= alloc_perm( sizeof(*pMobIndex) );
+	pMobIndex			= (MOB_INDEX_DATA*)alloc_perm( sizeof(*pMobIndex) );
 	pMobIndex->vnum			= vnum;
         pMobIndex->area                 = area_last;               /* OLC */
 	pMobIndex->new_format		= FALSE;
@@ -847,7 +843,7 @@ void load_old_obj( FILE *fp )
 	}
 	fBootDb = TRUE;
 
-	pObjIndex			= alloc_perm( sizeof(*pObjIndex) );
+	pObjIndex			= (OBJ_INDEX_DATA*)alloc_perm( sizeof(*pObjIndex) );
 	pObjIndex->vnum			= vnum;
         pObjIndex->area                 = area_last;            /* OLC */
 	pObjIndex->new_format		= FALSE;
@@ -878,9 +874,9 @@ void load_old_obj( FILE *fp )
 
 	if (pObjIndex->item_type == ITEM_WEAPON)
 	{
-	    if (is_name("two",pObjIndex->name) 
-	    ||  is_name("two-handed",pObjIndex->name) 
-	    ||  is_name("claymore",pObjIndex->name))
+	    if (is_name((char*)"two",pObjIndex->name) 
+	    ||  is_name((char*)"two-handed",pObjIndex->name) 
+	    ||  is_name((char*)"claymore",pObjIndex->name))
 		SET_BIT(pObjIndex->value[4],WEAPON_TWO_HANDS);
 	}
 
@@ -894,7 +890,7 @@ void load_old_obj( FILE *fp )
 	    {
 		AFFECT_DATA *paf;
 
-		paf			= alloc_perm( sizeof(*paf) );
+		paf			= (AFFECT_DATA*)alloc_perm( sizeof(*paf) );
 		paf->where		= TO_OBJECT;
 		paf->type		= -1;
 		paf->level		= 20; /* RT temp fix */
@@ -911,7 +907,7 @@ void load_old_obj( FILE *fp )
 	    {
 		EXTRA_DESCR_DATA *ed;
 
-		ed			= alloc_perm( sizeof(*ed) );
+		ed			= (EXTRA_DESCR_DATA*)alloc_perm( sizeof(*ed) );
 		ed->keyword		= fread_string( fp );
 		ed->description		= fread_string( fp );
 		ed->next		= pObjIndex->extra_descr;
@@ -1024,7 +1020,7 @@ void load_resets( FILE *fp )
 	    continue;
 	}
 
-	pReset		= alloc_perm( sizeof(*pReset) );
+	pReset		= (RESET_DATA*)alloc_perm( sizeof(*pReset) );
 	pReset->command	= letter;
 	/* if_flag */	  fread_number( fp );
 	pReset->arg1	= fread_number( fp );
@@ -1169,7 +1165,7 @@ void load_rooms( FILE *fp )
 	}
 	fBootDb = TRUE;
 
-	pRoomIndex			= alloc_perm( sizeof(*pRoomIndex) );
+	pRoomIndex			= (ROOM_INDEX_DATA*)alloc_perm( sizeof(*pRoomIndex) );
 	pRoomIndex->owner		= str_dup("");
 	pRoomIndex->people		= NULL;
 	pRoomIndex->contents		= NULL;
@@ -1228,7 +1224,7 @@ void load_rooms( FILE *fp )
 		    exit( 1 );
 		}
 
-		pexit			= alloc_perm( sizeof(*pexit) );
+		pexit			= (EXIT_DATA*)alloc_perm( sizeof(*pexit) );
 		pexit->description	= fread_string( fp );
 		if (sec == 4)
 		    fread_string( fp );
@@ -1260,7 +1256,7 @@ void load_rooms( FILE *fp )
 	    {
 		EXTRA_DESCR_DATA *ed;
 
-		ed			= alloc_perm( sizeof(*ed) );
+		ed			= (EXTRA_DESCR_DATA*)alloc_perm( sizeof(*ed) );
 		ed->keyword		= fread_string( fp );
 		ed->description		= fread_string( fp );
 		ed->next		= pRoomIndex->extra_descr;
@@ -1311,7 +1307,7 @@ void load_shops( FILE *fp )
 	MOB_INDEX_DATA *pMobIndex;
 	int iTrade;
 
-	pShop			= alloc_perm( sizeof(*pShop) );
+	pShop			= (SHOP_DATA*)alloc_perm( sizeof(*pShop) );
 	pShop->keeper		= fread_number( fp );
 	if ( pShop->keeper == 0 )
 	    break;
@@ -1486,7 +1482,7 @@ void load_mobprogs( FILE *fp )
 	}
 	fBootDb = TRUE;
 
-	pMprog		= alloc_perm( sizeof(*pMprog) );
+	pMprog		= (MPROG_CODE*)alloc_perm( sizeof(*pMprog) );
 	pMprog->vnum  	= vnum;
 	pMprog->code  	= fread_string( fp );
 	if ( mprog_list == NULL )
@@ -2166,7 +2162,7 @@ void clone_mobile(CHAR_DATA *parent, CHAR_DATA *clone)
     clone->description	= str_dup(parent->description);
     clone->group	= parent->group;
     clone->sex		= parent->sex;
-    clone->class	= parent->class;
+    clone->class_num= parent->class_num;
     clone->race		= parent->race;
     clone->level	= parent->level;
     clone->trust	= 0;
@@ -2987,90 +2983,6 @@ char *fread_word( FILE *fp )
     return NULL;
 }
 
-/*
- * Allocate some ordinary memory,
- *   with the expectation of freeing it someday.
- */
-void *alloc_mem( int sMem )
-{
-    void *pMem;
-    int *magic;
-    int iList;
-
-    sMem += sizeof(*magic);
-
-    for ( iList = 0; iList < MAX_MEM_LIST; iList++ )
-    {
-        if ( sMem <= rgSizeList[iList] )
-            break;
-    }
-
-    if ( iList == MAX_MEM_LIST )
-    {
-        bug( "Alloc_mem: size %d too large.", sMem );
-        exit( 1 );
-    }
-
-    if ( rgFreeList[iList] == NULL )
-    {
-        pMem              = alloc_perm( rgSizeList[iList] );
-    }
-    else
-    {
-        pMem              = rgFreeList[iList];
-        rgFreeList[iList] = * ((void **) rgFreeList[iList]);
-    }
-
-    magic = (int *) pMem;
-    *magic = MAGIC_NUM;
-    pMem += sizeof(*magic);
-
-    return pMem;
-}
-
-
-
-/*
- * Free some memory.
- * Recycle it back onto the free list for blocks of that size.
- */
-void free_mem( void *pMem, int sMem )
-{
-    int iList;
-    int *magic;
-
-    pMem -= sizeof(*magic);
-    magic = (int *) pMem;
-
-    if (*magic != MAGIC_NUM)
-    {
-        bug("Attempt to recyle invalid memory of size %d.",sMem);
-        bug((char*) pMem + sizeof(*magic),0);
-        abort( );
-        return;
-    }
-
-    *magic = 0;
-    sMem += sizeof(*magic);
-
-    for ( iList = 0; iList < MAX_MEM_LIST; iList++ )
-    {
-        if ( sMem <= rgSizeList[iList] )
-            break;
-    }
-
-    if ( iList == MAX_MEM_LIST )
-    {
-        bug( "Free_mem: size %d too large.", sMem );
-        exit( 1 );
-    }
-
-    * ((void **) pMem) = rgFreeList[iList];
-    rgFreeList[iList]  = pMem;
-
-    return;
-}
-
 
 /*
  * Allocate some permanent memory.
@@ -3094,7 +3006,7 @@ void *alloc_perm( int sMem )
     if ( pMemPerm == NULL || iMemPerm + sMem > MAX_PERM_BLOCK )
     {
 	iMemPerm = 0;
-	if ( ( pMemPerm = calloc( 1, MAX_PERM_BLOCK ) ) == NULL )
+	if ( ( pMemPerm = (char*)calloc( 1, MAX_PERM_BLOCK ) ) == NULL )
 	{
 	    perror( "Alloc_perm" );
 	    exit( 1 );
@@ -3124,7 +3036,7 @@ char *str_dup( const char *str )
     if ( str >= string_space && str < top_string )
 	return (char *) str;
 
-    str_new = alloc_mem( strlen(str) + 1 );
+    str_new = new char[strlen(str) + 1];
     strcpy( str_new, str );
     return str_new;
 }
@@ -3143,7 +3055,7 @@ void free_string( char *pstr )
     || ( pstr >= string_space && pstr < top_string ) )
 	return;
 
-    free_mem( pstr, strlen(pstr) + 1 );
+    delete [] pstr;
     return;
 }
 

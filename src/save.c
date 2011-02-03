@@ -34,7 +34,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-//#include <malloc.h>
+#include <stdlib.h>
 #include "merc.h"
 #include "recycle.h"
 #include "tables.h"
@@ -197,7 +197,7 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
     if (ch->pcdata->clan)
     	fprintf( fp, "Clan %s~\n", ch->pcdata->clan->name);
     fprintf( fp, "Sex  %d\n",	ch->sex			);
-    fprintf( fp, "Cla  %d\n",	ch->class		);
+    fprintf( fp, "Cla  %d\n",	ch->class_num		);
     fprintf( fp, "Levl %d\n",	ch->level		);
     if (ch->trust != 0)
 	fprintf( fp, "Tru  %d\n",	ch->trust	);
@@ -685,8 +685,8 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
     if (found && ch->version < 2)  /* need to add the new skills */
     {
 	group_add(ch,"rom basics",FALSE);
-	group_add(ch,class_table[ch->class].base_group,FALSE);
-	group_add(ch,class_table[ch->class].default_group,TRUE);
+	group_add(ch,class_table[ch->class_num].base_group,FALSE);
+	group_add(ch,class_table[ch->class_num].default_group,TRUE);
 	ch->pcdata->learned[gsn_recall] = 50;
     }
  
@@ -765,7 +765,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
 
     for ( ; ; )
     {
-	word   = feof( fp ) ? "End" : fread_word( fp );
+	word   = feof( fp ) ? (char*)"End" : fread_word( fp );
 	fMatch = FALSE;
 
 	switch ( UPPER(word[0]) )
@@ -934,8 +934,8 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
             break;
 
 	case 'C':
-	    KEY( "Class",	ch->class,		fread_number( fp ) );
-	    KEY( "Cla",		ch->class,		fread_number( fp ) );
+	    KEY( "Class",	ch->class_num,		fread_number( fp ) );
+	    KEY( "Cla",		ch->class_num,		fread_number( fp ) );
 	    KEY( "Clan",	ch->pcdata->clan,	get_clan(fread_string(fp)));
 
 	    if ( !str_cmp( word, "Condition" ) || !str_cmp(word,"Cond"))
@@ -1229,7 +1229,7 @@ void fread_pet( CHAR_DATA *ch, FILE *fp )
     int percent;
 
     /* first entry had BETTER be the vnum or we barf */
-    word = feof(fp) ? "END" : fread_word(fp);
+    word = feof(fp) ? (char*)"END" : fread_word(fp);
     if (!str_cmp(word,"Vnum"))
     {
     	int vnum;
@@ -1251,7 +1251,7 @@ void fread_pet( CHAR_DATA *ch, FILE *fp )
     
     for ( ; ; )
     {
-    	word 	= feof(fp) ? "END" : fread_word(fp);
+    	word 	= feof(fp) ? (char*)"END" : fread_word(fp);
     	fMatch = FALSE;
     	
     	switch (UPPER(word[0]))
@@ -1356,7 +1356,7 @@ void fread_pet( CHAR_DATA *ch, FILE *fp )
     	     break;
     	     
     	 case 'E':
-    	     if (!str_cmp(word,"End"))
+    	     if (!str_cmp(word,(char*)"End"))
 	     {
 		pet->leader = ch;
 		pet->master = ch;
@@ -1452,7 +1452,7 @@ void fread_obj( CHAR_DATA *ch, FILE *fp )
     new_format = FALSE;
     make_new = FALSE;
 
-    word   = feof( fp ) ? "End" : fread_word( fp );
+    word   = feof( fp ) ? (char*)"End" : fread_word( fp );
     if (!str_cmp(word,"Vnum" ))
     {
         int vnum;
@@ -1488,7 +1488,7 @@ void fread_obj( CHAR_DATA *ch, FILE *fp )
 	if (first)
 	    first = FALSE;
 	else
-	    word   = feof( fp ) ? "End" : fread_word( fp );
+	    word   = feof( fp ) ? (char*)"End" : fread_word( fp );
 	fMatch = FALSE;
 
 	switch ( UPPER(word[0]) )
@@ -1583,7 +1583,7 @@ void fread_obj( CHAR_DATA *ch, FILE *fp )
 		fMatch = TRUE;
 	    }
 
-	    if ( !str_cmp( word, "End" ) )
+	    if ( !str_cmp( word, (char*)"End" ) )
 	    {
 		if ( !fNest || ( fVnum && obj->pIndexData == NULL ) )
 		{

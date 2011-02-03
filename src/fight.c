@@ -488,8 +488,8 @@ void one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt, bool secondary )
     }
     else
     {
-	thac0_00 = class_table[ch->class].thac0_00;
-	thac0_32 = class_table[ch->class].thac0_32;
+	thac0_00 = class_table[ch->class_num].thac0_00;
+	thac0_32 = class_table[ch->class_num].thac0_32;
     }
     thac0  = interpolate( ch->level, thac0_00, thac0_32 );
 
@@ -3170,7 +3170,7 @@ void do_flee( CHAR_DATA *ch, char *argument )
 	if ( !IS_NPC(ch) )
 	{
 	    send_to_char( "You flee from combat!\n\r", ch );
-	if( (ch->class == 2) 
+	if( (ch->class_num == 2) 
 	    && (number_percent() < 3*(ch->level/2) ) )
 		send_to_char( "You snuck away safely.\n\r", ch);
 	else
@@ -3607,7 +3607,7 @@ void do_endure(CHAR_DATA *ch, char *arg)
       return;
     }
 
-  if ( ch->level < skill_table[gsn_endure].skill_level[ch->class] ||
+  if ( ch->level < skill_table[gsn_endure].skill_level[ch->class_num] ||
        ch->pcdata->learned[gsn_endure] <= 1 )
     {
       send_to_char("You lack the concentration.\n\r",ch);
@@ -3711,7 +3711,7 @@ void do_assassinate( CHAR_DATA *ch, char *argument )
 	return;
 
     if ( !IS_NPC(ch)
-    &&   ch->level < skill_table[gsn_assassinate].skill_level[ch->class] )
+    &&   ch->level < skill_table[gsn_assassinate].skill_level[ch->class_num] )
       {
 	send_to_char("You don't know how to assassinate.\n\r",ch);
 	return;
@@ -3811,7 +3811,7 @@ void do_strangle(CHAR_DATA *ch, char *argument)
     AFFECT_DATA af;
 
     if ( IS_NPC(ch) ||
-	 ch->level < skill_table[gsn_strangle].skill_level[ch->class] )
+	 ch->level < skill_table[gsn_strangle].skill_level[ch->class_num] )
     {
 	send_to_char("You lack the skill to strangle.\n\r",ch);
 	return;
@@ -3888,7 +3888,7 @@ void do_blackjack(CHAR_DATA *ch, char *argument)
     int chance;
 
     if ( IS_NPC(ch) ||
-	 ch->level < skill_table[gsn_blackjack].skill_level[ch->class] )
+	 ch->level < skill_table[gsn_blackjack].skill_level[ch->class_num] )
 
     {
 	send_to_char("Huh?\n\r",ch);

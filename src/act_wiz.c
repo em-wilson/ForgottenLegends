@@ -1703,7 +1703,7 @@ void do_mstat( CHAR_DATA *ch, char *argument )
     sprintf( buf,
 	"Lv: %d  Class: %s  Align: %d  Gold: %ld  Silver: %ld  Exp: %d\n\r",
 	victim->level,       
-	IS_NPC(victim) ? "mobile" : class_table[victim->class].name,            
+	IS_NPC(victim) ? "mobile" : class_table[victim->class_num].name,            
 	victim->alignment,
 	victim->gold, victim->silver, victim->exp );
     send_to_char( buf, ch );
@@ -3723,7 +3723,7 @@ void do_mset( CHAR_DATA *ch, char *argument )
 
     if ( !str_prefix( arg2, "class" ) )
     {
-	int class;
+	int class_num;
 
 	if (IS_NPC(victim))
 	{
@@ -3731,17 +3731,17 @@ void do_mset( CHAR_DATA *ch, char *argument )
 	    return;
 	}
 
-	class = class_lookup(arg3);
-	if ( class == -1 )
+	class_num = class_lookup(arg3);
+	if ( class_num == -1 )
 	{
 	    char buf[MAX_STRING_LENGTH];
 
         	strcpy( buf, "Possible classes are: " );
-        	for ( class = 0; class < MAX_CLASS; class++ )
+        	for ( class_num = 0; class_num < MAX_CLASS; class_num++ )
         	{
-            	    if ( class > 0 )
+            	    if ( class_num > 0 )
                     	strcat( buf, " " );
-            	    strcat( buf, class_table[class].name );
+            	    strcat( buf, class_table[class_num].name );
         	}
             strcat( buf, ".\n\r" );
 
@@ -3749,7 +3749,7 @@ void do_mset( CHAR_DATA *ch, char *argument )
 	    return;
 	}
 
-	victim->class = class;
+	victim->class_num = class_num;
 	return;
     }
 
@@ -5132,7 +5132,7 @@ void do_laston ( CHAR_DATA *ch, char *argument )
     {
 	char *word;
 	fread_to_eol(fp);
-	word = feof(fp) ? "End" : fread_word(fp);
+	word = feof(fp) ? (char*)"End" : fread_word(fp);
 	switch(UPPER(word[0]))
 	{
 	  case 'C':

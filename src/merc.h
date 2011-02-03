@@ -42,9 +42,6 @@
 #define DECLARE_SPELL_FUN( fun )	SPELL_FUN fun
 #endif
 
-/* system calls */
-int unlink();
-int system();
 
 
 
@@ -65,11 +62,9 @@ int system();
 #define const
 #endif
 typedef int				sh_int;
-typedef int				bool;
 #define unix
 #else
 typedef short   int			sh_int;
-typedef unsigned char			bool;
 #endif
 
 
@@ -92,7 +87,6 @@ typedef struct	kill_data		KILL_DATA;
 typedef struct	mem_data		MEM_DATA;
 typedef struct	mob_index_data		MOB_INDEX_DATA;
 typedef struct  web_index_data          WEB_INDEX_DATA;
-typedef struct	note_data		NOTE_DATA;
 typedef struct	obj_data		OBJ_DATA;
 typedef struct	obj_index_data		OBJ_INDEX_DATA;
 typedef struct	pc_data			PC_DATA;
@@ -541,25 +535,6 @@ struct spec_type
 {
     char * 	name;			/* special function name */
     SPEC_FUN *	function;		/* the function */
-};
-
-
-
-/*
- * Data structure for notes.
- */
-struct	note_data
-{
-    NOTE_DATA *	next;
-    bool 	valid;
-    sh_int	type;
-    char *	sender;
-    char *	date;
-    char *	to_list;
-    char *	subject;
-    char *	text;
-    time_t  	date_stamp;
-    time_t      expire;
 };
 
 
@@ -1555,7 +1530,7 @@ struct	char_data
     char *		prefix;
     sh_int		group;
     sh_int		sex;
-    sh_int		class;
+    sh_int		class_num;
     sh_int		race;
     sh_int		level;
     sh_int		trust;
@@ -2164,11 +2139,11 @@ do                                                              \
                                 && ch->pcdata->clan != NULL)
 
 /* Class macros by Blizzard */
-#define IS_MAGE( ch )		( ch->class == class_lookup("mage") )
-#define IS_THIEF( ch )		( ch->class == class_lookup("thief") )
-#define IS_CLERIC( ch )		( ch->class == class_lookup("cleric") )
-#define IS_WARRIOR( ch )	( ch->class == class_lookup("warrior") )
-#define IS_ARCHER( ch )		( ( !IS_NPC(ch) && ch->class == class_lookup("warrior") ) \
+#define IS_MAGE( ch )		( ch->class_num == class_lookup("mage") )
+#define IS_THIEF( ch )		( ch->class_num == class_lookup("thief") )
+#define IS_CLERIC( ch )		( ch->class_num == class_lookup("cleric") )
+#define IS_WARRIOR( ch )	( ch->class_num == class_lookup("warrior") )
+#define IS_ARCHER( ch )		( ( !IS_NPC(ch) && ch->class_num == class_lookup("warrior") ) \
 				    || (IS_NPC(ch) && IS_SET(ch->act, ACT_ARCHER)))
 
 /* Werefolk macros by Blizzard */
@@ -2490,9 +2465,7 @@ char *  fread_string_eol args(( FILE *fp ) );
 void	fread_to_eol	args( ( FILE *fp ) );
 char *	fread_word	args( ( FILE *fp ) );
 long	flag_convert	args( ( char letter) );
-void *	alloc_mem	args( ( int sMem ) );
 void *	alloc_perm	args( ( int sMem ) );
-void	free_mem	args( ( void *pMem, int sMem ) );
 char *	str_dup		args( ( const char *str ) );
 void	free_string	args( ( char *pstr ) );
 int	number_fuzzy	args( ( int number ) );
@@ -2529,9 +2502,9 @@ bool 	is_safe_spell	args( (CHAR_DATA *ch, CHAR_DATA *victim, bool area ) );
 void	violence_update	args( ( void ) );
 void	multi_hit	args( ( CHAR_DATA *ch, CHAR_DATA *victim, int dt ) );
 bool	damage		args( ( CHAR_DATA *ch, CHAR_DATA *victim, int dam,
-			        int dt, int class, bool show ) );
+			        int dt, int class_type, bool show ) );
 bool    damage_old      args( ( CHAR_DATA *ch, CHAR_DATA *victim, int dam,
-                                int dt, int class, bool show ) );
+                                int dt, int class_type, bool show ) );
 void	update_pos	args( ( CHAR_DATA *victim ) );
 void	stop_fighting	args( ( CHAR_DATA *ch, bool fBoth ) );
 void	check_killer	args( ( CHAR_DATA *ch, CHAR_DATA *victim) );
@@ -2624,7 +2597,7 @@ char *	weapon_bit_name	args( ( int weapon_flags ) );
 char *  comm_bit_name	args( ( int comm_flags ) );
 char *	cont_bit_name	args( ( int cont_flags) );
 CD   *	get_char_area	args( ( CHAR_DATA *ch, char *argument ) );
-bool	can_be_class	args( ( CHAR_DATA *ch, int class ) );
+bool	can_be_class	args( ( CHAR_DATA *ch, int class_num ) );
 
 /* interp.c */
 void	interpret	args( ( CHAR_DATA *ch, char *argument ) );
@@ -2698,7 +2671,7 @@ void	update_handler	args( ( void ) );
 /* string.c */
 void	string_edit	args( ( CHAR_DATA *ch, char **pString ) );
 void    string_append   args( ( CHAR_DATA *ch, char **pString ) );
-char *	string_replace	args( ( char * orig, char * old, char * new ) );
+char *	string_replace	args( ( char * orig, char * old, char * new_string ) );
 void    string_add      args( ( CHAR_DATA *ch, char *argument ) );
 char *  format_string   args( ( char *oldstring /*, bool fSpace */ ) );
 char *  first_arg       args( ( char *argument, char *arg_first, bool fCase ) );

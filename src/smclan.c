@@ -162,7 +162,7 @@ void fread_clan( CLAN_DATA *clan, FILE *fp )
 
     for ( ; ; )
     {
-	word   = feof( fp ) ? "End" : fread_word( fp );
+	word   = feof( fp ) ? (char*)"End" : fread_word( fp );
 	fMatch = FALSE;
 
 	switch ( UPPER(word[0]) )
@@ -362,7 +362,7 @@ void load_clans( )
 
     for ( ; ; )
     {
-	filename = feof( fpList ) ? "$" : fread_word( fpList );
+	filename = feof( fpList ) ? (char*)"$" : fread_word( fpList );
 	log_string( filename );
 	if ( filename[0] == '$' )
 	  break;
@@ -526,7 +526,7 @@ void do_outcast( CHAR_DATA *ch, char *argument )
 	free_string( ch->pcdata->clan->number2 );
 	ch->pcdata->clan->number2 = str_dup( "" );
     }
-    victim->pcdata->clan = get_clan("outcast");
+    victim->pcdata->clan = get_clan((char*)"outcast");
     act( "You outcast $N from $t", ch, clan->name, victim, TO_CHAR );
     act( "$n outcasts you from $t", ch, clan->name, victim, TO_VICT );
     save_char_obj( victim );	/* clan gets saved when pfile is saved */
@@ -624,7 +624,7 @@ void do_setclan( CHAR_DATA *ch, char *argument )
 	}
 
 	send_to_char("That flag does not exist.\n\rList of flags:\n\r", ch);
-	do_setclan(ch,"flags");
+	do_setclan(ch,(char*)"flags");
 	return;
     }
     if ( !str_prefix( arg2, "whoname" ) )
@@ -688,7 +688,7 @@ void do_setclan( CHAR_DATA *ch, char *argument )
 	save_clan( clan );
 	return;
     }
-    do_setclan( ch, "" );
+    do_setclan( ch, (char*)"" );
     return;
 }
 

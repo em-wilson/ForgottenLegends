@@ -307,13 +307,13 @@ bool show_help( CHAR_DATA *ch, char *argument )
 	    }
 	    else
 	    {
-		show_flag_cmds( ch, help_table[cnt].structure );
+		show_flag_cmds( ch, (flag_type*)help_table[cnt].structure );
 		return FALSE;
 	    }
 	}
     }
 
-    show_help( ch, "" );
+    show_help( ch, (char*)"" );
     return FALSE;
 }
 
@@ -344,7 +344,7 @@ REDIT( redit_rlist )
 		    vnum, capitalize( pRoomIndex->name ) );
 		add_buf( buf1, buf );
 		if ( ++col % 3 == 0 )
-		    add_buf( buf1, "\n\r" );
+		    add_buf( buf1, (char*)"\n\r" );
 	}
     }
 
@@ -355,7 +355,7 @@ REDIT( redit_rlist )
     }
 
     if ( col % 3 != 0 )
-	add_buf( buf1, "\n\r" );
+	add_buf( buf1, (char*)"\n\r" );
 
     page_to_char( buf_string(buf1), ch );
     free_buf(buf1);
@@ -397,7 +397,7 @@ REDIT( redit_mlist )
 		    pMobIndex->vnum, capitalize( pMobIndex->short_descr ) );
 		add_buf( buf1, buf );
 		if ( ++col % 3 == 0 )
-		    add_buf( buf1, "\n\r" );
+		    add_buf( buf1, (char*)"\n\r" );
 	    }
 	}
     }
@@ -409,7 +409,7 @@ REDIT( redit_mlist )
     }
 
     if ( col % 3 != 0 )
-	add_buf( buf1, "\n\r" );
+	add_buf( buf1, (char*)"\n\r" );
 
     page_to_char( buf_string(buf1), ch );
     free_buf(buf1);
@@ -454,7 +454,7 @@ REDIT( redit_olist )
 		    pObjIndex->vnum, capitalize( pObjIndex->short_descr ) );
 		add_buf( buf1, buf );
 		if ( ++col % 3 == 0 )
-		    add_buf( buf1, "\n\r" );
+		    add_buf( buf1, (char*)"\n\r" );
 	    }
 	}
     }
@@ -466,7 +466,7 @@ REDIT( redit_olist )
     }
 
     if ( col % 3 != 0 )
-	add_buf( buf1, "\n\r" );
+	add_buf( buf1, (char*)"\n\r" );
 
     page_to_char( buf_string(buf1), ch );
     free_buf(buf1);
@@ -897,7 +897,7 @@ AEDIT( aedit_builder )
 
     if ( strstr( pArea->builders, name ) != '\0' )
     {
-	pArea->builders = string_replace( pArea->builders, name, "\0" );
+	pArea->builders = string_replace( pArea->builders, name, (char*)"\0" );
 	pArea->builders = string_unpad( pArea->builders );
 
 	if ( pArea->builders[0] == '\0' )
@@ -913,7 +913,7 @@ AEDIT( aedit_builder )
 	buf[0] = '\0';
 	if ( strstr( pArea->builders, "None" ) != '\0' )
 	{
-	    pArea->builders = string_replace( pArea->builders, "None", "\0" );
+	    pArea->builders = string_replace( pArea->builders, (char*)"None",(char*) "\0" );
 	    pArea->builders = string_unpad( pArea->builders );
 	}
 
@@ -1319,7 +1319,7 @@ bool change_exit( CHAR_DATA *ch, char *argument, int door )
 
     if ( command[0] == '?' )
     {
-	do_help( ch, "EXIT" );
+	do_help( ch, (char*)"EXIT" );
 	return FALSE;
     }
 
@@ -1738,7 +1738,7 @@ REDIT( redit_ed )
 	return TRUE;
     }
 
-    redit_ed( ch, "" );
+    redit_ed( ch, (char*)"" );
     return FALSE;
 }
 
@@ -2466,7 +2466,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	    switch ( value_num )
 	    {
 	        default:
-		    do_help( ch, "ITEM_LIGHT" );
+		    do_help( ch, (char*)"ITEM_LIGHT" );
 	            return FALSE;
 	        case 2:
 	            send_to_char( "HOURS OF LIGHT SET.\n\r\n\r", ch );
@@ -2493,7 +2493,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	    switch ( value_num )
 	    {
 	        default:
-		    do_help( ch, "ITEM_STAFF_WAND" );
+		    do_help( ch, (char*)"ITEM_STAFF_WAND" );
 	            return FALSE;
 	        case 0:
 	            send_to_char( "SPELL LEVEL SET.\n\r\n\r", ch );
@@ -2520,7 +2520,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	    switch ( value_num )
 	    {
 	        default:
-		    do_help( ch, "ITEM_SCROLL_POTION_PILL" );
+		    do_help( ch, (char*)(char*)"ITEM_SCROLL_POTION_PILL" );
 	            return FALSE;
 	        case 0:
 	            send_to_char( "SPELL LEVEL SET.\n\r\n\r", ch );
@@ -2551,7 +2551,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	    switch ( value_num )
 	    {
 	        default:
-		    do_help( ch, "ITEM_ARMOR" );
+		    do_help( ch, (char*)"ITEM_ARMOR" );
 		    return FALSE;
 	        case 0:
 		    send_to_char( "AC PIERCE SET.\n\r\n\r", ch );
@@ -2596,7 +2596,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	    switch ( value_num )
 	    {
 	        default:
-		    do_help( ch, "ITEM_WEAPON" );
+		    do_help( ch, (char*)"ITEM_WEAPON" );
 	            return FALSE;
 	        case 0:
 		    send_to_char( "WEAPON CLASS SET.\n\r\n\r", ch );
@@ -2626,7 +2626,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	    switch ( value_num )
 	    {
 		default:
-		    do_help( ch, "ITEM_ARROW" );
+		    do_help( ch, (char*)"ITEM_ARROW" );
 		    return FALSE;
 		case 0:
 		    send_to_char("AMOUNT OF ARROWS SET.\n\r\n\r", ch );
@@ -2639,7 +2639,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	    switch ( value_num )
 	    {
 	        default:
-		    do_help( ch, "ITEM_BOW" );
+		    do_help( ch, (char*)"ITEM_BOW" );
 	            return FALSE;
 	        case 0:
 		    send_to_char( "WEAPON RANGE SET.\n\r\n\r", ch );
@@ -2669,7 +2669,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	    switch ( value_num )
 	    {
 	        default:
-	            do_help(ch, "ITEM_PORTAL" );
+	            do_help(ch, (char*)"ITEM_PORTAL" );
 	            return FALSE;
 	            
 	    	case 0:
@@ -2695,7 +2695,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	    switch ( value_num )
 	    {
 	        default:
-	            do_help( ch, "ITEM_FURNITURE" );
+	            do_help( ch, (char*)"ITEM_FURNITURE" );
 	            return FALSE;
 	            
 	        case 0:
@@ -2728,7 +2728,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 		int value;
 		
 		default:
-		    do_help( ch, "ITEM_CONTAINER" );
+		    do_help( ch, (char*)"ITEM_CONTAINER" );
 	            return FALSE;
 		case 0:
 	            send_to_char( "WEIGHT CAPACITY SET.\n\r\n\r", ch );
@@ -2740,7 +2740,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	        	TOGGLE_BIT(pObj->value[1], value);
 		    else
 		    {
-			do_help ( ch, "ITEM_CONTAINER" );
+			do_help ( ch, (char*)"ITEM_CONTAINER" );
 			return FALSE;
 		    }
 	            send_to_char( "CONTAINER TYPE SET.\n\r\n\r", ch );
@@ -2778,7 +2778,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	    switch ( value_num )
 	    {
 	        default:
-		    do_help( ch, "ITEM_DRINK" );
+		    do_help( ch, (char*)"ITEM_DRINK" );
 /* OLC		    do_help( ch, "liquids" );    */
 	            return FALSE;
 	        case 0:
@@ -2805,7 +2805,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	    switch (value_num)
 	    {
 	    	default:
-		    do_help( ch, "ITEM_FOUNTAIN" );
+		    do_help( ch, (char*)"ITEM_FOUNTAIN" );
 /* OLC		    do_help( ch, "liquids" );    */
 	            return FALSE;
 	        case 0:
@@ -2828,7 +2828,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	    switch ( value_num )
 	    {
 	        default:
-		    do_help( ch, "ITEM_FOOD" );
+		    do_help( ch, (char*)"ITEM_FOOD" );
 	            return FALSE;
 	        case 0:
 	            send_to_char( "HOURS OF FOOD SET.\n\r\n\r", ch );
@@ -2849,7 +2849,7 @@ bool set_obj_values( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, int value_num, char *a
 	    switch ( value_num )
 	    {
 	        default:
-		    do_help( ch, "ITEM_MONEY" );
+		    do_help( ch, (char*)"ITEM_MONEY" );
 	            return FALSE;
 	        case 0:
 	            send_to_char( "GOLD AMOUNT SET.\n\r\n\r", ch );
@@ -2983,7 +2983,7 @@ OEDIT( oedit_addaffect )
     if ( ( value = flag_value( apply_flags, loc ) ) == NO_FLAG ) /* Hugin */
     {
         send_to_char( "Valid affects are:\n\r", ch );
-	show_help( ch, "apply" );
+	show_help( ch, (char*)"apply" );
 	return FALSE;
     }
 
@@ -3022,14 +3022,14 @@ OEDIT( oedit_addapply )
     if ( type[0] == '\0' || ( typ = flag_value( apply_types, type ) ) == NO_FLAG )
     {
     	send_to_char( "Invalid apply type. Valid apply types are:\n\r", ch);
-    	show_help( ch, "apptype" );
+    	show_help( ch, (char*)"apptype" );
     	return FALSE;
     }
 
     if ( loc[0] == '\0' || ( value = flag_value( apply_flags, loc ) ) == NO_FLAG )
     {
         send_to_char( "Valid applys are:\n\r", ch );
-	show_help( ch, "apply" );
+	show_help( ch, (char*)"apply" );
 	return FALSE;
     }
 
@@ -3155,7 +3155,7 @@ OEDIT( oedit_str )
 
     EDIT_OBJ(ch, pObj);
 
-    if ( argument[0] == '\0' || !isdigit(argument) )
+    if ( argument[0] == '\0' || !is_number(argument) )
     {
 	send_to_char( "Syntax:  str [min strength]\n\r", ch );
 	return FALSE;
@@ -3223,7 +3223,7 @@ bool set_value( CHAR_DATA *ch, OBJ_INDEX_DATA *pObj, char *argument, int value )
 {
     if ( argument[0] == '\0' )
     {
-	set_obj_values( ch, pObj, -1, "" );     /* '\0' changed to "" -- Hugin */
+	set_obj_values( ch, pObj, -1, (char *)"" );     /* '\0' changed to "" -- Hugin */
 	return FALSE;
     }
 
@@ -3520,7 +3520,7 @@ OEDIT( oedit_ed )
 	return TRUE;
     }
 
-    oedit_ed( ch, "" );
+    oedit_ed( ch, (char *)"" );
     return FALSE;
 }
 
@@ -4265,7 +4265,7 @@ MEDIT( medit_shop )
 	return TRUE;
     }
 
-    medit_shop( ch, "" );
+    medit_shop( ch, (char*)"" );
     return FALSE;
 }
 
@@ -4868,7 +4868,7 @@ void show_liqlist(CHAR_DATA *ch)
     for ( liq = 0; liq_table[liq].liq_name != NULL; liq++)
     {
 	if ( (liq % 21) == 0 )
-	    add_buf(buffer,"Name                 Color          Proof Full Thirst Food Ssize\n\r");
+	    add_buf(buffer,(char*)"Name                 Color          Proof Full Thirst Food Ssize\n\r");
 
 	sprintf(buf, "%-20s %-14s %5d %4d %6d %4d %5d\n\r",
 		liq_table[liq].liq_name,liq_table[liq].liq_color,
@@ -4895,7 +4895,7 @@ void show_damlist(CHAR_DATA *ch)
     for ( att = 0; attack_table[att].name != NULL; att++)
     {
 	if ( (att % 21) == 0 )
-	    add_buf(buffer,"Name                 Noun\n\r");
+	    add_buf(buffer,(char*)"Name                 Noun\n\r");
 
 	sprintf(buf, "%-20s %-20s\n\r",
 		attack_table[att].name,attack_table[att].noun );
@@ -5016,7 +5016,7 @@ MEDIT ( medit_addmprog )
   if ( (value = flag_value (mprog_flags, trigger) ) == NO_FLAG)
   {
         send_to_char("Valid flags are:\n\r",ch);
-        show_help( ch, "mprog");
+        show_help( ch, (char*)"mprog");
         return FALSE;
   }
 

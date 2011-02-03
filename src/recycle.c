@@ -47,7 +47,7 @@ BAN_DATA *new_ban(void)
     BAN_DATA *ban;
 
     if (ban_free == NULL)
-	ban = alloc_perm(sizeof(*ban));
+	ban = (BAN_DATA *)alloc_perm(sizeof(*ban));
     else
     {
 	ban = ban_free;
@@ -81,7 +81,7 @@ DESCRIPTOR_DATA *new_descriptor(void)
     DESCRIPTOR_DATA *d;
 
     if (descriptor_free == NULL)
-	d = alloc_perm(sizeof(*d));
+	d = (DESCRIPTOR_DATA*)alloc_perm(sizeof(*d));
     else
     {
 	d = descriptor_free;
@@ -98,7 +98,7 @@ DESCRIPTOR_DATA *new_descriptor(void)
     d->pEdit		= NULL;			/* OLC */
     d->pString		= NULL;			/* OLC */
     d->editor		= 0;			/* OLC */
-    d->outbuf  = alloc_mem( d->outsize );
+    d->outbuf  = new char[d->outsize];
     
     return d;
 }
@@ -109,7 +109,7 @@ void free_descriptor(DESCRIPTOR_DATA *d)
 	return;
 
     free_string( d->host );
-    free_mem( d->outbuf, d->outsize );
+    delete [] d->outbuf;
     INVALIDATE(d);
     d->next = descriptor_free;
     descriptor_free = d;
@@ -124,7 +124,7 @@ GEN_DATA *new_gen_data(void)
     GEN_DATA *gen;
 
     if (gen_data_free == NULL)
-	gen = alloc_perm(sizeof(*gen));
+	gen = (GEN_DATA*)alloc_perm(sizeof(*gen));
     else
     {
 	gen = gen_data_free;
@@ -154,7 +154,7 @@ EXTRA_DESCR_DATA *new_extra_descr(void)
     EXTRA_DESCR_DATA *ed;
 
     if (extra_descr_free == NULL)
-	ed = alloc_perm(sizeof(*ed));
+	ed = (EXTRA_DESCR_DATA *)alloc_perm(sizeof(*ed));
     else
     {
 	ed = extra_descr_free;
@@ -190,7 +190,7 @@ AFFECT_DATA *new_affect(void)
     AFFECT_DATA *af;
 
     if (affect_free == NULL)
-	af = alloc_perm(sizeof(*af));
+	af = (AFFECT_DATA *)alloc_perm(sizeof(*af));
     else
     {
 	af = affect_free;
@@ -223,7 +223,7 @@ OBJ_DATA *new_obj(void)
     OBJ_DATA *obj;
 
     if (obj_free == NULL)
-	obj = alloc_perm(sizeof(*obj));
+	obj = (OBJ_DATA *)alloc_perm(sizeof(*obj));
     else
     {
 	obj = obj_free;
@@ -278,7 +278,7 @@ CHAR_DATA *new_char (void)
     int i;
 
     if (char_free == NULL)
-	ch = alloc_perm(sizeof(*ch));
+	ch = (CHAR_DATA *)alloc_perm(sizeof(*ch));
     else
     {
 	ch = char_free;
@@ -373,7 +373,7 @@ PC_DATA *new_pcdata(void)
     PC_DATA *pcdata;
 
     if (pcdata_free == NULL)
-	pcdata = alloc_perm(sizeof(*pcdata));
+	pcdata = (PC_DATA *)alloc_perm(sizeof(*pcdata));
     else
     {
 	pcdata = pcdata_free;
@@ -442,18 +442,19 @@ long get_mob_id(void)
     return last_mob_id;
 }
 
-MEM_DATA *mem_data_free;
+// MEM_DATA *mem_data_free;
 
 /* procedures and constants needed for buffering */
 
 BUFFER *buf_free;
 
+/*
 MEM_DATA *new_mem_data(void)
 {
     MEM_DATA *memory;
   
     if (mem_data_free == NULL)
-	memory = alloc_mem(sizeof(*memory));
+	memory = (MEM_DATA *)alloc_mem(sizeof(*memory));
     else
     {
 	memory = mem_data_free;
@@ -478,7 +479,7 @@ void free_mem_data(MEM_DATA *memory)
     mem_data_free = memory;
     INVALIDATE(memory);
 }
-
+*/
 
 
 /* buffer sizes */
@@ -507,7 +508,7 @@ BUFFER *new_buf()
     BUFFER *buffer;
 
     if (buf_free == NULL) 
-	buffer = alloc_perm(sizeof(*buffer));
+	buffer = (BUFFER *)alloc_perm(sizeof(*buffer));
     else
     {
 	buffer = buf_free;
@@ -518,7 +519,7 @@ BUFFER *new_buf()
     buffer->state	= BUFFER_SAFE;
     buffer->size	= get_size(BASE_BUF);
 
-    buffer->string	= alloc_mem(buffer->size);
+    buffer->string	= new char[buffer->size];
     buffer->string[0]	= '\0';
     VALIDATE(buffer);
 
@@ -530,7 +531,7 @@ BUFFER *new_buf_size(int size)
     BUFFER *buffer;
  
     if (buf_free == NULL)
-        buffer = alloc_perm(sizeof(*buffer));
+        buffer = (BUFFER *)alloc_perm(sizeof(*buffer));
     else
     {
         buffer = buf_free;
@@ -545,7 +546,7 @@ BUFFER *new_buf_size(int size)
         bug("new_buf: buffer size %d too large.",size);
         exit(1);
     }
-    buffer->string      = alloc_mem(buffer->size);
+    buffer->string      = new char[buffer->size];
     buffer->string[0]   = '\0';
     VALIDATE(buffer);
  
@@ -558,7 +559,7 @@ void free_buf(BUFFER *buffer)
     if (!IS_VALID(buffer))
 	return;
 
-    free_mem(buffer->string,buffer->size);
+    delete [] buffer->string;
     buffer->string = NULL;
     buffer->size   = 0;
     buffer->state  = BUFFER_FREED;
@@ -599,10 +600,10 @@ bool add_buf(BUFFER *buffer, char *string)
 
     if (buffer->size != oldsize)
     {
-	buffer->string	= alloc_mem(buffer->size);
+	buffer->string	= new char[buffer->size];
 
 	strcpy(buffer->string,oldstr);
-	free_mem(oldstr,oldsize);
+	delete [] oldstr;
     }
 
     strcat(buffer->string,string);
@@ -631,7 +632,7 @@ MPROG_LIST *new_mprog(void)
    MPROG_LIST *mp;
 
    if (mprog_free == NULL)
-       mp = alloc_perm(sizeof(*mp));
+       mp = (MPROG_LIST *)alloc_perm(sizeof(*mp));
    else
    {
        mp = mprog_free;
@@ -668,7 +669,7 @@ HELP_AREA * new_had ( void )
 		had_free	= had_free->next;
 	}
 	else
-		had		= alloc_perm( sizeof( *had ) );
+		had		= (HELP_AREA *)alloc_perm( sizeof( *had ) );
 
 	return had;
 }
@@ -685,7 +686,7 @@ HELP_DATA * new_help ( void )
 		help_free	= help_free->next;
 	}
 	else
-		help		= alloc_perm( sizeof( *help ) );
+		help		= (HELP_DATA *)alloc_perm( sizeof( *help ) );
 
 	return help;
 }

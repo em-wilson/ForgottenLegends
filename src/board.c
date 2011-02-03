@@ -91,47 +91,31 @@ static bool next_board (CHAR_DATA *ch);
 
 
 /* recycle a note */
-void free_note (NOTE_DATA *note)
+NOTE_DATA::~NOTE_DATA()
 {
-	if (note->sender)
-		free_string (note->sender);
-	if (note->to_list)
-		free_string (note->to_list);
-	if (note->subject)
-		free_string (note->subject);
-	if (note->date) /* was note->datestamp for some reason */
-		free_string (note->date);
-	if (note->text)
-		free_string (note->text);
-		
-	note->next = note_free;
-	note_free = note;	
+	if (this->sender)
+		free_string (this->sender);
+	if (this->to_list)
+		free_string (this->to_list);
+	if (this->subject)
+		free_string (this->subject);
+	if (this->date) /* was note->datestamp for some reason */
+		free_string (this->date);
+	if (this->text)
+		free_string (this->text);
 }
 
 /* allocate memory for a new note or recycle */
-NOTE_DATA *new_note ()
+NOTE_DATA::NOTE_DATA()
 {
-	NOTE_DATA *note;
-	
-	if (note_free)
-	{
-		note = note_free;
-		note_free = note_free->next;
-	}
-	else
-		note = alloc_mem (sizeof(NOTE_DATA));
-
-	/* Zero all the field - Envy does not gurantee zeroed memory */	
-	note->next = NULL;
-	note->sender = NULL;		
-	note->expire = 0;
-	note->to_list = NULL;
-	note->subject = NULL;
-	note->date = NULL;
-	note->date_stamp = 0;
-	note->text = NULL;
-	
-	return note;
+	this->next = NULL;
+	this->sender = NULL;		
+	this->expire = 0;
+	this->to_list = NULL;
+	this->subject = NULL;
+	this->date = NULL;
+	this->date_stamp = 0;
+	this->text = NULL;
 }
 
 /* append this note to the given file */
@@ -341,7 +325,7 @@ static void load_board (BOARD_DATA *board)
         while ( isspace(letter) );
         ungetc( letter, fp );
 
-        pnote             = alloc_perm( sizeof(*pnote) );
+        pnote             = new NOTE_DATA();
 
         if ( str_cmp( fread_word( fp ), "sender" ) )
             break;
@@ -389,7 +373,7 @@ static void load_board (BOARD_DATA *board)
 				fclose (fp_archive); /* it might be more efficient to close this later */
 			}
 
-			free_note (pnote);
+			delete pnote;
 			board->changed = TRUE;
 			continue;
 			
@@ -507,14 +491,14 @@ static void do_nwrite (CHAR_DATA *ch, char *argument)
 	{
 		send_to_char ("Note in progress cancelled because you did not manage to write any text \n\r"
 		              "before losing link.\n\r\n\r",ch);
-		free_note (ch->pcdata->in_progress);		              
+		delete ch->pcdata->in_progress;
 		ch->pcdata->in_progress = NULL;
 	}
 	
 	
 	if (!ch->pcdata->in_progress)
 	{
-		ch->pcdata->in_progress = new_note();
+		ch->pcdata->in_progress = new NOTE_DATA();
 		ch->pcdata->in_progress->sender = str_dup (ch->name);
 
 		/* convert to ascii. ctime returns a string which last character is \n, so remove that */	
@@ -682,7 +666,7 @@ static void do_nremove (CHAR_DATA *ch, char *argument)
 	}
 	
 	unlink_note (ch->pcdata->board,p);
-	free_note (p);
+	delete p;
 	send_to_char ("Note removed!\n\r",ch);
 	
 	save_board(ch->pcdata->board); /* save the board */
@@ -915,7 +899,7 @@ void make_note (const char* board_name, const char *sender, const char *to, cons
 	
 	board = &boards [board_index];
 	
-	note = new_note(); /* allocate new note */
+	note = new NOTE_DATA(); /* allocate new note */
 	
 	note->sender = str_dup (sender);
 	note->to_list = str_dup(to);
@@ -1182,7 +1166,7 @@ void handle_con_note_text (DESCRIPTOR_DATA *d, char * argument)
 	if ((strlen(letter) + strlen (buf)) > MAX_NOTE_TEXT)
 	{ /* Note too long, take appropriate steps */
 		write_to_buffer (d, "Note too long!\n\r", 0);
-		free_note (ch->pcdata->in_progress);
+		delete ch->pcdata->in_progress;
 		ch->pcdata->in_progress = NULL;			/* important */
 		d->connected = CON_PLAYING;
 		return;			
@@ -1247,7 +1231,7 @@ void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
 				
 			case 'f':
 				write_to_buffer (d, "Note cancelled!\n\r",0);
-				free_note (ch->pcdata->in_progress);
+				delete ch->pcdata->in_progress;
 				ch->pcdata->in_progress = NULL;
 				d->connected = CON_PLAYING;
 				/* remove afk status */

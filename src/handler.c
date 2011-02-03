@@ -152,7 +152,7 @@ char *item_name(int item_type)
     for (type = 0; item_table[type].name != NULL; type++)
 	if (item_type == item_table[type].type)
 	    return item_table[type].name;
-    return "none";
+    return (char*)"none";
 }
 
 char *weapon_name( int weapon_type)
@@ -197,13 +197,13 @@ long wiznet_lookup (const char *name)
 /* returns class number */
 int class_lookup (const char *name)
 {
-   int class;
+   int class_num;
  
-   for ( class = 0; class < MAX_CLASS; class++)
+   for ( class_num = 0; class_num < MAX_CLASS; class_num++)
    {
-        if (LOWER(name[0]) == LOWER(class_table[class].name[0])
-        &&  !str_prefix( name,class_table[class].name))
-            return class;
+        if (LOWER(name[0]) == LOWER(class_table[class_num].name[0])
+        &&  !str_prefix( name,class_table[class_num].name))
+            return class_num;
    }
  
    return -1;
@@ -694,7 +694,7 @@ int get_curr_stat( CHAR_DATA *ch, int stat )
     {
 	max = pc_race_table[ch->race].max_stats[stat] + 4;
 
-	if (class_table[ch->class].attr_prime == stat)
+	if (class_table[ch->class_num].attr_prime == stat)
 	    max += 2;
 
 	if ( ch->race == race_lookup("human"))
@@ -715,7 +715,7 @@ int get_max_train( CHAR_DATA *ch, int stat )
 	return 25;
 
     max = pc_race_table[ch->race].max_stats[stat];
-    if (class_table[ch->class].attr_prime == stat)
+    if (class_table[ch->class_num].attr_prime == stat)
     {
 	if (ch->race == race_lookup("human"))
 	   max += 3;
@@ -2533,7 +2533,7 @@ char *affect_loc_name( int location )
 {
     switch ( location )
     {
-    case APPLY_NONE:            return "none";
+    case APPLY_NONE:            return (char*)"none";
     case APPLY_STR:		return "strength";
     case APPLY_DEX:		return "dexterity";
     case APPLY_INT:		return "intelligence";
@@ -2556,7 +2556,7 @@ char *affect_loc_name( int location )
     case APPLY_SAVING_PETRI:	return "save vs petrification";
     case APPLY_SAVING_BREATH:	return "save vs breath";
     case APPLY_SAVING_SPELL:	return "save vs spell";
-    case APPLY_SPELL_AFFECT:	return "none";
+    case APPLY_SPELL_AFFECT:	return (char*)"none";
     }
 
     bug( "Affect_location_name: unknown location %d.", location );
@@ -2599,7 +2599,7 @@ char *affect_bit_name( int vector )
     if ( vector & AFF_SLOW          ) strcat( buf, " slow"          );
     if ( vector & AFF_PLAGUE	    ) strcat( buf, " plague" 	    );
     if ( vector & AFF_DARK_VISION   ) strcat( buf, " dark_vision"   );
-    return ( buf[0] != '\0' ) ? buf+1 : "none";
+    return ( buf[0] != '\0' ) ? buf+1 : (char*)"none";
 }
 
 
@@ -2634,7 +2634,7 @@ char *extra_bit_name( int extra_flags )
     if ( extra_flags & ITEM_BURN_PROOF	 ) strcat( buf, " burn_proof"	);
     if ( extra_flags & ITEM_NOUNCURSE	 ) strcat( buf, " no_uncurse"	);
     if ( extra_flags & ITEM_ARTIFACT	 ) strcat( buf, " artifact"	);
-    return ( buf[0] != '\0' ) ? buf+1 : "none";
+    return ( buf[0] != '\0' ) ? buf+1 : (char*)"none";
 }
 
 /* return ascii name of an act vector */
@@ -2684,7 +2684,7 @@ char *act_bit_name( int act_flags )
 	if (act_flags & PLR_FREEZE	) strcat(buf, " frozen");
 	if (act_flags & PLR_THIEF	) strcat(buf, " thief");
     }
-    return ( buf[0] != '\0' ) ? buf+1 : "none";
+    return ( buf[0] != '\0' ) ? buf+1 : (char*)"none";
 }
 
 char *comm_bit_name(int comm_flags)
@@ -2711,7 +2711,7 @@ char *comm_bit_name(int comm_flags)
     if (comm_flags & COMM_NOCHANNELS	) strcat(buf, " no_channels");
     
 
-    return ( buf[0] != '\0' ) ? buf+1 : "none";
+    return ( buf[0] != '\0' ) ? buf+1 : (char*)"none";
 }
 
 char *imm_bit_name(int imm_flags)
@@ -2743,7 +2743,7 @@ char *imm_bit_name(int imm_flags)
     if (imm_flags & VULN_WOOD		) strcat(buf, " wood");
     if (imm_flags & VULN_SILVER	) strcat(buf, " silver");
 
-    return ( buf[0] != '\0' ) ? buf+1 : "none";
+    return ( buf[0] != '\0' ) ? buf+1 : (char*)"none";
 }
 
 char *wear_bit_name(int wear_flags)
@@ -2771,7 +2771,7 @@ char *wear_bit_name(int wear_flags)
     if (wear_flags & ITEM_WEAR_BACK	) strcat(buf, " back");
     if (wear_flags & ITEM_WEAR_BOMB	) strcat(buf, " bomb");
 
-    return ( buf[0] != '\0' ) ? buf+1 : "none";
+    return ( buf[0] != '\0' ) ? buf+1 : (char*)"none";
 }
 
 char *form_bit_name(int form_flags)
@@ -2806,7 +2806,7 @@ char *form_bit_name(int form_flags)
     if (form_flags & FORM_FISH		) strcat(buf, " fish");
     if (form_flags & FORM_COLD_BLOOD 	) strcat(buf, " cold_blooded");
 
-    return ( buf[0] != '\0' ) ? buf+1 : "none";
+    return ( buf[0] != '\0' ) ? buf+1 : (char*)"none";
 }
 
 char *part_bit_name(int part_flags)
@@ -2836,7 +2836,7 @@ char *part_bit_name(int part_flags)
     if (part_flags & PART_HORNS		) strcat(buf, " horns");
     if (part_flags & PART_SCALES	) strcat(buf, " scales");
 
-    return ( buf[0] != '\0' ) ? buf+1 : "none";
+    return ( buf[0] != '\0' ) ? buf+1 : (char*)"none";
 }
 
 char *weapon_bit_name(int weapon_flags)
@@ -2853,7 +2853,7 @@ char *weapon_bit_name(int weapon_flags)
     if (weapon_flags & WEAPON_SHOCKING 	) strcat(buf, " shocking");
     if (weapon_flags & WEAPON_POISON	) strcat(buf, " poison");
 
-    return ( buf[0] != '\0' ) ? buf+1 : "none";
+    return ( buf[0] != '\0' ) ? buf+1 : (char*)"none";
 }
 
 char *cont_bit_name( int cont_flags)
@@ -2867,7 +2867,7 @@ char *cont_bit_name( int cont_flags)
     if (cont_flags & CONT_CLOSED	) strcat(buf, " closed");
     if (cont_flags & CONT_LOCKED	) strcat(buf, " locked");
 
-    return (buf[0] != '\0' ) ? buf+1 : "none";
+    return (buf[0] != '\0' ) ? buf+1 : (char*)"none";
 }
 
 
@@ -2899,7 +2899,7 @@ char *off_bit_name(int off_flags)
     if (off_flags & ASSIST_GUARD	) strcat(buf, " assist_guard");
     if (off_flags & ASSIST_VNUM		) strcat(buf, " assist_vnum");
 
-    return ( buf[0] != '\0' ) ? buf+1 : "none";
+    return ( buf[0] != '\0' ) ? buf+1 : (char*)"none";
 }
 
 /*
@@ -3026,51 +3026,51 @@ CHAR_DATA *get_char_area( CHAR_DATA *ch, char *argument )
     return ach;
 }
 
-bool can_be_class( CHAR_DATA *ch, int class )
+bool can_be_class( CHAR_DATA *ch, int class_num )
 {
-    if (IS_SET(class_table[class].flag, DONE_RANGER)
+    if (IS_SET(class_table[class_num].flag, DONE_RANGER)
 	&& (!IS_SET(ch->done, DONE_WARRIOR)
 	|| !IS_SET(ch->done, DONE_ARCHER)))
 	return FALSE;
 
     // Can ch be a druid?
-    if (IS_SET(class_table[class].flag, DONE_DRUID)
+    if (IS_SET(class_table[class_num].flag, DONE_DRUID)
 	&& ( (!IS_SET(ch->done, DONE_RANGER) || !IS_SET(ch->done, DONE_MAGE))
 	|| (!IS_SET(ch->done, DONE_RANGER) || !IS_SET(ch->done, DONE_MAGE))))
 	return FALSE;
 
-    if (IS_SET(class_table[class].flag, DONE_PALADIN))
+    if (IS_SET(class_table[class_num].flag, DONE_PALADIN))
         return FALSE;
 
-    if (IS_SET(class_table[class].flag, DONE_PSIONISCIST))
+    if (IS_SET(class_table[class_num].flag, DONE_PSIONISCIST))
 	return FALSE;
 
-    if (IS_SET(class_table[class].flag, DONE_ROGUE))
+    if (IS_SET(class_table[class_num].flag, DONE_ROGUE))
 	return FALSE;
 
-    if (IS_SET(class_table[class].flag, DONE_ILLUSIONIST))
+    if (IS_SET(class_table[class_num].flag, DONE_ILLUSIONIST))
 	return FALSE;
 
-    if (IS_SET(class_table[class].flag, DONE_INVOKER))
+    if (IS_SET(class_table[class_num].flag, DONE_INVOKER))
 	return FALSE;
 /*
-    if (IS_SET(class_table[class].flag, DONE_PALADIN)
+    if (IS_SET(class_table[class_num].flag, DONE_PALADIN)
 	&& ( !IS_SET(ch->done, DONE_WARRIOR) || !IS_SET(ch->done, DONE_CLERIC) ) )
 	return FALSE;
 
-    if (IS_SET(class_table[class].flag, DONE_INVOKER)
+    if (IS_SET(class_table[class_num].flag, DONE_INVOKER)
 	&& ( !IS_SET(ch->done, DONE_WARRIOR) || !IS_SET(ch->done, DONE_MAGE) ) )
 	return FALSE;
 
-    if (IS_SET(class_table[class].flag, DONE_ROGUE)
+    if (IS_SET(class_table[class_num].flag, DONE_ROGUE)
 	&& ( !IS_SET(ch->done, DONE_WARRIOR) || !IS_SET(ch->done, DONE_THIEF) ) )
 	return FALSE;
 
-    if (IS_SET(class_table[class].flag, DONE_PSIONISCIST)
+    if (IS_SET(class_table[class_num].flag, DONE_PSIONISCIST)
 	&& ( !IS_SET(ch->done, DONE_CLERIC) || !IS_SET(ch->done, DONE_MAGE) ) )
 	return FALSE;
 
-    if (IS_SET(class_table[class].flag, DONE_ILLUSIONIST)
+    if (IS_SET(class_table[class_num].flag, DONE_ILLUSIONIST)
 	&& ( !IS_SET(ch->done, DONE_THIEF) || !IS_SET(ch->done, DONE_MAGE) ) )
 	return FALSE;
 */

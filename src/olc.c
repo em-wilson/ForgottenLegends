@@ -768,7 +768,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
 	{
 	    ch->desc->editor = ED_ROOM;
 	    char_from_room( ch );
-	    char_to_room( ch, ch->desc->pEdit );
+	    char_to_room( ch, (ROOM_INDEX_DATA *)ch->desc->pEdit );
 	    SET_BIT( ((ROOM_INDEX_DATA *)ch->desc->pEdit)->area->area_flags, AREA_CHANGED );
 	}
 

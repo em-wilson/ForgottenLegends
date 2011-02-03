@@ -163,7 +163,6 @@ DECLARE_DO_FUN( do_heal		);
 DECLARE_DO_FUN(	do_help		);
 DECLARE_DO_FUN(	do_hide		);
 DECLARE_DO_FUN(	do_holylight	);
-DECLARE_DO_FUN(	do_hunt		);
 DECLARE_DO_FUN(	do_immtalk	);
 DECLARE_DO_FUN( do_imotd	);
 DECLARE_DO_FUN( do_incognito	);

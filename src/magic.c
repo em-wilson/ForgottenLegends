@@ -143,7 +143,7 @@ void say_spell( CHAR_DATA *ch, int sn )
     struct syl_type
     {
 	char *	old;
-	char *	new;
+	char *	new_syl;
     };
 
     static const struct syl_type syl_table[] =
@@ -188,7 +188,7 @@ void say_spell( CHAR_DATA *ch, int sn )
 	{
 	    if ( !str_prefix( syl_table[iSyl].old, pName ) )
 	    {
-		strcat( buf, syl_table[iSyl].new );
+		strcat( buf, syl_table[iSyl].new_syl );
 		break;
 	    }
 	}
@@ -203,7 +203,7 @@ void say_spell( CHAR_DATA *ch, int sn )
     for ( rch = ch->in_room->people; rch; rch = rch->next_in_room )
     {
 	if ( rch != ch )
-	    act((!IS_NPC(rch) && ch->class==rch->class) ? buf : buf2,
+	    act((!IS_NPC(rch) && ch->class_num==rch->class_num) ? buf : buf2,
 	        ch, NULL, rch, TO_VICT );
     }
 
@@ -231,7 +231,7 @@ bool saves_spell( int level, CHAR_DATA *victim, int dam_type )
 	case IS_VULNERABLE:	save -= 2;	break;
     }
 
-    if (!IS_NPC(victim) && class_table[victim->class].fMana)
+    if (!IS_NPC(victim) && class_table[victim->class_num].fMana)
 	save = 9 * save / 10;
     save = URANGE( 5, save, 95 );
     return number_percent( ) < save;
@@ -548,7 +548,7 @@ void do_cast( CHAR_DATA *ch, char *argument )
     else
     {
         ch->mana -= mana;
-        if (IS_NPC(ch) || class_table[ch->class].fMana) 
+        if (IS_NPC(ch) || class_table[ch->class_num].fMana) 
 	/* class has spells */
             (*skill_table[sn].spell_fun) ( sn, ch->level, ch, vo,target);
         else

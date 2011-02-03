@@ -57,6 +57,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdarg.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 #include "merc.h"
 #include "recycle.h"
@@ -115,162 +117,10 @@ const	char 	go_ahead_str	[] = { IAC, GA, '\0' };
 
 
 
-/*
- * OS-dependent declarations.
- */
-#if	defined(_AIX)
-#include <sys/select.h>
-int	accept		args( ( int s, struct sockaddr *addr, int *addrlen ) );
-int	bind		args( ( int s, struct sockaddr *name, int namelen ) );
-void	bzero		args( ( char *b, int length ) );
-int	getpeername	args( ( int s, struct sockaddr *name, int *namelen ) );
-int	getsockname	args( ( int s, struct sockaddr *name, int *namelen ) );
-int	gettimeofday	args( ( struct timeval *tp, struct timezone *tzp ) );
-int	listen		args( ( int s, int backlog ) );
-int	setsockopt	args( ( int s, int level, int optname, void *optval,
-			    int optlen ) );
-int	socket		args( ( int domain, int type, int protocol ) );
-#endif
-
-#if	defined(apollo)
-#include <unistd.h>
-void	bzero		args( ( char *b, int length ) );
-#endif
-
-#if	defined(__hpux)
-int	accept		args( ( int s, void *addr, int *addrlen ) );
-int	bind		args( ( int s, const void *addr, int addrlen ) );
-void	bzero		args( ( char *b, int length ) );
-int	getpeername	args( ( int s, void *addr, int *addrlen ) );
-int	getsockname	args( ( int s, void *name, int *addrlen ) );
-int	gettimeofday	args( ( struct timeval *tp, struct timezone *tzp ) );
-int	listen		args( ( int s, int backlog ) );
-int	setsockopt	args( ( int s, int level, int optname,
- 				const void *optval, int optlen ) );
-int	socket		args( ( int domain, int type, int protocol ) );
-#endif
-
-#if	defined(interactive)
-#include <net/errno.h>
-#include <sys/fnctl.h>
-#endif
-
-int	close		args( ( int fd ) );
-int	gettimeofday	args( ( struct timeval *tp, struct timezone *tzp ) );
-int	read		args( ( int fd, char *buf, int nbyte ) );
-int	select		args( ( int width, fd_set *readfds, fd_set *writefds,
-			    fd_set *exceptfds, struct timeval *timeout ) );
-int	socket		args( ( int domain, int type, int protocol ) );
-int	write		args( ( int fd, char *buf, int nbyte ) );
-
-#if	defined(macintosh)
-#include <console.h>
-#include <fcntl.h>
-#include <unix.h>
-struct	timeval
-{
-	time_t	tv_sec;
-	time_t	tv_usec;
-};
 #if	!defined(isascii)
 #define	isascii(c)		( (c) < 0200 )
 #endif
 static	long			theKeys	[4];
-
-int	gettimeofday		args( ( struct timeval *tp, void *tzp ) );
-#endif
-
-#if	defined(MIPS_OS)
-extern	int		errno;
-#endif
-
-#if	defined(MSDOS)
-int	gettimeofday	args( ( struct timeval *tp, void *tzp ) );
-int	kbhit		args( ( void ) );
-#endif
-
-#if	defined(NeXT)
-int	close		args( ( int fd ) );
-int	fcntl		args( ( int fd, int cmd, int arg ) );
-#if	!defined(htons)
-u_short	htons		args( ( u_short hostshort ) );
-#endif
-#if	!defined(ntohl)
-u_long	ntohl		args( ( u_long hostlong ) );
-#endif
-int	read		args( ( int fd, char *buf, int nbyte ) );
-int	select		args( ( int width, fd_set *readfds, fd_set *writefds,
-			    fd_set *exceptfds, struct timeval *timeout ) );
-int	write		args( ( int fd, char *buf, int nbyte ) );
-#endif
-
-#if	defined(sequent)
-int	accept		args( ( int s, struct sockaddr *addr, int *addrlen ) );
-int	bind		args( ( int s, struct sockaddr *name, int namelen ) );
-int	close		args( ( int fd ) );
-int	fcntl		args( ( int fd, int cmd, int arg ) );
-int	getpeername	args( ( int s, struct sockaddr *name, int *namelen ) );
-int	getsockname	args( ( int s, struct sockaddr *name, int *namelen ) );
-int	gettimeofday	args( ( struct timeval *tp, struct timezone *tzp ) );
-#if	!defined(htons)
-u_short	htons		args( ( u_short hostshort ) );
-#endif
-int	listen		args( ( int s, int backlog ) );
-#if	!defined(ntohl)
-u_long	ntohl		args( ( u_long hostlong ) );
-#endif
-int	read		args( ( int fd, char *buf, int nbyte ) );
-int	select		args( ( int width, fd_set *readfds, fd_set *writefds,
-			    fd_set *exceptfds, struct timeval *timeout ) );
-int	setsockopt	args( ( int s, int level, int optname, caddr_t optval,
-			    int optlen ) );
-int	socket		args( ( int domain, int type, int protocol ) );
-int	write		args( ( int fd, char *buf, int nbyte ) );
-#endif
-
-/* This includes Solaris Sys V as well */
-#if defined(sun)
-int	accept		args( ( int s, struct sockaddr *addr, int *addrlen ) );
-int	bind		args( ( int s, struct sockaddr *name, int namelen ) );
-void	bzero		args( ( char *b, int length ) );
-int	close		args( ( int fd ) );
-int	getpeername	args( ( int s, struct sockaddr *name, int *namelen ) );
-int	getsockname	args( ( int s, struct sockaddr *name, int *namelen ) );
-int	gettimeofday	args( ( struct timeval *tp, struct timezone *tzp ) );
-int	listen		args( ( int s, int backlog ) );
-int	read		args( ( int fd, char *buf, int nbyte ) );
-int	select		args( ( int width, fd_set *readfds, fd_set *writefds,
-			    fd_set *exceptfds, struct timeval *timeout ) );
-#if defined(SYSV)
-int setsockopt		args( ( int s, int level, int optname,
-			    const char *optval, int optlen ) );
-#else
-int	setsockopt	args( ( int s, int level, int optname, void *optval,
-			    int optlen ) );
-#endif
-int	socket		args( ( int domain, int type, int protocol ) );
-int	write		args( ( int fd, char *buf, int nbyte ) );
-#endif
-
-#if defined(ultrix)
-int	accept		args( ( int s, struct sockaddr *addr, int *addrlen ) );
-int	bind		args( ( int s, struct sockaddr *name, int namelen ) );
-void	bzero		args( ( char *b, int length ) );
-int	close		args( ( int fd ) );
-int	getpeername	args( ( int s, struct sockaddr *name, int *namelen ) );
-int	getsockname	args( ( int s, struct sockaddr *name, int *namelen ) );
-int	gettimeofday	args( ( struct timeval *tp, struct timezone *tzp ) );
-int	listen		args( ( int s, int backlog ) );
-int	read		args( ( int fd, char *buf, int nbyte ) );
-int	select		args( ( int width, fd_set *readfds, fd_set *writefds,
-			    fd_set *exceptfds, struct timeval *timeout ) );
-int	setsockopt	args( ( int s, int level, int optname, void *optval,
-			    int optlen ) );
-int	socket		args( ( int domain, int type, int protocol ) );
-int	write		args( ( int fd, char *buf, int nbyte ) );
-#endif
-
-
 
 /*
  * Global variables.
@@ -678,7 +528,7 @@ void init_descriptor( int control )
     struct sockaddr_in sock;
     struct hostent *from;
     int desc;
-    int size;
+    socklen_t size;
 
     size = sizeof(sock);
     getsockname( control, (struct sockaddr *) &sock, &size );
@@ -741,7 +591,7 @@ void init_descriptor( int control )
     if ( check_ban(dnew->host,BAN_ALL))
     {
 	write_to_descriptor( desc,
-	    "Your site has been banned from this mud.\n\r", 0 );
+	    (char*)"Your site has been banned from this mud.\n\r", 0 );
 	close( desc );
 	free_descriptor(dnew);
 	return;
@@ -802,7 +652,7 @@ void close_socket( DESCRIPTOR_DATA *dclose )
             && (dclose->connected <= CON_NOTE_FINISH)))
 	{
 	    act( "$n has lost $s link.", ch, NULL, NULL, TO_ROOM );
-	    wiznet("Net death has claimed $N.",ch,NULL,WIZ_LINKS,0,0);
+	    wiznet((char*)"Net death has claimed $N.",ch,NULL,WIZ_LINKS,0,0);
 	    ch->desc = NULL;
 	}
 	else
@@ -843,7 +693,7 @@ void close_socket( DESCRIPTOR_DATA *dclose )
 
 bool read_from_descriptor( DESCRIPTOR_DATA *d )
 {
-    int iStart;
+    unsigned int iStart;
 
     /* Hold horses if pending command already. */
     if ( d->incomm[0] != '\0' )
@@ -856,7 +706,7 @@ bool read_from_descriptor( DESCRIPTOR_DATA *d )
 	sprintf( log_buf, "%s input overflow!", d->host );
 	log_string( log_buf );
 	write_to_descriptor( d->descriptor,
-	    "\n\r*** PUT A LID ON IT!!! ***\n\r", 0 );
+	    (char*)"\n\r*** PUT A LID ON IT!!! ***\n\r", 0 );
 	return FALSE;
     }
 
@@ -922,7 +772,7 @@ void read_from_buffer( DESCRIPTOR_DATA *d )
     {
 	if ( k >= MAX_INPUT_LENGTH - 2 )
 	{
-	    write_to_descriptor( d->descriptor, "Line too long.\n\r", 0 );
+	    write_to_descriptor( d->descriptor, (char*)"Line too long.\n\r", 0 );
 
 	    /* skip the rest of the line */
 	    for ( ; d->inbuf[i] != '\0'; i++ )
@@ -965,7 +815,7 @@ void read_from_buffer( DESCRIPTOR_DATA *d )
 	    {
 		sprintf( log_buf, "%s input spamming!", d->host );
 		log_string( log_buf );
-		wiznet("Spam spam spam $N spam spam spam spam spam!",
+		wiznet((char*)"Spam spam spam $N spam spam spam spam spam!",
 		       d->character,NULL,WIZ_SPAM,0,get_trust(d->character));
 		if (d->incomm[0] == '!')
 		    wiznet(d->inlast,d->character,NULL,WIZ_SPAM,0,
@@ -1320,9 +1170,9 @@ void write_to_buffer( DESCRIPTOR_DATA *d, const char *txt, int length )
 	    close_socket(d);
 	    return;
  	}
-	outbuf      = alloc_mem( 2 * d->outsize );
+	outbuf      = new char[2 * d->outsize];
 	strncpy( outbuf, d->outbuf, d->outtop );
-	free_mem( d->outbuf, d->outsize );
+	delete [] d->outbuf;
 	d->outbuf   = outbuf;
 	d->outsize *= 2;
     }
@@ -1508,12 +1358,12 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 
 	if ( IS_IMMORTAL(ch) )
 	{
-	    do_help( ch, "imotd" );
+	    do_help( ch, (char*)"imotd" );
 	    d->connected = CON_READ_IMOTD;
  	}
 	else
 	{
-	    do_help( ch, "motd" );
+	    do_help( ch, (char*)"motd" );
 	    d->connected = CON_READ_MOTD;
 	}
 	break;
@@ -1647,7 +1497,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	{
 	    argument = one_argument(argument,arg);
 	    if (argument[0] == '\0')
-		do_help(ch,"race help");
+		do_help(ch,(char*)"race help");
 	    else
 		do_help(ch,argument);
             write_to_buffer(d,
@@ -1722,7 +1572,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	{
 	    argument = one_argument(argument,arg);
 	    if (argument[0] == '\0')
-		do_help(ch,"werefolk");
+		do_help(ch,(char*)"werefolk");
 	    else
 		do_help(ch,argument);
             write_to_buffer(d,
@@ -1778,7 +1628,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	{
 	    argument = one_argument(argument,arg);
 	    if (argument[0] == '\0')
-		do_help(ch,"race help");
+		do_help(ch,(char*)"race help");
 	    else
 		do_help(ch,argument);
             write_to_buffer(d,
@@ -1853,18 +1703,18 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    return;
 	}
 
-        ch->class = iClass;
-	SET_BIT(ch->done, class_table[ch->class].flag);
+        ch->class_num = iClass;
+	SET_BIT(ch->done, class_table[ch->class_num].flag);
 
 	sprintf( log_buf, "%s@%s new player.", ch->name, d->host );
 	log_string( log_buf );
-	wiznet("Newbie alert!  $N sighted.",ch,NULL,WIZ_NEWBIE,0,0);
+	wiznet((char*)"Newbie alert!  $N sighted.",ch,NULL,WIZ_NEWBIE,0,0);
         wiznet(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
 
 	write_to_buffer(d,"\n\r",0);
 
         group_add(ch,"rom basics",FALSE);
-        group_add(ch,class_table[ch->class].base_group,FALSE);
+        group_add(ch,class_table[ch->class_num].base_group,FALSE);
         ch->pcdata->learned[gsn_recall] = 50;
 
 	 /*
@@ -1891,23 +1741,23 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    return;
 	}
 
-        ch->class = iClass;
-	SET_BIT(ch->done, class_table[ch->class].flag);
+        ch->class_num = iClass;
+	SET_BIT(ch->done, class_table[ch->class_num].flag);
 
-	sprintf( log_buf, "%s@%s reclasses as the %s class.", ch->name, d->host, class_table[ch->class].name );
+	sprintf( log_buf, "%s@%s reclasses as the %s class.", ch->name, d->host, class_table[ch->class_num].name );
 	log_string( log_buf );
-	wiznet("Reclass alert!  $N sighted.",ch,NULL,WIZ_NEWBIE,0,0);
+	wiznet((char*)"Reclass alert!  $N sighted.",ch,NULL,WIZ_NEWBIE,0,0);
         wiznet(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
 
-        group_add(ch,class_table[ch->class].base_group,FALSE);
+        group_add(ch,class_table[ch->class_num].base_group,FALSE);
         ch->gen_data = new_gen_data();
         ch->gen_data->points_chosen = ch->pcdata->points;
-        do_help(ch,"group header");
+        do_help(ch,(char*)"group header");
         list_group_costs(ch);
         write_to_buffer(d,"You already have the following skills:\n\r",0);
 	must_have = ch->pcdata->points + 15;
-        do_skills(ch,"all");
-        do_help(ch,"menu choice");
+        do_skills(ch,(char*)"all");
+        do_help(ch,(char*)"menu choice");
 	d->connected = CON_RECLASS_CUST;
 	break;
 
@@ -1935,7 +1785,7 @@ case CON_RECLASS_CUST:
         "Choices are: list,learned,premise,add,drop,info,help, and done.\n\r"
         ,ch);
 
-        do_help(ch,"menu choice");
+        do_help(ch,(char*)"menu choice");
         break;
 
 case CON_DEFAULT_CHOICE:
@@ -1945,15 +1795,15 @@ case CON_DEFAULT_CHOICE:
         case 'y': case 'Y': 
 	    ch->gen_data = new_gen_data();
 	    ch->gen_data->points_chosen = ch->pcdata->points;
-	    do_help(ch,"group header");
+	    do_help(ch,(char*)"group header");
 	    list_group_costs(ch);
-	    write_to_buffer(d,"You already have the following skills:\n\r",0);
-	    do_skills(ch,"all");
-	    do_help(ch,"menu choice");
+	    write_to_buffer(d,(char*)"You already have the following skills:\n\r",0);
+	    do_skills(ch,(char*)"all");
+	    do_help(ch,(char*)"menu choice");
 	    d->connected = CON_GEN_GROUPS;
 	    break;
         case 'n': case 'N': 
-	    group_add(ch,class_table[ch->class].default_group,TRUE);
+	    group_add(ch,class_table[ch->class_num].default_group,TRUE);
             write_to_buffer( d, "\n\r", 2 );
 	    write_to_buffer(d,
 		"Please pick a weapon from the following choices:\n\r",0);
@@ -1995,7 +1845,7 @@ case CON_DEFAULT_CHOICE:
 
 	ch->pcdata->learned[*weapon_table[weapon].gsn] = 40;
 	write_to_buffer(d,"\n\r",2);
-	do_help(ch,"motd");
+	do_help(ch,(char*)"motd");
 	d->connected = CON_READ_MOTD;
 	break;
 
@@ -2033,12 +1883,12 @@ case CON_DEFAULT_CHOICE:
         "Choices are: list,learned,premise,add,drop,info,help, and done.\n\r"
         ,ch);
 
-        do_help(ch,"menu choice");
+        do_help(ch,(char*)"menu choice");
         break;
 
     case CON_READ_IMOTD:
 	write_to_buffer(d,"\n\r",2);
-        do_help( ch, "motd" );
+        do_help( ch, (char*)"motd" );
         d->connected = CON_READ_MOTD;
 	break;
 
@@ -2084,7 +1934,7 @@ case CON_DEFAULT_CHOICE:
 	if ( ch->level == 0 )
 	{
 
-	    ch->perm_stat[class_table[ch->class].attr_prime] += 3;
+	    ch->perm_stat[class_table[ch->class_num].attr_prime] += 3;
 
 	    ch->level	= 1;
 	    ch->exp	= exp_per_level(ch,ch->pcdata->points);
@@ -2093,15 +1943,15 @@ case CON_DEFAULT_CHOICE:
 	    ch->move	= ch->max_move;
 	    ch->train	 = 5;
 	    ch->practice = 5;
-	    sprintf( buf, "the %s", capitalize(class_table[ch->class].name) );
+	    sprintf( buf, "the %s", capitalize(class_table[ch->class_num].name) );
 	    set_title( ch, buf );
 
-	    do_outfit(ch,"");
+	    do_outfit(ch,(char*)"");
 	    obj_to_char(create_object(get_obj_index(OBJ_VNUM_MAP),0),ch);
 
 	    char_to_room( ch, get_room_index( ROOM_VNUM_SCHOOL ) );
 	    send_to_char("\n\r",ch);
-	    do_help(ch,"NEWBIE INFO");
+	    do_help(ch,(char*)"NEWBIE INFO");
 	    SET_BIT(ch->act, PLR_COLOUR);
 	    SET_BIT(ch->act, PLR_AUTOASSIST);
 	    SET_BIT(ch->act, PLR_AUTOLOOT);
@@ -2131,9 +1981,9 @@ case CON_DEFAULT_CHOICE:
 	}
 
 	act( "$n has entered the game.", ch, NULL, NULL, TO_ROOM );
-	do_look( ch, "auto" );
+	do_look( ch, (char*)"auto" );
 
-	wiznet("$N has left real life behind.",ch,NULL,
+	wiznet((char*)"$N has left real life behind.",ch,NULL,
 		WIZ_LOGINS,WIZ_SITES,get_trust(ch));
 
 	if (ch->pet != NULL)
@@ -2161,7 +2011,7 @@ bool check_parse_name( char *name )
      * Reserved words.
      */
     if ( is_name( name, 
-	"all auto immortal self someone something the you demise balance circle loner honor none") )
+	(char*)"all auto immortal self someone something the you demise balance circle loner honor none") )
 	return FALSE;
 	
     if (get_clan( name ) )
@@ -2188,7 +2038,7 @@ bool check_parse_name( char *name )
     {
 	char *pc;
 	bool fIll,adjcaps = FALSE,cleancaps = FALSE;
- 	int total_caps = 0;
+ 	unsigned int total_caps = 0;
 
 	fIll = TRUE;
 	for ( pc = name; *pc != '\0'; pc++ )
@@ -2280,7 +2130,7 @@ bool check_reconnect( DESCRIPTOR_DATA *d, char *name, bool fConn )
 
 		sprintf( log_buf, "%s@%s reconnected.", ch->name, d->host );
 		log_string( log_buf );
-		wiznet("$N groks the fullness of $S link.",
+		wiznet((char*)"$N groks the fullness of $S link.",
 		    ch,NULL,WIZ_LINKS,0,0);
 		d->connected = CON_PLAYING;
                /* Inform the character of a note in progress and the possbility
@@ -2423,7 +2273,7 @@ void page_to_char_bw( const char *txt, CHAR_DATA *ch )
 #if defined(macintosh)
 	send_to_char(txt,ch);
 #else
-    ch->desc->showstr_head = alloc_mem(strlen(txt) + 1);
+    ch->desc->showstr_head = new char[strlen(txt) + 1];
     strcpy(ch->desc->showstr_head,txt);
     ch->desc->showstr_point = ch->desc->showstr_head;
     show_string(ch->desc,"");
@@ -2460,10 +2310,10 @@ void page_to_char( const char *txt, CHAR_DATA *ch )
                    *++point2 = '\0';
                }                
                *point2 = '\0';
-               ch->desc->showstr_head  = alloc_mem( strlen( buf ) + 1 );
+               ch->desc->showstr_head  = new char[strlen( buf ) + 1];
                strcpy( ch->desc->showstr_head, buf );
                ch->desc->showstr_point = ch->desc->showstr_head;
-               show_string( ch->desc, "" );
+               show_string( ch->desc, (char*)"" );
            }
            else
            {
@@ -2478,10 +2328,10 @@ void page_to_char( const char *txt, CHAR_DATA *ch )
                    *++point2 = '\0';
                }
                *point2 = '\0';
-               ch->desc->showstr_head  = alloc_mem( strlen( buf ) + 1 );
+               ch->desc->showstr_head  = new char[strlen( buf ) + 1];
                strcpy( ch->desc->showstr_head, buf );
                ch->desc->showstr_point = ch->desc->showstr_head;
-               show_string( ch->desc, "" );
+               show_string( ch->desc, (char*)"" );
            }
        }
     return;
@@ -2502,8 +2352,8 @@ void show_string(struct descriptor_data *d, char *input)
     {
 	if (d->showstr_head)
 	{
-	    free_mem(d->showstr_head,strlen(d->showstr_head) + 1);
-	    d->showstr_head = 0;
+		delete d->showstr_head;
+	    d->showstr_head = NULL;
 	}
     	d->showstr_point  = 0;
 	return;
@@ -2530,8 +2380,8 @@ void show_string(struct descriptor_data *d, char *input)
 		{
 		    if (d->showstr_head)
         	    {
-            		free_mem(d->showstr_head,strlen(d->showstr_head) + 1);
-            		d->showstr_head = 0;
+            		delete d->showstr_head;
+            		d->showstr_head = NULL;
         	    }
         	    d->showstr_point  = 0;
     		}
@@ -2563,16 +2413,16 @@ void act (const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
 void act_new( const char *format, CHAR_DATA *ch, const void *arg1, 
               const void *arg2, int type, int min_pos )
 {
-    static char * const he_she  [] = { "it",  "he",  "she" };
-    static char * const him_her [] = { "it",  "him", "her" };
-    static char * const his_her [] = { "its", "his", "her" };
+    static char * const he_she  [] = { (char*)"it",  (char*)"he",  (char*)"she" };
+    static char * const him_her [] = { (char*)"it",  (char*)"him", (char*)"her" };
+    static char * const his_her [] = { (char*)"its", (char*)"his", (char*)"her" };
  
     CHAR_DATA          *to;
     CHAR_DATA          *vch = ( CHAR_DATA * ) arg2;
     OBJ_DATA           *obj1 = ( OBJ_DATA  * ) arg1;
     OBJ_DATA           *obj2 = ( OBJ_DATA  * ) arg2;
     const      char    *str;
-    char               *i = NULL;
+    const char               *i = NULL;
     char               *point;
     char	       *pbuff;
     char               buffer[ MAX_STRING_LENGTH*2 ];
@@ -2645,8 +2495,8 @@ void act_new( const char *format, CHAR_DATA *ch, const void *arg1,
                 /* Thx alex for 't' idea */
                 case 't': i = (char *) arg1;                            break;
                 case 'T': i = (char *) arg2;                            break;
-                case 'n': i = PERS( ch,  to  );                         break;
-                case 'N': i = PERS( vch, to  );                         break;
+                case 'n': i = (char *)PERS( ch,  to  );                 break;
+                case 'N': i = (char *)PERS( vch, to  );                 break;
                 case 'e': i = he_she  [URANGE(0, ch  ->sex, 2)];        break;
                 case 'E': i = he_she  [URANGE(0, vch ->sex, 2)];        break;
                 case 'm': i = him_her [URANGE(0, ch  ->sex, 2)];        break;
@@ -2657,13 +2507,13 @@ void act_new( const char *format, CHAR_DATA *ch, const void *arg1,
                 case 'p':
                     i = can_see_obj( to, obj1 )
                             ? obj1->short_descr
-                            : "something";
+                            : (char*)"something";
                     break;
  
                 case 'P':
                     i = can_see_obj( to, obj2 )
                             ? obj2->short_descr
-                            : "something";
+                            : (char*)"something";
                     break;
  
                 case 'd':
