@@ -77,7 +77,7 @@ void do_delete( CHAR_DATA *ch, char *argument)
 		ch->pcdata->clan->members--;
 		save_clan(ch->pcdata->clan);
 	    }
-	    do_quit(ch,"");
+	    do_quit(ch,(char*)"");
 	    unlink(strsave);
 	    return;
  	}
@@ -993,7 +993,7 @@ void do_pmote( CHAR_DATA *ch, char *argument )
     CHAR_DATA *vch;
     char *letter,*name;
     char last[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
-    int matches = 0;
+    unsigned int matches = 0;
 
     if ( !IS_NPC(ch) && IS_SET(ch->comm, COMM_NOEMOTE) )
     {
@@ -1082,7 +1082,7 @@ void do_pmote( CHAR_DATA *ch, char *argument )
  */
 struct	pose_table_type
 {
-    char *	message[2*MAX_CLASS];
+    const char *	message[2*MAX_CLASS];
 };
 
 const	struct	pose_table_type	pose_table	[]	=
@@ -1313,13 +1313,13 @@ const	struct	pose_table_type	pose_table	[]	=
 
 void do_pose( CHAR_DATA *ch, char *argument )
 {
-    int level;
+    unsigned int level;
     int pose;
 
     if ( IS_NPC(ch) )
 	return;
 
-    level = UMIN( ch->level, sizeof(pose_table) / sizeof(pose_table[0]) - 1 );
+    level = UMIN( (unsigned int)ch->level, sizeof(pose_table) / sizeof(pose_table[0]) - 1 );
     pose  = number_range(0, level);
 
     act( pose_table[pose].message[2*ch->class_num+0], ch, NULL, NULL, TO_CHAR );
@@ -1589,12 +1589,14 @@ void die_follower( CHAR_DATA *ch )
 
     ch->leader = NULL;
 
-    for ( fch = char_list; fch != NULL; fch = fch->next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
-	if ( fch->master == ch )
-	    stop_follower( fch );
-	if ( fch->leader == ch )
-	    fch->leader = fch;
+      fch = *it;
+
+      if ( fch->master == ch )
+        stop_follower( fch );
+	    if ( ch->leader == ch )
+	       fch->leader = fch;
     }
 
     return;
@@ -1706,8 +1708,9 @@ void do_group( CHAR_DATA *ch, char *argument )
 	sprintf( buf, "%s's group:\n\r", PERS(leader, ch) );
 	send_to_char( buf, ch );
 
-	for ( gch = char_list; gch != NULL; gch = gch->next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
 	{
+   gch = *it;
 	    if ( is_same_group( gch, ch ) )
 	    {
 		sprintf( buf,
@@ -1902,7 +1905,7 @@ void do_split( CHAR_DATA *ch, char *argument )
 
 void do_gtell( CHAR_DATA *ch, char *argument )
 {
-    CHAR_DATA *gch;
+    CHAR_DATA *gch = NULL;
 
     if ( argument[0] == '\0' )
     {
@@ -1916,8 +1919,9 @@ void do_gtell( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    for ( gch = char_list; gch != NULL; gch = gch->next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
+      gch = *it;
 	if ( is_same_group( gch, ch ) )
 	    act_new("{W$n tells the group '$t{W'{x",
 		ch,argument,gch,TO_VICT,POS_SLEEPING);

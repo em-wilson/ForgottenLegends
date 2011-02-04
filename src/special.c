@@ -287,8 +287,9 @@ bool spec_patrolman(CHAR_DATA *ch)
 	act("You blow down hard on $p.",ch,obj,NULL,TO_CHAR);
 	act("$n blows on $p, ***WHEEEEEEEEEEEET***",ch,obj,NULL,TO_ROOM);
 
-    	for ( vch = char_list; vch != NULL; vch = vch->next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     	{
+           vch = *it;
             if ( vch->in_room == NULL )
             	continue;
 

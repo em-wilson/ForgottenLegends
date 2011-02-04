@@ -74,9 +74,12 @@ bool can_loot(CHAR_DATA *ch, OBJ_DATA *obj)
 	return TRUE;
 
     owner = NULL;
-    for ( wch = char_list; wch != NULL ; wch = wch->next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
+    {
+    	wch = *it;
         if (!str_cmp(wch->name,obj->owner))
             owner = wch;
+    }
 
     if (owner == NULL)
 	return TRUE;

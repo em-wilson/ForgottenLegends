@@ -84,9 +84,9 @@ void violence_update( void )
     CHAR_DATA *ch_next;
     CHAR_DATA *victim;
 
-    for ( ch = char_list; ch != NULL; ch = ch_next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
-	ch_next	= ch->next;
+    	ch = *it;
 
 	if ( ( victim = ch->fighting ) == NULL || ch->in_room == NULL )
 	    continue;
@@ -1839,8 +1839,9 @@ void stop_fighting( CHAR_DATA *ch, bool fBoth )
 {
     CHAR_DATA *fch;
 
-    for ( fch = char_list; fch != NULL; fch = fch->next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
+    	fch = *it;
 	if ( fch == ch || ( fBoth && fch->fighting == ch ) )
 	{
 	    fch->fighting	= NULL;

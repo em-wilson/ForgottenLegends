@@ -59,7 +59,6 @@ time_t time(time_t *tloc);
 
 /* externals for counting purposes */
 extern	OBJ_DATA	*obj_free;
-extern	CHAR_DATA	*char_free;
 extern  DESCRIPTOR_DATA *descriptor_free;
 extern	PC_DATA		*pcdata_free;
 extern  AFFECT_DATA	*affect_free;
@@ -80,7 +79,7 @@ NOTE_DATA *		note_free;
 MPROG_CODE *		mprog_list;
 
 char			bug_buf		[2*MAX_INPUT_LENGTH];
-CHAR_DATA *		char_list;
+std::list<CHAR_DATA *> char_list;
 char *			help_greeting;
 char			log_buf		[2*MAX_INPUT_LENGTH];
 KILL_DATA		kill_table	[MAX_LEVEL];
@@ -1931,7 +1930,7 @@ CHAR_DATA *create_mobile( MOB_INDEX_DATA *pMobIndex )
 	exit( 1 );
     }
 
-    mob = new_char();
+    mob = new CHAR_DATA();
 
     mob->pIndexData	= pMobIndex;
 
@@ -2139,8 +2138,7 @@ CHAR_DATA *create_mobile( MOB_INDEX_DATA *pMobIndex )
 
 
     /* link the mob to the world list */
-    mob->next		= char_list;
-    char_list		= mob;
+    char_list.push_back(mob);
     pMobIndex->count++;
     return mob;
 }
@@ -3156,25 +3154,18 @@ void do_dump( CHAR_DATA *ch, char *argument )
 
     /* mobs */
     count = 0;  count2 = 0;
-    for (fch = char_list; fch != NULL; fch = fch->next)
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
+    	fch = *it;
 	count++;
 	if (fch->pcdata != NULL)
 	    num_pcs++;
 	for (af = fch->affected; af != NULL; af = af->next)
 	    aff_count++;
     }
-    for (fch = char_free; fch != NULL; fch = fch->next)
-	count2++;
 
-    fprintf(fp,"Mobs	%4d (%8ld bytes), %2d free (%ld bytes)\n",
-	count, count * (sizeof(*fch)), count2, count2 * (sizeof(*fch)));
-
-    /* pcdata */
-    count = PC_DATA::active.size();
-
-    fprintf(fp,"Pcdata	%4d (%8ld bytes), %2d free (%ld bytes)\n",
-	num_pcs, num_pcs * (sizeof(*pc)), count, count * (sizeof(*pc)));
+    fprintf(fp,"Mobs	%4d (%8ld bytes)\n",
+	count, count * (sizeof(*fch)));
 
     /* descriptors */
     count = 0; count2 = 0;
@@ -3594,7 +3585,7 @@ char *capitalize( const char *str )
 /*
  * Append a string to a file.
  */
-void append_file( CHAR_DATA *ch, char *file, char *str )
+void append_file( CHAR_DATA *ch, const char *file, const char *str )
 {
     FILE *fp;
 

@@ -385,10 +385,6 @@ void who_html_update (void)
 		else
 		    race = str_dup(pc_race_table[wch->orig_form].who_name);
 	    }
-	    if (!str_cmp(wch->name, "Blizzard"))
-		race = str_dup(" <FONT COLOR=""#0000FF"">Bunny");
-	    if (!str_cmp(wch->name, "ChibiUsa"))
-		race = str_dup(" <FONT COLOR=""#FF00FF"">Bunny");
 
 	count++;
 

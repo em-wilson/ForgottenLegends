@@ -186,16 +186,6 @@ int main( int argc, char **argv )
     strcpy( str_boot_time, ctime( &current_time ) );
 
     /*
-     * Macintosh console initialization.
-     */
-#if defined(macintosh)
-    console_options.nrows = 31;
-    cshow( stdout );
-    csetmode( C_RAW, stdin );
-    cecho2file( "log file", 1, stderr );
-#endif
-
-    /*
      * Reserve one channel for our use.
      */
     if ( ( fpReserve = fopen( NULL_FILE, "r" ) ) == NULL )
@@ -657,8 +647,13 @@ void close_socket( DESCRIPTOR_DATA *dclose )
 	}
 	else
 	{
-	    free_char(dclose->original ? dclose->original : 
-		dclose->character );
+	    if ( dclose->original ) {
+	    	delete dclose->original;
+	    	dclose->original = NULL;
+	    } else {
+			delete dclose->character;
+			dclose->character = NULL;
+	    }
 	}
     }
 
@@ -1391,7 +1386,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    write_to_buffer(d,"Reconnect attempt failed.\n\rName: ",0);
             if ( d->character != NULL )
             {
-                free_char( d->character );
+                delete d->character;
                 d->character = NULL;
             }
 	    d->connected = CON_GET_NAME;
@@ -1401,7 +1396,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    write_to_buffer(d,"Name: ",0);
             if ( d->character != NULL )
             {
-                free_char( d->character );
+                delete d->character;
                 d->character = NULL;
             }
 	    d->connected = CON_GET_NAME;
@@ -1425,7 +1420,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 
 	case 'n': case 'N':
 	    write_to_buffer( d, "Ok, what IS it, then? ", 0 );
-	    free_char( d->character );
+	    delete d->character;
 	    d->character = NULL;
 	    d->connected = CON_GET_NAME;
 	    break;
@@ -1924,8 +1919,7 @@ case CON_DEFAULT_CHOICE:
                 "Type 'password null <new password>' to fix.\n\r",0);
         }
 
-	ch->next	= char_list;
-	char_list	= ch;
+	char_list.push_back(ch);
 	d->connected	= CON_PLAYING;
 	send_to_char("The early bird may get the worm, but it's the second mouse that gets\n\r",ch);
 	send_to_char("the cheese.\n\r\n\r\n\r",ch);
@@ -2099,8 +2093,9 @@ bool check_reconnect( DESCRIPTOR_DATA *d, char *name, bool fConn )
 {
     CHAR_DATA *ch;
 
-    for ( ch = char_list; ch != NULL; ch = ch->next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
+    	ch = *it;
 	if ( !IS_NPC(ch)
 	&&   (!fConn || !ch->desc)
 	&&   !str_cmp( d->character->name, ch->name ) )
@@ -2112,7 +2107,7 @@ bool check_reconnect( DESCRIPTOR_DATA *d, char *name, bool fConn )
 	    }
 	    else
 	    {
-		free_char( d->character );
+		delete d->character;
 		d->character = ch;
 		ch->desc	 = d;
 		ch->timer	 = 0;
@@ -2781,7 +2776,7 @@ int strlen_color(char *argument)
 }
 
 /* source: EOD, by John Booth <???> */
-void printf_to_char (CHAR_DATA *ch, char *fmt, ...)
+void printf_to_char (CHAR_DATA *ch, const char *fmt, ...)
 {
 	char buf [MAX_STRING_LENGTH];
 	va_list args;

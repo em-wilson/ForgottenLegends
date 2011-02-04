@@ -54,7 +54,7 @@ void do_join( CHAR_DATA *ch, char *argument )
 	send_to_char("Clans Available for you to Join:\n\r",ch);
 	send_to_char("================================\n\r",ch);
 
-	do_clist(ch, "");
+	do_clist(ch, (char*)"");
 
 	send_to_char("\n\r",ch);
 	return;

@@ -76,13 +76,6 @@ OD	*new_obj args( (void) );
 void	free_obj args( (OBJ_DATA *obj) );
 #undef OD
 
-/* character recyling */
-#define CD CHAR_DATA
-CD	*new_char args( (void) );
-void	free_char args( (CHAR_DATA *ch) );
-#undef CD
-
-
 /* mob id and memory procedures */
 #define MD MEM_DATA
 long 	get_pc_id args( (void) );
@@ -96,7 +89,7 @@ MD	*find_memory args( (MEM_DATA *memory, long id) );
 BUFFER	*new_buf args( (void) );
 BUFFER  *new_buf_size args( (int size) );
 void	free_buf args( (BUFFER *buffer) );
-bool	add_buf args( (BUFFER *buffer, char *string) );
+bool	add_buf args( (BUFFER *buffer, const char *string) );
 void	clear_buf args( (BUFFER *buffer) );
 char	*buf_string args( (BUFFER *buffer) );
 

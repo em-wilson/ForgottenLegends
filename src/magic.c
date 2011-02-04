@@ -927,9 +927,9 @@ void spell_call_lightning( int sn, int level,CHAR_DATA *ch,void *vo,int target)
     act( "$n calls Mota's lightning to strike $s foes!",
 	ch, NULL, NULL, TO_ROOM );
 
-    for ( vch = char_list; vch != NULL; vch = vch_next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
-	vch_next	= vch->next;
+	vch = *it;
 	if ( vch->in_room == NULL )
 	    continue;
 	if ( vch->in_room == ch->in_room )
@@ -2195,9 +2195,9 @@ void spell_earthquake( int sn, int level, CHAR_DATA *ch, void *vo,int target )
     send_to_char( "The earth trembles beneath your feet!\n\r", ch );
     act( "$n makes the earth tremble and shiver.", ch, NULL, NULL, TO_ROOM );
 
-    for ( vch = char_list; vch != NULL; vch = vch_next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
-	vch_next	= vch->next;
+	vch = *it;
 	if ( vch->in_room == NULL )
 	    continue;
 	if ( vch->in_room == ch->in_room )

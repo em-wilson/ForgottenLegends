@@ -1936,41 +1936,22 @@ void extract_char( CHAR_DATA *ch, bool fPull )
 	ch->desc = NULL;
     }
 
-    for ( wch = char_list; wch != NULL; wch = wch->next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
+        wch = *it;
 	if ( wch->reply == ch )
 	    wch->reply = NULL;
 	if ( ch->mprog_target == wch )
 	    wch->mprog_target = NULL;
     }
 
-    if ( ch == char_list )
-    {
-       char_list = ch->next;
+    char_list.remove(ch);
+
+    if ( ch->desc != NULL ) {
+        ch->desc->character = NULL;
     }
-    else
-    {
-	CHAR_DATA *prev;
-
-	for ( prev = char_list; prev != NULL; prev = prev->next )
-	{
-	    if ( prev->next == ch )
-	    {
-		prev->next = ch->next;
-		break;
-	    }
-	}
-
-	if ( prev == NULL )
-	{
-	    bug( "Extract_char: char not found.", 0 );
-	    return;
-	}
-    }
-
-    if ( ch->desc != NULL )
-	ch->desc->character = NULL;
-    free_char( ch );
+    delete ch;
+    ch = NULL;
     return;
 }
 
@@ -2019,8 +2000,9 @@ CHAR_DATA *get_char_world( CHAR_DATA *ch, char *argument )
 
     number = number_argument( argument, arg );
     count  = 0;
-    for ( wch = char_list; wch != NULL ; wch = wch->next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
+        wch = *it;
 	if ( wch->in_room == NULL || !can_see( ch, wch ) 
 	||   !is_name( arg, wch->name ) )
 	    continue;
@@ -3013,9 +2995,10 @@ CHAR_DATA *get_char_area( CHAR_DATA *ch, char *argument )
         return ach;
 
     number = number_argument( argument, arg );
-    count = 0;   
-    for ( ach = char_list; ach != NULL; ach = ach->next )
+    count = 0;
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
+        ach = *it;
         if (ach->in_room->area != ch->in_room->area
         ||  !can_see( ch, ach ) || !is_name( arg, ach->name ))
             continue; 

@@ -171,7 +171,7 @@ void do_wiznet( CHAR_DATA *ch, char *argument )
 
 }
 
-void wiznet(char *string, CHAR_DATA *ch, OBJ_DATA *obj,
+void wiznet(const char *string, CHAR_DATA *ch, OBJ_DATA *obj,
 	    long flag, long flag_skip, int min_level) 
 {
     DESCRIPTOR_DATA *d;
@@ -968,8 +968,9 @@ void do_at( CHAR_DATA *ch, char *argument )
      * See if 'ch' still exists before continuing!
      * Handles 'at XXXX quit' case.
      */
-    for ( wch = char_list; wch != NULL; wch = wch->next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
+        wch = *it;
 	if ( wch == ch )
 	{
 	    char_from_room( ch );
@@ -2100,8 +2101,9 @@ void do_mwhere( CHAR_DATA *ch, char *argument )
 
     found = FALSE;
     buffer = new_buf();
-    for ( victim = char_list; victim != NULL; victim = victim->next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
+        victim = *it;
 	if ( victim->in_room != NULL
 	&&   is_name( argument, victim->name ) )
 	{
@@ -4440,9 +4442,9 @@ void do_force( CHAR_DATA *ch, char *argument )
 	    return;
 	}
 
-	for ( vch = char_list; vch != NULL; vch = vch_next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
 	{
-	    vch_next = vch->next;
+       vch = *it;
 
 	    if ( !IS_NPC(vch) && get_trust( vch ) < get_trust( ch ) )
 	    {
@@ -4462,9 +4464,9 @@ void do_force( CHAR_DATA *ch, char *argument )
             return;
         }
  
-        for ( vch = char_list; vch != NULL; vch = vch_next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
         {
-            vch_next = vch->next;
+            vch = *it;
  
             if ( !IS_NPC(vch) && get_trust( vch ) < get_trust( ch ) 
 	    &&	 vch->level < LEVEL_HERO)
@@ -4485,9 +4487,9 @@ void do_force( CHAR_DATA *ch, char *argument )
             return;
         }
  
-        for ( vch = char_list; vch != NULL; vch = vch_next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
         {
-            vch_next = vch->next;
+            vch = *it;
  
             if ( !IS_NPC(vch) && get_trust( vch ) < get_trust( ch )
             &&   vch->level >= LEVEL_HERO)
@@ -4862,9 +4864,7 @@ void copyover_recover ()
                        if (!d->character->in_room)
                                d->character->in_room = get_room_index (ROOM_VNUM_TEMPLE);
 
-                       /* Insert in the char_list */
-                       d->character->next = char_list;
-                       char_list = d->character;
+                        char_list.push_back(d->character);
 
                        char_to_room (d->character, d->character->in_room);
                        do_look (d->character, "auto");

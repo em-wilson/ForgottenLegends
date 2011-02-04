@@ -51,7 +51,7 @@ DECLARE_DO_FUN( do_play		);
 
 void show_eq_char( CHAR_DATA *ch, CHAR_DATA *ch1 );
 
-char *	const	where_name	[] =
+const char *	const	where_name	[] =
 {
     "<used as light>     ",
     "<worn on finger>    ",
@@ -1586,11 +1586,11 @@ void do_score( CHAR_DATA *ch, char *argument )
 
 	switch(i)
 	{
-	    case(AC_PIERCE):	temp = "piercing";	break;
-	    case(AC_BASH):	temp = "bashing";	break;
-	    case(AC_SLASH):	temp = "slashing";	break;
-	    case(AC_EXOTIC):	temp = "magic";		break;
-	    default:		temp = "error";		break;
+	    case(AC_PIERCE):	temp = (char*)"piercing";	break;
+	    case(AC_BASH):	temp = (char*)"bashing";	break;
+	    case(AC_SLASH):	temp = (char*)"slashing";	break;
+	    case(AC_EXOTIC):	temp = (char*)"magic";		break;
+	    default:		temp = (char*)"error";		break;
 	}
 	
 	send_to_char("You are ", ch);
@@ -1712,7 +1712,7 @@ char *	const	day_name	[] =
     "the Great Gods", "the Sun"
 };
 
-char *	const	month_name	[] =
+const char *	const	month_name	[] =
 {
     "Winter", "the Winter Wolf", "the Frost Giant", "the Old Forces",
     "the Grand Struggle", "the Spring", "Nature", "Futility", "the Dragon",
@@ -1910,10 +1910,6 @@ void do_whois (CHAR_DATA *ch, char *argument)
 		else
 		    race = str_dup(pc_race_table[wch->orig_form].who_name);
 	    }
-	    if (!str_cmp(wch->name, "Blizzard"))
-		race = str_dup(" {BBunny{x");
-	    if (!str_cmp(wch->name, "ChibiUsa"))
-		race = str_dup(" {MBunny{x");
 
 	    /* a little formatting */
 	    sprintf(buf, "{w[{R%2d {y%6s {W%s{w]{x %s%s%s%s%s%s%s%s\n\r",
@@ -2117,10 +2113,6 @@ void do_who( CHAR_DATA *ch, char *argument )
 		else
 		    race = str_dup(pc_race_table[wch->orig_form].who_name);
 	    }
-	    if (!str_cmp(wch->name, "Blizzard"))
-		race = str_dup(" {BBunny{x");
-	    if (!str_cmp(wch->name, "ChibiUsa"))
-		race = str_dup(" {MBunny{x");
 
 	/*
 	 * Format it up.
@@ -2322,8 +2314,9 @@ void do_where( CHAR_DATA *ch, char *argument )
     else
     {
 	found = FALSE;
-	for ( victim = char_list; victim != NULL; victim = victim->next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
 	{
+       victim = *it;
 	    if ( victim->in_room != NULL
 	    &&   victim->in_room->area == ch->in_room->area
 	    &&   !IS_AFFECTED(victim, AFF_HIDE)

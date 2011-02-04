@@ -36,7 +36,7 @@
 #include <time.h>
 #include "merc.h"
 
-char *const distance[4]=
+const char *const distance[4]=
 {
 "right here.", "nearby to the %s.", "not far %s.", "off in the distance %s."
 };

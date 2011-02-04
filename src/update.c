@@ -419,9 +419,9 @@ void mobile_update( void )
     int door;
 
     /* Examine all mobs. */
-    for ( ch = char_list; ch != NULL; ch = ch_next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
-	ch_next = ch->next;
+	ch = *it;
 
 	if ( !IS_NPC(ch) || ch->in_room == NULL || IS_AFFECTED(ch,AFF_CHARM))
 	    continue;
@@ -708,12 +708,11 @@ void char_update( void )
     if (save_number > 29)
 	save_number = 0;
 
-    for ( ch = char_list; ch != NULL; ch = ch_next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
+    	ch = *it;
 	AFFECT_DATA *paf;
 	AFFECT_DATA *paf_next;
-
-	ch_next = ch->next;
 
         if ( ch->timer > 30 )
             ch_quit = ch;
@@ -920,9 +919,9 @@ void char_update( void )
      * Autosave and autoquit.
      * Check that these chars still exist.
      */
-    for ( ch = char_list; ch != NULL; ch = ch_next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
-        ch_next = ch->next;
+        ch = *it;
 
 	if (ch->desc != NULL && ch->desc->descriptor % 30 == save_number)
 	    save_char_obj(ch);
@@ -1110,9 +1109,9 @@ void aggr_update( void )
     CHAR_DATA *vch_next;
     CHAR_DATA *victim;
 
-    for ( wch = char_list; wch != NULL; wch = wch_next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
-	wch_next = wch->next;
+	wch = *it;
 	if ( IS_NPC(wch)
 	||   wch->level >= LEVEL_IMMORTAL
 	||   wch->in_room == NULL 

@@ -77,7 +77,6 @@ typedef struct	area_data		AREA_DATA;
 typedef struct  auction_data		AUCTION_DATA;
 typedef struct	ban_data		BAN_DATA;
 typedef struct 	buf_type	 	BUFFER;
-typedef struct	char_data		CHAR_DATA;
 typedef struct	descriptor_data		DESCRIPTOR_DATA;
 typedef struct	exit_data		EXIT_DATA;
 typedef struct	extra_descr_data	EXTRA_DESCR_DATA;
@@ -99,7 +98,7 @@ typedef struct  mprog_list		MPROG_LIST;
 typedef struct  mprog_code		MPROG_CODE;
 typedef struct  clan_data		CLAN_DATA;
 
-
+class CHAR_DATA;
 /*
  * Function types.
  */
@@ -1489,128 +1488,7 @@ struct mem_data
 };
 
 #include "board.h"
-#include "pc_data.h"
-
-/*
- * One character (PC or NPC).
- */
-struct	char_data
-{
-    CHAR_DATA *		next;
-    CHAR_DATA *		next_in_room;
-    CHAR_DATA *		master;
-    CHAR_DATA *		leader;
-    CHAR_DATA *		fighting;
-    CHAR_DATA *		reply;
-    CHAR_DATA *		pet;
-    CHAR_DATA *		mprog_target;
-    CHAR_DATA *		hunting;
-    MEM_DATA *		memory;
-    SPEC_FUN *		spec_fun;
-    MOB_INDEX_DATA *	pIndexData;
-    DESCRIPTOR_DATA *	desc;
-    AFFECT_DATA *	affected;
-    OBJ_DATA *		carrying;
-    OBJ_DATA *		on;
-    ROOM_INDEX_DATA *	in_room;
-    ROOM_INDEX_DATA *	was_in_room;
-    ROOM_INDEX_DATA *	was_note_room;
-    AREA_DATA *		zone;
-    PC_DATA *		pcdata;
-    GEN_DATA *		gen_data;
-    bool		valid;
-    bool		confirm_reclass;
-    char *		name;
-    long		id;
-    sh_int		version;
-    char *		short_descr;
-    char *		long_descr;
-    char *		description;
-    char *		prompt;
-    char *		prefix;
-    sh_int		group;
-    sh_int		sex;
-    sh_int		class_num;
-    sh_int		race;
-    sh_int		level;
-    sh_int		trust;
-    sh_int		drac;
-    sh_int		breathe;
-    int			played;
-    AUCTION_DATA *	auction;
-    int			lines;  /* for the pager */
-    time_t		logon;
-    sh_int		timer;
-    sh_int		wait;
-    sh_int		daze;
-    sh_int		hit;
-    sh_int		max_hit;
-    sh_int		mana;
-    sh_int		max_mana;
-    sh_int		move;
-    sh_int		max_move;
-    long		gold;
-    long		silver;
-    int			exp;
-    long		act;
-    long		comm;   /* RT added to pad the vector */
-    long		done;   /* What classes have they completed? */
-    int			reclass_num; /* How many times have the reclassed? */
-    long		wiznet; /* wiz stuff */
-    long		imm_flags;
-    long		res_flags;
-    long		vuln_flags;
-    sh_int		invis_level;
-    sh_int		incog_level;
-    long			affected_by;
-    sh_int		position;
-    sh_int		practice;
-    sh_int		train;
-    sh_int		carry_weight;
-    sh_int		carry_number;
-    sh_int		saving_throw;
-    sh_int		alignment;
-    sh_int		hitroll;
-    sh_int		damroll;
-    sh_int		armor[4];
-    sh_int		wimpy;
-    /* stats */
-    sh_int		perm_stat[MAX_STATS];
-    sh_int		mod_stat[MAX_STATS];
-    /* parts stuff */
-    long		form;
-    long		parts;
-    sh_int		size;
-    char*		material;
-    /* mobile stuff */
-    long		off_flags;
-    sh_int		damage[3];
-    sh_int		dam_type;
-    sh_int		start_pos;
-    sh_int		default_pos;
-
-    sh_int		mprog_delay;
-
-    /* werefolk stuff */
-    sh_int		morph_form;
-    sh_int		orig_form;
-    int			xp;
-
-    /* clan stuff */
-    bool		confirm_pk;
-    bool		makeclan;
-    CLAN_DATA *		join;
-    int			pkills;
-    int			pkilled;
-    int			mkills;
-    int			mkilled;
-    int			range;
-    int			clan_cust;
-    int			adrenaline;
-    int			jkilled; // If they were just killed
-};
-
-
+#include "char_data.h"
 
 /* Data for generating characters -- only used during generation */
 struct gen_data
@@ -2190,7 +2068,7 @@ extern  const   struct  draconian_type  draconian_table [MAX_DRACONIAN];
 extern		HELP_DATA	  *	help_first;
 extern		SHOP_DATA	  *	shop_first;
 
-extern		CHAR_DATA	  *	char_list;
+extern      std::list<CHAR_DATA *> char_list;
 extern		DESCRIPTOR_DATA   *	descriptor_list;
 extern		OBJ_DATA	  *	object_list;
 
@@ -2369,7 +2247,7 @@ void    get_obj         args( ( CHAR_DATA *ch, OBJ_DATA *obj,
                             OBJ_DATA *container ) );
 
 /* act_wiz.c */
-void	wiznet		args( (char *string, CHAR_DATA *ch, OBJ_DATA *obj,
+void	wiznet		args( (const char *string, CHAR_DATA *ch, OBJ_DATA *obj,
 			       long flag, long flag_skip, int min_level ) );
 void	copyover_recover   args( ( void ) );
 RID *	find_location	args( (CHAR_DATA *ch, char *argument ) );
@@ -2391,7 +2269,7 @@ void	show_string	args( ( struct descriptor_data *d, char *input) );
 void	close_socket	args( ( DESCRIPTOR_DATA *dclose ) );
 void	write_to_buffer	args( ( DESCRIPTOR_DATA *d, const char *txt,
 			    int length ) );
-void printf_to_char  args( ( CHAR_DATA *ch, char *fmt, ...) ) __attribute__ ((format(printf, 2,3)));
+void printf_to_char  args( ( CHAR_DATA *ch, const char *fmt, ...) ) __attribute__ ((format(printf, 2,3)));
 void	send_to_char	args( ( const char *txt, CHAR_DATA *ch ) );
 void	page_to_char	args( ( const char *txt, CHAR_DATA *ch ) );
 void	act		args( ( const char *format, CHAR_DATA *ch,
@@ -2449,7 +2327,7 @@ bool	str_prefix	args( ( const char *astr, const char *bstr ) );
 bool	str_infix	args( ( const char *astr, const char *bstr ) );
 bool	str_suffix	args( ( const char *astr, const char *bstr ) );
 char *	capitalize	args( ( const char *str ) );
-void	append_file	args( ( CHAR_DATA *ch, char *file, char *str ) );
+void	append_file	args( ( CHAR_DATA *ch, const char *file, const char *str ) );
 void	bug		args( ( const char *str, int param ) );
 void	log_string	args( ( const char *str ) );
 void	tail_chain	args( ( void ) );

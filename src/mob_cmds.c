@@ -736,8 +736,9 @@ void do_mpat( CHAR_DATA *ch, char *argument )
      * See if 'ch' still exists before continuing!
      * Handles 'at XXXX quit' case.
      */
-    for ( wch = char_list; wch != NULL; wch = wch->next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
+        wch = *it;
 	if ( wch == ch )
 	{
 	    char_from_room( ch );
@@ -886,9 +887,9 @@ void do_mpforce( CHAR_DATA *ch, char *argument )
         CHAR_DATA *vch;
         CHAR_DATA *vch_next;
 
-	for ( vch = char_list; vch != NULL; vch = vch_next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
 	{
-	    vch_next = vch->next;
+       vch = *it;
 
 	    if ( vch->in_room == ch->in_room
 		&& get_trust( vch ) < get_trust( ch ) 
@@ -980,9 +981,9 @@ void do_mpvforce( CHAR_DATA *ch, char *argument )
 
     vnum = atoi( arg );
 
-    for ( victim = char_list; victim; victim = victim_next )
+    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
-	victim_next = victim->next;
+        victim = *it;
 	if ( IS_NPC(victim) && victim->pIndexData->vnum == vnum
 	&&   ch != victim && victim->fighting == NULL )
 	    interpret( victim, argument );

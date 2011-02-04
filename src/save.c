@@ -570,7 +570,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
     bool found;
     int stat;
 
-    ch = new_char();
+    ch = new CHAR_DATA();
     ch->pcdata = new PC_DATA();
 
     d->character			= ch;
