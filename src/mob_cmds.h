@@ -36,7 +36,7 @@
 
 struct	mob_cmd_type
 {
-    char * const	name;
+    const char *	name;
     DO_FUN *		do_fun;
 };
 

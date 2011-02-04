@@ -414,7 +414,6 @@ void gain_condition( CHAR_DATA *ch, int iCond, int value )
 void mobile_update( void )
 {
     CHAR_DATA *ch;
-    CHAR_DATA *ch_next;
     EXIT_DATA *pexit;
     int door;
 
@@ -697,7 +696,6 @@ void info_update( void )
 void char_update( void )
 {   
     CHAR_DATA *ch;
-    CHAR_DATA *ch_next;
     CHAR_DATA *ch_quit;
 
     ch_quit	= NULL;
@@ -927,7 +925,7 @@ void char_update( void )
 	    save_char_obj(ch);
 
         if ( ch == ch_quit )
-            do_quit( ch, "" );
+            do_quit( ch, (char*)"" );
     }
 
     return;
@@ -999,25 +997,25 @@ void obj_update( void )
 
 	switch ( obj->item_type )
 	{
-	default:              message = "$p crumbles into dust.";  break;
-	case ITEM_FOUNTAIN:   message = "$p dries up.";         break;
-	case ITEM_CORPSE_NPC: message = "$p decays into dust."; break;
-	case ITEM_CORPSE_PC:  message = "$p decays into dust."; break;
-	case ITEM_FOOD:       message = "$p decomposes.";	break;
-	case ITEM_POTION:     message = "$p has evaporated from disuse.";	
+	default:              message = (char*)"$p crumbles into dust.";  break;
+	case ITEM_FOUNTAIN:   message = (char*)"$p dries up.";         break;
+	case ITEM_CORPSE_NPC: message = (char*)"$p decays into dust."; break;
+	case ITEM_CORPSE_PC:  message = (char*)"$p decays into dust."; break;
+	case ITEM_FOOD:       message = (char*)"$p decomposes.";	break;
+	case ITEM_POTION:     message = (char*)"$p has evaporated from disuse.";	
 								break;
-	case ITEM_PORTAL:     message = "$p fades out of existence."; break;
+	case ITEM_PORTAL:     message = (char*)"$p fades out of existence."; break;
 	case ITEM_CONTAINER: 
 	    if (CAN_WEAR(obj,ITEM_WEAR_FLOAT))
 	    {
 		if (obj->contains)
 		    message = 
-		"$p flickers and vanishes, spilling its contents on the floor.";
+		(char*)"$p flickers and vanishes, spilling its contents on the floor.";
 		else
-		    message = "$p flickers and vanishes.";
+		    message = (char*)"$p flickers and vanishes.";
 	    }
 	    else
-		message = "$p crumbles into dust.";
+		message = (char*)"$p crumbles into dust.";
 	    break;
 	}
 
@@ -1102,7 +1100,6 @@ void obj_update( void )
 void aggr_update( void )
 {
     CHAR_DATA *wch;
-    CHAR_DATA *wch_next;
     CHAR_DATA *ch;
     CHAR_DATA *ch_next;
     CHAR_DATA *vch;

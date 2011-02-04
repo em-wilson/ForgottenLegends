@@ -74,7 +74,7 @@ void do_gain(CHAR_DATA *ch, char *argument)
 
     if (arg[0] == '\0')
     {
-	do_say(trainer,"Pardon me?");
+	do_say(trainer,(char*)"Pardon me?");
 	return;
     }
 
@@ -658,7 +658,7 @@ bool parse_gen_groups(CHAR_DATA *ch,char *argument)
     {
 	if (argument[0] == '\0')
 	{
-	    do_help(ch,"group help");
+	    do_help(ch,(char*)"group help");
 	    return TRUE;
 	}
 
@@ -771,7 +771,7 @@ bool parse_gen_groups(CHAR_DATA *ch,char *argument)
 
     if (!str_prefix(arg,"premise"))
     {
-	do_help(ch,"premise");
+	do_help(ch,(char*)"premise");
 	return TRUE;
     }
 

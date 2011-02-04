@@ -83,7 +83,7 @@ void do_heal(CHAR_DATA *ch, char *argument)
     {
         spell = spell_cure_light;
 	sn    = skill_lookup("cure light");
-	words = "judicandus dies";
+	words = (char*)"judicandus dies";
 	 cost  = 1000;
     }
 
@@ -91,7 +91,7 @@ void do_heal(CHAR_DATA *ch, char *argument)
     {
 	spell = spell_cure_serious;
 	sn    = skill_lookup("cure serious");
-	words = "judicandus gzfuajg";
+	words = (char*)"judicandus gzfuajg";
 	cost  = 1600;
     }
 
@@ -99,7 +99,7 @@ void do_heal(CHAR_DATA *ch, char *argument)
     {
 	spell = spell_cure_critical;
 	sn    = skill_lookup("cure critical");
-	words = "judicandus qfuhuqar";
+	words = (char*)"judicandus qfuhuqar";
 	cost  = 2500;
     }
 
@@ -107,7 +107,7 @@ void do_heal(CHAR_DATA *ch, char *argument)
     {
 	spell = spell_heal;
 	sn = skill_lookup("heal");
-	words = "pzar";
+	words = (char*)"pzar";
 	cost  = 5000;
     }
 
@@ -115,7 +115,7 @@ void do_heal(CHAR_DATA *ch, char *argument)
     {
 	spell = spell_cure_blindness;
 	sn    = skill_lookup("cure blindness");
-      	words = "judicandus noselacri";		
+      	words = (char*)"judicandus noselacri";		
         cost  = 2000;
     }
 
@@ -123,7 +123,7 @@ void do_heal(CHAR_DATA *ch, char *argument)
     {
 	spell = spell_cure_disease;
 	sn    = skill_lookup("cure disease");
-	words = "judicandus eugzagz";
+	words = (char*)"judicandus eugzagz";
 	cost = 1500;
     }
 
@@ -131,7 +131,7 @@ void do_heal(CHAR_DATA *ch, char *argument)
     {
 	spell = spell_cure_poison;
 	sn    = skill_lookup("cure poison");
-	words = "judicandus sausabru";
+	words = (char*)"judicandus sausabru";
 	cost  = 2500;
     }
 	
@@ -139,7 +139,7 @@ void do_heal(CHAR_DATA *ch, char *argument)
     {
 	spell = spell_remove_curse; 
 	sn    = skill_lookup("remove curse");
-	words = "candussido judifgz";
+	words = (char*)"candussido judifgz";
 	cost  = 5000;
     }
 
@@ -147,7 +147,7 @@ void do_heal(CHAR_DATA *ch, char *argument)
     {
         spell = NULL;
         sn = -1;
-        words = "energizer";
+        words = (char*)"energizer";
         cost = 1000;
     }
 
@@ -156,7 +156,7 @@ void do_heal(CHAR_DATA *ch, char *argument)
     {
 	spell =  spell_refresh;
 	sn    = skill_lookup("refresh");
-	words = "candusima"; 
+	words = (char*)"candusima"; 
 	cost  = 500;
     }
 

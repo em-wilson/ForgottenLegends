@@ -47,7 +47,7 @@ void scan_char           args((CHAR_DATA *victim, CHAR_DATA *ch,
                                sh_int depth, sh_int door));
 void do_scan(CHAR_DATA *ch, char *argument)
 {
-   extern char *const dir_name[];
+   extern const char *const dir_name[];
    char arg1[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
    ROOM_INDEX_DATA *scan_room;
    EXIT_DATA *pExit;
@@ -110,7 +110,7 @@ void scan_list(ROOM_INDEX_DATA *scan_room, CHAR_DATA *ch, sh_int depth,
 
 void scan_char(CHAR_DATA *victim, CHAR_DATA *ch, sh_int depth, sh_int door)
 {
-   extern char *const dir_name[];
+   extern const char *const dir_name[];
    char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
 
    buf[0] = '\0';

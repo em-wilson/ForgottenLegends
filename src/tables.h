@@ -72,29 +72,29 @@ extern  const	struct	size_type	info_table[MAX_INFO];
 
 struct flag_type
 {
-    char *name;
+    const char *name;
     int bit;
     bool settable;
 };
 
 struct position_type
 {
-    char *name;
-    char *short_name;
+    const char *name;
+    const char *short_name;
 };
 
 struct sex_type
 {
-    char *name;
+    const char *name;
 };
 
 struct size_type
 {
-    char *name;
+    const char *name;
 };
 
 struct	bit_type
 {
 	const	struct	flag_type *	table;
-	char *				help;
+	const char *				help;
 };

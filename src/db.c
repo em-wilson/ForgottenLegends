@@ -2128,7 +2128,7 @@ CHAR_DATA *create_mobile( MOB_INDEX_DATA *pMobIndex )
 	mob->form		= pMobIndex->form;
 	mob->parts		= pMobIndex->parts;
 	mob->size		= SIZE_MEDIUM;
-	mob->material		= "";
+	mob->material		= (char*)"";
 
         for (i = 0; i < MAX_STATS; i ++)
             mob->perm_stat[i] = 11 + mob->level/4;
@@ -2772,7 +2772,7 @@ char *fread_string( FILE *fp )
 		    char *	pc;
 		    char	rgc[sizeof(char *)];
 		} u1;
-		int ic;
+		unsigned int ic;
 		int iHash;
 		char *pHash;
 		char *pHashPrev;
@@ -2869,7 +2869,7 @@ char *fread_string_eol( FILE *fp )
                     char *      pc;
                     char        rgc[sizeof(char *)];
                 } u1;
-                int ic;
+                unsigned int ic;
                 int iHash;
                 char *pHash;
                 char *pHashPrev;
@@ -3129,7 +3129,6 @@ void do_dump( CHAR_DATA *ch, char *argument )
     int count,count2,num_pcs,aff_count;
     CHAR_DATA *fch;
     MOB_INDEX_DATA *pMobIndex;
-    PC_DATA *pc;
     OBJ_DATA *obj;
     OBJ_INDEX_DATA *pObjIndex;
     ROOM_INDEX_DATA *room;
@@ -3678,7 +3677,7 @@ void log_string( const char *str )
     strtime                    = ctime( &current_time );
     strtime[strlen(strtime)-1] = '\0';
     fprintf( stderr, "%s :: %s\n", strtime, str );
-    sprintf(strtime, str);
+    sprintf(strtime, "%s", str);
     wiznet( strtime, 0, 0, WIZ_LOG, WIZ_SECURE, 0);
     return;
 }

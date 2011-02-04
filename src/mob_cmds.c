@@ -118,7 +118,7 @@ void mob_interpret( CHAR_DATA *ch, char *argument )
     bug( buf, 0 );
 }
 
-char *mprog_type_to_name( int type )
+const char *mprog_type_to_name( int type )
 {
     switch ( type )
     {
@@ -821,7 +821,7 @@ void do_mptransfer( CHAR_DATA *ch, char *argument )
 	stop_fighting( victim, TRUE );
     char_from_room( victim );
     char_to_room( victim, location );
-    do_look( victim, "auto" );
+    do_look( victim, (char*)"auto" );
 
     return;
 }
@@ -885,7 +885,6 @@ void do_mpforce( CHAR_DATA *ch, char *argument )
     if ( !str_cmp( arg, "all" ) )
     {
         CHAR_DATA *vch;
-        CHAR_DATA *vch_next;
 
     for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
 	{
@@ -959,7 +958,7 @@ void do_mpgforce( CHAR_DATA *ch, char *argument )
  */
 void do_mpvforce( CHAR_DATA *ch, char *argument )
 {
-    CHAR_DATA *victim, *victim_next;
+    CHAR_DATA *victim;
     char arg[ MAX_INPUT_LENGTH ];
     int vnum;
 

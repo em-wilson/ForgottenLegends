@@ -42,7 +42,7 @@ DECLARE_DO_FUN(do_recall	);
 DECLARE_DO_FUN(do_stand		);
 
 
-char *	const	dir_name	[]		=
+const char *	const	dir_name	[]		=
 {
     "north", "east", "south", "west", "up", "down"
 };
@@ -224,7 +224,7 @@ void move_char( CHAR_DATA *ch, int door, bool follow )
 	    if (IS_BUNNY(fch))
 	act("$N has arrived.", fch, NULL, ch, TO_CHAR );
 
-    do_look( ch, "auto" );
+    do_look( ch, (char*)"auto" );
 
     if (in_room == to_room) /* no circular follows */
 	return;
@@ -235,7 +235,7 @@ void move_char( CHAR_DATA *ch, int door, bool follow )
 
 	if ( fch->master == ch && IS_AFFECTED(fch,AFF_CHARM) 
 	&&   fch->position < POS_STANDING)
-	    do_stand(fch,"");
+	    do_stand(fch,(char*)"");
 
 	if ( fch->master == ch && fch->position == POS_STANDING 
 	&&   can_see_room(fch,to_room))
@@ -964,7 +964,7 @@ void do_stand( CHAR_DATA *ch, char *argument )
 	    act("$n wakes and stands in $p.",ch,obj,NULL,TO_ROOM);
 	}
 	ch->position = POS_STANDING;
-	do_look(ch,"auto");
+	do_look(ch,(char*)"auto");
 	break;
 
     case POS_RESTING: case POS_SITTING:
@@ -1081,7 +1081,7 @@ void do_rest( CHAR_DATA *ch, char *argument )
             act("$n wakes up and rests in $p.",ch,obj,NULL,TO_ROOM);
         }
 	ch->position = POS_RESTING;
-	do_look(ch,"auto");
+	do_look(ch,(char*)"auto");
 	break;
 
     case POS_RESTING:
@@ -1214,7 +1214,7 @@ void do_sit (CHAR_DATA *ch, char *argument )
             }
 
 	    ch->position = POS_SITTING;
-	    do_look(ch,"auto");
+	    do_look(ch,(char*)"auto");
 	    break;
 
 	case POS_RESTING:
@@ -1363,7 +1363,7 @@ void do_wake( CHAR_DATA *ch, char *argument )
 	{ act( "You can't wake $M!",   ch, NULL, victim, TO_CHAR );  return; }
 
     act_new( "$n wakes you.", ch, NULL, victim, TO_VICT,POS_SLEEPING );
-    do_stand(victim,"");
+    do_stand(victim,(char*)"");
     return;
 }
 
@@ -1495,22 +1495,23 @@ void do_recall( CHAR_DATA *ch, char *argument )
     char_from_room( ch );
     char_to_room( ch, location );
     act( "$n appears in the room.", ch, NULL, NULL, TO_ROOM );
-    do_look( ch, "auto" );
+    do_look( ch, (char*)"auto" );
     
     if (ch->pet != NULL)
-	do_recall(ch->pet,"");
+	do_recall(ch->pet,(char*)"");
 
     return;
 }
 
 
 
-void do_train( CHAR_DATA *ch, char *argument )
+void do_train( CHAR_DATA *ch, char *arguments )
 {
     char buf[MAX_STRING_LENGTH];
     CHAR_DATA *mob;
     sh_int stat = - 1;
-    char *pOutput = NULL;
+    char pOutput[MAX_STRING_LENGTH];
+    char argument[MAX_STRING_LENGTH];
     int cost;
 
     if ( IS_NPC(ch) )
@@ -1531,11 +1532,13 @@ void do_train( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if ( argument[0] == '\0' )
+    if ( arguments[0] == '\0' )
     {
 	sprintf( buf, "You have %d training sessions.\n\r", ch->train );
 	send_to_char( buf, ch );
-	argument = "foo";
+	strcpy( argument, "foo" );
+    } else {
+    	strcpy( argument, arguments );
     }
 
     cost = 1;
@@ -1545,7 +1548,7 @@ void do_train( CHAR_DATA *ch, char *argument )
 	if ( class_table[ch->class_num].attr_prime == STAT_STR )
 	    cost    = 1;
 	stat        = STAT_STR;
-	pOutput     = "strength";
+	strcpy( pOutput, "strength" );
     }
 
     else if ( !str_cmp( argument, "int" ) )
@@ -1553,7 +1556,7 @@ void do_train( CHAR_DATA *ch, char *argument )
 	if ( class_table[ch->class_num].attr_prime == STAT_INT )
 	    cost    = 1;
 	stat	    = STAT_INT;
-	pOutput     = "intelligence";
+	strcpy( pOutput, "intelligence" );
     }
 
     else if ( !str_cmp( argument, "wis" ) )
@@ -1561,7 +1564,7 @@ void do_train( CHAR_DATA *ch, char *argument )
 	if ( class_table[ch->class_num].attr_prime == STAT_WIS )
 	    cost    = 1;
 	stat	    = STAT_WIS;
-	pOutput     = "wisdom";
+	strcpy( pOutput, "wisdom" );
     }
 
     else if ( !str_cmp( argument, "dex" ) )
@@ -1569,7 +1572,7 @@ void do_train( CHAR_DATA *ch, char *argument )
 	if ( class_table[ch->class_num].attr_prime == STAT_DEX )
 	    cost    = 1;
 	stat  	    = STAT_DEX;
-	pOutput     = "dexterity";
+	strcpy( pOutput, "dexterity" );
     }
 
     else if ( !str_cmp( argument, "con" ) )
@@ -1577,7 +1580,7 @@ void do_train( CHAR_DATA *ch, char *argument )
 	if ( class_table[ch->class_num].attr_prime == STAT_CON )
 	    cost    = 1;
 	stat	    = STAT_CON;
-	pOutput     = "constitution";
+	strcpy( pOutput, "constitution" );
     }
 
     else if ( !str_cmp(argument, "hp" ) )

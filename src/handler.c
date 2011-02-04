@@ -145,17 +145,17 @@ int weapon_type (const char *name)
     return WEAPON_EXOTIC;
 }
 
-char *item_name(int item_type)
+const char *item_name(int item_type)
 {
     int type;
 
     for (type = 0; item_table[type].name != NULL; type++)
 	if (item_type == item_table[type].type)
 	    return item_table[type].name;
-    return (char*)"none";
+    return "none";
 }
 
-char *weapon_name( int weapon_type)
+const char *weapon_name( int weapon_type)
 {
     int type;
  
@@ -1932,7 +1932,7 @@ void extract_char( CHAR_DATA *ch, bool fPull )
 
     if ( ch->desc != NULL && ch->desc->original != NULL )
     {
-	do_return( ch, "" );
+	do_return( ch, (char*)"" );
 	ch->desc = NULL;
     }
 
@@ -2511,11 +2511,11 @@ bool can_drop_obj( CHAR_DATA *ch, OBJ_DATA *obj )
 /*
  * Return ascii name of an affect location.
  */
-char *affect_loc_name( int location )
+const char *affect_loc_name( int location )
 {
     switch ( location )
     {
-    case APPLY_NONE:            return (char*)"none";
+    case APPLY_NONE:            return "none";
     case APPLY_STR:		return "strength";
     case APPLY_DEX:		return "dexterity";
     case APPLY_INT:		return "intelligence";

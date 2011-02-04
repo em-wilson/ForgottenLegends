@@ -29,8 +29,6 @@
 #include "recycle.h"
 #include "lookup.h"
 
-char * mprog_type_to_name ( int type );
-
 /* Return TRUE if area changed, FALSE if not. */
 #define REDIT( fun )		bool fun( CHAR_DATA *ch, char *argument )
 #define OEDIT( fun )		bool fun( CHAR_DATA *ch, char *argument )
@@ -41,9 +39,9 @@ char * mprog_type_to_name ( int type );
 
 struct olc_help_type
 {
-    char *command;
+    const char *command;
     const void *structure;
-    char *desc;
+    const char *desc;
 };
 
 
@@ -3037,7 +3035,7 @@ OEDIT( oedit_addapply )
     {
     	send_to_char( "Invalid bitvector type.\n\r", ch );
 	send_to_char( "Valid bitvector types are:\n\r", ch );
-	show_help( ch, bitvector_type[typ].help );
+	show_help( ch, (char*)bitvector_type[typ].help );
     	return FALSE;
     }
 

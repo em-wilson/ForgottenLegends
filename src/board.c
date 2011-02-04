@@ -626,14 +626,14 @@ static void do_nread (CHAR_DATA *ch, char *argument)
 			{
 			sprintf (buf, "Changed to next board, {M%s{x.\n\r", ch->pcdata->board->short_name);
                         send_to_char(buf, ch);
-                        do_nread (ch, "");
+                        do_nread (ch, (char*)"");
                         return;
                         }
                 else
                         {
                         sprintf (buf, "There are no more boards.\n\r");
 			send_to_char("\n\r",ch);
-                        do_board (ch, "1");
+                        do_board (ch, (char*)"1");
                         return;
 			}
 			
@@ -764,7 +764,7 @@ void do_note (CHAR_DATA *ch, char *argument)
 	else if (!str_cmp (arg, "catchup"))
 		do_ncatchup (ch, argument);
 	else 
-		do_help (ch, "note");
+		do_help (ch, (char*)"note");
 }
 
 /* Show all accessible boards with their numbers of unread messages OR

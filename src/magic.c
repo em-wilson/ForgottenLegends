@@ -142,8 +142,8 @@ void say_spell( CHAR_DATA *ch, int sn )
 
     struct syl_type
     {
-	char *	old;
-	char *	new_syl;
+	const char *	old;
+	const char *	new_syl;
     };
 
     static const struct syl_type syl_table[] =
@@ -182,7 +182,7 @@ void say_spell( CHAR_DATA *ch, int sn )
     };
 
     buf[0]	= '\0';
-    for ( pName = skill_table[sn].name; *pName != '\0'; pName += length )
+    for ( pName = (char*)skill_table[sn].name; *pName != '\0'; pName += length )
     {
 	for ( iSyl = 0; (length = strlen(syl_table[iSyl].old)) != 0; iSyl++ )
 	{
@@ -692,7 +692,7 @@ void obj_cast_spell( int sn, int level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DA
 	break;
     }
 
-    target_name = "";
+    target_name = (char*)"";
     (*skill_table[sn].spell_fun) ( sn, level, ch, vo,target);
 
     
@@ -892,7 +892,7 @@ void spell_burning_hands(int sn,int level, CHAR_DATA *ch, void *vo, int target)
     };
     int dam;
 
-    level	= UMIN(level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
+    level	= UMIN((unsigned)level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
     level	= UMAX(0, level);
     dam		= number_range( dam_each[level] / 2, dam_each[level] * 2 );
     if ( saves_spell( level, victim,DAM_FIRE) )
@@ -906,7 +906,6 @@ void spell_burning_hands(int sn,int level, CHAR_DATA *ch, void *vo, int target)
 void spell_call_lightning( int sn, int level,CHAR_DATA *ch,void *vo,int target)
 {
     CHAR_DATA *vch;
-    CHAR_DATA *vch_next;
     int dam;
 
     if ( !IS_OUTSIDE(ch) )
@@ -1377,7 +1376,7 @@ void spell_chill_touch( int sn, int level, CHAR_DATA *ch, void *vo,int target )
     AFFECT_DATA af;
     int dam;
 
-    level	= UMIN(level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
+    level	= UMIN((unsigned)level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
     level	= UMAX(0, level);
     dam		= number_range( dam_each[level] / 2, dam_each[level] * 2 );
     if ( !saves_spell( level, victim,DAM_COLD ) )
@@ -1417,7 +1416,7 @@ void spell_colour_spray( int sn, int level, CHAR_DATA *ch, void *vo,int target )
     };
     int dam;
 
-    level	= UMIN(level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
+    level	= UMIN((unsigned)level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
     level	= UMAX(0, level);
     dam		= number_range( dam_each[level] / 2,  dam_each[level] * 2 );
     if ( saves_spell( level, victim,DAM_LIGHT) )
@@ -1544,7 +1543,7 @@ void spell_create_water( int sn, int level, CHAR_DATA *ch, void *vo,int target)
     {
 	obj->value[2] = LIQ_WATER;
 	obj->value[1] += water;
-	if ( !is_name( "water", obj->name ) )
+	if ( !is_name( (char*)"water", obj->name ) )
 	{
 	    char buf[MAX_STRING_LENGTH];
 
@@ -2190,7 +2189,6 @@ void spell_dispel_magic( int sn, int level, CHAR_DATA *ch, void *vo,int target )
 void spell_earthquake( int sn, int level, CHAR_DATA *ch, void *vo,int target )
 {
     CHAR_DATA *vch;
-    CHAR_DATA *vch_next;
 
     send_to_char( "The earth trembles beneath your feet!\n\r", ch );
     act( "$n makes the earth tremble and shiver.", ch, NULL, NULL, TO_ROOM );
@@ -2671,7 +2669,7 @@ void spell_fireball( int sn, int level, CHAR_DATA *ch, void *vo,int target )
     };
     int dam;
 
-    level	= UMIN(level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
+    level	= UMIN((unsigned)level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
     level	= UMAX(0, level);
     dam		= number_range( dam_each[level] / 2, dam_each[level] * 2 );
     if ( saves_spell( level, victim, DAM_FIRE) )
@@ -2914,7 +2912,7 @@ void spell_gate( int sn, int level, CHAR_DATA *ch, void *vo,int target )
     char_to_room(ch,victim->in_room);
 
     act("$n has arrived through a gate.",ch,NULL,NULL,TO_ROOM);
-    do_look(ch,"auto");
+    do_look(ch,(char*)"auto");
 
     if (gate_pet)
     {
@@ -2923,7 +2921,7 @@ void spell_gate( int sn, int level, CHAR_DATA *ch, void *vo,int target )
 	char_from_room(ch->pet);
 	char_to_room(ch->pet,victim->in_room);
 	act("$n has arrived through a gate.",ch->pet,NULL,NULL,TO_ROOM);
-	do_look(ch->pet,"auto");
+	do_look(ch->pet,(char*)"auto");
     }
 }
 
@@ -3554,13 +3552,13 @@ void spell_know_alignment(int sn,int level,CHAR_DATA *ch,void *vo,int target )
 
     ap = victim->alignment;
 
-         if ( ap >  700 ) msg = "$N has a pure and good aura.";
-    else if ( ap >  350 ) msg = "$N is of excellent moral character.";
-    else if ( ap >  100 ) msg = "$N is often kind and thoughtful.";
-    else if ( ap > -100 ) msg = "$N doesn't have a firm moral commitment.";
-    else if ( ap > -350 ) msg = "$N lies to $S friends.";
-    else if ( ap > -700 ) msg = "$N is a black-hearted murderer.";
-    else msg = "$N is the embodiment of pure evil!.";
+         if ( ap >  700 ) msg = (char*)"$N has a pure and good aura.";
+    else if ( ap >  350 ) msg = (char*)"$N is of excellent moral character.";
+    else if ( ap >  100 ) msg = (char*)"$N is often kind and thoughtful.";
+    else if ( ap > -100 ) msg = (char*)"$N doesn't have a firm moral commitment.";
+    else if ( ap > -350 ) msg = (char*)"$N lies to $S friends.";
+    else if ( ap > -700 ) msg = (char*)"$N is a black-hearted murderer.";
+    else msg = (char*)"$N is the embodiment of pure evil!.";
 
     act( msg, ch, NULL, victim, TO_CHAR );
     return;
@@ -3582,7 +3580,7 @@ void spell_lightning_bolt(int sn,int level,CHAR_DATA *ch,void *vo,int target)
     };
     int dam;
 
-    level	= UMIN(level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
+    level	= UMIN((unsigned)level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
     level	= UMAX(0, level);
     dam		= number_range( dam_each[level] / 2, dam_each[level] * 2 );
     if ( saves_spell( level, victim,DAM_LIGHTNING) )
@@ -3670,7 +3668,7 @@ void spell_magic_missile( int sn, int level, CHAR_DATA *ch,void *vo,int target)
     };
     int dam;
 
-    level	= UMIN(level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
+    level	= UMIN((unsigned)level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
     level	= UMAX(0, level);
     dam		= number_range( dam_each[level] / 2, dam_each[level] * 2 );
     if ( saves_spell( level, victim,DAM_ENERGY) )
@@ -4199,7 +4197,7 @@ void spell_shocking_grasp(int sn,int level,CHAR_DATA *ch,void *vo,int target)
     };
     int dam;
 
-    level	= UMIN(level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
+    level	= UMIN((unsigned)level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
     level	= UMAX(0, level);
     dam		= number_range( dam_each[level] / 2, dam_each[level] * 2 );
     if ( saves_spell( level, victim,DAM_LIGHTNING) )
@@ -4354,7 +4352,7 @@ void spell_summon( int sn, int level, CHAR_DATA *ch, void *vo,int target )
     char_to_room( victim, ch->in_room );
     act( "$n arrives suddenly.", victim, NULL, NULL, TO_ROOM );
     act( "$n has summoned you!", ch, NULL, victim,   TO_VICT );
-    do_look( victim, "auto" );
+    do_look( victim, (char*)"auto" );
     return;
 }
 
@@ -4385,7 +4383,7 @@ void spell_teleport( int sn, int level, CHAR_DATA *ch, void *vo,int target )
     char_from_room( victim );
     char_to_room( victim, pRoomIndex );
     act( "$n slowly fades into existence.", victim, NULL, NULL, TO_ROOM );
-    do_look( victim, "auto" );
+    do_look( victim, (char*)"auto" );
     return;
 }
 
@@ -4469,7 +4467,7 @@ void spell_word_of_recall( int sn, int level, CHAR_DATA *ch,void *vo,int target)
     char_from_room(victim);
     char_to_room(victim,location);
     act("$n appears in the room.",victim,NULL,NULL,TO_ROOM);
-    do_look(victim,"auto");
+    do_look(victim,(char*)"auto");
 }
 
 /*
@@ -4755,7 +4753,7 @@ void spell_call_ent( int sn, int level, CHAR_DATA *ch, void *vo,int target)
     mob->leader = ch;
     ch->pet = mob;
     /* For a little flavor... */
-    do_say( mob, "How may I serve you, druid of the forests?" );
+    do_say( mob, (char*)"How may I serve you, druid of the forests?" );
     return;
 }
 

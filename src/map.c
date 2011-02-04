@@ -31,7 +31,7 @@
 #define MAX_MAP 90
 #define MAX_MAP_DIR 4
 
-char *map[MAX_MAP][MAX_MAP];
+const char *map[MAX_MAP][MAX_MAP];
 int offsets[4][2] ={ {-1, 0},{ 0, 1},{ 1, 0},{ 0,-1} };
 
 void MapArea 

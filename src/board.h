@@ -46,13 +46,13 @@ public:
 /* Data about a board */
 struct board_data
 {
-	char *short_name; /* Max 8 chars */
-	char *long_name;  /* Explanatory text, should be no more than 40 ? chars */
+	const char *short_name; /* Max 8 chars */
+	const char *long_name;  /* Explanatory text, should be no more than 40 ? chars */
 	
 	int read_level; /* minimum level to see board */
 	int write_level;/* minimum level to post notes */
 
-	char *names;       /* Default recipient */
+	const char *names;       /* Default recipient */
 	int force_type; /* Default action (DEF_XXX) */
 	
 	int purge_days; /* Default expiration */

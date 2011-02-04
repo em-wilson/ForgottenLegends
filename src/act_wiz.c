@@ -65,7 +65,7 @@ DECLARE_DO_FUN(do_stand		);
  * Local functions.
  */
 int     close           args( ( int fd ) );
-bool    write_to_descriptor     args( ( int desc, char *txt, int length ) );
+bool    write_to_descriptor     args( ( int desc, const char *txt, int length ) );
 
 void do_wiznet( CHAR_DATA *ch, char *argument )
 {
@@ -372,7 +372,7 @@ void do_smote(CHAR_DATA *ch, char *argument )
     CHAR_DATA *vch;
     char *letter,*name;
     char last[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
-    int matches = 0;
+    unsigned int matches = 0;
  
     if ( !IS_NPC(ch) && IS_SET(ch->comm, COMM_NOEMOTE) )
     {
@@ -561,7 +561,7 @@ void do_deny( CHAR_DATA *ch, char *argument )
     send_to_char( "OK.\n\r", ch );
     save_char_obj(victim);
     stop_fighting(victim,TRUE);
-    do_quit( victim, "" );
+    do_quit( victim, (char*)"" );
 
     return;
 }
@@ -914,7 +914,7 @@ void do_transfer( CHAR_DATA *ch, char *argument )
     act( "$n arrives from a puff of smoke.", victim, NULL, NULL, TO_ROOM );
     if ( ch != victim )
 	act( "$n has transferred you.", ch, NULL, victim, TO_VICT );
-    do_look( victim, "auto" );
+    do_look( victim, (char*)"auto" );
     send_to_char( "Ok.\n\r", ch );
 }
 
@@ -1051,7 +1051,7 @@ void do_goto( CHAR_DATA *ch, char *argument )
         }
     }
 
-    do_look( ch, "auto" );
+    do_look( ch, (char*)"auto" );
     return;
 }
 
@@ -1115,7 +1115,7 @@ void do_violate( CHAR_DATA *ch, char *argument )
         }
     }
  
-    do_look( ch, "auto" );
+    do_look( ch, (char*)"auto" );
     return;
 }
 
@@ -2592,7 +2592,7 @@ void do_load(CHAR_DATA *ch, char *argument )
 	return;
     }
     /* echo syntax */
-    do_load(ch,"");
+    do_load(ch,(char*)"");
 }
 
 
@@ -3391,7 +3391,7 @@ void do_set( CHAR_DATA *ch, char *argument )
 	return;
     }
     /* echo syntax */
-    do_set(ch,"");
+    do_set(ch,(char*)"");
 }
 
 
@@ -3965,7 +3965,7 @@ void do_mset( CHAR_DATA *ch, char *argument )
     /*
      * Generate usage message.
      */
-    do_mset( ch, "" );
+    do_mset( ch,(char*) "" );
     return;
 }
 
@@ -4128,7 +4128,7 @@ void do_string( CHAR_DATA *ch, char *argument )
     
     	
     /* echo bad use message */
-    do_string(ch,"");
+    do_string(ch,(char*)"");
 }
 
 
@@ -4239,7 +4239,7 @@ void do_oset( CHAR_DATA *ch, char *argument )
     /*
      * Generate usage message.
      */
-    do_oset( ch, "" );
+    do_oset( ch, (char*)"" );
     return;
 }
 
@@ -4308,7 +4308,7 @@ void do_rset( CHAR_DATA *ch, char *argument )
     /*
      * Generate usage message.
      */
-    do_rset( ch, "" );
+    do_rset( ch, (char*)"" );
     return;
 }
 
@@ -4326,7 +4326,7 @@ void do_sockets( CHAR_DATA *ch, char *argument )
     char            buf  [ MAX_STRING_LENGTH ];
     char            buf2 [ MAX_STRING_LENGTH ];
     int             count;
-    char *          st;
+    char            st[16];
     char            s[100];
     char            idle[10];
 
@@ -4345,30 +4345,30 @@ void do_sockets( CHAR_DATA *ch, char *argument )
            /* NB: You may need to edit the CON_ values */
            switch( d->connected )
            {
-		case CON_PLAYING:		st = "    PLAYING    "; break;
-		case CON_GET_NAME:		st = "   Get Name    "; break;
-		case CON_GET_OLD_PASSWORD:	st = "Get Old Passwd "; break;
-		case CON_CONFIRM_NEW_NAME:	st = " Confirm Name  "; break;
-		case CON_GET_NEW_PASSWORD:	st = "Get New Passwd "; break;
-		case CON_CONFIRM_NEW_PASSWORD:	st = "Confirm Passwd "; break;
-		case CON_GET_NEW_RACE:		st = "  Get New Race "; break;
-		case CON_GET_NEW_SEX:		st = "  Get New Sex  "; break;
-		case CON_GET_NEW_CLASS:		st = " Get New Class "; break;
-		case CON_GET_ALIGNMENT:		st = " Get New Align "; break;
-		case CON_DEFAULT_CHOICE:	st = " Choosing Cust "; break;
-		case CON_GEN_GROUPS:		st = " Customization "; break;
-		case CON_PICK_WEAPON:		st = " Picking Weapon"; break;
-		case CON_READ_IMOTD:		st = " Reading IMOTD "; break;
-		case CON_BREAK_CONNECT:		st = "   LINKDEAD    "; break;
-		case CON_READ_MOTD:		st = "  Reading MOTD "; break;
-		case CON_GET_MORPH:		st = "Choosing  Morph"; break;
-		case CON_GET_MORPH_ORIG:	st = "Choosing  Morph"; break;
-		case CON_NOTE_TO:		st = " Writing Notes "; break;
-		case CON_NOTE_SUBJECT:		st = " Writing Notes "; break;
-		case CON_NOTE_EXPIRE:		st = " Writing Notes "; break;
-		case CON_NOTE_TEXT:		st = " Writing Notes "; break;
-		case CON_NOTE_FINISH:		st = " Writing Notes "; break;
-		default:			st = "   !UNKNOWN!   "; break;
+		case CON_PLAYING:		       strcpy( st, "    PLAYING    " ); break;
+		case CON_GET_NAME:		       strcpy( st, "   Get Name    " ); break;
+		case CON_GET_OLD_PASSWORD:	   strcpy( st, "Get Old Passwd " ); break;
+		case CON_CONFIRM_NEW_NAME:	   strcpy( st, " Confirm Name  " ); break;
+		case CON_GET_NEW_PASSWORD:	   strcpy( st, "Get New Passwd " ); break;
+		case CON_CONFIRM_NEW_PASSWORD: strcpy( st, "Confirm Passwd " ); break;
+		case CON_GET_NEW_RACE:		   strcpy( st, "  Get New Race " ); break;
+		case CON_GET_NEW_SEX:		   strcpy( st, "  Get New Sex  " ); break;
+		case CON_GET_NEW_CLASS:		   strcpy( st, " Get New Class " ); break;
+		case CON_GET_ALIGNMENT:		   strcpy( st, " Get New Align " ); break;
+		case CON_DEFAULT_CHOICE:	   strcpy( st, " Choosing Cust " ); break;
+		case CON_GEN_GROUPS:		   strcpy( st, " Customization " ); break;
+		case CON_PICK_WEAPON:		   strcpy( st, " Picking Weapon" ); break;
+		case CON_READ_IMOTD:		   strcpy( st, " Reading IMOTD " ); break;
+		case CON_BREAK_CONNECT:		   strcpy( st, "   LINKDEAD    " ); break;
+		case CON_READ_MOTD:		       strcpy( st, "  Reading MOTD " ); break;
+		case CON_GET_MORPH:		       strcpy( st, "Choosing  Morph" ); break;
+		case CON_GET_MORPH_ORIG:	   strcpy( st, "Choosing  Morph" ); break;
+		case CON_NOTE_TO:		       strcpy( st, " Writing Notes " ); break;
+		case CON_NOTE_SUBJECT:		   strcpy( st, " Writing Notes " ); break;
+		case CON_NOTE_EXPIRE:		   strcpy( st, " Writing Notes " ); break;
+		case CON_NOTE_TEXT:		       strcpy( st, " Writing Notes " ); break;
+		case CON_NOTE_FINISH:		   strcpy( st, " Writing Notes " ); break;
+		default:			           strcpy( st, "   !UNKNOWN!   " ); break;
            }
            count++;
            
@@ -4434,7 +4434,6 @@ void do_force( CHAR_DATA *ch, char *argument )
     if ( !str_cmp( arg, "all" ) )
     {
 	CHAR_DATA *vch;
-	CHAR_DATA *vch_next;
 
 	if (get_trust(ch) < MAX_LEVEL - 3)
 	{
@@ -4456,7 +4455,6 @@ void do_force( CHAR_DATA *ch, char *argument )
     else if (!str_cmp(arg,"players"))
     {
         CHAR_DATA *vch;
-        CHAR_DATA *vch_next;
  
         if (get_trust(ch) < MAX_LEVEL - 2)
         {
@@ -4479,7 +4477,6 @@ void do_force( CHAR_DATA *ch, char *argument )
     else if (!str_cmp(arg,"gods"))
     {
         CHAR_DATA *vch;
-        CHAR_DATA *vch_next;
  
         if (get_trust(ch) < MAX_LEVEL - 2)
         {
@@ -4742,7 +4739,7 @@ void do_copyover (CHAR_DATA *ch, char * argument)
        if (!fp)
        {
                send_to_char ("Copyover file not writeable, aborted.\n\r",ch);
-               log_stringf("Could not write to copyover file: %s", COPYOVER_FILE);
+               log_stringf((char*)"Could not write to copyover file: %s", COPYOVER_FILE);
                perror ("do_copyover:fopen");
                return;
        }
@@ -4867,7 +4864,7 @@ void copyover_recover ()
                         char_list.push_back(d->character);
 
                        char_to_room (d->character, d->character->in_room);
-                       do_look (d->character, "auto");
+                       do_look (d->character, (char*)"auto");
                        act ("$n materializes!", d->character, NULL, NULL, TO_ROOM);
                        d->connected = CON_PLAYING;
 
@@ -4922,7 +4919,7 @@ void do_giveskill( CHAR_DATA *ch, char *argument )
 
     if (arg2[0] == '\0')
     {
-	do_giveskill(ch, "");
+	do_giveskill(ch, (char*)"");
 	return;
     }
 
@@ -4934,7 +4931,7 @@ void do_giveskill( CHAR_DATA *ch, char *argument )
 
     if (arg3[0] == '\0')
     {
-	do_giveskill(ch,"");
+	do_giveskill(ch,(char*)"");
 	return;
     }
 
@@ -4947,7 +4944,7 @@ void do_giveskill( CHAR_DATA *ch, char *argument )
 
     if (arg4[0] == '\0')
     {
-	do_giveskill(ch,"");
+	do_giveskill(ch,(char*)"");
 	return;
     }
 
@@ -4960,7 +4957,7 @@ void do_giveskill( CHAR_DATA *ch, char *argument )
 
     if (argument[0] == '\0')
     {
-	do_giveskill(ch,"");
+	do_giveskill(ch,(char*)"");
 	return;
     }
 
@@ -5104,7 +5101,7 @@ void do_laston ( CHAR_DATA *ch, char *argument )
    long laston = 0;
    bool finished = FALSE;
    int d, h, m, s, kills = 0, deaths = 0, PCkills = 0, PCdeaths = 0, level = 0, classnum = 0;
-   char *race = "";
+   char *race = (char*)"";
 
    argument = one_argument( argument, arg1 );
 

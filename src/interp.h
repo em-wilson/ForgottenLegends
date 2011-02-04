@@ -48,7 +48,7 @@
  */
 struct	cmd_type
 {
-    char * const	name;
+    const char *	name;
     DO_FUN *		do_fun;
     sh_int		position;
     sh_int		level;

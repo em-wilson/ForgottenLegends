@@ -81,7 +81,6 @@ void	disarm		args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
 void violence_update( void )
 {
     CHAR_DATA *ch;
-    CHAR_DATA *ch_next;
     CHAR_DATA *victim;
 
     for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
@@ -133,7 +132,7 @@ void check_assist(CHAR_DATA *ch,CHAR_DATA *victim)
 	    && IS_SET(rch->off_flags,ASSIST_PLAYERS)
 	    &&  rch->level + 6 > victim->level)
 	    {
-		do_emote(rch,"screams and attacks!");
+		do_emote(rch,(char*)"screams and attacks!");
 		multi_hit(rch,victim,TYPE_UNDEFINED);
 		continue;
 	    }
@@ -193,7 +192,7 @@ void check_assist(CHAR_DATA *ch,CHAR_DATA *victim)
 
 		    if (target != NULL)
 		    {
-			do_emote(rch,"screams and attacks!");
+			do_emote(rch,(char*)"screams and attacks!");
 			multi_hit(rch,target,TYPE_UNDEFINED);
 		    }
 		}	
@@ -355,12 +354,12 @@ one_hit(ch,vch,dt, FALSE);
     {
     case (0) :
 	if (IS_SET(ch->off_flags,OFF_BASH))
-	    do_bash(ch,"");
+	    do_bash(ch,(char*)"");
 	break;
 
     case (1) :
 	if (IS_SET(ch->off_flags,OFF_BERSERK) && !IS_AFFECTED(ch,AFF_BERSERK))
-	    do_berserk(ch,"");
+	    do_berserk(ch,(char*)"");
 	break;
 
 
@@ -369,41 +368,41 @@ one_hit(ch,vch,dt, FALSE);
 	|| (get_weapon_sn(ch) != gsn_hand_to_hand 
 	&& (IS_SET(ch->act,ACT_WARRIOR)
    	||  IS_SET(ch->act,ACT_THIEF))))
-	    do_disarm(ch,"");
+	    do_disarm(ch,(char*)"");
 	break;
 
     case (3) :
 	if (IS_SET(ch->off_flags,OFF_KICK))
-	    do_kick(ch,"");
+	    do_kick(ch,(char*)"");
 	break;
 
     case (4) :
 	if (IS_SET(ch->off_flags,OFF_KICK_DIRT))
-	    do_dirt(ch,"");
+	    do_dirt(ch,(char*)"");
 	break;
 
     case (5) :
 	if (IS_SET(ch->off_flags,OFF_TAIL))
 	{
-	    /* do_tail(ch,"") */ ;
+	    /* do_tail(ch,(char*)"") */ ;
 	}
 	break; 
 
     case (6) :
 	if (IS_SET(ch->off_flags,OFF_TRIP))
-	    do_trip(ch,"");
+	    do_trip(ch,(char*)"");
 	break;
 
     case (7) :
 	if (IS_SET(ch->off_flags,OFF_CRUSH))
 	{
-	    /* do_crush(ch,"") */ ;
+	    /* do_crush(ch,(char*)"") */ ;
 	}
 	break;
     case (8) :
 	if (IS_SET(ch->off_flags,OFF_BACKSTAB))
 	{
-	    do_backstab(ch,"");
+	    do_backstab(ch,(char*)"");
 	}
     }
 }
@@ -997,23 +996,23 @@ bool damage(CHAR_DATA *ch,CHAR_DATA *victim,int dam,int dt,int dam_type,
         /* RT new auto commands */
 
 	if (!IS_NPC(ch)
-	&&  (corpse = get_obj_list(ch,"corpse",ch->in_room->contents)) != NULL
+	&&  (corpse = get_obj_list(ch,(char*)"corpse",ch->in_room->contents)) != NULL
 	&&  corpse->item_type == ITEM_CORPSE_NPC && can_see_obj(ch,corpse))
 	{
 	    OBJ_DATA *coins;
 
-	    corpse = get_obj_list( ch, "corpse", ch->in_room->contents ); 
+	    corpse = get_obj_list( ch, (char*)"corpse", ch->in_room->contents ); 
 
 	    if ( IS_SET(ch->act, PLR_AUTOLOOT) &&
 		 corpse && corpse->contains) /* exists and not empty */
-		do_get( ch, "all corpse" );
+		do_get( ch, (char*)"all corpse" );
 
  	    if (IS_SET(ch->act,PLR_AUTOGOLD) &&
 	        corpse && corpse->contains  && /* exists and not empty */
 		!IS_SET(ch->act,PLR_AUTOLOOT))
-		if ((coins = get_obj_list(ch,"gcash",corpse->contains))
+		if ((coins = get_obj_list(ch,(char*)"gcash",corpse->contains))
 		     != NULL)
-	      	    do_get(ch, "all.gcash corpse");
+	      	    do_get(ch, (char*)"all.gcash corpse");
             
 	    /* A high-energy night by spirited teens! */
 	    if (IS_SET(ch->act, PLR_AUTOPISS) )
@@ -1027,7 +1026,7 @@ bool damage(CHAR_DATA *ch,CHAR_DATA *victim,int dam,int dt,int dam_type,
        	      if ( IS_SET(ch->act,PLR_AUTOLOOT) && corpse && corpse->contains)
 		return TRUE;  /* leave if corpse has treasure */
 	      else
-		do_sacrifice( ch, "corpse" );
+		do_sacrifice( ch, (char*)"corpse" );
 	    }
 	}
 
@@ -1044,7 +1043,7 @@ bool damage(CHAR_DATA *ch,CHAR_DATA *victim,int dam,int dt,int dam_type,
     {
 	if ( number_range( 0, victim->wait ) == 0 )
 	{
-	    do_recall( victim, "" );
+	    do_recall( victim, (char*)"" );
 	    return TRUE;
 	}
     }
@@ -1058,14 +1057,14 @@ bool damage(CHAR_DATA *ch,CHAR_DATA *victim,int dam,int dt,int dam_type,
 	&&   victim->hit < victim->max_hit / 5) 
 	||   ( IS_AFFECTED(victim, AFF_CHARM) && victim->master != NULL
 	&&     victim->master->in_room != victim->in_room ) )
-	    do_flee( victim, "" );
+	    do_flee( victim, (char*)"" );
     }
 
     if ( !IS_NPC(victim)
     &&   victim->hit > 0
     &&   victim->hit <= victim->wimpy
     &&   victim->wait < PULSE_VIOLENCE / 2 )
-	do_flee( victim, "" );
+	do_flee( victim, (char*)"" );
 
     tail_chain( );
     return TRUE;
@@ -1327,23 +1326,23 @@ dam_type, bool show ) {
 
 	if ( !IS_NPC(ch) && IS_NPC(victim) )
 	{
-	    corpse = get_obj_list( ch, "corpse", ch->in_room->contents ); 
+	    corpse = get_obj_list( ch, (char*)"corpse", ch->in_room->contents ); 
 
 	    if ( IS_SET(ch->act, PLR_AUTOLOOT) &&
 		 corpse && corpse->contains) /* exists and not empty */
-		do_get( ch, "all corpse" );
+		do_get( ch, (char*)"all corpse" );
 
  	    if (IS_SET(ch->act,PLR_AUTOGOLD) &&
 	        corpse && corpse->contains  && /* exists and not empty */
 		!IS_SET(ch->act,PLR_AUTOLOOT))
-	      do_get(ch, "gold corpse");
+	      do_get(ch, (char*)"gold corpse");
             
 	    if ( IS_SET(ch->act, PLR_AUTOSAC) )
 	    {
        	      if ( IS_SET(ch->act,PLR_AUTOLOOT) && corpse && corpse->contains)
 		return TRUE;  /* leave if corpse has treasure */
 	      else
-		do_sacrifice( ch, "corpse" );
+		do_sacrifice( ch, (char*)"corpse" );
 	    }
 	}
 
@@ -1360,7 +1359,7 @@ dam_type, bool show ) {
     {
 	if ( number_range( 0, victim->wait ) == 0 )
 	{
-	    do_recall( victim, "" );
+	    do_recall( victim, (char*)"" );
 	    return TRUE;
 	}
     }
@@ -1374,14 +1373,14 @@ dam_type, bool show ) {
 	&&   victim->hit < victim->max_hit / 5) 
 	||   ( IS_AFFECTED(victim, AFF_CHARM) && victim->master != NULL
 	&&     victim->master->in_room != victim->in_room ) )
-	    do_flee( victim, "" );
+	    do_flee( victim, (char*)"" );
     }
 
     if ( !IS_NPC(victim)
     &&   victim->hit > 0
     &&   victim->hit <= victim->wimpy
     &&   victim->wait < PULSE_VIOLENCE / 2 )
-	do_flee( victim, "" );
+	do_flee( victim, (char*)"" );
 
     tail_chain( );
     return TRUE;
@@ -1981,56 +1980,56 @@ void death_cry( CHAR_DATA *ch )
     int vnum;
 
     vnum = 0;
-    msg = "You hear $n's death cry.";
+    msg = (char*)"You hear $n's death cry.";
 
     switch ( number_bits(4))
     {
-    case  0: msg  = "$n hits the ground ... DEAD.";			break;
+    case  0: msg  = (char*)"$n hits the ground ... DEAD.";			break;
     case  1: 
 	if (ch->material == 0)
 	{
-	    msg  = "$n splatters blood on your armor.";		
+	    msg  =(char*) "$n splatters blood on your armor.";		
 	    break;
 	}
     case  2: 							
 	if (IS_SET(ch->parts,PART_GUTS))
 	{
-	    msg = "$n spills $s guts all over the floor.";
+	    msg = (char*)"$n spills $s guts all over the floor.";
 	    vnum = OBJ_VNUM_GUTS;
 	}
 	break;
     case  3: 
 	if (IS_SET(ch->parts,PART_HEAD))
 	{
-	    msg  = "$n's severed head plops on the ground.";
+	    msg  = (char*)"$n's severed head plops on the ground.";
 	    vnum = OBJ_VNUM_SEVERED_HEAD;				
 	}
 	break;
     case  4: 
 	if (IS_SET(ch->parts,PART_HEART))
 	{
-	    msg  = "$n's heart is torn from $s chest.";
+	    msg  = (char*)"$n's heart is torn from $s chest.";
 	    vnum = OBJ_VNUM_TORN_HEART;				
 	}
 	break;
     case  5: 
 	if (IS_SET(ch->parts,PART_ARMS))
 	{
-	    msg  = "$n's arm is sliced from $s dead body.";
+	    msg  = (char*)"$n's arm is sliced from $s dead body.";
 	    vnum = OBJ_VNUM_SLICED_ARM;				
 	}
 	break;
     case  6: 
 	if (IS_SET(ch->parts,PART_LEGS))
 	{
-	    msg  = "$n's leg is sliced from $s dead body.";
+	    msg  = (char*)"$n's leg is sliced from $s dead body.";
 	    vnum = OBJ_VNUM_SLICED_LEG;				
 	}
 	break;
     case 7:
 	if (IS_SET(ch->parts,PART_BRAINS))
 	{
-	    msg = "$n's head is shattered, and $s brains splash all over you.";
+	    msg = (char*)"$n's head is shattered, and $s brains splash all over you.";
 	    vnum = OBJ_VNUM_BRAINS;
 	}
     }
@@ -2067,9 +2066,9 @@ void death_cry( CHAR_DATA *ch )
     }
 
     if ( IS_NPC(ch) )
-	msg = "You hear something's death cry.";
+	msg = (char*)"You hear something's death cry.";
     else
-	msg = "You hear someone's death cry.";
+	msg = (char*)"You hear someone's death cry.";
 
     was_in_room = ch->in_room;
     for ( door = 0; door <= 5; door++ )
@@ -3797,7 +3796,7 @@ void do_assassinate( CHAR_DATA *ch, char *argument )
 	&& victim->position == POS_FIGHTING)
       {
 	if (!can_see(victim, ch))
-	  do_yell(victim, "Help! Someone tried to assassinate me!");
+	  do_yell(victim, (char*)"Help! Someone tried to assassinate me!");
 	else
 	  {
 	    sprintf( buf, "Help! %s tried to assassinate me!", ch->name );
@@ -3873,7 +3872,7 @@ void do_strangle(CHAR_DATA *ch, char *argument)
 	damage(ch,victim,0,gsn_strangle,DAM_NONE, TRUE);
 	check_improve(ch,gsn_strangle,FALSE,1);
 	if (!can_see(victim, ch))
-	  do_yell(victim, "Help! I'm being strangled by someone!");
+	  do_yell(victim, (char*)"Help! I'm being strangled by someone!");
 	else
 	  {
 	    sprintf(buf, "Help! I'm being strangled by %s!", ch->name );
@@ -3962,7 +3961,7 @@ void do_blackjack(CHAR_DATA *ch, char *argument)
 	if (!IS_NPC(victim))  
 	{
 	if (!can_see(victim, ch))
-	  do_yell(victim, "Help! I'm being blackjacked by someone!");
+	  do_yell(victim, (char*)"Help! I'm being blackjacked by someone!");
 	else
 	  {
 	    sprintf(buf, "Help! I'm being blackjacked by %s!", ch->name );

@@ -658,7 +658,7 @@ void do_olc( CHAR_DATA *ch, char *argument )
 
     if ( command[0] == '\0' )
     {
-        do_help( ch, "olc" );
+        do_help( ch, (char*)"olc" );
         return;
     }
  
@@ -673,7 +673,7 @@ void do_olc( CHAR_DATA *ch, char *argument )
     }
 
     /* Invalid command, send help. */
-    do_help( ch, "olc" );
+    do_help( ch, (char*)"olc" );
     return;
 }
 
@@ -711,7 +711,7 @@ void do_aedit( CHAR_DATA *ch, char *argument )
 		return;
 	}
 
-	aedit_create( ch, "" );
+	aedit_create( ch, (char*)"" );
 	ch->desc->editor = ED_AREA;
 	return;
     }

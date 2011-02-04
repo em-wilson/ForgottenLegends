@@ -120,7 +120,6 @@ const	char 	go_ahead_str	[] = { IAC, GA, '\0' };
 #if	!defined(isascii)
 #define	isascii(c)		( (c) < 0200 )
 #endif
-static	long			theKeys	[4];
 
 /*
  * Global variables.
@@ -144,7 +143,7 @@ void	game_loop_unix		args( ( int control ) );
 int	init_socket		args( ( int port ) );
 void	init_descriptor		args( ( int control ) );
 bool	read_from_descriptor	args( ( DESCRIPTOR_DATA *d ) );
-bool	write_to_descriptor	args( ( int desc, char *txt, int length ) );
+bool	write_to_descriptor	args( ( int desc, const char *txt, int length ) );
 
 
 
@@ -581,7 +580,7 @@ void init_descriptor( int control )
     if ( check_ban(dnew->host,BAN_ALL))
     {
 	write_to_descriptor( desc,
-	    (char*)"Your site has been banned from this mud.\n\r", 0 );
+	    "Your site has been banned from this mud.\n\r", 0 );
 	close( desc );
 	free_descriptor(dnew);
 	return;
@@ -1189,7 +1188,7 @@ void write_to_buffer( DESCRIPTOR_DATA *d, const char *txt, int length )
  * If this gives errors on very long blocks (like 'ofind all'),
  *   try lowering the max block size.
  */
-bool write_to_descriptor( int desc, char *txt, int length )
+bool write_to_descriptor( int desc, const char *txt, int length )
 {
     int iStart;
     int nWrite;
@@ -1987,7 +1986,7 @@ case CON_DEFAULT_CHOICE:
 	}
 
        send_to_char("\n", ch);
-       do_board(ch, "");  /* Show board status */
+       do_board(ch, (char*)"");  /* Show board status */
        break;
     }
 
@@ -2271,7 +2270,7 @@ void page_to_char_bw( const char *txt, CHAR_DATA *ch )
     ch->desc->showstr_head = new char[strlen(txt) + 1];
     strcpy(ch->desc->showstr_head,txt);
     ch->desc->showstr_point = ch->desc->showstr_head;
-    show_string(ch->desc,"");
+    show_string(ch->desc,(char*)"");
 #endif
 }
 
@@ -2736,7 +2735,7 @@ void colourconv( char *buffer, const char *txt, CHAR_DATA *ch )
     return;
 }
 
-void log_stringf (char * fmt, ...)
+void log_stringf (const char * fmt, ...)
 {
        char buf [2*MSL];
        va_list args;

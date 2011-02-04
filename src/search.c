@@ -18,7 +18,7 @@ void save_object_stats_html args( ( FILE *fp, OBJ_INDEX_DATA *pObjIndex ) );
 void html_colour( char * in, char * out );
 void save_area_objects args( ( AREA_DATA *pArea ) );
 char *fix_string args( ( const char *str ) );
-void save_item_level args( ( char *title, int type, long int wear ) );
+void save_item_level args( ( const char *title, int type, long int wear ) );
 
 void do_wdump( CHAR_DATA *ch, char *argument )
 {
@@ -55,7 +55,7 @@ void do_wdump( CHAR_DATA *ch, char *argument )
 
     fprintf(fp, "<H2>%s</H2>\n<p>", buf);
     html_colour(room->description,buf);
-    fprintf(fp, buf);
+    fprintf(fp, "%s", buf);
     fprintf(fp, "</p>" );
 
     fprintf(fp, "        <table border=\"1\" width=\"100%%\">\n" );
@@ -91,7 +91,7 @@ fprintf(fp, "</td>\n                <td>&nbsp;</td>\
     send_to_char("World dump completed.\n\r",ch);
 }
 
-void save_item_level( char *title, int type, long int wear )
+void save_item_level( const char *title, int type, long int wear )
 {
     char buf[MAX_STRING_LENGTH];
     char fixer[MAX_STRING_LENGTH];
@@ -299,13 +299,13 @@ void save_object_stats_html( FILE *fp, OBJ_INDEX_DATA *pObjIndex )
     {
         sprintf( buf, " %s%-8d%s ", paf->modifier > 0 ? "+" : "",
             paf->modifier, flag_string( apply_flags, paf->location ) );
-        fprintf( fp, buf );
+        fprintf( fp, "%s", buf );
         cnt++;
     }
 
     sprintf(buf, " (%s) ", extra_bit_name( pObjIndex->extra_flags ) );
     if (str_cmp(buf, " (none) ") )
-	fprintf(fp,buf);
+	fprintf(fp, "%s", buf);
 
     fprintf( fp, "  </td>\n</tr>\n" );
 
@@ -398,7 +398,7 @@ void who_html_update (void)
 //      sprintf(buf2, "%s", wch->pcdata->title);
 
       html_colour(buf2,buf);
-      fprintf(fp, buf);
+      fprintf(fp, "%s", buf);
      	fprintf(fp, "\n");
 
   }    /*end for */
@@ -413,7 +413,7 @@ void who_html_update (void)
   fprintf(fp, "<font color=""#FFFFFF"" face=""Times New Roman"">\n");
   strftime( s, 100, "%I:%M%p", localtime( &current_time ) );
   sprintf(buf, "This file last updated at %s Central Time.\n", s);
-  fprintf(fp, buf);
+  fprintf(fp, "%s", buf);
   fprintf(fp, "<br>\n");
   fprintf(fp, "If this is more than a few moments old, the mud is likely to be down.\n");
   fprintf(fp, "<br>\n");

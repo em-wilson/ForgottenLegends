@@ -119,7 +119,7 @@ SPEC_FUN *spec_lookup( const char *name )
     return 0;
 }
 
-char *spec_name( SPEC_FUN *function)
+const char *spec_name( SPEC_FUN *function)
 {
     int i;
 
@@ -168,20 +168,20 @@ bool spec_troll_member( CHAR_DATA *ch)
     switch (number_range(0,6))
     {
 	default:  message = NULL; 	break;
-	case 0:	message = "$n yells 'I've been looking for you, punk!'";
+	case 0:	message = (char*)"$n yells 'I've been looking for you, punk!'";
 		break;
-	case 1: message = "With a scream of rage, $n attacks $N.";
+	case 1: message = (char*)"With a scream of rage, $n attacks $N.";
 		break;
 	case 2: message = 
-		"$n says 'What's slimy Ogre trash like you doing around here?'";
+		(char*)"$n says 'What's slimy Ogre trash like you doing around here?'";
 		break;
-	case 3: message = "$n cracks his knuckles and says 'Do ya feel lucky?'";
+	case 3: message = (char*)"$n cracks his knuckles and says 'Do ya feel lucky?'";
 		break;
-	case 4: message = "$n says 'There's no cops to save you this time!'";
+	case 4: message = (char*)"$n says 'There's no cops to save you this time!'";
 		break;	
-	case 5: message = "$n says 'Time to join your brother, spud.'";
+	case 5: message = (char*)"$n says 'Time to join your brother, spud.'";
 		break;
-	case 6: message = "$n says 'Let's rock.'";
+	case 6: message = (char*)"$n says 'Let's rock.'";
 		break;
     }
 
@@ -227,20 +227,20 @@ bool spec_ogre_member( CHAR_DATA *ch)
     switch (number_range(0,6))
     {
 	default: message = NULL;	break;
-        case 0: message = "$n yells 'I've been looking for you, punk!'";
+        case 0: message = (char*)"$n yells 'I've been looking for you, punk!'";
                 break;
-        case 1: message = "With a scream of rage, $n attacks $N.'";
+        case 1: message = (char*)"With a scream of rage, $n attacks $N.'";
                 break;
         case 2: message =
-                "$n says 'What's Troll filth like you doing around here?'";
+                (char*)"$n says 'What's Troll filth like you doing around here?'";
                 break;
-        case 3: message = "$n cracks his knuckles and says 'Do ya feel lucky?'";
+        case 3: message = (char*)"$n cracks his knuckles and says 'Do ya feel lucky?'";
                 break;
-        case 4: message = "$n says 'There's no cops to save you this time!'";
+        case 4: message = (char*)"$n says 'There's no cops to save you this time!'";
                 break;
-        case 5: message = "$n says 'Time to join your brother, spud.'";
+        case 5: message = (char*)"$n says 'Time to join your brother, spud.'";
                 break;
-        case 6: message = "$n says 'Let's rock.'";
+        case 6: message = (char*)"$n says 'Let's rock.'";
                 break;
     }
  
@@ -302,22 +302,22 @@ bool spec_patrolman(CHAR_DATA *ch)
     switch (number_range(0,6))
     {
 	default:	message = NULL;		break;
-	case 0:	message = "$n yells 'All roit! All roit! break it up!'";
+	case 0:	message = (char*)"$n yells 'All roit! All roit! break it up!'";
 		break;
 	case 1: message = 
-		"$n says 'Society's to blame, but what's a bloke to do?'";
+		(char*)"$n says 'Society's to blame, but what's a bloke to do?'";
 		break;
 	case 2: message = 
-		"$n mumbles 'bloody kids will be the death of us all.'";
+		(char*)"$n mumbles 'bloody kids will be the death of us all.'";
 		break;
-	case 3: message = "$n shouts 'Stop that! Stop that!' and attacks.";
+	case 3: message = (char*)"$n shouts 'Stop that! Stop that!' and attacks.";
 		break;
-	case 4: message = "$n pulls out his billy and goes to work.";
+	case 4: message = (char*)"$n pulls out his billy and goes to work.";
 		break;
 	case 5: message = 
-		"$n sighs in resignation and proceeds to break up the fight.";
+		(char*)"$n sighs in resignation and proceeds to break up the fight.";
 		break;
-	case 6: message = "$n says 'Settle down, you hooligans!'";
+	case 6: message = (char*)"$n says 'Settle down, you hooligans!'";
 		break;
     }
 
@@ -374,7 +374,7 @@ bool spec_nasty( CHAR_DATA *ch )
                  ch->gold     += gold;
                  return TRUE;
  
-        case 1:  do_flee( ch, "");
+        case 1:  do_flee( ch, (char*)"");
                  return TRUE;
  
         default: return FALSE;
@@ -438,21 +438,21 @@ bool spec_breath_any( CHAR_DATA *ch )
 
 bool spec_breath_acid( CHAR_DATA *ch )
 {
-    return dragon( ch, "acid breath" );
+    return dragon( ch, (char*)"acid breath" );
 }
 
 
 
 bool spec_breath_fire( CHAR_DATA *ch )
 {
-    return dragon( ch, "fire breath" );
+    return dragon( ch, (char*)"fire breath" );
 }
 
 
 
 bool spec_breath_frost( CHAR_DATA *ch )
 {
-    return dragon( ch, "frost breath" );
+    return dragon( ch, (char*)"frost breath" );
 }
 
 
@@ -474,7 +474,7 @@ bool spec_breath_gas( CHAR_DATA *ch )
 
 bool spec_breath_lightning( CHAR_DATA *ch )
 {
-    return dragon( ch, "lightning breath" );
+    return dragon( ch, (char*)"lightning breath" );
 }
 
 
@@ -570,19 +570,19 @@ bool spec_cast_cleric( CHAR_DATA *ch )
 
 	switch ( number_bits( 4 ) )
 	{
-	case  0: min_level =  0; spell = "blindness";      break;
-	case  1: min_level =  3; spell = "cause serious";  break;
-	case  2: min_level =  7; spell = "earthquake";     break;
-	case  3: min_level =  9; spell = "cause critical"; break;
-	case  4: min_level = 10; spell = "dispel evil";    break;
-	case  5: min_level = 12; spell = "curse";          break;
-	case  6: min_level = 12; spell = "change sex";     break;
-	case  7: min_level = 13; spell = "flamestrike";    break;
+	case  0: min_level =  0; spell = (char*)"blindness";      break;
+	case  1: min_level =  3; spell = (char*)"cause serious";  break;
+	case  2: min_level =  7; spell = (char*)"earthquake";     break;
+	case  3: min_level =  9; spell = (char*)"cause critical"; break;
+	case  4: min_level = 10; spell = (char*)"dispel evil";    break;
+	case  5: min_level = 12; spell = (char*)"curse";          break;
+	case  6: min_level = 12; spell = (char*)"change sex";     break;
+	case  7: min_level = 13; spell = (char*)"flamestrike";    break;
 	case  8:
 	case  9:
-	case 10: min_level = 15; spell = "harm";           break;
-	case 11: min_level = 15; spell = "plague";	   break;
-	default: min_level = 16; spell = "dispel magic";   break;
+	case 10: min_level = 15; spell = (char*)"harm";           break;
+	case 11: min_level = 15; spell = (char*)"plague";	   break;
+	default: min_level = 16; spell = (char*)"dispel magic";   break;
 	}
 
 	if ( ch->level >= min_level )
@@ -615,7 +615,7 @@ bool spec_cast_judge( CHAR_DATA *ch )
     if ( victim == NULL )
         return FALSE;
  
-    spell = "high explosive";
+    spell = (char*)"high explosive";
     if ( ( sn = skill_lookup( spell ) ) < 0 )
         return FALSE;
     (*skill_table[sn].spell_fun) ( sn, ch->level, ch, victim,TARGET_CHAR);
@@ -650,18 +650,18 @@ bool spec_cast_mage( CHAR_DATA *ch )
 
 	switch ( number_bits( 4 ) )
 	{
-	case  0: min_level =  0; spell = "blindness";      break;
-	case  1: min_level =  3; spell = "chill touch";    break;
-	case  2: min_level =  7; spell = "weaken";         break;
-	case  3: min_level =  8; spell = "teleport";       break;
-	case  4: min_level = 11; spell = "colour spray";   break;
-	case  5: min_level = 12; spell = "change sex";     break;
-	case  6: min_level = 13; spell = "energy drain";   break;
+	case  0: min_level =  0; spell = (char*)"blindness";      break;
+	case  1: min_level =  3; spell = (char*)"chill touch";    break;
+	case  2: min_level =  7; spell = (char*)"weaken";         break;
+	case  3: min_level =  8; spell = (char*)"teleport";       break;
+	case  4: min_level = 11; spell = (char*)"colour spray";   break;
+	case  5: min_level = 12; spell = (char*)"change sex";     break;
+	case  6: min_level = 13; spell = (char*)"energy drain";   break;
 	case  7:
 	case  8:
-	case  9: min_level = 15; spell = "fireball";       break;
-	case 10: min_level = 20; spell = "plague";	   break;
-	default: min_level = 20; spell = "acid blast";     break;
+	case  9: min_level = 15; spell = (char*)"fireball";       break;
+	case 10: min_level = 20; spell = (char*)"plague";	   break;
+	default: min_level = 20; spell = (char*)"acid blast";     break;
 	}
 
 	if ( ch->level >= min_level )
@@ -702,16 +702,16 @@ bool spec_cast_undead( CHAR_DATA *ch )
 
 	switch ( number_bits( 4 ) )
 	{
-	case  0: min_level =  0; spell = "curse";          break;
-	case  1: min_level =  3; spell = "weaken";         break;
-	case  2: min_level =  6; spell = "chill touch";    break;
-	case  3: min_level =  9; spell = "blindness";      break;
-	case  4: min_level = 12; spell = "poison";         break;
-	case  5: min_level = 15; spell = "energy drain";   break;
-	case  6: min_level = 18; spell = "harm";           break;
-	case  7: min_level = 21; spell = "teleport";       break;
-	case  8: min_level = 20; spell = "plague";	   break;
-	default: min_level = 18; spell = "harm";           break;
+	case  0: min_level =  0; spell = (char*)"curse";          break;
+	case  1: min_level =  3; spell = (char*)"weaken";         break;
+	case  2: min_level =  6; spell = (char*)"chill touch";    break;
+	case  3: min_level =  9; spell = (char*)"blindness";      break;
+	case  4: min_level = 12; spell = (char*)"poison";         break;
+	case  5: min_level = 15; spell = (char*)"energy drain";   break;
+	case  6: min_level = 18; spell = (char*)"harm";           break;
+	case  7: min_level = 21; spell = (char*)"teleport";       break;
+	case  8: min_level = 20; spell = (char*)"plague";	   break;
+	default: min_level = 18; spell = (char*)"harm";           break;
 	}
 
 	if ( ch->level >= min_level )
@@ -735,14 +735,14 @@ bool spec_executioner( CHAR_DATA *ch )
     if ( !IS_AWAKE(ch) || ch->fighting != NULL )
 	return FALSE;
 
-    crime = "";
+    crime = (char*)"";
     for ( victim = ch->in_room->people; victim != NULL; victim = v_next )
     {
 	v_next = victim->next_in_room;
 
 	if ( !IS_NPC(victim) && IS_SET(victim->act, PLR_THIEF) 
 	&&   can_see(ch,victim))
-	    { crime = "THIEF"; break; }
+	    { crime = (char*)"THIEF"; break; }
     }
 
     if ( victim == NULL || IS_IMMORTAL(victim) )
@@ -804,7 +804,7 @@ bool spec_guard( CHAR_DATA *ch )
 
     max_evil = 300;
     ech      = NULL;
-    crime    = "";
+    crime    = (char*)"";
 
     for ( victim = ch->in_room->people; victim != NULL; victim = v_next )
     {
@@ -812,7 +812,7 @@ bool spec_guard( CHAR_DATA *ch )
 
 	if ( !IS_NPC(victim) && IS_SET(victim->act, PLR_THIEF) 
 	&&   can_see(ch,victim))
-	    { crime = "THIEF"; break; }
+	    { crime = (char*)"THIEF"; break; }
 
 	if ( victim->fighting != NULL
 	&&   victim->fighting != ch
@@ -958,11 +958,11 @@ bool spec_mayor( CHAR_DATA *ch )
 
     case 'O':
 /*	do_unlock( ch, "gate" ); */
-	do_open( ch, "gate" );
+	do_open( ch, (char*)"gate" );
 	break;
 
     case 'C':
-	do_close( ch, "gate" );
+	do_close( ch, (char*)"gate" );
 /*	do_lock( ch, "gate" ); */
 	break;
 

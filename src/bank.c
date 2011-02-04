@@ -34,13 +34,13 @@ void do_bank( CHAR_DATA *ch, char *argument)
 
     if (!str_cmp(arg, "balance"))
     {
-	do_bank_balance(ch,"");
+	do_bank_balance(ch,(char*)"");
 	return;
     }
 
     if (!str_cmp(arg, "close"))
     {
-	do_bank_close(ch,"");
+	do_bank_close(ch,(char*)"");
 	return;
     }
 
@@ -58,7 +58,7 @@ void do_bank( CHAR_DATA *ch, char *argument)
 
     if (!str_cmp(arg, "open"))
     {
-	do_bank_open(ch,"");
+	do_bank_open(ch,(char*)"");
 	return;
     }
 
@@ -77,7 +77,7 @@ void do_bank_balance(CHAR_DATA *ch, char *argument)
     char buf[MAX_STRING_LENGTH];
     OBJ_DATA *obj;
 
-    if ( ( obj = get_obj_carry( ch, "bank note", ch ) ) == NULL )
+    if ( ( obj = get_obj_carry( ch, (char*)"bank note", ch ) ) == NULL )
     {
 	send_to_char( "You do not own a bank note.\n\r", ch );
 	return;
@@ -91,7 +91,7 @@ void do_bank_close(CHAR_DATA *ch, char *argument)
 {
     OBJ_DATA *obj;
 
-    if ( ( obj = get_obj_carry( ch, "bank note", ch ) ) == NULL )
+    if ( ( obj = get_obj_carry( ch, (char*)"bank note", ch ) ) == NULL )
     {
 	send_to_char( "You do not own a bank note.\n\r", ch );
 	return;
@@ -107,7 +107,7 @@ void do_bank_close(CHAR_DATA *ch, char *argument)
 void do_bank_open(CHAR_DATA *ch, char *argument)
 {
     OBJ_DATA *obj;
-    if ( ( obj = get_obj_carry( ch, "bank note", ch ) ) != NULL )
+    if ( ( obj = get_obj_carry( ch, (char*)"bank note", ch ) ) != NULL )
     {
 	send_to_char( "You already own a bank note.\n\r", ch );
 	return;
@@ -142,7 +142,7 @@ void do_bank_withdraw( CHAR_DATA *ch, char *argument )
         return;
     }
 
-    if ( ( obj = get_obj_carry( ch, "bank note", ch ) ) == NULL )
+    if ( ( obj = get_obj_carry( ch, (char*)"bank note", ch ) ) == NULL )
     {
         send_to_char( "You do not own a bank note.\n\r", ch );
         return;
@@ -222,7 +222,7 @@ void do_bank_deposit( CHAR_DATA *ch, char *argument )
         return;
     }
 
-    if ( ( obj = get_obj_carry( ch, "bank note", ch ) ) == NULL )
+    if ( ( obj = get_obj_carry( ch, (char*)"bank note", ch ) ) == NULL )
     {
         send_to_char( "You do not own a bank note.\n\r", ch );
         return;
@@ -314,7 +314,7 @@ void do_bank_change( CHAR_DATA *ch, char *argument )
 
     amount = atoi(arg);
   
-    obj = get_obj_carry( ch, "bank note", ch );
+    obj = get_obj_carry( ch, (char*)"bank note", ch );
 
 	
 	if ( amount < 0 )
@@ -336,6 +336,8 @@ void do_bank_clan(CHAR_DATA *ch, char *argument)
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
+    arg1[0] = '\0';
+    arg2[0] = '\0';
     long amount;
 
     argument = one_argument( argument, arg1 );
@@ -383,7 +385,7 @@ void do_bank_clan(CHAR_DATA *ch, char *argument)
 	    return;
 	}
 
-	if (!arg2 || (str_cmp(arg2, "gold") && str_cmp(arg2, "silver")))
+	if (arg2[0] == '\0' || (str_cmp(arg2, "gold") && str_cmp(arg2, "silver")))
 	{
 	    send_to_char("Syntax: bank clan (+/- amount) (gold/silver)\n\r",ch);
 	    return;

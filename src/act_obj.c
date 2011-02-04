@@ -2338,7 +2338,7 @@ void do_steal( CHAR_DATA *ch, char *argument )
 	    break;
         }
         if (!IS_AWAKE(victim))
-            do_wake(victim,"");
+            do_wake(victim,(char*)"");
 	if (IS_AWAKE(victim))
 	    do_yell( victim, buf );
 	if ( !IS_NPC(ch) )
@@ -2459,13 +2459,13 @@ CHAR_DATA *find_keeper( CHAR_DATA *ch )
      */
     if ( time_info.hour < pShop->open_hour )
     {
-	do_say( keeper, "Sorry, I am closed. Come back later." );
+	do_say( keeper, (char*)"Sorry, I am closed. Come back later." );
 	return NULL;
     }
     
     if ( time_info.hour > pShop->close_hour )
     {
-	do_say( keeper, "Sorry, I am closed. Come back tomorrow." );
+	do_say( keeper, (char*)"Sorry, I am closed. Come back tomorrow." );
 	return NULL;
     }
 
@@ -2474,7 +2474,7 @@ CHAR_DATA *find_keeper( CHAR_DATA *ch )
      */
     if ( !can_see( keeper, ch ) )
     {
-	do_say( keeper, "I don't trade with folks I can't see." );
+	do_say( keeper, (char*)"I don't trade with folks I can't see." );
 	return NULL;
     }
 

@@ -406,17 +406,17 @@ struct	shop_data
 
 struct  draconian_type
 {
-    char *	name;
-    char *	colour;
+    const char *	name;
+    const char *	colour;
     sh_int	attr_prime;
     int         damt;
-    char *	breath;
+    const char *	breath;
 };
 
 struct	class_type
 {
-    char *	name;			/* the full name of the class 	*/
-    char 	who_name	[4];	/* Three-letter name for 'who'	*/
+    const char *	name;			/* the full name of the class 	*/
+    const char 	who_name	[4];	/* Three-letter name for 'who'	*/
     sh_int	attr_prime;		/* Prime attribute		*/
     sh_int	weapon;			/* First weapon			*/
     sh_int	guild[MAX_GUILD];	/* Vnum of guild rooms		*/
@@ -426,20 +426,20 @@ struct	class_type
     sh_int	hp_min;			/* Min hp gained on leveling	*/
     sh_int	hp_max;			/* Max hp gained on leveling	*/
     bool	fMana;			/* Class gains mana on level	*/
-    char *	base_group;		/* base skills gained		*/
-    char *	default_group;		/* default skills gained	*/
+    const char *	base_group;		/* base skills gained		*/
+    const char *	default_group;		/* default skills gained	*/
     long	flag;			/* saves into pfile for reclass */
 };
 
 struct item_type
 {
     int		type;
-    char *	name;
+    const char *	name;
 };
 
 struct weapon_type
 {
-    char *	name;
+    const char *	name;
     sh_int	vnum;
     sh_int	type;
     sh_int	*gsn;
@@ -447,21 +447,21 @@ struct weapon_type
 
 struct wiznet_type
 {
-    char *	name;
+    const char *	name;
     long 	flag;
     int		level;
 };
 
 struct attack_type
 {
-    char *	name;			/* name */
-    char *	noun;			/* message */
+    const char *	name;			/* name */
+    const char *	noun;			/* message */
     int   	damage;			/* damage class */
 };
 
 struct race_type
 {
-    char *	name;			/* call name of the race */
+    const char *	name;			/* call name of the race */
     bool	pc_race;		/* can be chosen by pcs */
     long	act;			/* act bits for the race */
     long	aff;			/* aff bits for the race */
@@ -510,11 +510,11 @@ struct  clan_data
 
 struct pc_race_type  /* additional data for pc races */
 {
-    char *	name;			/* MUST be in race_type */
+    const char *	name;			/* MUST be in race_type */
     char 	who_name[6];
     sh_int	points;			/* cost in points of the race */
     sh_int	class_mult[MAX_CLASS];	/* exp multiplier for class, * 100 */
-    char *	skills[5];		/* bonus skills for the race */
+    const char *	skills[5];		/* bonus skills for the race */
     sh_int 	stats[MAX_STATS];	/* starting stats */
     sh_int	max_stats[MAX_STATS];	/* maximum stats */
     sh_int	size;			/* aff bits for the race */
@@ -523,15 +523,15 @@ struct pc_race_type  /* additional data for pc races */
 
 struct morph_race_type  /* additional data for pc races */
 {
-    char *	name;
+    const char *	name;
     char 	who_name[6];
-    char *	skills[5];
+    const char *	skills[5];
 };
 
 
 struct spec_type
 {
-    char * 	name;			/* special function name */
+    const char * 	name;			/* special function name */
     SPEC_FUN *	function;		/* the function */
 };
 
@@ -1509,8 +1509,8 @@ struct gen_data
 
 struct	liq_type
 {
-    char *	liq_name;
-    char *	liq_color;
+    const char *	liq_name;
+    const char *	liq_color;
     sh_int	liq_affect[5];
 };
 
@@ -1734,7 +1734,7 @@ struct	room_index_data
  */
 struct	skill_type
 {
-    char *	name;			/* Name of skill		*/
+    const char *	name;			/* Name of skill		*/
     sh_int	skill_level[MAX_CLASS];	/* Level needed by class	*/
     sh_int	rating[MAX_CLASS];	/* How hard it is to learn	*/	
     SPELL_FUN *	spell_fun;		/* Spell pointer (for spells)	*/
@@ -1744,16 +1744,16 @@ struct	skill_type
     sh_int	slot;			/* Slot for #OBJECT loading	*/
     sh_int	min_mana;		/* Minimum mana used		*/
     sh_int	beats;			/* Waiting time after use	*/
-    char *	noun_damage;		/* Damage message		*/
-    char *	msg_off;		/* Wear off message		*/
-    char *	msg_obj;		/* Wear off message for obects	*/
+    const char *	noun_damage;		/* Damage message		*/
+    const char *	msg_off;		/* Wear off message		*/
+    const char *	msg_obj;		/* Wear off message for obects	*/
 };
 
 struct  group_type
 {
-    char *	name;
+    const char *	name;
     sh_int	rating[MAX_CLASS];
-    char *	spells[MAX_IN_GROUP];
+    const char *	spells[MAX_IN_GROUP];
 };
 
 /*
@@ -2055,7 +2055,7 @@ extern	const	struct	liq_type	liq_table	[];
 extern	const	struct	skill_type	skill_table	[MAX_SKILL];
 extern  const   struct  group_type      group_table	[MAX_GROUP];
 extern          struct social_type      social_table	[MAX_SOCIALS];
-extern	char *	const			title_table	[MAX_CLASS]
+extern	const char *	const			title_table	[MAX_CLASS]
 							[MAX_LEVEL+1]
 							[2];
 extern  const   struct  draconian_type  draconian_table [MAX_DRACONIAN];
@@ -2233,7 +2233,7 @@ bool	is_same_group	args( ( CHAR_DATA *ach, CHAR_DATA *bch ) );
 RID  *get_random_room   args ( (CHAR_DATA *ch) );
 
 /* act_info.c */
-char *eq_worn(CHAR_DATA *ch, int iWear);
+const char *eq_worn(CHAR_DATA *ch, int iWear);
 void	set_title	args( ( CHAR_DATA *ch, char *title ) );
 void	look_window	args( ( CHAR_DATA *ch, OBJ_DATA *obj ) );
 
@@ -2277,7 +2277,7 @@ void	act		args( ( const char *format, CHAR_DATA *ch,
 void	act_new		args( ( const char *format, CHAR_DATA *ch, 
 			    const void *arg1, const void *arg2, int type,
 			    int min_pos) );
-void    log_stringf            args( ( char * fmt, ...) );
+void    log_stringf            args( ( const char * fmt, ...) );
 /*
  * Colour stuff by Lope of Loping Through The MUD
  */
@@ -2364,8 +2364,8 @@ int 	check_immune	args( (CHAR_DATA *ch, int dam_type) );
 int 	material_lookup args( ( const char *name) );
 int	weapon_lookup	args( ( const char *name) );
 int	weapon_type	args( ( const char *name) );
-char 	*weapon_name	args( ( int weapon_Type) );
-char	*item_name	args( ( int item_type) ); 
+const char 	*weapon_name	args( ( int weapon_Type) );
+const char	*item_name	args( ( int item_type) ); 
 int	attack_lookup	args( ( const char *name) );
 long	wiznet_lookup	args( ( const char *name) );
 int	class_lookup	args( ( const char *name) );
@@ -2429,7 +2429,7 @@ bool	can_see		args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
 bool	can_see_obj	args( ( CHAR_DATA *ch, OBJ_DATA *obj ) );
 bool	can_see_room	args( ( CHAR_DATA *ch, ROOM_INDEX_DATA *pRoomIndex) );
 bool	can_drop_obj	args( ( CHAR_DATA *ch, OBJ_DATA *obj ) );
-char *	affect_loc_name	args( ( int location ) );
+const char *	affect_loc_name	args( ( int location ) );
 char *	affect_bit_name	args( ( int vector ) );
 char *	extra_bit_name	args( ( int extra_flags ) );
 char * 	wear_bit_name	args( ( int wear_flags ) );
@@ -2502,7 +2502,7 @@ int	skill_rating	args( ( CHAR_DATA *ch, int sn ) );
 
 /* special.c */
 SF *	spec_lookup	args( ( const char *name ) );
-char *	spec_name	args( ( SPEC_FUN *function ) );
+const char *	spec_name	args( ( SPEC_FUN *function ) );
 
 /* teleport.c */
 RID *	room_by_name	args( ( char *target, int level, bool error) );
@@ -2571,7 +2571,7 @@ long	clan_nw_lookup	args( ( CLAN_DATA *clan ) );
 /*
  * Global Constants
  */
-extern	char *	const	dir_name        [];
+extern	const    char *	const	dir_name        [];
 extern	const	sh_int	rev_dir         [];          /* sh_int - ROM OLC */
 extern	const	struct	spec_type	spec_table	[];
 

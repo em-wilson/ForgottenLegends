@@ -85,7 +85,7 @@ void	mpedit		args( ( CHAR_DATA *ch, char *argument ) );
  */
 struct olc_cmd_type
 {
-    char * const	name;
+    const char *	name;
     OLC_FUN *		olc_fun;
 };
 
@@ -96,7 +96,7 @@ struct olc_cmd_type
  */
 struct	editor_cmd_type
 {
-    char * const	name;
+    const char *	name;
     DO_FUN *		do_fun;
 };
 
@@ -305,7 +305,7 @@ void		free_mob_index		args ( ( MOB_INDEX_DATA *pMob ) );
 void		show_liqlist		args ( ( CHAR_DATA *ch ) );
 void		show_damlist		args ( ( CHAR_DATA *ch ) );
 
-char *		mprog_type_to_name	args ( ( int type ) );
+const char *		mprog_type_to_name	args ( ( int type ) );
 MPROG_LIST      *new_mprog              args ( ( void ) );
 void            free_mprog              args ( ( MPROG_LIST *mp ) );
 MPROG_CODE	*new_mpcode		args ( (void) );

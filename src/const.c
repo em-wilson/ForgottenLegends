@@ -627,7 +627,7 @@ const	struct	class_type	class_table	[MAX_CLASS]	=
 /*
 * Titles.
 */
-char *	const			title_table	[MAX_CLASS][MAX_LEVEL+1][2] =
+const char *	const			title_table	[MAX_CLASS][MAX_LEVEL+1][2] =
 {
     {
 	{ "Man",			"Woman"				},

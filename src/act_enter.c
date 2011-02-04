@@ -155,7 +155,7 @@ void do_enter( CHAR_DATA *ch, char *argument)
 	else
 	    act("$n has arrived through $p.",ch,portal,NULL,TO_ROOM);
 
-	do_look(ch,"auto");
+	do_look(ch,(char*)"auto");
 
 	/* charges */
 	if (portal->value[0] > 0)
@@ -179,7 +179,7 @@ void do_enter( CHAR_DATA *ch, char *argument)
  
             if ( fch->master == ch && IS_AFFECTED(fch,AFF_CHARM)
             &&   fch->position < POS_STANDING)
-            	do_stand(fch,"");
+            	do_stand(fch,(char*)"");
 
             if ( fch->master == ch && fch->position == POS_STANDING)
             {

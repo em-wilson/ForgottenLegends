@@ -97,22 +97,22 @@ void acid_effect(void *vo, int level, int dam, int target)
 	    case ITEM_CONTAINER:
 	    case ITEM_CORPSE_PC:
 	    case ITEM_CORPSE_NPC:
-		msg = "$p fumes and dissolves.";
+		msg = (char*)"$p fumes and dissolves.";
 		break;
 	    case ITEM_ARMOR:
-		msg = "$p is pitted and etched.";
+		msg = (char*)"$p is pitted and etched.";
 		break;
 	    case ITEM_CLOTHING:
-		msg = "$p is corroded into scrap.";
+		msg = (char*)"$p is corroded into scrap.";
 	 	break;
 	    case ITEM_STAFF:
 	    case ITEM_WAND:
 		chance -= 10;
-		msg = "$p corrodes and breaks.";
+		msg = (char*)"$p corrodes and breaks.";
 		break;
 	    case ITEM_SCROLL:
 		chance += 10;
-		msg = "$p is burned into waste.";
+		msg = (char*)"$p is burned into waste.";
 		break; 
 	}
 
@@ -272,11 +272,11 @@ void cold_effect(void *vo, int level, int dam, int target)
 	    default:
 		return;
 	    case ITEM_POTION:
-		msg = "$p freezes and shatters!";
+		msg = (char*)"$p freezes and shatters!";
 		chance += 25;
 		break;
 	    case ITEM_DRINK_CON:
-		msg = "$p freezes and shatters!";
+		msg = (char*)"$p freezes and shatters!";
 		chance += 5;
 		break;
 	}
@@ -380,28 +380,28 @@ void fire_effect(void *vo, int level, int dam, int target)
         default:             
 	    return;
         case ITEM_CONTAINER:
-            msg = "$p ignites and burns!";
+            msg = (char*)"$p ignites and burns!";
             break;
         case ITEM_POTION:
             chance += 25;
-            msg = "$p bubbles and boils!";
+            msg = (char*)"$p bubbles and boils!";
             break;
         case ITEM_SCROLL:
             chance += 50;
-            msg = "$p crackles and burns!";
+            msg = (char*)"$p crackles and burns!";
             break;
         case ITEM_STAFF:
             chance += 10;
-            msg = "$p smokes and chars!";
+            msg = (char*)"$p smokes and chars!";
             break;
         case ITEM_WAND:
-            msg = "$p sparks and sputters!";
+            msg = (char*)"$p sparks and sputters!";
             break;
         case ITEM_FOOD:
-            msg = "$p blackens and crisps!";
+            msg = (char*)"$p blackens and crisps!";
             break;
         case ITEM_PILL:
-            msg = "$p melts and drips!";
+            msg = (char*)"$p melts and drips!";
             break;
         }
 
@@ -597,11 +597,11 @@ void shock_effect(void *vo,int level, int dam, int target)
 	   case ITEM_WAND:
 	   case ITEM_STAFF:
 		chance += 10;
-		msg = "$p overloads and explodes!";
+		msg = (char*)"$p overloads and explodes!";
 		break;
 	   case ITEM_JEWELRY:
 		chance -= 10;
-		msg = "$p is fused into a worthless lump.";
+		msg = (char*)"$p is fused into a worthless lump.";
 	}
 	
 	chance = URANGE(5,chance,95);

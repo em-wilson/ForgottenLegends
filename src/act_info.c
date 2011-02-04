@@ -612,27 +612,27 @@ void do_socials(CHAR_DATA *ch, char *argument)
 
 void do_motd(CHAR_DATA *ch, char *argument)
 {
-    do_help(ch,"motd");
+    do_help(ch,(char*)"motd");
 }
 
 void do_imotd(CHAR_DATA *ch, char *argument)
 {  
-    do_help(ch,"imotd");
+    do_help(ch,(char*)"imotd");
 }
 
 void do_rules(CHAR_DATA *ch, char *argument)
 {
-    do_help(ch,"rules");
+    do_help(ch,(char*)"rules");
 }
 
 void do_story(CHAR_DATA *ch, char *argument)
 {
-    do_help(ch,"story");
+    do_help(ch,(char*)"story");
 }
 
 void do_wizlist(CHAR_DATA *ch, char *argument)
 {
-    do_help(ch,"wizlist");
+    do_help(ch,(char*)"wizlist");
 }
 
 /* RT this following section holds all the auto commands from ROM, as well as
@@ -1072,7 +1072,7 @@ void do_look( CHAR_DATA *ch, char *argument )
         if ( !IS_NPC(ch) && IS_SET(ch->act, PLR_AUTOEXIT) )
 	{
 	    send_to_char("\n\r",ch);
-            do_exits( ch, "auto" );
+            do_exits( ch, (char*)"auto" );
 	}
 
 	show_list_to_char( ch->in_room->contents, ch, FALSE, FALSE );
@@ -1306,7 +1306,7 @@ void do_examine( CHAR_DATA *ch, char *argument )
 	    break;
 	
 	case ITEM_JUKEBOX:
-	    do_play(ch,"list");
+	    do_play(ch,(char*)"list");
 	    break;
 
 	case ITEM_MONEY:
@@ -1354,7 +1354,7 @@ void do_examine( CHAR_DATA *ch, char *argument )
  */
 void do_exits( CHAR_DATA *ch, char *argument )
 {
-    extern char * const dir_name[];
+    extern const char * const dir_name[];
     char buf[MAX_STRING_LENGTH];
     EXIT_DATA *pexit;
     bool found;
@@ -1655,7 +1655,7 @@ void do_score( CHAR_DATA *ch, char *argument )
     }
     
     if (IS_SET(ch->comm,COMM_SHOW_AFFECTS))
-	do_affects(ch,"");
+	do_affects(ch,(char*)"");
 }
 
 void do_affects(CHAR_DATA *ch, char *argument )
@@ -1706,7 +1706,7 @@ void do_affects(CHAR_DATA *ch, char *argument )
 
 
 
-char *	const	day_name	[] =
+const char *	const	day_name	[] =
 {
     "the Moon", "the Bull", "Deception", "Thunder", "Freedom",
     "the Great Gods", "the Sun"
@@ -1724,16 +1724,16 @@ void do_time( CHAR_DATA *ch, char *argument )
 {
     extern char str_boot_time[];
     char buf[MAX_STRING_LENGTH];
-    char *suf;
+    char *suf = new char[3];
     int day;
 
     day     = time_info.day + 1;
 
-         if ( day > 4 && day <  20 ) suf = "th";
-    else if ( day % 10 ==  1       ) suf = "st";
-    else if ( day % 10 ==  2       ) suf = "nd";
-    else if ( day % 10 ==  3       ) suf = "rd";
-    else                             suf = "th";
+         if ( day > 4 && day <  20 ) strcpy( suf, "th" );
+    else if ( day % 10 ==  1       ) strcpy( suf, "st" );
+    else if ( day % 10 ==  2       ) strcpy( suf, "nd" );
+    else if ( day % 10 ==  3       ) strcpy( suf, "rd" );
+    else                             strcpy( suf, "th" );
 
     sprintf( buf,
 	"It is %d o'clock %s, Day of %s, %d%s the Month of %s.\n\r",
@@ -1749,6 +1749,7 @@ void do_time( CHAR_DATA *ch, char *argument )
 	);
 
     send_to_char( buf, ch );
+    delete [] suf;
     return;
 }
 
@@ -1758,7 +1759,7 @@ void do_weather( CHAR_DATA *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
 
-    static char * const sky_look[4] =
+    static const char * const sky_look[4] =
     {
 	"cloudless",
 	"cloudy",
@@ -1792,8 +1793,9 @@ void do_help( CHAR_DATA *ch, char *argument )
 
     output = new_buf();
 
-    if ( argument[0] == '\0' )
-	argument = "summary";
+    if ( argument[0] == '\0' ) {
+        argument = (char*)"summary";
+    }
 
     /* this parts handles help a b so that it returns help 'a b' */
     argall[0] = '\0';
@@ -2176,7 +2178,7 @@ void do_compare( CHAR_DATA *ch, char *argument )
     OBJ_DATA *obj2;
     int value1;
     int value2;
-    char *msg;
+    char *msg = new char[MAX_STRING_LENGTH];
 
     argument = one_argument( argument, arg1 );
     argument = one_argument( argument, arg2 );
@@ -2222,18 +2224,18 @@ void do_compare( CHAR_DATA *ch, char *argument )
 
     if ( obj1 == obj2 )
     {
-	msg = "You compare $p to itself.  It looks about the same.";
+	   strncpy( msg, "You compare $p to itself.  It looks about the same.", MAX_STRING_LENGTH );
     }
     else if ( obj1->item_type != obj2->item_type )
     {
-	msg = "You can't compare $p and $P.";
+	   strncpy( msg, "You can't compare $p and $P.", MAX_STRING_LENGTH );
     }
     else
     {
 	switch ( obj1->item_type )
 	{
 	default:
-	    msg = "You can't compare $p and $P.";
+	    strncpy( msg, "You can't compare $p and $P.", MAX_STRING_LENGTH );
 	    break;
 
 	case ITEM_ARMOR:
@@ -2257,12 +2259,13 @@ void do_compare( CHAR_DATA *ch, char *argument )
 
     if ( msg == NULL )
     {
-	     if ( value1 == value2 ) msg = "$p and $P look about the same.";
-	else if ( value1  > value2 ) msg = "$p looks better than $P.";
-	else                         msg = "$p looks worse than $P.";
+	     if ( value1 == value2 ) strncpy( msg, "$p and $P look about the same.", MAX_STRING_LENGTH );
+	else if ( value1  > value2 ) strncpy( msg, "$p looks better than $P.", MAX_STRING_LENGTH );
+	else                         strncpy( msg, "$p looks worse than $P.", MAX_STRING_LENGTH );
     }
 
     act( msg, ch, obj1, obj2, TO_CHAR );
+    delete [] msg;
     return;
 }
 
@@ -2270,7 +2273,7 @@ void do_compare( CHAR_DATA *ch, char *argument )
 
 void do_credits( CHAR_DATA *ch, char *argument )
 {
-    do_help( ch, "diku" );
+    do_help( ch, (char*)"diku" );
     return;
 }
 
@@ -2345,7 +2348,7 @@ void do_consider( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     CHAR_DATA *victim;
-    char *msg;
+    char *msg = new char[MAX_STRING_LENGTH];
     int diff;
 
     one_argument( argument, arg );
@@ -2370,15 +2373,16 @@ void do_consider( CHAR_DATA *ch, char *argument )
 
     diff = victim->level - ch->level;
 
-         if ( diff <= -10 ) msg = "You can kill $N naked and weaponless.";
-    else if ( diff <=  -5 ) msg = "$N is no match for you.";
-    else if ( diff <=  -2 ) msg = "$N looks like an easy kill.";
-    else if ( diff <=   1 ) msg = "The perfect match!";
-    else if ( diff <=   4 ) msg = "$N says 'Do you feel lucky, punk?'.";
-    else if ( diff <=   9 ) msg = "$N laughs at you mercilessly.";
-    else                    msg = "Death will thank you for your gift.";
+         if ( diff <= -10 ) strncpy( msg, "You can kill $N naked and weaponless.", MAX_STRING_LENGTH );
+    else if ( diff <=  -5 ) strncpy( msg, "$N is no match for you.", MAX_STRING_LENGTH );
+    else if ( diff <=  -2 ) strncpy( msg, "$N looks like an easy kill.", MAX_STRING_LENGTH );
+    else if ( diff <=   1 ) strncpy( msg, "The perfect match!", MAX_STRING_LENGTH );
+    else if ( diff <=   4 ) strncpy( msg, "$N says 'Do you feel lucky, punk?'.", MAX_STRING_LENGTH );
+    else if ( diff <=   9 ) strncpy( msg, "$N laughs at you mercilessly.", MAX_STRING_LENGTH );
+    else                    strncpy( msg, "Death will thank you for your gift.", MAX_STRING_LENGTH );
 
     act( msg, ch, NULL, victim, TO_CHAR );
+    delete [] msg;
     return;
 }
 
@@ -2846,7 +2850,7 @@ void do_nw( CHAR_DATA *ch, char *argument )
     }
 }
 
-char *eq_worn(CHAR_DATA *ch, int iWear)
+const char *eq_worn(CHAR_DATA *ch, int iWear)
 {
   OBJ_DATA *obj;
 

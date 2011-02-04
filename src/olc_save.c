@@ -1168,7 +1168,7 @@ void do_asave( CHAR_DATA *ch, char *argument )
     /* Show correct syntax. */
     /* -------------------- */
     if (ch)
-	do_asave( ch, "" );
+	do_asave( ch, (char*)"" );
 
     return;
 }
