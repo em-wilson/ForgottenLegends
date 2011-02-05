@@ -2247,8 +2247,6 @@ void    get_obj         args( ( CHAR_DATA *ch, OBJ_DATA *obj,
                             OBJ_DATA *container ) );
 
 /* act_wiz.c */
-void	wiznet		args( (const char *string, CHAR_DATA *ch, OBJ_DATA *obj,
-			       long flag, long flag_skip, int min_level ) );
 void	copyover_recover   args( ( void ) );
 RID *	find_location	args( (CHAR_DATA *ch, char *argument ) );
 
@@ -2508,9 +2506,6 @@ const char *	spec_name	args( ( SPEC_FUN *function ) );
 RID *	room_by_name	args( ( char *target, int level, bool error) );
 
 /* update.c */
-void	advance_level	args( ( CHAR_DATA *ch, bool hide ) );
-void	gain_exp	args( ( CHAR_DATA *ch, int gain ) );
-void	gain_condition	args( ( CHAR_DATA *ch, int iCond, int value ) );
 void	update_handler	args( ( void ) );
 
 /* string.c */

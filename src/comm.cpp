@@ -63,6 +63,7 @@
 #include "merc.h"
 #include "recycle.h"
 #include "clan.h"
+#include "Wiznet.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_help		);
@@ -636,7 +637,7 @@ void close_socket( DESCRIPTOR_DATA *dclose )
             && (dclose->connected <= CON_NOTE_FINISH)))
 	{
 	    act( "$n has lost $s link.", ch, NULL, NULL, TO_ROOM );
-	    wiznet((char*)"Net death has claimed $N.",ch,NULL,WIZ_LINKS,0,0);
+	    Wiznet::instance()->report((char*)"Net death has claimed $N.",ch,NULL,WIZ_LINKS,0,0);
 	    ch->desc = NULL;
 	}
 	else
@@ -804,13 +805,13 @@ void read_from_buffer( DESCRIPTOR_DATA *d )
 	    {
 		sprintf( log_buf, "%s input spamming!", d->host );
 		log_string( log_buf );
-		wiznet((char*)"Spam spam spam $N spam spam spam spam spam!",
+		Wiznet::instance()->report((char*)"Spam spam spam $N spam spam spam spam spam!",
 		       d->character,NULL,WIZ_SPAM,0,get_trust(d->character));
 		if (d->incomm[0] == '!')
-		    wiznet(d->inlast,d->character,NULL,WIZ_SPAM,0,
+		    Wiznet::instance()->report(d->inlast,d->character,NULL,WIZ_SPAM,0,
 			get_trust(d->character));
 		else
-		    wiznet(d->incomm,d->character,NULL,WIZ_SPAM,0,
+		    Wiznet::instance()->report(d->incomm,d->character,NULL,WIZ_SPAM,0,
 			get_trust(d->character));
 
 		d->repeat = 0;
@@ -1343,7 +1344,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 
 	sprintf( log_buf, "%s@%s has connected.", ch->name, d->host );
 	log_string( log_buf );
-	wiznet(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
+	Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
 
 	if ( IS_IMMORTAL(ch) )
 	{
@@ -1697,8 +1698,8 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 
 	sprintf( log_buf, "%s@%s new player.", ch->name, d->host );
 	log_string( log_buf );
-	wiznet((char*)"Newbie alert!  $N sighted.",ch,NULL,WIZ_NEWBIE,0,0);
-        wiznet(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
+	Wiznet::instance()->report((char*)"Newbie alert!  $N sighted.",ch,NULL,WIZ_NEWBIE,0,0);
+        Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
 
 	write_to_buffer(d,"\n\r",0);
 
@@ -1735,8 +1736,8 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 
 	sprintf( log_buf, "%s@%s reclasses as the %s class.", ch->name, d->host, class_table[ch->class_num].name );
 	log_string( log_buf );
-	wiznet((char*)"Reclass alert!  $N sighted.",ch,NULL,WIZ_NEWBIE,0,0);
-        wiznet(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
+	Wiznet::instance()->report((char*)"Reclass alert!  $N sighted.",ch,NULL,WIZ_NEWBIE,0,0);
+        Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
 
         group_add(ch,class_table[ch->class_num].base_group,FALSE);
         ch->gen_data = new_gen_data();
@@ -1971,7 +1972,7 @@ case CON_DEFAULT_CHOICE:
 	act( "$n has entered the game.", ch, NULL, NULL, TO_ROOM );
 	do_look( ch, (char*)"auto" );
 
-	wiznet((char*)"$N has left real life behind.",ch,NULL,
+	Wiznet::instance()->report((char*)"$N has left real life behind.",ch,NULL,
 		WIZ_LOGINS,WIZ_SITES,get_trust(ch));
 
 	if (ch->pet != NULL)
@@ -2119,7 +2120,7 @@ bool check_reconnect( DESCRIPTOR_DATA *d, char *name, bool fConn )
 
 		sprintf( log_buf, "%s@%s reconnected.", ch->name, d->host );
 		log_string( log_buf );
-		wiznet((char*)"$N groks the fullness of $S link.",
+		Wiznet::instance()->report((char*)"$N groks the fullness of $S link.",
 		    ch,NULL,WIZ_LINKS,0,0);
 		d->connected = CON_PLAYING;
                /* Inform the character of a note in progress and the possbility

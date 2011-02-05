@@ -37,6 +37,7 @@
 #include "music.h"
 #include "tables.h"
 #include "recycle.h"
+#include "Wiznet.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_quit		);
@@ -45,9 +46,6 @@ DECLARE_DO_FUN(do_mobhunt	);
 /*
  * Local functions.
  */
-int	hit_gain	args( ( CHAR_DATA *ch ) );
-int	mana_gain	args( ( CHAR_DATA *ch ) );
-int	move_gain	args( ( CHAR_DATA *ch ) );
 void	mobile_update	args( ( void ) );
 void	weather_update	args( ( void ) );
 void	char_update	args( ( void ) );
@@ -60,349 +58,6 @@ void	info_update	args( ( void ) );
 int	save_number = 0;
 
 
-
-/*
- * Advancement stuff.
- */
-void advance_level( CHAR_DATA *ch, bool hide )
-{
-    char buf[MAX_STRING_LENGTH];
-    int add_hp, add_mana, add_move, dracnum, add_prac;
-
-    ch->pcdata->last_level = 
-	( ch->played + (int) (current_time - ch->logon) ) / 3600;
-
-/*
-    sprintf( buf, "the %s",
-	title_table [ch->class_num] [ch->level] [ch->sex == SEX_FEMALE ? 1 : 0] );
-    set_title( ch, buf );
-*/
-
-    add_hp	= con_app[get_curr_stat(ch,STAT_CON)].hitp + number_range(
-		    class_table[ch->class_num].hp_min,
-		    class_table[ch->class_num].hp_max );
-    add_mana 	= number_range(2,(2*get_curr_stat(ch,STAT_INT)
-				  + get_curr_stat(ch,STAT_WIS))/5);
-    if (!class_table[ch->class_num].fMana)
-	add_mana /= 2;
-    add_move	= number_range( 1, (get_curr_stat(ch,STAT_CON)
-				  + get_curr_stat(ch,STAT_DEX))/6 );
-    add_prac	= wis_app[get_curr_stat(ch,STAT_WIS)].practice;
-
-    add_hp = add_hp * 9/10;
-    add_mana = add_mana * 9/10;
-    add_move = add_move * 9/10;
-
-    add_hp	= UMAX(  2, add_hp   );
-    add_mana	= UMAX(  2, add_mana );
-    add_move	= UMAX(  6, add_move );
-
-    ch->max_hit 	+= add_hp;
-    ch->max_mana	+= add_mana;
-    ch->max_move	+= add_move;
-    ch->practice	+= add_prac;
-    ch->train		+= 1;
-
-    ch->pcdata->perm_hit	+= add_hp;
-    ch->pcdata->perm_mana	+= add_mana;
-    ch->pcdata->perm_move	+= add_move;
-
-    if (ch->level == 10 && (ch->race == race_lookup("draconian")))
-    {
-/*
-	if (ch->alignment > 500)
-	    dracnum = number_range(0, 4);
-	else if (ch->alignment < 500)
-	    dracnum = number_range(10, 14);
-	else
-	    dracnum = number_range(5, 9);
-*/
-	dracnum = number_range(0,14);
-	ch->drac = dracnum;
-	sprintf(buf, "You scream in agony as %s scales pierce your tender skin!\n\r", draconian_table[ch->drac].colour);
-	send_to_char(buf,ch);
-	if (ch->perm_stat[STAT_STR] < 25)
-	    ch->perm_stat[STAT_STR]++;
-	else
-	    ch->train++;
-
-	if (ch->perm_stat[draconian_table[ch->drac].attr_prime] < 25)
-	    ch->perm_stat[draconian_table[ch->drac].attr_prime]++;
-	else
-	    ch->train++;
-    }
-
-    if (!hide)
-    {
-    	sprintf(buf,
-	    "{BYou have leveled!{x\n\r"
-	    "You gain %d hit point%s, %d mana, %d move, and %d practice%s.\n\r",
-	    add_hp, add_hp == 1 ? "" : "s", add_mana, add_move,
-	    add_prac, add_prac == 1 ? "" : "s");
-	send_to_char( buf, ch );
-    }
-    return;
-}   
-
-
-
-void gain_exp( CHAR_DATA *ch, int gain )
-{
-    char buf[MAX_STRING_LENGTH];
-
-    if ( IS_NPC(ch) || ch->level >= LEVEL_HERO )
-	return;
-
-    ch->exp = UMAX( exp_per_level(ch,ch->pcdata->points), ch->exp + gain );
-    while ( ch->level < LEVEL_HERO && ch->exp >= 
-	exp_per_level(ch,ch->pcdata->points) * (ch->level+1) )
-    {
-	send_to_char( "You raise a level!!  ", ch );
-	ch->level += 1;
-	sprintf(buf,"%s gained level %d",ch->name,ch->level);
-	log_string(buf);
-	sprintf(buf,"$N has attained level %d!",ch->level);
-	wiznet(buf,ch,NULL,WIZ_LEVELS,0,0);
-	advance_level(ch,FALSE);
-	save_char_obj(ch);
-    }
-
-    return;
-}
-
-
-
-/*
- * Regeneration stuff.
- */
-int hit_gain( CHAR_DATA *ch )
-{
-    int gain;
-    int number;
-
-    if (ch->in_room == NULL)
-	return 0;
-
-    if ( IS_NPC(ch) )
-    {
-	gain =  5 + ch->level;
- 	if (IS_AFFECTED(ch,AFF_REGENERATION))
-	    gain *= 2;
-
-	switch(ch->position)
-	{
-	    default : 		gain /= 2;			break;
-	    case POS_SLEEPING: 	gain = 3 * gain/2;		break;
-	    case POS_RESTING:  					break;
-	    case POS_FIGHTING:	gain /= 3;		 	break;
- 	}
-
-	
-    }
-    else
-    {
-	gain = UMAX(3,get_curr_stat(ch,STAT_CON) - 3 + ch->level/2); 
-	gain += class_table[ch->class_num].hp_max - 10;
- 	number = number_percent();
-	if (number < get_skill(ch,gsn_fast_healing))
-	{
-	    gain += number * gain / 100;
-	    if (ch->hit < ch->max_hit)
-		check_improve(ch,gsn_fast_healing,TRUE,8);
-	}
-
-	switch ( ch->position )
-	{
-	    default:	   	gain /= 4;			break;
-	    case POS_SLEEPING: 					break;
-	    case POS_RESTING:  	gain /= 2;			break;
-	    case POS_FIGHTING: 	gain /= 6;			break;
-	}
-
-	if ( ch->pcdata->condition[COND_HUNGER]   == 0 )
-	    gain /= 2;
-
-	if ( ch->pcdata->condition[COND_THIRST] == 0 )
-	    gain /= 2;
-
-    }
-
-    gain = gain * ch->in_room->heal_rate / 100;
-    
-    if (ch->on != NULL && ch->on->item_type == ITEM_FURNITURE)
-	gain = gain * ch->on->value[3] / 100;
-
-    if ( IS_AFFECTED(ch, AFF_POISON) )
-	gain /= 4;
-
-    if (IS_AFFECTED(ch, AFF_PLAGUE))
-	gain /= 8;
-
-    if (IS_AFFECTED(ch,AFF_HASTE) || IS_AFFECTED(ch,AFF_SLOW))
-	gain /=2 ;
-
-    if (!IS_NPC(ch) && ch->pcdata->clan)
-	gain *= 1.5;
-
-    return UMIN(gain, ch->max_hit - ch->hit);
-}
-
-
-
-int mana_gain( CHAR_DATA *ch )
-{
-    int gain;
-    int number;
-
-    if (ch->in_room == NULL)
-	return 0;
-
-    if ( IS_NPC(ch) )
-    {
-	gain = 5 + ch->level;
-	switch (ch->position)
-	{
-	    default:		gain /= 2;		break;
-	    case POS_SLEEPING:	gain = 3 * gain/2;	break;
-   	    case POS_RESTING:				break;
-	    case POS_FIGHTING:	gain /= 3;		break;
-    	}
-    }
-    else
-    {
-	gain = (get_curr_stat(ch,STAT_WIS) 
-	      + get_curr_stat(ch,STAT_INT) + ch->level) / 2;
-	number = number_percent();
-	if (number < get_skill(ch,gsn_meditation))
-	{
-	    gain += number * gain / 100;
-	    if (ch->mana < ch->max_mana)
-	        check_improve(ch,gsn_meditation,TRUE,8);
-	}
-	if (!class_table[ch->class_num].fMana)
-	    gain /= 2;
-
-	switch ( ch->position )
-	{
-	    default:		gain /= 4;			break;
-	    case POS_SLEEPING: 					break;
-	    case POS_RESTING:	gain /= 2;			break;
-	    case POS_FIGHTING:	gain /= 6;			break;
-	}
-
-	if ( ch->pcdata->condition[COND_HUNGER]   == 0 )
-	    gain /= 2;
-
-	if ( ch->pcdata->condition[COND_THIRST] == 0 )
-	    gain /= 2;
-
-    }
-
-    gain = gain * ch->in_room->mana_rate / 100;
-
-    if (ch->on != NULL && ch->on->item_type == ITEM_FURNITURE)
-	gain = gain * ch->on->value[4] / 100;
-
-    if ( IS_AFFECTED( ch, AFF_POISON ) )
-	gain /= 4;
-
-    if (IS_AFFECTED(ch, AFF_PLAGUE))
-        gain /= 8;
-
-    if (IS_AFFECTED(ch,AFF_HASTE) || IS_AFFECTED(ch,AFF_SLOW))
-        gain /=2 ;
-
-    if (!IS_NPC(ch) && ch->pcdata->clan)
-	gain *= 1.5;
-
-    return UMIN(gain, ch->max_mana - ch->mana);
-}
-
-
-
-int move_gain( CHAR_DATA *ch )
-{
-    int gain;
-
-    if (ch->in_room == NULL)
-	return 0;
-
-    if ( IS_NPC(ch) )
-    {
-	gain = ch->level;
-    }
-    else
-    {
-	gain = UMAX( 15, ch->level );
-
-	switch ( ch->position )
-	{
-	case POS_SLEEPING: gain += get_curr_stat(ch,STAT_DEX);		break;
-	case POS_RESTING:  gain += get_curr_stat(ch,STAT_DEX) / 2;	break;
-	}
-
-	if ( ch->pcdata->condition[COND_HUNGER]   == 0 )
-	    gain /= 2;
-
-	if ( ch->pcdata->condition[COND_THIRST] == 0 )
-	    gain /= 2;
-    }
-
-    gain = gain * ch->in_room->heal_rate/100;
-
-    if (ch->on != NULL && ch->on->item_type == ITEM_FURNITURE)
-	gain = gain * ch->on->value[3] / 100;
-
-    if ( IS_AFFECTED(ch, AFF_POISON) )
-	gain /= 4;
-
-    if (IS_AFFECTED(ch, AFF_PLAGUE))
-        gain /= 8;
-
-    if (IS_AFFECTED(ch,AFF_HASTE) || IS_AFFECTED(ch,AFF_SLOW))
-        gain /=2 ;
-
-    if (!IS_NPC(ch) && ch->pcdata->clan)
-	gain *= 1.5;
-
-    return UMIN(gain, ch->max_move - ch->move);
-}
-
-
-
-void gain_condition( CHAR_DATA *ch, int iCond, int value )
-{
-    int condition;
-
-    if ( value == 0 || IS_NPC(ch) || ch->level >= LEVEL_IMMORTAL)
-	return;
-
-    condition				= ch->pcdata->condition[iCond];
-    if (condition == -1)
-        return;
-    ch->pcdata->condition[iCond]	= URANGE( 0, condition + value, 48 );
-
-    if ( ch->pcdata->condition[iCond] == 0 )
-    {
-	switch ( iCond )
-	{
-	case COND_HUNGER:
-	    send_to_char( "You are hungry.\n\r",  ch );
-	    break;
-
-	case COND_THIRST:
-	    send_to_char( "You are thirsty.\n\r", ch );
-	    break;
-
-	case COND_DRUNK:
-	    if ( condition != 0 )
-		send_to_char( "You are sober.\n\r", ch );
-	    break;
-	}
-    }
-
-    return;
-}
 
 
 
@@ -737,17 +392,17 @@ void char_update( void )
             }
 
 	    if ( ch->hit  < ch->max_hit )
-		ch->hit  += hit_gain(ch);
+		ch->hit  += ch->hit_gain();
 	    else
 		ch->hit = ch->max_hit;
 
 	    if ( ch->mana < ch->max_mana )
-		ch->mana += mana_gain(ch);
+		ch->mana += ch->mana_gain();
 	    else
 		ch->mana = ch->max_mana;
 
 	    if ( ch->move < ch->max_move )
-		ch->move += move_gain(ch);
+		ch->move += ch->move_gain();
 	    else
 		ch->move = ch->max_move;
 	}
@@ -794,10 +449,10 @@ void char_update( void )
 		}
 	    }
 
-	    gain_condition( ch, COND_DRUNK,  -1 );
-	    gain_condition( ch, COND_FULL, ch->size > SIZE_MEDIUM ? -4 : -2 );
-	    gain_condition( ch, COND_THIRST, -1 );
-	    gain_condition( ch, COND_HUNGER, ch->size > SIZE_MEDIUM ? -2 : -1);
+	    ch->gain_condition( COND_DRUNK,  -1 );
+	    ch->gain_condition( COND_FULL, ch->size > SIZE_MEDIUM ? -4 : -2 );
+	    ch->gain_condition( COND_THIRST, -1 );
+	    ch->gain_condition( COND_HUNGER, ch->size > SIZE_MEDIUM ? -2 : -1);
 	}
 
 	for ( paf = ch->affected; paf != NULL; paf = paf_next )
@@ -1216,7 +871,7 @@ void update_handler( void )
 
     if ( --pulse_point    <= 0 )
     {
-	wiznet("TICK!",NULL,NULL,WIZ_TICKS,0,0);
+	Wiznet::instance()->report("TICK!",NULL,NULL,WIZ_TICKS,0,0);
 	pulse_point     = PULSE_TICK;
 /* number_range( PULSE_TICK / 2, 3 * PULSE_TICK / 2 ); */
 	weather_update	( );

@@ -38,6 +38,7 @@
 #include "merc.h"
 #include "interp.h"
 #include "recycle.h"
+#include "Wiznet.h"
 
 bool	check_social	args( ( CHAR_DATA *ch, char *command,
 			    char *argument ) );
@@ -522,7 +523,7 @@ void interpret( CHAR_DATA *ch, char *argument )
     ||   cmd_table[cmd].log == LOG_ALWAYS )
     {
 	sprintf( log_buf, "Log %s: %s", ch->name, logline );
-	wiznet(log_buf,ch,NULL,WIZ_SECURE,0,get_trust(ch));
+	Wiznet::instance()->report(log_buf,ch,NULL,WIZ_SECURE,0,get_trust(ch));
 	log_string( log_buf );
     }
 

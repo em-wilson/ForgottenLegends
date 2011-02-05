@@ -911,7 +911,7 @@ void check_improve( CHAR_DATA *ch, int sn, bool success, int multiplier )
 		    skill_table[sn].name);
 	    send_to_char(buf,ch);
 	    ch->pcdata->learned[sn]++;
-	    gain_exp(ch,2 + skill_rating(ch,sn));
+	    ch->gain_exp(2 + skill_rating(ch,sn));
 	}
     }
 
@@ -926,7 +926,7 @@ void check_improve( CHAR_DATA *ch, int sn, bool success, int multiplier )
 	    send_to_char(buf,ch);
 	    ch->pcdata->learned[sn] += number_range(1,3);
 	    ch->pcdata->learned[sn] = UMIN(ch->pcdata->learned[sn],100);
-	    gain_exp(ch,2 + skill_rating(ch,sn));
+	    ch->gain_exp(2 + skill_rating(ch,sn));
 	}
     }
 }

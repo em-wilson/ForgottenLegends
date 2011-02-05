@@ -40,6 +40,7 @@
 #include "merc.h"
 #include "recycle.h"
 #include "tables.h"
+#include "Wiznet.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_quit	);
@@ -70,7 +71,7 @@ void do_delete( CHAR_DATA *ch, char *argument)
 	else
 	{
     	    sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( ch->name ) );
-	    wiznet("$N turns $Mself into line noise.",ch,NULL,0,0,0);
+	    Wiznet::instance()->report("$N turns $Mself into line noise.",ch,NULL,0,0,0);
 	    stop_fighting(ch,TRUE);
 	    if (ch->pcdata->clan)
 	    {
@@ -94,7 +95,7 @@ void do_delete( CHAR_DATA *ch, char *argument)
     send_to_char("Typing delete with an argument will undo delete status.\n\r",
 	ch);
     ch->pcdata->confirm_delete = TRUE;
-    wiznet("$N is contemplating deletion.",ch,NULL,0,0,get_trust(ch));
+    Wiznet::instance()->report("$N is contemplating deletion.",ch,NULL,0,0,get_trust(ch));
 }
 	    
 
@@ -1404,7 +1405,7 @@ And there {Rw{ra{Rs{x {CIndustrial {WLight{x and {MMagic{x\n\r"
     act( "$n has left the game.", ch, NULL, NULL, TO_ROOM );
     sprintf( log_buf, "%s has quit.", ch->name );
     log_string( log_buf );
-     wiznet("$N rejoins the real world.",ch,NULL,WIZ_LOGINS,0,get_trust(ch));
+     Wiznet::instance()->report("$N rejoins the real world.",ch,NULL,WIZ_LOGINS,0,get_trust(ch));
 
     /*
      * After extract_char the ch is no longer valid!

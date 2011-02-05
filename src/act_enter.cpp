@@ -339,7 +339,7 @@ void do_detonate( CHAR_DATA *ch, char *argument )
 
         sprintf( buf, "%d people have been killed by the bomb blast detonated by %s. (%d PC's)\n\rYou receive %d experience points, before the heat from the bomb incinerates you.\n\r", count, ch->name, pcount, gch->xp);
         send_to_char( buf, gch );
-        gain_exp( gch, gch->xp );
+        gch->gain_exp( gch->xp );
 	gch->mkills += count;
 	gch->pkills += pcount;
         gch->xp = 0;
@@ -349,7 +349,7 @@ void do_detonate( CHAR_DATA *ch, char *argument )
 
     sprintf( buf, "%d people have been killed by the blast. (%d PC's)\n\rYou receive %d experience points, before the heat from the bomb incinerates you.\n\r", count, pcount, ch->xp );
     send_to_char( buf, ch );
-    gain_exp( ch, ch->xp );
+    ch->gain_exp( ch->xp );
     ch->mkills += count;
     ch->pkills += pcount;
     ch->xp = 0;

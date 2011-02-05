@@ -34,6 +34,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "Wiznet.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_backstab	);
@@ -933,7 +934,7 @@ bool damage(CHAR_DATA *ch,CHAR_DATA *victim,int dam,int dt,int dam_type,
 	     */
 	    if ( victim->exp > exp_per_level(victim,victim->pcdata->points) 
 			       * victim->level )
-	gain_exp( victim, (2 * (exp_per_level(victim,victim->pcdata->points)
+			victim->gain_exp( (2 * (exp_per_level(victim,victim->pcdata->points)
 			         * victim->level - victim->exp)/3) + 50 );
 	}
 
@@ -947,7 +948,7 @@ bool damage(CHAR_DATA *ch,CHAR_DATA *victim,int dam,int dt,int dam_type,
 	    if (!IS_NPC(ch))
 		ch->mkills++;
 
-            wiznet(log_buf,NULL,NULL,WIZ_MOBDEATHS,0,0);
+            Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_MOBDEATHS,0,0);
 	}
         else
 	{
@@ -973,7 +974,7 @@ bool damage(CHAR_DATA *ch,CHAR_DATA *victim,int dam,int dt,int dam_type,
 		ch->mkilled++;
 		victim->jkilled = 5;
 
-            wiznet(log_buf,NULL,NULL,WIZ_DEATHS,0,0);
+            Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_DEATHS,0,0);
 	}
 
 	/*
@@ -1301,7 +1302,7 @@ dam_type, bool show ) {
 	     */
 	    if ( victim->exp > exp_per_level(victim,victim->pcdata->points) 
 			       * victim->level )
-	gain_exp( victim, (2 * (exp_per_level(victim,victim->pcdata->points)
+			victim->gain_exp( (2 * (exp_per_level(victim,victim->pcdata->points)
 			         * victim->level - victim->exp)/3) + 50 );
 	}
 
@@ -1311,9 +1312,9 @@ dam_type, bool show ) {
             ch->in_room->name, ch->in_room->vnum);
  
         if (IS_NPC(victim))
-            wiznet(log_buf,NULL,NULL,WIZ_MOBDEATHS,0,0);
+            Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_MOBDEATHS,0,0);
         else
-            wiznet(log_buf,NULL,NULL,WIZ_DEATHS,0,0);
+            Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_DEATHS,0,0);
 
 	raw_kill( victim );
 	/* dump the flags */
@@ -1682,7 +1683,7 @@ void check_killer( CHAR_DATA *ch, CHAR_DATA *victim )
 	return;
 
     sprintf(buf,"$N is attempting to murder %s",victim->name);
-    wiznet(buf,ch,NULL,WIZ_FLAGS,0,0);
+    Wiznet::instance()->report(buf,ch,NULL,WIZ_FLAGS,0,0);
     save_char_obj( ch );
     return;
 }
@@ -2184,7 +2185,7 @@ void group_gain( CHAR_DATA *ch, CHAR_DATA *victim )
 	xp = xp_compute( gch, victim, group_levels );  
 	sprintf( buf, "You receive %d experience points.\n\r", xp );
 	send_to_char( buf, gch );
-	gain_exp( gch, xp );
+	gch->gain_exp( xp );
 
 	for ( obj = gch->carrying; obj != NULL; obj = obj_next )
 	{
@@ -3176,7 +3177,7 @@ void do_flee( CHAR_DATA *ch, char *argument )
 	else
 	    {
 	    send_to_char( "You lost 10 exp.\n\r", ch); 
-	    gain_exp( ch, -10 );
+	    ch->gain_exp( -10 );
 	    }
 	}
 

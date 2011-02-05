@@ -233,7 +233,7 @@ void cold_effect(void *vo, int level, int dam, int target)
 
 	/* hunger! (warmth sucked out */
 	if (!IS_NPC(victim))
-	    gain_condition(victim,COND_HUNGER,dam/20);
+	    victim->gain_condition(COND_HUNGER,dam/20);
 
 	/* let's toast some gear */
 	for (obj = victim->carrying; obj != NULL; obj = obj_next)
@@ -340,7 +340,7 @@ void fire_effect(void *vo, int level, int dam, int target)
 
 	/* getting thirsty */
 	if (!IS_NPC(victim))
-	    gain_condition(victim,COND_THIRST,dam/20);
+	    victim->gain_condition(COND_THIRST,dam/20);
 
 	/* let's toast some gear! */
 	for (obj = victim->carrying; obj != NULL; obj = obj_next)

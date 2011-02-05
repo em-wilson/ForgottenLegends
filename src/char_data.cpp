@@ -2,6 +2,7 @@
 #include "merc.h"
 #include "recycle.h"
 #include "char_data.h"
+#include "Wiznet.h"
 
 CHAR_DATA::CHAR_DATA()
 {
@@ -152,4 +153,346 @@ CHAR_DATA::~CHAR_DATA()
     }
 
     INVALIDATE(this);
+}
+
+/*
+ * Advancement stuff.
+ */
+void CHAR_DATA::advance_level( bool hide )
+{
+    char buf[MAX_STRING_LENGTH];
+    int add_hp, add_mana, add_move, dracnum, add_prac;
+
+    this->pcdata->last_level = 
+    ( this->played + (int) (current_time - this->logon) ) / 3600;
+
+/*
+    sprintf( buf, "the %s",
+    title_table [this->class_num] [this->level] [this->sex == SEX_FEMALE ? 1 : 0] );
+    set_title( this, buf );
+*/
+
+    add_hp  = con_app[get_curr_stat(this,STAT_CON)].hitp + number_range(
+            class_table[this->class_num].hp_min,
+            class_table[this->class_num].hp_max );
+    add_mana    = number_range(2,(2*get_curr_stat(this,STAT_INT)
+                  + get_curr_stat(this,STAT_WIS))/5);
+    if (!class_table[this->class_num].fMana)
+    add_mana /= 2;
+    add_move    = number_range( 1, (get_curr_stat(this,STAT_CON)
+                  + get_curr_stat(this,STAT_DEX))/6 );
+    add_prac    = wis_app[get_curr_stat(this,STAT_WIS)].practice;
+
+    add_hp = add_hp * 9/10;
+    add_mana = add_mana * 9/10;
+    add_move = add_move * 9/10;
+
+    add_hp  = UMAX(  2, add_hp   );
+    add_mana    = UMAX(  2, add_mana );
+    add_move    = UMAX(  6, add_move );
+
+    this->max_hit     += add_hp;
+    this->max_mana    += add_mana;
+    this->max_move    += add_move;
+    this->practice    += add_prac;
+    this->train       += 1;
+
+    this->pcdata->perm_hit    += add_hp;
+    this->pcdata->perm_mana   += add_mana;
+    this->pcdata->perm_move   += add_move;
+
+    if (this->level == 10 && (this->race == race_lookup("draconian")))
+    {
+/*
+    if (this->alignment > 500)
+        dracnum = number_range(0, 4);
+    else if (this->alignment < 500)
+        dracnum = number_range(10, 14);
+    else
+        dracnum = number_range(5, 9);
+*/
+    dracnum = number_range(0,14);
+    this->drac = dracnum;
+    sprintf(buf, "You scream in agony as %s scales pierce your tender skin!\n\r", draconian_table[this->drac].colour);
+    send_to_char(buf,this);
+    if (this->perm_stat[STAT_STR] < 25)
+        this->perm_stat[STAT_STR]++;
+    else
+        this->train++;
+
+    if (this->perm_stat[draconian_table[this->drac].attr_prime] < 25)
+        this->perm_stat[draconian_table[this->drac].attr_prime]++;
+    else
+        this->train++;
+    }
+
+    if (!hide)
+    {
+        sprintf(buf,
+        "{BYou have leveled!{x\n\r"
+        "You gain %d hit point%s, %d mana, %d move, and %d practice%s.\n\r",
+        add_hp, add_hp == 1 ? "" : "s", add_mana, add_move,
+        add_prac, add_prac == 1 ? "" : "s");
+    send_to_char( buf, this );
+    }
+    return;
+}   
+
+
+
+void CHAR_DATA::gain_exp( int gain )
+{
+    char buf[MAX_STRING_LENGTH];
+
+    if ( IS_NPC(this) || this->level >= LEVEL_HERO )
+    return;
+
+    this->exp = UMAX( exp_per_level(this,this->pcdata->points), this->exp + gain );
+    while ( this->level < LEVEL_HERO && this->exp >= exp_per_level(this,this->pcdata->points) * (this->level+1) )
+    {
+        send_to_char( "You raise a level!!  ", this );
+        this->level += 1;
+        sprintf(buf,"%s gained level %d",this->name,this->level);
+        log_string(buf);
+        sprintf(buf,"$N has attained level %d!",this->level);
+        this->advance_level(FALSE);
+        save_char_obj(this);
+        Wiznet::instance()->report( buf, this, NULL, WIZ_LEVELS, 0, 0 );
+    }
+
+    return;
+}
+
+
+
+/*
+ * Regeneration stuff.
+ */
+int CHAR_DATA::hit_gain( )
+{
+    int gain;
+    int number;
+
+    if (this->in_room == NULL)
+    return 0;
+
+    if ( IS_NPC(this) )
+    {
+    gain =  5 + this->level;
+    if (IS_AFFECTED(this,AFF_REGENERATION))
+        gain *= 2;
+
+    switch(this->position)
+    {
+        default :       gain /= 2;          break;
+        case POS_SLEEPING:  gain = 3 * gain/2;      break;
+        case POS_RESTING:                   break;
+        case POS_FIGHTING:  gain /= 3;          break;
+    }
+
+    
+    }
+    else
+    {
+    gain = UMAX(3,get_curr_stat(this,STAT_CON) - 3 + this->level/2); 
+    gain += class_table[this->class_num].hp_max - 10;
+    number = number_percent();
+    if (number < get_skill(this,gsn_fast_healing))
+    {
+        gain += number * gain / 100;
+        if (this->hit < this->max_hit)
+        check_improve(this,gsn_fast_healing,TRUE,8);
+    }
+
+    switch ( this->position )
+    {
+        default:        gain /= 4;          break;
+        case POS_SLEEPING:                  break;
+        case POS_RESTING:   gain /= 2;          break;
+        case POS_FIGHTING:  gain /= 6;          break;
+    }
+
+    if ( this->pcdata->condition[COND_HUNGER]   == 0 )
+        gain /= 2;
+
+    if ( this->pcdata->condition[COND_THIRST] == 0 )
+        gain /= 2;
+
+    }
+
+    gain = gain * this->in_room->heal_rate / 100;
+    
+    if (this->on != NULL && this->on->item_type == ITEM_FURNITURE)
+    gain = gain * this->on->value[3] / 100;
+
+    if ( IS_AFFECTED(this, AFF_POISON) )
+    gain /= 4;
+
+    if (IS_AFFECTED(this, AFF_PLAGUE))
+    gain /= 8;
+
+    if (IS_AFFECTED(this,AFF_HASTE) || IS_AFFECTED(this,AFF_SLOW))
+    gain /=2 ;
+
+    if (!IS_NPC(this) && this->pcdata->clan)
+    gain *= 1.5;
+
+    return UMIN(gain, this->max_hit - this->hit);
+}
+
+
+
+int CHAR_DATA::mana_gain( )
+{
+    int gain;
+    int number;
+
+    if (this->in_room == NULL)
+    return 0;
+
+    if ( IS_NPC(this) )
+    {
+    gain = 5 + this->level;
+    switch (this->position)
+    {
+        default:        gain /= 2;      break;
+        case POS_SLEEPING:  gain = 3 * gain/2;  break;
+        case POS_RESTING:               break;
+        case POS_FIGHTING:  gain /= 3;      break;
+        }
+    }
+    else
+    {
+    gain = (get_curr_stat(this,STAT_WIS) 
+          + get_curr_stat(this,STAT_INT) + this->level) / 2;
+    number = number_percent();
+    if (number < get_skill(this,gsn_meditation))
+    {
+        gain += number * gain / 100;
+        if (this->mana < this->max_mana)
+            check_improve(this,gsn_meditation,TRUE,8);
+    }
+    if (!class_table[this->class_num].fMana)
+        gain /= 2;
+
+    switch ( this->position )
+    {
+        default:        gain /= 4;          break;
+        case POS_SLEEPING:                  break;
+        case POS_RESTING:   gain /= 2;          break;
+        case POS_FIGHTING:  gain /= 6;          break;
+    }
+
+    if ( this->pcdata->condition[COND_HUNGER]   == 0 )
+        gain /= 2;
+
+    if ( this->pcdata->condition[COND_THIRST] == 0 )
+        gain /= 2;
+
+    }
+
+    gain = gain * this->in_room->mana_rate / 100;
+
+    if (this->on != NULL && this->on->item_type == ITEM_FURNITURE)
+    gain = gain * this->on->value[4] / 100;
+
+    if ( IS_AFFECTED( this, AFF_POISON ) )
+    gain /= 4;
+
+    if (IS_AFFECTED(this, AFF_PLAGUE))
+        gain /= 8;
+
+    if (IS_AFFECTED(this,AFF_HASTE) || IS_AFFECTED(this,AFF_SLOW))
+        gain /=2 ;
+
+    if (!IS_NPC(this) && this->pcdata->clan)
+    gain *= 1.5;
+
+    return UMIN(gain, this->max_mana - this->mana);
+}
+
+
+
+int CHAR_DATA::move_gain( )
+{
+    int gain;
+
+    if (this->in_room == NULL)
+    return 0;
+
+    if ( IS_NPC(this) )
+    {
+    gain = this->level;
+    }
+    else
+    {
+    gain = UMAX( 15, this->level );
+
+    switch ( this->position )
+    {
+    case POS_SLEEPING: gain += get_curr_stat(this,STAT_DEX);      break;
+    case POS_RESTING:  gain += get_curr_stat(this,STAT_DEX) / 2;  break;
+    }
+
+    if ( this->pcdata->condition[COND_HUNGER]   == 0 )
+        gain /= 2;
+
+    if ( this->pcdata->condition[COND_THIRST] == 0 )
+        gain /= 2;
+    }
+
+    gain = gain * this->in_room->heal_rate/100;
+
+    if (this->on != NULL && this->on->item_type == ITEM_FURNITURE)
+    gain = gain * this->on->value[3] / 100;
+
+    if ( IS_AFFECTED(this, AFF_POISON) )
+    gain /= 4;
+
+    if (IS_AFFECTED(this, AFF_PLAGUE))
+        gain /= 8;
+
+    if (IS_AFFECTED(this,AFF_HASTE) || IS_AFFECTED(this,AFF_SLOW))
+        gain /=2 ;
+
+    if (!IS_NPC(this) && this->pcdata->clan)
+    gain *= 1.5;
+
+    return UMIN(gain, this->max_move - this->move);
+}
+
+
+
+void CHAR_DATA::gain_condition( int iCond, int value )
+{
+    int condition;
+
+    if ( value == 0 || IS_NPC(this) || this->level >= LEVEL_IMMORTAL)
+    return;
+
+    condition               = this->pcdata->condition[iCond];
+    if (condition == -1)
+        return;
+    this->pcdata->condition[iCond]    = URANGE( 0, condition + value, 48 );
+
+    if ( this->pcdata->condition[iCond] == 0 )
+    {
+    switch ( iCond )
+    {
+    case COND_HUNGER:
+        send_to_char( "You are hungry.\n\r",  this );
+        break;
+
+    case COND_THIRST:
+        send_to_char( "You are thirsty.\n\r", this );
+        break;
+
+    case COND_DRUNK:
+        if ( condition != 0 )
+        send_to_char( "You are sober.\n\r", this );
+        break;
+    }
+    }
+
+    return;
 }

@@ -1482,7 +1482,7 @@ void do_recall( CHAR_DATA *ch, char *argument )
 	}
 
 	lose = (ch->desc != NULL) ? 25 : 50;
-	gain_exp( ch, 0 - lose );
+	ch->gain_exp( 0 - lose );
 	check_improve(ch,gsn_recall,TRUE,4);
 	sprintf( buf, "You recall from combat!  You lose %d exps.\n\r", lose );
 	send_to_char( buf, ch );

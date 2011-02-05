@@ -41,6 +41,7 @@
 #include "music.h"
 #include "tables.h"
 #include "lookup.h"
+#include "Wiznet.h"
 
 
 #if !defined(macintosh)
@@ -1552,7 +1553,7 @@ void area_update( void )
 
 	    reset_area( pArea );
 	    sprintf(buf,"%s has just been reset.",pArea->name);
-	    wiznet(buf,NULL,NULL,WIZ_RESETS,0,0);
+	    Wiznet::instance()->report(buf,NULL,NULL,WIZ_RESETS,0,0);
 	
 	    pArea->age = number_range( 0, 3 );
 	    pRoomIndex = get_room_index( ROOM_VNUM_SCHOOL );
@@ -3678,7 +3679,7 @@ void log_string( const char *str )
     strtime[strlen(strtime)-1] = '\0';
     fprintf( stderr, "%s :: %s\n", strtime, str );
     sprintf(strtime, "%s", str);
-    wiznet( strtime, 0, 0, WIZ_LOG, WIZ_SECURE, 0);
+    Wiznet::instance()->report( strtime, 0, 0, WIZ_LOG, WIZ_SECURE, 0);
     return;
 }
 

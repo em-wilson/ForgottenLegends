@@ -40,6 +40,7 @@
 #include "recycle.h"
 #include "tables.h"
 #include "lookup.h"
+#include "Wiznet.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_rstat		);
@@ -169,30 +170,6 @@ void do_wiznet( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-}
-
-void wiznet(const char *string, CHAR_DATA *ch, OBJ_DATA *obj,
-	    long flag, long flag_skip, int min_level) 
-{
-    DESCRIPTOR_DATA *d;
-
-    for ( d = descriptor_list; d != NULL; d = d->next )
-    {
-        if (d->connected == CON_PLAYING
-	&&  IS_IMMORTAL(d->character) 
-	&&  IS_SET(d->character->wiznet,WIZ_ON) 
-	&&  (!flag || IS_SET(d->character->wiznet,flag))
-	&&  (!flag_skip || !IS_SET(d->character->wiznet,flag_skip))
-	&&  get_trust(d->character) >= min_level
-	&&  d->character != ch)
-        {
-	    if (IS_SET(d->character->wiznet,WIZ_PREFIX))
-	  	send_to_char("--> ",d->character);
-            act_new(string,d->character,obj,ch,TO_CHAR,POS_DEAD);
-        }
-    }
- 
-    return;
 }
 
 void do_guild( CHAR_DATA *ch, char *argument )
@@ -351,7 +328,7 @@ void do_nochannels( CHAR_DATA *ch, char *argument )
 		      victim );
         send_to_char( "NOCHANNELS removed.\n\r", ch );
 	sprintf(buf,"$N restores channels to %s",victim->name);
-	wiznet(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
     else
     {
@@ -360,7 +337,7 @@ void do_nochannels( CHAR_DATA *ch, char *argument )
 		       victim );
         send_to_char( "NOCHANNELS set.\n\r", ch );
 	sprintf(buf,"$N revokes %s's channels.",victim->name);
-	wiznet(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
  
     return;
@@ -557,7 +534,7 @@ void do_deny( CHAR_DATA *ch, char *argument )
     SET_BIT(victim->act, PLR_DENY);
     send_to_char( "You are denied access!\n\r", victim );
     sprintf(buf,"$N denies access to %s",victim->name);
-    wiznet(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+    Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     send_to_char( "OK.\n\r", ch );
     save_char_obj(victim);
     stop_fighting(victim,TRUE);
@@ -2261,7 +2238,7 @@ void do_snoop( CHAR_DATA *ch, char *argument )
     if ( victim == ch )
     {
 	send_to_char( "Cancelling all snoops.\n\r", ch );
-	wiznet("$N stops being such a snoop.",
+	Wiznet::instance()->report("$N stops being such a snoop.",
 		ch,NULL,WIZ_SNOOPS,WIZ_SECURE,get_trust(ch));
 	for ( d = descriptor_list; d != NULL; d = d->next )
 	{
@@ -2306,7 +2283,7 @@ void do_snoop( CHAR_DATA *ch, char *argument )
     victim->desc->snoop_by = ch->desc;
     sprintf(buf,"$N starts snooping on %s",
 	(IS_NPC(ch) ? victim->short_descr : victim->name));
-    wiznet(buf,ch,NULL,WIZ_SNOOPS,WIZ_SECURE,get_trust(ch));
+    Wiznet::instance()->report(buf,ch,NULL,WIZ_SNOOPS,WIZ_SECURE,get_trust(ch));
     send_to_char( "Ok.\n\r", ch );
     return;
 }
@@ -2367,7 +2344,7 @@ void do_switch( CHAR_DATA *ch, char *argument )
     }
 
     sprintf(buf,"$N switches into %s",victim->short_descr);
-    wiznet(buf,ch,NULL,WIZ_SWITCHES,WIZ_SECURE,get_trust(ch));
+    Wiznet::instance()->report(buf,ch,NULL,WIZ_SWITCHES,WIZ_SECURE,get_trust(ch));
 
     ch->desc->character = victim;
     ch->desc->original  = ch;
@@ -2407,7 +2384,7 @@ void do_return( CHAR_DATA *ch, char *argument )
     }
 
     sprintf(buf,"$N returns from %s.",ch->short_descr);
-    wiznet(buf,ch->desc->original,0,WIZ_SWITCHES,WIZ_SECURE,get_trust(ch));
+    Wiznet::instance()->report(buf,ch->desc->original,0,WIZ_SWITCHES,WIZ_SECURE,get_trust(ch));
     ch->desc->character       = ch->desc->original;
     ch->desc->original        = NULL;
     ch->desc->character->desc = ch->desc; 
@@ -2515,7 +2492,7 @@ void do_clone(CHAR_DATA *ch, char *argument )
 
 	act("$n has created $p.",ch,clone,NULL,TO_ROOM);
 	act("You clone $p.",ch,clone,NULL,TO_CHAR);
-	wiznet("$N clones $p.",ch,clone,WIZ_LOAD,WIZ_SECURE,get_trust(ch));
+	Wiznet::instance()->report("$N clones $p.",ch,clone,WIZ_LOAD,WIZ_SECURE,get_trust(ch));
 	return;
     }
     else if (mob != NULL)
@@ -2559,7 +2536,7 @@ void do_clone(CHAR_DATA *ch, char *argument )
         act("$n has created $N.",ch,NULL,clone,TO_ROOM);
         act("You clone $N.",ch,NULL,clone,TO_CHAR);
 	sprintf(buf,"$N clones %s.",clone->short_descr);
-	wiznet(buf,ch,NULL,WIZ_LOAD,WIZ_SECURE,get_trust(ch));
+	Wiznet::instance()->report(buf,ch,NULL,WIZ_LOAD,WIZ_SECURE,get_trust(ch));
         return;
     }
 }
@@ -2621,7 +2598,7 @@ void do_mload( CHAR_DATA *ch, char *argument )
     char_to_room( victim, ch->in_room );
     act( "$n has created $N!", ch, NULL, victim, TO_ROOM );
     sprintf(buf,"$N loads %s.",victim->short_descr);
-    wiznet(buf,ch,NULL,WIZ_LOAD,WIZ_SECURE,get_trust(ch));
+    Wiznet::instance()->report(buf,ch,NULL,WIZ_LOAD,WIZ_SECURE,get_trust(ch));
     send_to_char( "Ok.\n\r", ch );
     return;
 }
@@ -2679,7 +2656,7 @@ void do_oload( CHAR_DATA *ch, char *argument )
     else
 	obj_to_room( obj, ch->in_room );
     act( "$n has created $p!", ch, obj, NULL, TO_ROOM );
-    wiznet("$N loads $p.",ch,obj,WIZ_LOAD,WIZ_SECURE,get_trust(ch));
+    Wiznet::instance()->report("$N loads $p.",ch,obj,WIZ_LOAD,WIZ_SECURE,get_trust(ch));
     send_to_char( "Ok.\n\r", ch );
     return;
 }
@@ -2829,7 +2806,7 @@ void do_advance( CHAR_DATA *ch, char *argument )
 	victim->hit      = victim->max_hit;
 	victim->mana     = victim->max_mana;
 	victim->move     = victim->max_move;
-	advance_level( victim, TRUE );
+	victim->advance_level( TRUE );
 	victim->practice = temp_prac;
     }
     else
@@ -2841,7 +2818,7 @@ void do_advance( CHAR_DATA *ch, char *argument )
     for ( iLevel = victim->level ; iLevel < level; iLevel++ )
     {
 	victim->level += 1;
-	advance_level( victim,TRUE);
+	victim->advance_level( TRUE);
     }
     sprintf(buf,"You are now level %d.\n\r",victim->level);
     send_to_char(buf,victim);
@@ -2922,7 +2899,7 @@ void do_restore( CHAR_DATA *ch, char *argument )
         }
 
         sprintf(buf,"$N restored room %d.",ch->in_room->vnum);
-        wiznet(buf,ch,NULL,WIZ_RESTORE,WIZ_SECURE,get_trust(ch));
+        Wiznet::instance()->report(buf,ch,NULL,WIZ_RESTORE,WIZ_SECURE,get_trust(ch));
         
         send_to_char("Room restored.\n\r",ch);
         return;
@@ -2975,7 +2952,7 @@ void do_restore( CHAR_DATA *ch, char *argument )
     act( "$n has restored you.", ch, NULL, victim, TO_VICT );
     sprintf(buf,"$N restored %s",
 	IS_NPC(victim) ? victim->short_descr : victim->name);
-    wiznet(buf,ch,NULL,WIZ_RESTORE,WIZ_SECURE,get_trust(ch));
+    Wiznet::instance()->report(buf,ch,NULL,WIZ_RESTORE,WIZ_SECURE,get_trust(ch));
     send_to_char( "Ok.\n\r", ch );
     return;
 }
@@ -3018,7 +2995,7 @@ void do_freeze( CHAR_DATA *ch, char *argument )
 	send_to_char( "You can play again.\n\r", victim );
 	send_to_char( "FREEZE removed.\n\r", ch );
 	sprintf(buf,"$N thaws %s.",victim->name);
-	wiznet(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
     else
     {
@@ -3026,7 +3003,7 @@ void do_freeze( CHAR_DATA *ch, char *argument )
 	send_to_char( "You can't do ANYthing!\n\r", victim );
 	send_to_char( "FREEZE set.\n\r", ch );
 	sprintf(buf,"$N puts %s in the deep freeze.",victim->name);
-	wiznet(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
 
     save_char_obj( victim );
@@ -3127,7 +3104,7 @@ void do_noemote( CHAR_DATA *ch, char *argument )
 	send_to_char( "You can emote again.\n\r", victim );
 	send_to_char( "NOEMOTE removed.\n\r", ch );
 	sprintf(buf,"$N restores emotes to %s.",victim->name);
-	wiznet(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
     else
     {
@@ -3135,7 +3112,7 @@ void do_noemote( CHAR_DATA *ch, char *argument )
 	send_to_char( "You can't emote!\n\r", victim );
 	send_to_char( "NOEMOTE set.\n\r", ch );
 	sprintf(buf,"$N revokes %s's emotes.",victim->name);
-	wiznet(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
 
     return;
@@ -3180,7 +3157,7 @@ void do_noshout( CHAR_DATA *ch, char *argument )
 	send_to_char( "You can shout again.\n\r", victim );
 	send_to_char( "NOSHOUT removed.\n\r", ch );
 	sprintf(buf,"$N restores shouts to %s.",victim->name);
-	wiznet(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
     else
     {
@@ -3188,7 +3165,7 @@ void do_noshout( CHAR_DATA *ch, char *argument )
 	send_to_char( "You can't shout!\n\r", victim );
 	send_to_char( "NOSHOUT set.\n\r", ch );
 	sprintf(buf,"$N revokes %s's shouts.",victim->name);
-	wiznet(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
 
     return;
@@ -3227,7 +3204,7 @@ void do_notell( CHAR_DATA *ch, char *argument )
 	send_to_char( "You can tell again.\n\r", victim );
 	send_to_char( "NOTELL removed.\n\r", ch );
 	sprintf(buf,"$N restores tells to %s.",victim->name);
-	wiznet(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
     else
     {
@@ -3235,7 +3212,7 @@ void do_notell( CHAR_DATA *ch, char *argument )
 	send_to_char( "You can't tell!\n\r", victim );
 	send_to_char( "NOTELL set.\n\r", ch );
 	sprintf(buf,"$N revokes %s's tells.",victim->name);
-	wiznet(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
 
     return;
@@ -3268,12 +3245,12 @@ void do_wizlock( CHAR_DATA *ch, char *argument )
 
     if ( wizlock )
     {
-	wiznet("$N has wizlocked the game.",ch,NULL,0,0,0);
+	Wiznet::instance()->report("$N has wizlocked the game.",ch,NULL,0,0,0);
 	send_to_char( "Game wizlocked.\n\r", ch );
     }
     else
     {
-	wiznet("$N removes wizlock.",ch,NULL,0,0,0);
+	Wiznet::instance()->report("$N removes wizlock.",ch,NULL,0,0,0);
 	send_to_char( "Game un-wizlocked.\n\r", ch );
     }
 
@@ -3289,12 +3266,12 @@ void do_newlock( CHAR_DATA *ch, char *argument )
  
     if ( newlock )
     {
-	wiznet("$N locks out new characters.",ch,NULL,0,0,0);
+	Wiznet::instance()->report("$N locks out new characters.",ch,NULL,0,0,0);
         send_to_char( "New characters have been locked out.\n\r", ch );
     }
     else
     {
-	wiznet("$N allows new characters back in.",ch,NULL,0,0,0);
+	Wiznet::instance()->report("$N allows new characters back in.",ch,NULL,0,0,0);
         send_to_char( "Newlock removed.\n\r", ch );
     }
  
@@ -5070,7 +5047,7 @@ void do_bonus( CHAR_DATA *ch, char *argument)
 	return;
     }
 
-    gain_exp(victim, value);
+    victim->gain_exp( value );
    
     sprintf( buf,"You have bonused %s a whopping %d experience points.\n\r",
     		victim->name, value);
