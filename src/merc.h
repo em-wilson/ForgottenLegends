@@ -145,7 +145,7 @@ typedef void SPELL_FUN	args( ( int sn, int level, CHAR_DATA *ch, void *vo,
 #define PULSE_VIOLENCE		  ( 3 * PULSE_PER_SECOND)
 #define PULSE_MOBILE		  ( 4 * PULSE_PER_SECOND)
 #define PULSE_MUSIC		  (12 * PULSE_PER_SECOND)
-#define PULSE_INFO		  (20 * PULSE_PER_SECOND)
+#define PULSE_INFO		  (5 * 60 * PULSE_PER_SECOND)
 #define PULSE_TICK		  (60 * PULSE_PER_SECOND)
 #define PULSE_AREA		  (120 * PULSE_PER_SECOND)
 

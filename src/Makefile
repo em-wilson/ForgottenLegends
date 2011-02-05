@@ -15,5 +15,5 @@ rom: $(O_FILES)
 	rm -f rom
 	$(CC) $(L_FLAGS) -o rom $(O_FILES)
 
-.c.o: merc.h
+.cpp.o: merc.h
 	$(CC) -c $(C_FLAGS) $<
