@@ -347,7 +347,7 @@ void do_play(CHAR_DATA *ch, char *argument)
 	DESCRIPTOR_DATA *d;
 
 		sprintf(buf, "This next song dedicated to %s by %s.",
-			dedicate->name, ch->name);
+			dedicate->getName(), ch->getName());
 
 	    for (d = descriptor_list; d != NULL; d = d->next)
 	    {

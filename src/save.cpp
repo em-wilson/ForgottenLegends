@@ -118,7 +118,7 @@ void save_char_obj( CHAR_DATA *ch )
     if (IS_IMMORTAL(ch) || ch->level >= LEVEL_IMMORTAL)
     {
 	fclose(fpReserve);
-	sprintf(strsave, "%s%s",GOD_DIR, capitalize(ch->name));
+	sprintf(strsave, "%s%s",GOD_DIR, capitalize(ch->getName()));
 	if ((fp = fopen(strsave,"w")) == NULL)
 	{
 	    bug("Save_char_obj: fopen",0);
@@ -126,13 +126,13 @@ void save_char_obj( CHAR_DATA *ch )
  	}
 
 	fprintf(fp,"Lev %2d Trust %2d  %s%s\n",
-	    ch->level, get_trust(ch), ch->name, ch->pcdata->title);
+	    ch->level, get_trust(ch), ch->getName(), ch->pcdata->title);
 	fclose( fp );
 	fpReserve = fopen( NULL_FILE, "r" );
     }
 
     fclose( fpReserve );
-    sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( ch->name ) );
+    sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( ch->getName() ) );
     if ( ( fp = fopen( TEMP_FILE, "w" ) ) == NULL )
     {
 	bug( "Save_char_obj: fopen", 0 );
@@ -166,7 +166,7 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
 
     fprintf( fp, "#%s\n", IS_NPC(ch) ? "MOB" : "PLAYER"	);
 
-    fprintf( fp, "Name %s~\n",	ch->name		);
+    fprintf( fp, "Name %s~\n",	ch->getName()		);
     fprintf( fp, "Id   %ld\n", ch->id			);
     fprintf( fp, "LogO %ld\n",	current_time		);
     fprintf( fp, "Vers %d\n",   5			);
@@ -174,8 +174,8 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
       	fprintf( fp, "ShD  %s~\n",	ch->short_descr	);
     if( ch->long_descr[0] != '\0')
 	fprintf( fp, "LnD  %s~\n",	ch->long_descr	);
-    if (ch->description[0] != '\0')
-    	fprintf( fp, "Desc %s~\n",	ch->description	);
+    if ( ch->getDescription() )
+    	fprintf( fp, "Desc %s~\n",	ch->getDescription()	);
     if (ch->prompt != NULL || !str_cmp(ch->prompt,"<%X to level>%c<%h/%Hhp %m/%Mm %v/%Vmv> "))
         fprintf( fp, "Prom %s~\n",      ch->prompt  	);
     fprintf( fp, "Race %s~\n", pc_race_table[ch->race].name );
@@ -362,14 +362,14 @@ void fwrite_pet( CHAR_DATA *pet, FILE *fp)
     
     fprintf(fp,"Vnum %d\n",pet->pIndexData->vnum);
     
-    fprintf(fp,"Name %s~\n", pet->name);
+    fprintf(fp,"Name %s~\n", pet->getName());
     fprintf(fp,"LogO %ld\n", current_time);
     if (pet->short_descr != pet->pIndexData->short_descr)
     	fprintf(fp,"ShD  %s~\n", pet->short_descr);
     if (pet->long_descr != pet->pIndexData->long_descr)
     	fprintf(fp,"LnD  %s~\n", pet->long_descr);
-    if (pet->description != pet->pIndexData->description)
-    	fprintf(fp,"Desc %s~\n", pet->description);
+    if (pet->getDescription() && pet->getDescription() != pet->pIndexData->description )
+    	fprintf(fp,"Desc %s~\n", pet->getDescription());
     if (pet->race != pet->pIndexData->race)
     	fprintf(fp,"Race %s~\n", race_table[pet->race].name);
     fprintf(fp,"Sex  %d\n", pet->sex);
@@ -575,7 +575,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 
     d->character			= ch;
     ch->desc				= d;
-    ch->name				= str_dup( name );
+    ch->setName(name);
     ch->id				= get_pc_id();
     ch->race				= race_lookup("human");
     ch->act				= PLR_NOSUMMON;
@@ -751,6 +751,21 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 				    break;				\
 				}
 
+/* set a string variable in a class */
+#if defined(CKEYS)
+#undef CKEYS
+#endif
+
+#define CKEYS( literal, func, value )               \
+                if ( !str_cmp( word, literal ) )    \
+                {                                   \
+                    char * val = value;             \
+                    func( val );                    \
+                    free_string( val );             \
+                    fMatch = TRUE;                  \
+                    break;                          \
+                }
+
 void fread_char( CHAR_DATA *ch, FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];
@@ -760,7 +775,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
     int lastlogoff = current_time;
     int percent;
 
-    sprintf(buf,"Loading %s.",ch->name);
+    sprintf(buf,"Loading %s.",ch->getName());
     log_string(buf);
 
     for ( ; ; )
@@ -921,7 +936,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
                     if (i == BOARD_NOTFOUND) /* Does board still exist ? */
                      {
                         sprintf (buf, "fread_char: %s had unknown board name: %s. Skipped.",
-                            ch->name, boardname);
+                            ch->getName(), boardname);
                         log_string (buf);
                         fread_number (fp); /* read last_note and skip info */
                     }
@@ -962,8 +977,8 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
 	case 'D':
 	    KEY( "Damroll",	ch->damroll,		fread_number( fp ) );
 	    KEY( "Dam",		ch->damroll,		fread_number( fp ) );
-	    KEY( "Description",	ch->description,	fread_string( fp ) );
-	    KEY( "Desc",	ch->description,	fread_string( fp ) );
+        CKEYS( "Description",	ch->setDescription,	fread_string( fp ) );
+	    CKEYS( "Desc",	        ch->setDescription,	fread_string( fp ) );
 	    KEY( "Done",	ch->done,		fread_flag( fp ) );
 	    KEY( "Drac",	ch->drac,		fread_number( fp ) );
 	    break;
@@ -1070,7 +1085,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
 	    break;
 
 	case 'N':
-	    KEYS( "Name",	ch->name,		fread_string( fp ) );
+        CKEYS( "Name",  ch->setName,        fread_string( fp ) );
 	    break;
 
 	case 'O':
@@ -1352,7 +1367,7 @@ void fread_pet( CHAR_DATA *ch, FILE *fp )
     	     
     	 case 'D':
     	     KEY( "Dam",	pet->damroll,		fread_number(fp));
-    	     KEY( "Desc",	pet->description,	fread_string(fp));
+    	     CKEYS( "Desc",	pet->setDescription,	fread_string(fp));
     	     break;
     	     
     	 case 'E':
@@ -1404,7 +1419,7 @@ void fread_pet( CHAR_DATA *ch, FILE *fp )
     	     break;
     	     
     	case 'N':
-    	     KEY( "Name",	pet->name,		fread_string(fp));
+            CKEYS( "Name",  pet->setName,   fread_string(fp) );
     	     break;
     	     
     	case 'P':

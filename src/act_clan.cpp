@@ -83,7 +83,7 @@ void do_join( CHAR_DATA *ch, char *argument )
 
 void do_cedit( CHAR_DATA *ch, char *argument )
 {
-    if (!IS_CLANNED(ch) || str_cmp(ch->name,ch->pcdata->clan->leader))
+    if (!IS_CLANNED(ch) || str_cmp(ch->getName(),ch->pcdata->clan->leader))
     {
 	send_to_char("Only clan leaders may use this command.",ch);
 	return;

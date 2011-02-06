@@ -1935,10 +1935,10 @@ CHAR_DATA *create_mobile( MOB_INDEX_DATA *pMobIndex )
 
     mob->pIndexData	= pMobIndex;
 
-    mob->name		= str_dup( pMobIndex->player_name );    /* OLC */
+    mob->setName( pMobIndex->player_name );    /* OLC */
     mob->short_descr	= str_dup( pMobIndex->short_descr );    /* OLC */
     mob->long_descr	= str_dup( pMobIndex->long_descr );     /* OLC */
-    mob->description	= str_dup( pMobIndex->description );    /* OLC */
+    mob->setDescription( pMobIndex->description );    /* OLC */
     mob->id		= get_mob_id();
     mob->spec_fun	= pMobIndex->spec_fun;
     mob->prompt		= NULL;
@@ -2154,11 +2154,11 @@ void clone_mobile(CHAR_DATA *parent, CHAR_DATA *clone)
 	return;
     
     /* start fixing values */ 
-    clone->name 	= str_dup(parent->name);
+    clone->setName(parent->getName());
     clone->version	= parent->version;
     clone->short_descr	= str_dup(parent->short_descr);
     clone->long_descr	= str_dup(parent->long_descr);
-    clone->description	= str_dup(parent->description);
+    clone->setDescription(parent->getDescription());
     clone->group	= parent->group;
     clone->sex		= parent->sex;
     clone->class_num= parent->class_num;
@@ -2421,40 +2421,6 @@ void clone_object(OBJ_DATA *parent, OBJ_DATA *clone)
 }
 
 
-
-/*
- * Clear a new character.
- */
-void clear_char( CHAR_DATA *ch )
-{
-    static CHAR_DATA ch_zero;
-    int i;
-
-    *ch				= ch_zero;
-    ch->name			= &str_empty[0];
-    ch->short_descr		= &str_empty[0];
-    ch->long_descr		= &str_empty[0];
-    ch->description		= &str_empty[0];
-    ch->prompt                  = &str_empty[0];
-    ch->logon			= current_time;
-    ch->lines			= PAGELEN;
-    for (i = 0; i < 4; i++)
-    	ch->armor[i]		= 100;
-    ch->position		= POS_STANDING;
-    ch->hit			= 20;
-    ch->max_hit			= 20;
-    ch->mana			= 100;
-    ch->max_mana		= 100;
-    ch->move			= 100;
-    ch->max_move		= 100;
-    ch->on			= NULL;
-    for (i = 0; i < MAX_STATS; i ++)
-    {
-	ch->perm_stat[i] = 13; 
-	ch->mod_stat[i] = 0;
-    }
-    return;
-}
 
 /*
  * Get an extra description from a list.
@@ -3601,7 +3567,7 @@ void append_file( CHAR_DATA *ch, const char *file, const char *str )
     else
     {
 	fprintf( fp, "[%5d] %s: %s\n",
-	    ch->in_room ? ch->in_room->vnum : 0, ch->name, str );
+	    ch->in_room ? ch->in_room->vnum : 0, ch->getName(), str );
 	fclose( fp );
     }
 

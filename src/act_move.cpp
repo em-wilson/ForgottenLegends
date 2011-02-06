@@ -209,7 +209,7 @@ void move_char( CHAR_DATA *ch, int door, bool follow )
 	    if (IS_BUNNY(fch))
 	    {
 		char buf[MSL];
-		sprintf(buf,"%s leaves %s.\n\r", can_see(ch,fch) ? ch->name : "someone", dir_name[door] );
+		sprintf(buf,"%s leaves %s.\n\r", can_see(ch,fch) ? ch->getName() : "someone", dir_name[door] );
 		send_to_char(buf,ch);
 	    }
 

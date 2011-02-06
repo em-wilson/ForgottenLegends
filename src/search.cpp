@@ -392,7 +392,7 @@ void who_html_update (void)
 	fprintf(fp, "%2d ", wch->level );
 	fprintf(fp, "<FONT COLOR=""#808000"">%6s ", race );
 	fprintf(fp, "<FONT COLOR=""#FFFFFF"">%s<FONT COLOR=""#C0C0C0"">] ", class_name );
-	fprintf(fp, "%s", wch->name);
+	fprintf(fp, "%s", wch->getName());
 	buf[0] = '\0';
 	buf2 = str_dup(wch->pcdata->title);
 //      sprintf(buf2, "%s", wch->pcdata->title);

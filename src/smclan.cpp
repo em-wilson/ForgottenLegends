@@ -393,9 +393,9 @@ void do_induct( CHAR_DATA *ch, char *argument )
 
     clan = ch->pcdata->clan;
     
-    if ( !str_cmp( ch->name, clan->leader  )
-    ||   !str_cmp( ch->name, clan->number1 )
-    ||   !str_cmp( ch->name, clan->number2 ) )
+    if ( !str_cmp( ch->getName(), clan->leader  )
+    ||   !str_cmp( ch->getName(), clan->number1 )
+    ||   !str_cmp( ch->getName(), clan->number2 ) )
 	;
     else
     {
@@ -468,9 +468,9 @@ void do_outcast( CHAR_DATA *ch, char *argument )
 
     clan = ch->pcdata->clan;
 
-    if ( !str_cmp( ch->name, clan->leader  )
-    ||   !str_cmp( ch->name, clan->number1 )
-    ||   !str_cmp( ch->name, clan->number2 ) )
+    if ( !str_cmp( ch->getName(), clan->leader  )
+    ||   !str_cmp( ch->getName(), clan->number1 )
+    ||   !str_cmp( ch->getName(), clan->number2 ) )
 	;
     else
     {
@@ -510,18 +510,18 @@ void do_outcast( CHAR_DATA *ch, char *argument )
 	    send_to_char( "This player does not belong to your clan!\n\r", ch );
 	    return;
     }
-    if ( !str_cmp(victim->name, ch->pcdata->clan->leader ) )
+    if ( !str_cmp(victim->getName(), ch->pcdata->clan->leader ) )
     {
 	send_to_char("You cannot loner your own leader!\n\r",ch);
 	return;
     }
     --clan->members;
-    if ( !str_cmp( victim->name, ch->pcdata->clan->number1 ) )
+    if ( !str_cmp( victim->getName(), ch->pcdata->clan->number1 ) )
     {
 	free_string( ch->pcdata->clan->number1 );
 	ch->pcdata->clan->number1 = str_dup( "" );
     }
-    if ( !str_cmp( victim->name, ch->pcdata->clan->number2 ) )
+    if ( !str_cmp( victim->getName(), ch->pcdata->clan->number2 ) )
     {
 	free_string( ch->pcdata->clan->number2 );
 	ch->pcdata->clan->number2 = str_dup( "" );
@@ -834,11 +834,11 @@ if (get_trust(ch) < MAX_LEVEL)
     clan->motto		= str_dup( "" );
     clan->description	= str_dup( "" );
     free_string( clan->leader );
-    clan->leader	= str_dup( leader->name );
+    clan->leader	= str_dup( leader->getName() );
     free_string( clan->number1 );
-    clan->number1	= str_dup( rec1->name );
+    clan->number1	= str_dup( rec1->getName() );
     free_string( clan->number2 );
-    clan->number2	= str_dup( rec2->name );
+    clan->number2	= str_dup( rec2->getName() );
     free_string( clan->filename );
     clan->filename	= str_dup( filename );
     SET_BIT( clan->flags, CLAN_PK );

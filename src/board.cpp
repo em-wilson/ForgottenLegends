@@ -404,7 +404,7 @@ void load_boards ()
 /* Returns TRUE if the specified note is address to ch */
 bool is_note_to (CHAR_DATA *ch, NOTE_DATA *note)
 {
-	if (!str_cmp (ch->name, note->sender))
+	if (!str_cmp (ch->getName(), note->sender))
 		return TRUE;
 	
 	if (is_full_name ("all", note->to_list))
@@ -426,7 +426,7 @@ bool is_note_to (CHAR_DATA *ch, NOTE_DATA *note)
 		is_full_name ("implementors", note->to_list)))
 		return TRUE;
 		
-	if (is_full_name (ch->name, note->to_list))
+	if (is_full_name (ch->getName(), note->to_list))
 		return TRUE;
 
 	/* Allow a note to e.g. 40 to send to characters level 40 and above */		
@@ -499,7 +499,7 @@ static void do_nwrite (CHAR_DATA *ch, char *argument)
 	if (!ch->pcdata->in_progress)
 	{
 		ch->pcdata->in_progress = new NOTE_DATA();
-		ch->pcdata->in_progress->sender = str_dup (ch->name);
+		ch->pcdata->in_progress->sender = str_dup (ch->getName());
 
 		/* convert to ascii. ctime returns a string which last character is \n, so remove that */	
 		strtime = ctime (&current_time);
@@ -526,7 +526,7 @@ static void do_nwrite (CHAR_DATA *ch, char *argument)
 	               ch->pcdata->board->short_name);
 	send_to_char (buf,ch);
 	
-	sprintf (buf, BOLD YELLOW "From" NO_COLOR ":    %s\n\r\n\r", ch->name);
+	sprintf (buf, BOLD YELLOW "From" NO_COLOR ":    %s\n\r\n\r", ch->getName());
 	send_to_char (buf,ch);
 
 	if (!ch->pcdata->in_progress->text) /* Are we continuing an old note or not? */
@@ -659,7 +659,7 @@ static void do_nremove (CHAR_DATA *ch, char *argument)
 		return;
 	}
 	
-	if (str_cmp(ch->name,p->sender) && (get_trust(ch) < MAX_LEVEL))
+	if (str_cmp(ch->getName(),p->sender) && (get_trust(ch) < MAX_LEVEL))
 	{
 		send_to_char ("You are not authorized to remove this note.\n\r",ch);
 		return;

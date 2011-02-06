@@ -2,6 +2,7 @@
 #define CHARDATA_H
 
 #include <list>
+#include <string>
 #include "pc_data.h"
 
 /*
@@ -34,12 +35,10 @@ public:
     GEN_DATA *		gen_data;
     bool		valid;
     bool		confirm_reclass;
-    char *		name;
     long		id;
     sh_int		version;
     char *		short_descr;
     char *		long_descr;
-    char *		description;
     char *		prompt;
     char *		prefix;
     sh_int		group;
@@ -134,5 +133,12 @@ public:
     int mana_gain( );
     int move_gain( );
     void gain_condition( int iCond, int value );
+    void setName( const char * name );
+    char * getName();
+    void setDescription( const char * description );
+    char * getDescription();
+private:
+    std::string _name;
+    std::string _description;
 };
 #endif

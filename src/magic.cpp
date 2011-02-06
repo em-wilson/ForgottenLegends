@@ -429,7 +429,7 @@ void do_cast( CHAR_DATA *ch, char *argument )
 	break;
 
     case TAR_CHAR_SELF:
-	if ( arg2[0] != '\0' && !is_name( target_name, ch->name ) )
+	if ( arg2[0] != '\0' && !is_name( target_name, ch->getName() ) )
 	{
 	    send_to_char( "You cannot cast this spell on another.\n\r", ch );
 	    return;
@@ -4404,7 +4404,7 @@ void spell_ventriloquate( int sn, int level, CHAR_DATA *ch,void *vo,int target)
 
     for ( vch = ch->in_room->people; vch != NULL; vch = vch->next_in_room )
     {
-	if (!is_exact_name( speaker, vch->name) && IS_AWAKE(vch))
+	if (!is_exact_name( speaker, vch->getName()) && IS_AWAKE(vch))
 	    send_to_char( saves_spell(level,vch,DAM_OTHER) ? buf2 : buf1, vch );
     }
 

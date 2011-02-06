@@ -70,7 +70,7 @@ void do_delete( CHAR_DATA *ch, char *argument)
 	}
 	else
 	{
-    	    sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( ch->name ) );
+    	    sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( ch->getName() ) );
 	    Wiznet::instance()->report("$N turns $Mself into line noise.",ch,NULL,0,0,0);
 	    stop_fighting(ch,TRUE);
 	    if (ch->pcdata->clan)
@@ -920,7 +920,7 @@ void do_reply( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    sprintf(buf,"%s %s", ch->reply->name, argument );
+    sprintf(buf,"%s %s", ch->reply->getName(), argument );
     do_tell(ch,buf);
     return;
 }
@@ -1015,7 +1015,7 @@ void do_pmote( CHAR_DATA *ch, char *argument )
 	if (vch->desc == NULL || vch == ch)
 	    continue;
 
-	if ((letter = strstr(argument,vch->name)) == NULL)
+	if ((letter = strstr(argument,vch->getName())) == NULL)
 	{
 	    MOBtrigger = FALSE;
 	    act("$N $t",vch,argument,ch,TO_CHAR);
@@ -1026,23 +1026,23 @@ void do_pmote( CHAR_DATA *ch, char *argument )
 	strcpy(temp,argument);
 	temp[strlen(argument) - strlen(letter)] = '\0';
    	last[0] = '\0';
- 	name = vch->name;
+ 	name = vch->getName();
 	
 	for (; *letter != '\0'; letter++)
 	{ 
-	    if (*letter == '\'' && matches == strlen(vch->name))
+	    if (*letter == '\'' && matches == strlen(vch->getName()))
 	    {
 		strcat(temp,"r");
 		continue;
 	    }
 
-	    if (*letter == 's' && matches == strlen(vch->name))
+	    if (*letter == 's' && matches == strlen(vch->getName()))
 	    {
 		matches = 0;
 		continue;
 	    }
 	    
- 	    if (matches == strlen(vch->name))
+ 	    if (matches == strlen(vch->getName()))
 	    {
 		matches = 0;
 	    }
@@ -1051,11 +1051,11 @@ void do_pmote( CHAR_DATA *ch, char *argument )
 	    {
 		matches++;
 		name++;
-		if (matches == strlen(vch->name))
+		if (matches == strlen(vch->getName()))
 		{
 		    strcat(temp,"you");
 		    last[0] = '\0';
-		    name = vch->name;
+		    name = vch->getName();
 		    continue;
 		}
 		strncat(last,letter,1);
@@ -1066,7 +1066,7 @@ void do_pmote( CHAR_DATA *ch, char *argument )
 	    strcat(temp,last);
 	    strncat(temp,letter,1);
 	    last[0] = '\0';
-	    name = vch->name;
+	    name = vch->getName();
 	}
 
 	MOBtrigger = FALSE;
@@ -1403,7 +1403,7 @@ And there {Rw{ra{Rs{x {CIndustrial {WLight{x and {MMagic{x\n\r"
 
     send_to_char("'Good, bad, I'm the guy with the gun.' -Ash\n\r",ch);
     act( "$n has left the game.", ch, NULL, NULL, TO_ROOM );
-    sprintf( log_buf, "%s has quit.", ch->name );
+    sprintf( log_buf, "%s has quit.", ch->getName() );
     log_string( log_buf );
      Wiznet::instance()->report("$N rejoins the real world.",ch,NULL,WIZ_LOGINS,0,get_trust(ch));
 

@@ -923,8 +923,8 @@ bool damage(CHAR_DATA *ch,CHAR_DATA *victim,int dam,int dt,int dam_type,
 	if ( !IS_NPC(victim) )
 	{
 	    sprintf( log_buf, "%s killed by %s at %d",
-		victim->name,
-		(IS_NPC(ch) ? ch->short_descr : ch->name),
+		victim->getName(),
+		(IS_NPC(ch) ? ch->short_descr : ch->getName()),
 		ch->in_room->vnum );
 	    log_string( log_buf );
 
@@ -939,8 +939,8 @@ bool damage(CHAR_DATA *ch,CHAR_DATA *victim,int dam,int dt,int dam_type,
 	}
 
         sprintf( log_buf, "%s got toasted by %s at %s [room %d]",
-            (IS_NPC(victim) ? victim->short_descr : victim->name),
-            (IS_NPC(ch) ? ch->short_descr : ch->name),
+            (IS_NPC(victim) ? victim->short_descr : victim->getName()),
+            (IS_NPC(ch) ? ch->short_descr : ch->getName()),
             ch->in_room->name, ch->in_room->vnum);
  
         if (IS_NPC(victim))
@@ -1291,8 +1291,8 @@ dam_type, bool show ) {
 	if ( !IS_NPC(victim) )
 	{
 	    sprintf( log_buf, "%s killed by %s at %d",
-		victim->name,
-		(IS_NPC(ch) ? ch->short_descr : ch->name),
+		victim->getName(),
+		(IS_NPC(ch) ? ch->short_descr : ch->getName()),
 		victim->in_room->vnum );
 	    log_string( log_buf );
 
@@ -1307,8 +1307,8 @@ dam_type, bool show ) {
 	}
 
         sprintf( log_buf, "%s got toasted by %s at %s [room %d]",
-            (IS_NPC(victim) ? victim->short_descr : victim->name),
-            (IS_NPC(ch) ? ch->short_descr : ch->name),
+            (IS_NPC(victim) ? victim->short_descr : victim->getName()),
+            (IS_NPC(ch) ? ch->short_descr : ch->getName()),
             ch->in_room->name, ch->in_room->vnum);
  
         if (IS_NPC(victim))
@@ -1658,7 +1658,7 @@ void check_killer( CHAR_DATA *ch, CHAR_DATA *victim )
 	    char buf[MAX_STRING_LENGTH];
 
 	    sprintf( buf, "Check_killer: %s bad AFF_CHARM",
-		IS_NPC(ch) ? ch->short_descr : ch->name );
+		IS_NPC(ch) ? ch->short_descr : ch->getName() );
 	    bug( buf, 0 );
 	    affect_strip( ch, gsn_charm_person );
 	    REMOVE_BIT( ch->affected_by, AFF_CHARM );
@@ -1682,7 +1682,7 @@ void check_killer( CHAR_DATA *ch, CHAR_DATA *victim )
     ||	 ch->fighting  == victim)
 	return;
 
-    sprintf(buf,"$N is attempting to murder %s",victim->name);
+    sprintf(buf,"$N is attempting to murder %s",victim->getName());
     Wiznet::instance()->report(buf,ch,NULL,WIZ_FLAGS,0,0);
     save_char_obj( ch );
     return;
@@ -1881,12 +1881,12 @@ void make_corpse( CHAR_DATA *ch )
     }
     else
     {
-	name		= ch->name;
+	name		= ch->getName();
 	corpse		= create_object(get_obj_index(OBJ_VNUM_CORPSE_PC), 0);
 	corpse->timer	= number_range( 25, 40 );
 	REMOVE_BIT(ch->act,PLR_CANLOOT);
 	if (!IS_CLANNED(ch))
-	    corpse->owner = str_dup(ch->name);
+	    corpse->owner = str_dup(ch->getName());
 	else
 	{
 	    corpse->owner = NULL;
@@ -2043,7 +2043,7 @@ void death_cry( CHAR_DATA *ch )
 	OBJ_DATA *obj;
 	char *name;
 
-	name		= IS_NPC(ch) ? ch->short_descr : ch->name;
+	name		= IS_NPC(ch) ? ch->short_descr : ch->getName();
 	obj		= create_object( get_obj_index( vnum ), 0 );
 	obj->timer	= number_range( 4, 7 );
 
@@ -3044,7 +3044,7 @@ void do_murder( CHAR_DATA *ch, char *argument )
     if (IS_NPC(ch))
 	sprintf(buf, "Help! I am being attacked by %s!",ch->short_descr);
     else
-    	sprintf( buf, "Help!  I am being attacked by %s!", ch->name );
+    	sprintf( buf, "Help!  I am being attacked by %s!", ch->getName() );
     do_yell( victim, buf );
     check_killer( ch, victim );
     multi_hit( ch, victim, TYPE_UNDEFINED );
@@ -3800,7 +3800,7 @@ void do_assassinate( CHAR_DATA *ch, char *argument )
 	  do_yell(victim, (char*)"Help! Someone tried to assassinate me!");
 	else
 	  {
-	    sprintf( buf, "Help! %s tried to assassinate me!", ch->name );
+	    sprintf( buf, "Help! %s tried to assassinate me!", ch->getName() );
 	    do_yell( victim, buf );
 	  }
       }
@@ -3876,7 +3876,7 @@ void do_strangle(CHAR_DATA *ch, char *argument)
 	  do_yell(victim, (char*)"Help! I'm being strangled by someone!");
 	else
 	  {
-	    sprintf(buf, "Help! I'm being strangled by %s!", ch->name );
+	    sprintf(buf, "Help! I'm being strangled by %s!", ch->getName() );
 	    if (!IS_NPC(victim)) do_yell(victim,buf);
 	  }
       }
@@ -3965,7 +3965,7 @@ void do_blackjack(CHAR_DATA *ch, char *argument)
 	  do_yell(victim, (char*)"Help! I'm being blackjacked by someone!");
 	else
 	  {
-	    sprintf(buf, "Help! I'm being blackjacked by %s!", ch->name );
+	    sprintf(buf, "Help! I'm being blackjacked by %s!", ch->getName() );
 	    if (!IS_NPC(victim)) do_yell(victim,buf);
 	  }
 	}

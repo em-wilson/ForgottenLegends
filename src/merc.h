@@ -1978,7 +1978,7 @@ do                                                              \
 #define IS_SWITCHED( ch )       ( ch->desc && ch->desc->original )
 #define IS_BUILDER(ch, Area)	( !IS_NPC(ch) && !IS_SWITCHED( ch ) &&	  \
 				( ch->pcdata->security >= Area->security  \
-				|| strstr( Area->builders, ch->name )	  \
+				|| strstr( Area->builders, ch->getName() )	  \
 				|| strstr( Area->builders, "All" ) ) )
 #define IS_CLANNED(ch)          (!IS_NPC(ch)                             \
                                 && ch->pcdata->clan != NULL)
@@ -2013,7 +2013,7 @@ do                                                              \
  */
 #define PERS(ch, looker)	( can_see( looker, (ch) ) ?		\
 				( IS_NPC(ch) ? (ch)->short_descr	\
-				: (ch)->name ) : "someone" )
+				: (ch)->getName() ) : "someone" )
 
 /*
  * Structure for a social in the socials table.
@@ -2294,7 +2294,6 @@ CD *	create_mobile	args( ( MOB_INDEX_DATA *pMobIndex ) );
 void	clone_mobile	args( ( CHAR_DATA *parent, CHAR_DATA *clone) );
 OD *	create_object	args( ( OBJ_INDEX_DATA *pObjIndex, int level ) );
 void	clone_object	args( ( OBJ_DATA *parent, OBJ_DATA *clone ) );
-void	clear_char	args( ( CHAR_DATA *ch ) );
 char *	get_extra_descr	args( ( const char *name, EXTRA_DESCR_DATA *ed ) );
 MID *	get_mob_index	args( ( int vnum ) );
 OID *	get_obj_index	args( ( int vnum ) );

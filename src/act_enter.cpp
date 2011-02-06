@@ -337,7 +337,7 @@ void do_detonate( CHAR_DATA *ch, char *argument )
         if ( !is_same_group( gch, ch ) || IS_NPC(gch) || gch == ch)
             continue;
 
-        sprintf( buf, "%d people have been killed by the bomb blast detonated by %s. (%d PC's)\n\rYou receive %d experience points, before the heat from the bomb incinerates you.\n\r", count, ch->name, pcount, gch->xp);
+        sprintf( buf, "%d people have been killed by the bomb blast detonated by %s. (%d PC's)\n\rYou receive %d experience points, before the heat from the bomb incinerates you.\n\r", count, ch->getName(), pcount, gch->xp);
         send_to_char( buf, gch );
         gch->gain_exp( gch->xp );
 	gch->mkills += count;

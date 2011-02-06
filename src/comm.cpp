@@ -628,7 +628,7 @@ void close_socket( DESCRIPTOR_DATA *dclose )
 
     if ( ( ch = dclose->character ) != NULL )
     {
-	sprintf( log_buf, "Closing link to %s.", ch->name );
+	sprintf( log_buf, "Closing link to %s.", ch->getName() );
 	log_string( log_buf );
 	/* cut down on wiznet spam when rebooting */
        /* If ch is writing note or playing, just lose link otherwise clear char */
@@ -924,7 +924,7 @@ bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
 		}
  
 		sprintf(buf,"%s %s \n\r", 
-	            IS_NPC(victim) ? victim->short_descr : victim->name,wound);
+	            IS_NPC(victim) ? victim->short_descr : victim->getName(),wound);
 		buf[0]      = UPPER( buf[0] );
 		pbuff       = buffer;
 		colourconv( pbuff, buf, d->character );
@@ -954,7 +954,7 @@ bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
 	if ( d->snoop_by != NULL )
 	{
 	    if (d->character != NULL)
-		write_to_buffer( d->snoop_by, d->character->name,0);
+		write_to_buffer( d->snoop_by, d->character->getName(),0);
 	    write_to_buffer( d->snoop_by, "> ", 2 );
 	    write_to_buffer( d->snoop_by, d->outbuf, d->outtop );
 	}
@@ -1336,13 +1336,13 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
  
 	write_to_buffer( d, echo_on_str, 0 );
 
-	if (check_playing(d,ch->name))
+	if (check_playing(d,ch->getName()))
 	    return;
 
-	if ( check_reconnect( d, ch->name, TRUE ) )
+	if ( check_reconnect( d, ch->getName(), TRUE ) )
 	    return;
 
-	sprintf( log_buf, "%s@%s has connected.", ch->name, d->host );
+	sprintf( log_buf, "%s@%s has connected.", ch->getName(), d->host );
 	log_string( log_buf );
 	Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
 
@@ -1370,13 +1370,13 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 		if (d_old == d || d_old->character == NULL)
 		    continue;
 
-		if (str_cmp(ch->name,d_old->original ?
-		    d_old->original->name : d_old->character->name))
+		if (str_cmp(ch->getName(),d_old->original ?
+		    d_old->original->getName() : d_old->character->getName()))
 		    continue;
 
 		close_socket(d_old);
 	    }
-	    if (check_reconnect(d,ch->name,TRUE))
+	    if (check_reconnect(d,ch->getName(),TRUE))
 	    	return;
 	    write_to_buffer(d,"Reconnect attempt failed.\n\rName: ",0);
             if ( d->character != NULL )
@@ -1408,7 +1408,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	{
 	case 'y': case 'Y':
 	    sprintf( buf, "New character.\n\rGive me a password for %s: %s",
-		ch->name, echo_off_str );
+		ch->getName(), echo_off_str );
 	    write_to_buffer( d, buf, 0 );
 	    d->connected = CON_GET_NEW_PASSWORD;
 	    break;
@@ -1696,7 +1696,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
         ch->class_num = iClass;
 	SET_BIT(ch->done, class_table[ch->class_num].flag);
 
-	sprintf( log_buf, "%s@%s new player.", ch->name, d->host );
+	sprintf( log_buf, "%s@%s new player.", ch->getName(), d->host );
 	log_string( log_buf );
 	Wiznet::instance()->report((char*)"Newbie alert!  $N sighted.",ch,NULL,WIZ_NEWBIE,0,0);
         Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
@@ -1734,7 +1734,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
         ch->class_num = iClass;
 	SET_BIT(ch->done, class_table[ch->class_num].flag);
 
-	sprintf( log_buf, "%s@%s reclasses as the %s class.", ch->name, d->host, class_table[ch->class_num].name );
+	sprintf( log_buf, "%s@%s reclasses as the %s class.", ch->getName(), d->host, class_table[ch->class_num].name );
 	log_string( log_buf );
 	Wiznet::instance()->report((char*)"Reclass alert!  $N sighted.",ch,NULL,WIZ_NEWBIE,0,0);
         Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
@@ -2093,7 +2093,7 @@ bool check_reconnect( DESCRIPTOR_DATA *d, char *name, bool fConn )
     	ch = *it;
 	if ( !IS_NPC(ch)
 	&&   (!fConn || !ch->desc)
-	&&   !str_cmp( d->character->name, ch->name ) )
+	&&   !str_cmp( d->character->getName(), ch->getName() ) )
 	{
 	    if ( fConn == FALSE )
 	    {
@@ -2118,7 +2118,7 @@ bool check_reconnect( DESCRIPTOR_DATA *d, char *name, bool fConn )
 
 		act( "$n has reconnected.", ch, NULL, NULL, TO_ROOM );
 
-		sprintf( log_buf, "%s@%s reconnected.", ch->name, d->host );
+		sprintf( log_buf, "%s@%s reconnected.", ch->getName(), d->host );
 		log_string( log_buf );
 		Wiznet::instance()->report((char*)"$N groks the fullness of $S link.",
 		    ch,NULL,WIZ_LINKS,0,0);
@@ -2152,7 +2152,7 @@ bool check_playing( DESCRIPTOR_DATA *d, char *name )
 	&&   dold->connected != CON_GET_NAME
 	&&   dold->connected != CON_GET_OLD_PASSWORD
 	&&   !str_cmp( name, dold->original
-	         ? dold->original->name : dold->character->name ) )
+	         ? dold->original->getName() : dold->character->getName() ) )
 	{
 	    write_to_buffer( d, "That character is already playing.\n\r",0);
 	    write_to_buffer( d, "Do you wish to connect anyway (Y/N)?",0);

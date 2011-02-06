@@ -379,7 +379,7 @@ void do_bank_clan(CHAR_DATA *ch, char *argument)
     }
     else
     {
-	if (str_cmp(ch->pcdata->clan->leader, ch->name))
+	if (str_cmp(ch->pcdata->clan->leader, ch->getName() ))
 	{
 	    send_to_char("Only your clan leader may access the clan account.\n\r", ch);
 	    return;

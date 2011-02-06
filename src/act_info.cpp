@@ -441,9 +441,9 @@ void show_char_to_char_1( CHAR_DATA *victim, CHAR_DATA *ch )
 	}
     }
 
-    if ( victim->description[0] != '\0' )
+    if ( victim->getDescription() )
     {
-	send_to_char( victim->description, ch );
+	send_to_char( victim->getDescription(), ch );
     }
     else
     {
@@ -1444,7 +1444,7 @@ void do_score( CHAR_DATA *ch, char *argument )
 
     sprintf( buf,
 	"You are %s%s, level %d, %d years old (%d hours).\n\r",
-	ch->name,
+	ch->getName(),
 	IS_NPC(ch) ? "" : ch->pcdata->title,
 	ch->level, get_age(ch),
         ( ch->played + (int) (current_time - ch->logon) ) / 3600);
@@ -1885,7 +1885,7 @@ void do_whois (CHAR_DATA *ch, char *argument)
  	if (!can_see(ch,wch))
 	    continue;
 
-	if (!str_prefix(arg,wch->name))
+	if (!str_prefix(arg,wch->getName()))
 	{
 	    found = TRUE;
 	    
@@ -1922,7 +1922,7 @@ void do_whois (CHAR_DATA *ch, char *argument)
 	     IS_SET(wch->comm, COMM_AFK) ? "[AFK] " : "",
              (IS_CLANNED(ch) && IS_CLANNED(wch) && IS_SET(wch->pcdata->clan->flags, CLAN_PK) && IS_SET(ch->pcdata->clan->flags, CLAN_PK) && wch->level + wch->range >= ch->level ) ? "{R({rPK{R){x " : "",
              IS_SET(wch->act,PLR_THIEF) ? "{B({YTHIEF{B){x " : "",
-		wch->name, IS_NPC(wch) ? "" : wch->pcdata->title);
+		wch->getName(), IS_NPC(wch) ? "" : wch->pcdata->title);
 	    add_buf(output,buf);
 	}
     }
@@ -2127,7 +2127,7 @@ void do_who( CHAR_DATA *ch, char *argument )
 	    IS_SET(wch->comm, COMM_AFK) ? "[AFK] " : "",
              (IS_CLANNED(ch) && IS_CLANNED(wch) && IS_SET(wch->pcdata->clan->flags, CLAN_PK) && IS_SET(ch->pcdata->clan->flags, CLAN_PK) && wch->level + wch->range >= ch->level ) ? "{R({rPK{R){x " : "",
             IS_SET(wch->act, PLR_THIEF)  ? "{B({YTHIEF{B){x "  : "",
-	    wch->name,
+	    wch->getName(),
 	    IS_NPC(wch) ? "" : wch->pcdata->title );
 	add_buf(output,buf);
     }
@@ -2307,7 +2307,7 @@ void do_where( CHAR_DATA *ch, char *argument )
 	    {
 		found = TRUE;
 		sprintf( buf, "%-28s %s\n\r",
-		    victim->name, victim->in_room->name );
+		    victim->getName(), victim->in_room->name );
 		send_to_char( buf, ch );
 	    }
 	}
@@ -2325,7 +2325,7 @@ void do_where( CHAR_DATA *ch, char *argument )
 	    &&   !IS_AFFECTED(victim, AFF_HIDE)
 	    &&   !IS_AFFECTED(victim, AFF_SNEAK)
 	    &&   can_see( ch, victim )
-	    &&   is_name( arg, victim->name ) )
+	    &&   is_name( arg, victim->getName() ) )
 	    {
 		found = TRUE;
 		sprintf( buf, "%-28s %s\n\r",
@@ -2450,13 +2450,13 @@ void do_description( CHAR_DATA *ch, char *argument )
             int len;
             bool found = FALSE;
  
-            if (ch->description == NULL || ch->description[0] == '\0')
+            if (ch->getDescription() == NULL || ch->getDescription()[0] == '\0')
             {
                 send_to_char("No lines left to remove.\n\r",ch);
                 return;
             }
 	
-  	    strcpy(buf,ch->description);
+  	    strcpy(buf,ch->getDescription());
  
             for (len = strlen(buf); len > 0; len--)
             {
@@ -2471,25 +2471,23 @@ void do_description( CHAR_DATA *ch, char *argument )
                     else /* found the second one */
                     {
                         buf[len + 1] = '\0';
-			free_string(ch->description);
-			ch->description = str_dup(buf);
+			ch->setDescription(buf);
 			send_to_char( "Your description is:\n\r", ch );
-			send_to_char( ch->description ? ch->description : 
+			send_to_char( ch->getDescription() ? ch->getDescription() : 
 			    "(None).\n\r", ch );
                         return;
                     }
                 }
             }
             buf[0] = '\0';
-	    free_string(ch->description);
-	    ch->description = str_dup(buf);
+	    ch->setDescription(buf);
 	    send_to_char("Description cleared.\n\r",ch);
 	    return;
         }
 	if ( argument[0] == '+' )
 	{
-	    if ( ch->description != NULL )
-		strcat( buf, ch->description );
+	    if ( ch->getDescription() != NULL )
+		strcat( buf, ch->getDescription() );
 	    argument++;
 	    while ( isspace(*argument) )
 		argument++;
@@ -2503,12 +2501,11 @@ void do_description( CHAR_DATA *ch, char *argument )
 
 	strcat( buf, argument );
 	strcat( buf, "\n\r" );
-	free_string( ch->description );
-	ch->description = str_dup( buf );
+    ch->setDescription( buf );
     }
 
     send_to_char( "Your description is:\n\r", ch );
-    send_to_char( ch->description ? ch->description : "(None).\n\r", ch );
+    send_to_char( ch->getDescription() ? ch->getDescription() : "(None).\n\r", ch );
     return;
 }
 
@@ -2845,7 +2842,7 @@ void do_nw( CHAR_DATA *ch, char *argument )
 	if (d->connected != CON_PLAYING || !can_see(ch,wch))
 	    continue;
 
-	sprintf(buf, "%-15s %-15d\n\r", wch->name, nw_lookup(wch));
+	sprintf(buf, "%-15s %-15d\n\r", wch->getName(), nw_lookup(wch));
 	send_to_char(buf,ch);
     }
 }

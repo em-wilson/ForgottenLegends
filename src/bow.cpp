@@ -194,7 +194,7 @@ CHAR_DATA * find_char( CHAR_DATA *ch, char *search, ROOM_INDEX_DATA *scan_room )
 	*/
 	if (str_cmp(search, "random"))
 	{
-	    if (is_name( search, rch->name ) && can_see(ch, rch))
+	    if (is_name( search, rch->getName() ) && can_see(ch, rch))
 		return rch;
 	}
 

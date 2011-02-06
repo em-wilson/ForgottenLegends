@@ -1973,7 +1973,7 @@ CHAR_DATA *get_char_room( CHAR_DATA *ch, char *argument )
 	return ch;
     for ( rch = ch->in_room->people; rch != NULL; rch = rch->next_in_room )
     {
-	if ( !can_see( ch, rch ) || !is_name( arg, rch->name ) )
+	if ( !can_see( ch, rch ) || !is_name( arg, rch->getName() ) )
 	    continue;
 	if ( ++count == number )
 	    return rch;
@@ -2004,7 +2004,7 @@ CHAR_DATA *get_char_world( CHAR_DATA *ch, char *argument )
     {
         wch = *it;
 	if ( wch->in_room == NULL || !can_see( ch, wch ) 
-	||   !is_name( arg, wch->name ) )
+	||   !is_name( arg, wch->getName() ) )
 	    continue;
 	if ( ++count == number )
 	    return wch;
@@ -2346,7 +2346,7 @@ bool is_room_owner(CHAR_DATA *ch, ROOM_INDEX_DATA *room)
     if (room->owner == NULL || room->owner[0] == '\0')
 	return FALSE;
 
-    return is_name(ch->name,room->owner);
+    return is_name(ch->getName(),room->owner);
 }
 
 /*
@@ -3000,7 +3000,7 @@ CHAR_DATA *get_char_area( CHAR_DATA *ch, char *argument )
     {
         ach = *it;
         if (ach->in_room->area != ch->in_room->area
-        ||  !can_see( ch, ach ) || !is_name( arg, ach->name ))
+        ||  !can_see( ch, ach ) || !is_name( arg, ach->getName() ))
             continue; 
         if (++count == number)
             return ach;

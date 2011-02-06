@@ -522,7 +522,7 @@ void interpret( CHAR_DATA *ch, char *argument )
     ||   fLogAll
     ||   cmd_table[cmd].log == LOG_ALWAYS )
     {
-	sprintf( log_buf, "Log %s: %s", ch->name, logline );
+	sprintf( log_buf, "Log %s: %s", ch->getName(), logline );
 	Wiznet::instance()->report(log_buf,ch,NULL,WIZ_SECURE,0,get_trust(ch));
 	log_string( log_buf );
     }

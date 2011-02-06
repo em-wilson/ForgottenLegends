@@ -1,3 +1,4 @@
+#include <string.h>
 #include <sys/types.h>
 #include "merc.h"
 #include "recycle.h"
@@ -6,7 +7,6 @@
 
 CHAR_DATA::CHAR_DATA()
 {
-    this->next = NULL;
     this->next_in_room = NULL;
     this->master = NULL;
     this->leader = NULL;
@@ -30,12 +30,12 @@ CHAR_DATA::CHAR_DATA()
     this->gen_data = NULL;
     this->valid = false;
     this->confirm_reclass = false;
-    this->name = &str_empty[0];
+    this->_name = std::string();
+    this->_description = std::string();
     this->id = 0;
     this->version = 0;
     this->short_descr = &str_empty[0];
     this->long_descr = &str_empty[0];
-    this->description = &str_empty[0];
     this->prompt = &str_empty[0];
     this->prefix = &str_empty[0];
     this->group = 0;
@@ -123,10 +123,8 @@ CHAR_DATA::~CHAR_DATA()
 {
 	OBJ_DATA *obj_next;
 	AFFECT_DATA *paf_next;
-    if ( this->name ) free_string( this->name );
     if ( this->short_descr ) free_string( this->short_descr );
     if ( this->long_descr ) free_string( this->long_descr );
-    if ( this->description ) free_string( this->description );
     if ( this->prompt ) free_string( this->prompt );
     if ( this->prefix ) free_string( this->prefix );
     if ( this->material ) free_string( this->material );
@@ -153,6 +151,26 @@ CHAR_DATA::~CHAR_DATA()
     }
 
     INVALIDATE(this);
+}
+
+void CHAR_DATA::setName( const char * name )
+{
+    _name = name;
+}
+
+char * CHAR_DATA::getName()
+{
+    return _name.empty() ? NULL : (char*)_name.c_str();
+}
+
+void CHAR_DATA::setDescription( const char * description )
+{
+    _description = description;
+}
+
+char * CHAR_DATA::getDescription()
+{
+    return _description.empty() ? NULL : (char*)_description.c_str();
 }
 
 /*
@@ -252,7 +270,7 @@ void CHAR_DATA::gain_exp( int gain )
     {
         send_to_char( "You raise a level!!  ", this );
         this->level += 1;
-        sprintf(buf,"%s gained level %d",this->name,this->level);
+        sprintf(buf,"%s gained level %d",this->getName(),this->level);
         log_string(buf);
         sprintf(buf,"$N has attained level %d!",this->level);
         this->advance_level(FALSE);
