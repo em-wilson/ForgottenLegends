@@ -134,7 +134,7 @@ typedef void SPELL_FUN	args( ( int sn, int level, Character *ch, void *vo,
 #define MAX_IN_GROUP		   15
 #define MAX_ALIAS		    5
 #define MAX_CLASS		   12
-#define MAX_PC_RACE		    7
+#define MAX_PC_RACE		    4
 #define MAX_DAMAGE_MESSAGE	   42
 #define MAX_LEVEL		   60
 #define MAX_INFO		   50

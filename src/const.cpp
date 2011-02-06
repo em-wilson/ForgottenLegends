@@ -204,28 +204,6 @@ const 	struct	race_type	race_table	[]		=
     },
 
     {
-	"giant",		TRUE,
-	0,		0,		0,
-	0,		RES_FIRE|RES_COLD,	VULN_MENTAL|VULN_LIGHTNING,
-	A|H|M|V,	A|B|C|D|E|F|G|H|I|J|K
-    },
-
-    {
-        "draconian",            TRUE,
-        0,              AFF_FLYING,           0,
-        IMM_POISON|IMM_DISEASE, RES_COLD,
-        VULN_SLASH|VULN_PIERCE|VULN_LIGHTNING|RES_FIRE,
-        A|H|M|V,        A|B|C|D|E|F|G|H|I|J|K|P|Q
-    },
-
-    {
-	"werefolk",		TRUE,
-	0,		0, 		0,
-	0, 		0,		0,
-	A|H|M|V,	A|B|C|D|E|F|G|H|I|J|K
-    },
-
-    {
 	"bat",			FALSE,
 	0,		AFF_FLYING|AFF_DARK_VISION,	OFF_DODGE|OFF_FAST,
 	0,		0,		VULN_LIGHT,
@@ -269,6 +247,14 @@ const 	struct	race_type	race_table	[]		=
 	E|J|M|cc,	A|B|C|G|H|K
     },
 
+    {
+        "draconian",            FALSE,
+        0,              AFF_FLYING,           0,
+        IMM_POISON|IMM_DISEASE, RES_COLD,
+        VULN_SLASH|VULN_PIERCE|VULN_LIGHTNING|RES_FIRE,
+        A|H|M|V,        A|B|C|D|E|F|G|H|I|J|K|P|Q
+    },
+
     { 	"dragon", 		FALSE,
 	0, 			AFF_INFRARED|AFF_FLYING,	0,
 	0,			RES_FIRE|RES_BASH|RES_CHARM,
@@ -295,6 +281,13 @@ const 	struct	race_type	race_table	[]		=
 	0,		AFF_DARK_VISION,	OFF_FAST|OFF_DODGE,
 	0,		0,		0,
 	A|G|V,		A|C|D|E|F|H|J|K|Q|V
+    },
+
+    {
+        "giant",        FALSE,
+        0,      0,      0,
+        0,      RES_FIRE|RES_COLD,  VULN_MENTAL|VULN_LIGHTNING,
+        A|H|M|V,    A|B|C|D|E|F|G|H|I|J|K
     },
 
     {
@@ -402,6 +395,13 @@ const 	struct	race_type	race_table	[]		=
 	0,		AFF_SWIM|AFF_FLYING,	0,
 	0,		RES_DROWNING,		0,
 	A|G|W,		A|C|D|E|F|H|K|P
+    },
+
+    {
+    "werefolk",     FALSE,
+    0,      0,      0,
+    0,      0,      0,
+    A|H|M|V,    A|B|C|D|E|F|G|H|I|J|K
     },
 
     {
@@ -520,24 +520,6 @@ const	struct	pc_race_type	pc_race_table	[]	=
 	"dwarf",	"Dwarf",	7,	{ 150, 100, 125, 100 },
 	{ "berserk" },
 	{ 14, 12, 14, 10, 15 },	{ 20, 16, 19, 14, 21 }, SIZE_MEDIUM
-    },
-
-    {
-	"giant",	"Giant",	6,	{ 200, 150, 150, 105 },
-	{ "bash", "fast healing" },
-	{ 16, 11, 13, 11, 14 },	{ 22, 15, 18, 15, 20 }, SIZE_LARGE
-    },
-
-    {
-        "draconian",        "Drac ",     10,      { 100, 100, 100, 100 },
-        { "breath" },
-        { 18, 15, 15, 15, 16 }, { 22, 21, 22, 19, 25 }, SIZE_MEDIUM
-    },
-
-    {
-	"werefolk",	" Wer ",	8,	{ 100, 100, 100, 100 },
-	{ "morph" },
-	{ 13, 13, 13, 13, 13 },	{ 18, 18, 18, 18, 18 },	SIZE_MEDIUM
     }
 };
 
