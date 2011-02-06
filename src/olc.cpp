@@ -61,7 +61,7 @@ bool run_olc_editor( DESCRIPTOR_DATA *d )
 
 
 
-char *olc_ed_name( CHAR_DATA *ch )
+char *olc_ed_name( Character *ch )
 {
     static char buf[10];
     
@@ -92,7 +92,7 @@ char *olc_ed_name( CHAR_DATA *ch )
 
 
 
-char *olc_ed_vnum( CHAR_DATA *ch )
+char *olc_ed_vnum( Character *ch )
 {
     AREA_DATA *pArea;
     ROOM_INDEX_DATA *pRoom;
@@ -139,7 +139,7 @@ char *olc_ed_vnum( CHAR_DATA *ch )
  Purpose:	Format up the commands from given table.
  Called by:	show_commands(olc_act.c).
  ****************************************************************************/
-void show_olc_cmds( CHAR_DATA *ch, const struct olc_cmd_type *olc_table )
+void show_olc_cmds( Character *ch, const struct olc_cmd_type *olc_table )
 {
     char buf  [ MAX_STRING_LENGTH ];
     char buf1 [ MAX_STRING_LENGTH ];
@@ -170,7 +170,7 @@ void show_olc_cmds( CHAR_DATA *ch, const struct olc_cmd_type *olc_table )
  Purpose:	Display all olc commands.
  Called by:	olc interpreters.
  ****************************************************************************/
-bool show_commands( CHAR_DATA *ch, char *argument )
+bool show_commands( Character *ch, char *argument )
 {
     switch (ch->desc->editor)
     {
@@ -383,7 +383,7 @@ AREA_DATA *get_area_data( int vnum )
  Purpose:	Resets builder information on completion.
  Called by:	aedit, redit, oedit, medit(olc.c)
  ****************************************************************************/
-bool edit_done( CHAR_DATA *ch )
+bool edit_done( Character *ch )
 {
     ch->desc->pEdit = NULL;
     ch->desc->editor = 0;
@@ -398,7 +398,7 @@ bool edit_done( CHAR_DATA *ch )
 
 
 /* Area Interpreter, called by do_aedit. */
-void aedit( CHAR_DATA *ch, char *argument )
+void aedit( Character *ch, char *argument )
 {
     AREA_DATA *pArea;
     char command[MAX_INPUT_LENGTH];
@@ -461,7 +461,7 @@ void aedit( CHAR_DATA *ch, char *argument )
 
 
 /* Room Interpreter, called by do_redit. */
-void redit( CHAR_DATA *ch, char *argument )
+void redit( Character *ch, char *argument )
 {
     AREA_DATA *pArea;
     ROOM_INDEX_DATA *pRoom;
@@ -518,7 +518,7 @@ void redit( CHAR_DATA *ch, char *argument )
 
 
 /* Object Interpreter, called by do_oedit. */
-void oedit( CHAR_DATA *ch, char *argument )
+void oedit( Character *ch, char *argument )
 {
     AREA_DATA *pArea;
     OBJ_INDEX_DATA *pObj;
@@ -575,7 +575,7 @@ void oedit( CHAR_DATA *ch, char *argument )
 
 
 /* Mobile Interpreter, called by do_medit. */
-void medit( CHAR_DATA *ch, char *argument )
+void medit( Character *ch, char *argument )
 {
     AREA_DATA *pArea;
     MOB_INDEX_DATA *pMob;
@@ -646,7 +646,7 @@ const struct editor_cmd_type editor_table[] =
 
 
 /* Entry point for all editors. */
-void do_olc( CHAR_DATA *ch, char *argument )
+void do_olc( Character *ch, char *argument )
 {
     char command[MAX_INPUT_LENGTH];
     int  cmd;
@@ -680,7 +680,7 @@ void do_olc( CHAR_DATA *ch, char *argument )
 
 
 /* Entry point for editing area_data. */
-void do_aedit( CHAR_DATA *ch, char *argument )
+void do_aedit( Character *ch, char *argument )
 {
     AREA_DATA *pArea;
     int value;
@@ -730,7 +730,7 @@ void do_aedit( CHAR_DATA *ch, char *argument )
 
 
 /* Entry point for editing room_index_data. */
-void do_redit( CHAR_DATA *ch, char *argument )
+void do_redit( Character *ch, char *argument )
 {
     ROOM_INDEX_DATA *pRoom;
     char arg1[MAX_STRING_LENGTH];
@@ -809,7 +809,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
 
 
 /* Entry point for editing obj_index_data. */
-void do_oedit( CHAR_DATA *ch, char *argument )
+void do_oedit( Character *ch, char *argument )
 {
     OBJ_INDEX_DATA *pObj;
     AREA_DATA *pArea;
@@ -881,7 +881,7 @@ void do_oedit( CHAR_DATA *ch, char *argument )
 
 
 /* Entry point for editing mob_index_data. */
-void do_medit( CHAR_DATA *ch, char *argument )
+void do_medit( Character *ch, char *argument )
 {
     MOB_INDEX_DATA *pMob;
     AREA_DATA *pArea;
@@ -952,7 +952,7 @@ void do_medit( CHAR_DATA *ch, char *argument )
 
 
 
-void display_resets( CHAR_DATA *ch )
+void display_resets( Character *ch )
 {
     ROOM_INDEX_DATA	*pRoom;
     RESET_DATA		*pReset;
@@ -1209,7 +1209,7 @@ void add_reset( ROOM_INDEX_DATA *room, RESET_DATA *pReset, int index )
 
 
 
-void do_resets( CHAR_DATA *ch, char *argument )
+void do_resets( Character *ch, char *argument )
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
@@ -1452,7 +1452,7 @@ void do_resets( CHAR_DATA *ch, char *argument )
  Purpose:	Normal command to list areas and display area information.
  Called by:	interpreter(interp.c)
  ****************************************************************************/
-void do_alist( CHAR_DATA *ch, char *argument )
+void do_alist( Character *ch, char *argument )
 {
     char buf    [ MAX_STRING_LENGTH ];
     char result [ MAX_STRING_LENGTH*2 ];	/* May need tweaking. */

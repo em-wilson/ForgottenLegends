@@ -9,12 +9,12 @@
 #include <string.h>
 #include "merc.h"
 
-CHAR_DATA * find_target args( ( CHAR_DATA *ch, int dir, char * search ) );
-CHAR_DATA * find_char	args( ( CHAR_DATA *ch, char *search, ROOM_INDEX_DATA *scan_room ) );
+Character * find_target args( ( Character *ch, int dir, char * search ) );
+Character * find_char	args( ( Character *ch, char *search, ROOM_INDEX_DATA *scan_room ) );
 
-void do_shoot( CHAR_DATA *ch, char *argument )
+void do_shoot( Character *ch, char *argument )
 {
-    CHAR_DATA *victim;
+    Character *victim;
     OBJ_DATA *bow;
     OBJ_DATA *arrow;
     bool found_arrow;
@@ -118,7 +118,7 @@ void do_shoot( CHAR_DATA *ch, char *argument )
 	/* Create them */
 	for (num = 0; num < (ch->level / 10); num++)
 	{
-	    CHAR_DATA *mob;
+	    Character *mob;
 
 	    mob = create_mobile( get_mob_index( MOB_VNUM_CITYGUARD ) );
 	    char_to_room( mob, victim->in_room );
@@ -147,9 +147,9 @@ void do_shoot( CHAR_DATA *ch, char *argument )
     return;
 }
 
-CHAR_DATA * find_target( CHAR_DATA *ch, int dir, char * search )
+Character * find_target( Character *ch, int dir, char * search )
 {
-    CHAR_DATA * victim;
+    Character * victim;
     OBJ_DATA * bow;
     ROOM_INDEX_DATA *scan_room;
     EXIT_DATA *pExit;
@@ -176,10 +176,10 @@ CHAR_DATA * find_target( CHAR_DATA *ch, int dir, char * search )
     return victim;
 }
 
-CHAR_DATA * find_char( CHAR_DATA *ch, char *search, ROOM_INDEX_DATA *scan_room )
+Character * find_char( Character *ch, char *search, ROOM_INDEX_DATA *scan_room )
 {
-    CHAR_DATA *victim;
-    CHAR_DATA *rch;
+    Character *victim;
+    Character *rch;
 
     victim = NULL;
     if (scan_room == NULL) return victim;
@@ -208,6 +208,6 @@ CHAR_DATA * find_char( CHAR_DATA *ch, char *search, ROOM_INDEX_DATA *scan_room )
     return victim;
 }
 
-void dispatch_guard( CHAR_DATA *victim, CHAR_DATA *ch )
+void dispatch_guard( Character *victim, Character *ch )
 {
 }

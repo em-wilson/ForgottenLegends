@@ -38,9 +38,9 @@
 #include "merc.h"
 #include "magic.h"
 
-void do_heal(CHAR_DATA *ch, char *argument)
+void do_heal(Character *ch, char *argument)
 {
-    CHAR_DATA *mob;
+    Character *mob;
     char arg[MAX_INPUT_LENGTH];
     int cost,sn;
     SPELL_FUN *spell;

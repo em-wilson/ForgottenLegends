@@ -45,7 +45,7 @@
 
 DECLARE_DO_FUN( do_clist	);
 
-void do_join( CHAR_DATA *ch, char *argument )
+void do_join( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
 
@@ -81,7 +81,7 @@ void do_join( CHAR_DATA *ch, char *argument )
     return;
 }
 
-void do_cedit( CHAR_DATA *ch, char *argument )
+void do_cedit( Character *ch, char *argument )
 {
     if (!IS_CLANNED(ch) || str_cmp(ch->getName(),ch->pcdata->clan->leader))
     {

@@ -14,7 +14,7 @@
 DECLARE_DO_FUN( do_bank_change	);
 DECLARE_DO_FUN( do_bank_clan	);
 
-void do_bank( CHAR_DATA *ch, char *argument)
+void do_bank( Character *ch, char *argument)
 {
     char arg[MAX_INPUT_LENGTH];
 
@@ -72,7 +72,7 @@ void do_bank( CHAR_DATA *ch, char *argument)
     return;
 }
 
-void do_bank_balance(CHAR_DATA *ch, char *argument)
+void do_bank_balance(Character *ch, char *argument)
 {
     char buf[MAX_STRING_LENGTH];
     OBJ_DATA *obj;
@@ -87,7 +87,7 @@ void do_bank_balance(CHAR_DATA *ch, char *argument)
     send_to_char(buf,ch);
 }
 
-void do_bank_close(CHAR_DATA *ch, char *argument)
+void do_bank_close(Character *ch, char *argument)
 {
     OBJ_DATA *obj;
 
@@ -104,7 +104,7 @@ void do_bank_close(CHAR_DATA *ch, char *argument)
     return;
 }
 
-void do_bank_open(CHAR_DATA *ch, char *argument)
+void do_bank_open(Character *ch, char *argument)
 {
     OBJ_DATA *obj;
     if ( ( obj = get_obj_carry( ch, (char*)"bank note", ch ) ) != NULL )
@@ -125,7 +125,7 @@ void do_bank_open(CHAR_DATA *ch, char *argument)
     return;
 }
 
-void do_bank_withdraw( CHAR_DATA *ch, char *argument )
+void do_bank_withdraw( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     char buf[MAX_INPUT_LENGTH];
@@ -206,7 +206,7 @@ void do_bank_withdraw( CHAR_DATA *ch, char *argument )
        return;
 }   
 
-void do_bank_deposit( CHAR_DATA *ch, char *argument )
+void do_bank_deposit( Character *ch, char *argument )
 {
     char arg1[MAX_INPUT_LENGTH];
     char buf[MAX_INPUT_LENGTH];
@@ -302,7 +302,7 @@ void do_bank_deposit( CHAR_DATA *ch, char *argument )
        return;
 }   
 
-void do_bank_change( CHAR_DATA *ch, char *argument )
+void do_bank_change( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
@@ -332,7 +332,7 @@ void do_bank_change( CHAR_DATA *ch, char *argument )
     return;
 }
 
-void do_bank_clan(CHAR_DATA *ch, char *argument)
+void do_bank_clan(Character *ch, char *argument)
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];

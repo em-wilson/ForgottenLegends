@@ -41,11 +41,11 @@ const char *const distance[4]=
 "right here.", "nearby to the %s.", "not far %s.", "off in the distance %s."
 };
 
-void scan_list           args((ROOM_INDEX_DATA *scan_room, CHAR_DATA *ch,
+void scan_list           args((ROOM_INDEX_DATA *scan_room, Character *ch,
                                sh_int depth, sh_int door));
-void scan_char           args((CHAR_DATA *victim, CHAR_DATA *ch,
+void scan_char           args((Character *victim, Character *ch,
                                sh_int depth, sh_int door));
-void do_scan(CHAR_DATA *ch, char *argument)
+void do_scan(Character *ch, char *argument)
 {
    extern const char *const dir_name[];
    char arg1[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
@@ -93,10 +93,10 @@ void do_scan(CHAR_DATA *ch, char *argument)
    return;
 }
 
-void scan_list(ROOM_INDEX_DATA *scan_room, CHAR_DATA *ch, sh_int depth,
+void scan_list(ROOM_INDEX_DATA *scan_room, Character *ch, sh_int depth,
                sh_int door)
 {
-   CHAR_DATA *rch;
+   Character *rch;
 
    if (scan_room == NULL) return;
    for (rch=scan_room->people; rch != NULL; rch=rch->next_in_room)
@@ -108,7 +108,7 @@ void scan_list(ROOM_INDEX_DATA *scan_room, CHAR_DATA *ch, sh_int depth,
    return;
 }
 
-void scan_char(CHAR_DATA *victim, CHAR_DATA *ch, sh_int depth, sh_int door)
+void scan_char(Character *victim, Character *ch, sh_int depth, sh_int door)
 {
    extern const char *const dir_name[];
    char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];

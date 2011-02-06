@@ -44,16 +44,16 @@
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_quit	);
-void chatperform(CHAR_DATA *ch,CHAR_DATA *victim,char* msg);
+void chatperform(Character *ch,Character *victim,char* msg);
 
 /* RT code to delete yourself */
 
-void do_delet( CHAR_DATA *ch, char *argument)
+void do_delet( Character *ch, char *argument)
 {
     send_to_char("You must type the full command to delete yourself.\n\r",ch);
 }
 
-void do_delete( CHAR_DATA *ch, char *argument)
+void do_delete( Character *ch, char *argument)
 {
    char strsave[MAX_INPUT_LENGTH];
 
@@ -101,7 +101,7 @@ void do_delete( CHAR_DATA *ch, char *argument)
 
 /* RT code to display channel status */
 
-void do_channels( CHAR_DATA *ch, char *argument)
+void do_channels( Character *ch, char *argument)
 {
     char buf[MAX_STRING_LENGTH];
 
@@ -217,7 +217,7 @@ void do_channels( CHAR_DATA *ch, char *argument)
 
 /* RT deaf blocks out all shouts */
 
-void do_deaf( CHAR_DATA *ch, char *argument)
+void do_deaf( Character *ch, char *argument)
 {
     
    if (IS_SET(ch->comm,COMM_DEAF))
@@ -234,7 +234,7 @@ void do_deaf( CHAR_DATA *ch, char *argument)
 
 /* RT quiet blocks out all communication */
 
-void do_quiet ( CHAR_DATA *ch, char * argument)
+void do_quiet ( Character *ch, char * argument)
 {
     if (IS_SET(ch->comm,COMM_QUIET))
     {
@@ -250,7 +250,7 @@ void do_quiet ( CHAR_DATA *ch, char * argument)
 
 /* afk command */
 
-void do_afk ( CHAR_DATA *ch, char * argument)
+void do_afk ( Character *ch, char * argument)
 {
     if (IS_SET(ch->comm,COMM_AFK))
     {
@@ -264,7 +264,7 @@ void do_afk ( CHAR_DATA *ch, char * argument)
    }
 }
 
-void do_replay (CHAR_DATA *ch, char *argument)
+void do_replay (Character *ch, char *argument)
 {
     if (IS_NPC(ch))
     {
@@ -289,7 +289,7 @@ void talk_auction( char *argument )
 
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
-	CHAR_DATA *victim;
+	Character *victim;
 
 	victim = d->original ? d->original : d->character;
 
@@ -305,7 +305,7 @@ void talk_auction( char *argument )
 }
 
 /* RT chat replaced with ROM gossip */
-void do_gossip( CHAR_DATA *ch, char *argument )
+void do_gossip( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *d;
@@ -344,7 +344,7 @@ void do_gossip( CHAR_DATA *ch, char *argument )
       send_to_char( buf, ch );
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
-        CHAR_DATA *victim;
+        Character *victim;
  
         victim = d->original ? d->original : d->character;
  
@@ -360,7 +360,7 @@ void do_gossip( CHAR_DATA *ch, char *argument )
     }
 }
 
-void do_grats( CHAR_DATA *ch, char *argument )
+void do_grats( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *d;
@@ -399,7 +399,7 @@ void do_grats( CHAR_DATA *ch, char *argument )
       send_to_char( buf, ch );
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
-        CHAR_DATA *victim;
+        Character *victim;
  
         victim = d->original ? d->original : d->character;
  
@@ -415,7 +415,7 @@ void do_grats( CHAR_DATA *ch, char *argument )
     }
 }
 
-void do_quote( CHAR_DATA *ch, char *argument )
+void do_quote( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *d;
@@ -454,7 +454,7 @@ void do_quote( CHAR_DATA *ch, char *argument )
       send_to_char( buf, ch );
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
-        CHAR_DATA *victim;
+        Character *victim;
  
         victim = d->original ? d->original : d->character;
  
@@ -471,7 +471,7 @@ void do_quote( CHAR_DATA *ch, char *argument )
 }
 
 /* RT question channel */
-void do_question( CHAR_DATA *ch, char *argument )
+void do_question( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *d;
@@ -509,7 +509,7 @@ void do_question( CHAR_DATA *ch, char *argument )
       send_to_char( buf, ch );
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
-        CHAR_DATA *victim;
+        Character *victim;
  
         victim = d->original ? d->original : d->character;
  
@@ -526,7 +526,7 @@ void do_question( CHAR_DATA *ch, char *argument )
 }
 
 /* RT answer channel - uses same line as questions */
-void do_answer( CHAR_DATA *ch, char *argument )
+void do_answer( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *d;
@@ -564,7 +564,7 @@ void do_answer( CHAR_DATA *ch, char *argument )
       send_to_char( buf, ch );
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
-        CHAR_DATA *victim;
+        Character *victim;
  
         victim = d->original ? d->original : d->character;
  
@@ -581,7 +581,7 @@ void do_answer( CHAR_DATA *ch, char *argument )
 }
 
 /* RT music channel */
-void do_music( CHAR_DATA *ch, char *argument )
+void do_music( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *d;
@@ -620,7 +620,7 @@ void do_music( CHAR_DATA *ch, char *argument )
       sprintf( buf, "$n MUSIC: '%s'", argument );
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
-        CHAR_DATA *victim;
+        Character *victim;
  
         victim = d->original ? d->original : d->character;
  
@@ -637,7 +637,7 @@ void do_music( CHAR_DATA *ch, char *argument )
 }
 
 /* clan channels */
-void do_clantalk( CHAR_DATA *ch, char *argument )
+void do_clantalk( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *d;
@@ -688,7 +688,7 @@ void do_clantalk( CHAR_DATA *ch, char *argument )
     return;
 }
 
-void do_immtalk( CHAR_DATA *ch, char *argument )
+void do_immtalk( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *d;
@@ -727,7 +727,7 @@ void do_immtalk( CHAR_DATA *ch, char *argument )
 
 
 
-void do_say( CHAR_DATA *ch, char *argument )
+void do_say( Character *ch, char *argument )
 {
     if ( argument[0] == '\0' )
     {
@@ -740,7 +740,7 @@ void do_say( CHAR_DATA *ch, char *argument )
 
     if ( !IS_NPC(ch) )
     {
-	CHAR_DATA *mob, *mob_next;
+	Character *mob, *mob_next;
 	for ( mob = ch->in_room->people; mob != NULL; mob = mob_next )
 	{
 	    mob_next = mob->next_in_room;
@@ -754,7 +754,7 @@ void do_say( CHAR_DATA *ch, char *argument )
 
 
 
-void do_shout( CHAR_DATA *ch, char *argument )
+void do_shout( Character *ch, char *argument )
 {
     DESCRIPTOR_DATA *d;
 
@@ -786,7 +786,7 @@ void do_shout( CHAR_DATA *ch, char *argument )
     act( "You shout '$T'", ch, NULL, argument, TO_CHAR );
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
-	CHAR_DATA *victim;
+	Character *victim;
 
 	victim = d->original ? d->original : d->character;
 
@@ -804,10 +804,10 @@ void do_shout( CHAR_DATA *ch, char *argument )
 
 
 
-void do_tell( CHAR_DATA *ch, char *argument )
+void do_tell( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH],buf[MAX_STRING_LENGTH];
-    CHAR_DATA *victim;
+    Character *victim;
 
     if ( IS_SET(ch->comm, COMM_NOTELL) || IS_SET(ch->comm,COMM_DEAF))
     {
@@ -902,9 +902,9 @@ void do_tell( CHAR_DATA *ch, char *argument )
 
 
 
-void do_reply( CHAR_DATA *ch, char *argument )
+void do_reply( Character *ch, char *argument )
 {
-    CHAR_DATA *victim;
+    Character *victim;
     char buf[MAX_STRING_LENGTH];
 
     if ( IS_SET(ch->comm, COMM_NOTELL) )
@@ -927,7 +927,7 @@ void do_reply( CHAR_DATA *ch, char *argument )
 
 
 
-void do_yell( CHAR_DATA *ch, char *argument )
+void do_yell( Character *ch, char *argument )
 {
     DESCRIPTOR_DATA *d;
 
@@ -945,6 +945,7 @@ void do_yell( CHAR_DATA *ch, char *argument )
 
 
     act("You yell '$t'",ch,argument,NULL,TO_CHAR);
+    
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
 	if ( d->connected == CON_PLAYING
@@ -961,7 +962,7 @@ void do_yell( CHAR_DATA *ch, char *argument )
 }
 
 
-void do_emote( CHAR_DATA *ch, char *argument )
+void do_emote( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
 
@@ -989,9 +990,9 @@ void do_emote( CHAR_DATA *ch, char *argument )
 }
 
 
-void do_pmote( CHAR_DATA *ch, char *argument )
+void do_pmote( Character *ch, char *argument )
 {
-    CHAR_DATA *vch;
+    Character *vch;
     char *letter,*name;
     char last[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
     unsigned int matches = 0;
@@ -1312,7 +1313,7 @@ const	struct	pose_table_type	pose_table	[]	=
 
 
 
-void do_pose( CHAR_DATA *ch, char *argument )
+void do_pose( Character *ch, char *argument )
 {
     unsigned int level;
     int pose;
@@ -1331,28 +1332,28 @@ void do_pose( CHAR_DATA *ch, char *argument )
 
 
 
-void do_bug( CHAR_DATA *ch, char *argument )
+void do_bug( Character *ch, char *argument )
 {
     append_file( ch, BUG_FILE, argument );
     send_to_char( "Bug logged.\n\r", ch );
     return;
 }
 
-void do_typo( CHAR_DATA *ch, char *argument )
+void do_typo( Character *ch, char *argument )
 {
     append_file( ch, TYPO_FILE, argument );
     send_to_char( "Typo logged.\n\r", ch );
     return;
 }
 
-void do_rent( CHAR_DATA *ch, char *argument )
+void do_rent( Character *ch, char *argument )
 {
     send_to_char( "There is no rent here.  Just save and quit.\n\r", ch );
     return;
 }
 
 
-void do_qui( CHAR_DATA *ch, char *argument )
+void do_qui( Character *ch, char *argument )
 {
     send_to_char( "If you want to QUIT, you have to spell it out.\n\r", ch );
     return;
@@ -1360,7 +1361,7 @@ void do_qui( CHAR_DATA *ch, char *argument )
 
 
 
-void do_quit( CHAR_DATA *ch, char *argument )
+void do_quit( Character *ch, char *argument )
 {
     DESCRIPTOR_DATA *d,*d_next;
     int id;
@@ -1427,7 +1428,7 @@ And there {Rw{ra{Rs{x {CIndustrial {WLight{x and {MMagic{x\n\r"
     /* toast evil cheating bastards */
     for (d = descriptor_list; d != NULL; d = d_next)
     {
-	CHAR_DATA *tch;
+	Character *tch;
 
 	d_next = d->next;
 	tch = d->original ? d->original : d->character;
@@ -1443,7 +1444,7 @@ And there {Rw{ra{Rs{x {CIndustrial {WLight{x and {MMagic{x\n\r"
 
 
 
-void do_save( CHAR_DATA *ch, char *argument )
+void do_save( Character *ch, char *argument )
 {
     if ( IS_NPC(ch) )
 	return;
@@ -1456,11 +1457,11 @@ void do_save( CHAR_DATA *ch, char *argument )
 
 
 
-void do_follow( CHAR_DATA *ch, char *argument )
+void do_follow( Character *ch, char *argument )
 {
 /* RT changed to allow unlimited following and follow the NOFOLLOW rules */
     char arg[MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
+    Character *victim;
 
     one_argument( argument, arg );
 
@@ -1510,7 +1511,7 @@ void do_follow( CHAR_DATA *ch, char *argument )
 }
 
 
-void add_follower( CHAR_DATA *ch, CHAR_DATA *master )
+void add_follower( Character *ch, Character *master )
 {
     if ( ch->master != NULL )
     {
@@ -1531,7 +1532,7 @@ void add_follower( CHAR_DATA *ch, CHAR_DATA *master )
 
 
 
-void stop_follower( CHAR_DATA *ch )
+void stop_follower( Character *ch )
 {
     if ( ch->master == NULL )
     {
@@ -1559,9 +1560,9 @@ void stop_follower( CHAR_DATA *ch )
 }
 
 /* nukes charmed monsters and pets */
-void nuke_pets( CHAR_DATA *ch )
+void nuke_pets( Character *ch )
 {    
-    CHAR_DATA *pet;
+    Character *pet;
 
     if ((pet = ch->pet) != NULL)
     {
@@ -1577,9 +1578,9 @@ void nuke_pets( CHAR_DATA *ch )
 
 
 
-void die_follower( CHAR_DATA *ch )
+void die_follower( Character *ch )
 {
-    CHAR_DATA *fch;
+    Character *fch;
 
     if ( ch->master != NULL )
     {
@@ -1590,7 +1591,7 @@ void die_follower( CHAR_DATA *ch )
 
     ch->leader = NULL;
 
-    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
+    for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
       fch = *it;
 
@@ -1605,13 +1606,13 @@ void die_follower( CHAR_DATA *ch )
 
 
 
-void do_order( CHAR_DATA *ch, char *argument )
+void do_order( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH],arg2[MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
-    CHAR_DATA *och;
-    CHAR_DATA *och_next;
+    Character *victim;
+    Character *och;
+    Character *och_next;
     bool found;
     bool fAll;
 
@@ -1692,24 +1693,24 @@ void do_order( CHAR_DATA *ch, char *argument )
 
 
 
-void do_group( CHAR_DATA *ch, char *argument )
+void do_group( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
+    Character *victim;
 
     one_argument( argument, arg );
 
     if ( arg[0] == '\0' )
     {
-	CHAR_DATA *gch;
-	CHAR_DATA *leader;
+	Character *gch;
+	Character *leader;
 
 	leader = (ch->leader != NULL) ? ch->leader : ch;
 	sprintf( buf, "%s's group:\n\r", PERS(leader, ch) );
 	send_to_char( buf, ch );
 
-    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
+    for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
 	{
    gch = *it;
 	    if ( is_same_group( gch, ch ) )
@@ -1784,11 +1785,11 @@ void do_group( CHAR_DATA *ch, char *argument )
 /*
  * 'Split' originally by Gnort, God of Chaos.
  */
-void do_split( CHAR_DATA *ch, char *argument )
+void do_split( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     char arg1[MAX_INPUT_LENGTH],arg2[MAX_INPUT_LENGTH];
-    CHAR_DATA *gch;
+    Character *gch;
     int members;
     int amount_gold = 0, amount_silver = 0;
     int share_gold, share_silver;
@@ -1904,9 +1905,9 @@ void do_split( CHAR_DATA *ch, char *argument )
 
 
 
-void do_gtell( CHAR_DATA *ch, char *argument )
+void do_gtell( Character *ch, char *argument )
 {
-    CHAR_DATA *gch = NULL;
+    Character *gch = NULL;
 
     if ( argument[0] == '\0' )
     {
@@ -1920,7 +1921,7 @@ void do_gtell( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
+    for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
       gch = *it;
 	if ( is_same_group( gch, ch ) )
@@ -1940,7 +1941,7 @@ void do_gtell( CHAR_DATA *ch, char *argument )
  * (2) if A ~ B then B ~ A
  * (3) if A ~ B  and B ~ C, then A ~ C
  */
-bool is_same_group( CHAR_DATA *ach, CHAR_DATA *bch )
+bool is_same_group( Character *ach, Character *bch )
 {
     if ( ach == NULL || bch == NULL)
 	return FALSE;
@@ -1953,7 +1954,7 @@ bool is_same_group( CHAR_DATA *ach, CHAR_DATA *bch )
 /*
  * Colour setting and unsetting, way cool, Lope Oct '94
  */
-void do_colour( CHAR_DATA *ch, char *argument )
+void do_colour( Character *ch, char *argument )
 {
     char       arg[ MAX_STRING_LENGTH ];
 
@@ -1982,7 +1983,7 @@ void do_colour( CHAR_DATA *ch, char *argument )
     return;
 }
 
-void do_noauction( CHAR_DATA *ch, char *argument )
+void do_noauction( Character *ch, char *argument )
 {
     if (IS_SET(ch->comm, COMM_NOAUCTION) )
     {
@@ -1996,7 +1997,7 @@ void do_noauction( CHAR_DATA *ch, char *argument )
     }
 }
 
-void do_reclass( CHAR_DATA *ch, char *argument)
+void do_reclass( Character *ch, char *argument)
 {
     char buf[MAX_STRING_LENGTH];
     int iClass;
@@ -2072,7 +2073,7 @@ void do_reclass( CHAR_DATA *ch, char *argument)
     ch->desc->connected = CON_GET_RECLASS;
 }
 
-void do_info( CHAR_DATA *ch, char *argument )
+void do_info( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *d;
@@ -2120,7 +2121,7 @@ void do_info( CHAR_DATA *ch, char *argument )
 
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
-        CHAR_DATA *victim;
+        Character *victim;
 
         victim = d->original ? d->original : d->character;
 

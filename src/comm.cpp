@@ -160,8 +160,8 @@ int	main			args( ( int argc, char **argv ) );
 void	nanny			args( ( DESCRIPTOR_DATA *d, char *argument ) );
 bool	process_output		args( ( DESCRIPTOR_DATA *d, bool fPrompt ) );
 void	read_from_buffer	args( ( DESCRIPTOR_DATA *d ) );
-void	stop_idling		args( ( CHAR_DATA *ch ) );
-void    bust_a_prompt           args( ( CHAR_DATA *ch ) );
+void	stop_idling		args( ( Character *ch ) );
+void    bust_a_prompt           args( ( Character *ch ) );
 
 /* Needs to be global because of do_copyover */
 int port, control;
@@ -605,7 +605,7 @@ void init_descriptor( int control )
 
 void close_socket( DESCRIPTOR_DATA *dclose )
 {
-    CHAR_DATA *ch;
+    Character *ch;
 
     if ( dclose->outtop > 0 )
 	process_output( dclose, FALSE );
@@ -867,8 +867,8 @@ bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
 	}
 	else if ( fPrompt && d->connected == CON_PLAYING )
 	{
-	    CHAR_DATA *ch;
-	    CHAR_DATA *victim;
+	    Character *ch;
+	    Character *victim;
 
 	    ch = d->character;
 
@@ -980,7 +980,7 @@ bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
  * Bust a prompt (player settable prompt)
  * coded by Morgenes for Aldara Mud
  */
-void bust_a_prompt( CHAR_DATA *ch )
+void bust_a_prompt( Character *ch )
 {
     char buf[MAX_STRING_LENGTH];
     char buf2[MAX_STRING_LENGTH];
@@ -1219,7 +1219,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
     char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
     int must_have;
-    CHAR_DATA *ch;
+    Character *ch;
     char *pwdnew;
     char *p;
     int iClass,race,omorph, i,weapon;
@@ -2086,9 +2086,9 @@ bool check_parse_name( char *name )
  */
 bool check_reconnect( DESCRIPTOR_DATA *d, char *name, bool fConn )
 {
-    CHAR_DATA *ch;
+    Character *ch;
 
-    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
+    for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
     	ch = *it;
 	if ( !IS_NPC(ch)
@@ -2166,7 +2166,7 @@ bool check_playing( DESCRIPTOR_DATA *d, char *name )
 
 
 
-void stop_idling( CHAR_DATA *ch )
+void stop_idling( Character *ch )
 {
     if ( ch == NULL
     ||   ch->desc == NULL
@@ -2188,7 +2188,7 @@ void stop_idling( CHAR_DATA *ch )
 /*
  * Write to one char.
  */
-void send_to_char_bw( const char *txt, CHAR_DATA *ch )
+void send_to_char_bw( const char *txt, Character *ch )
 {
     if ( txt && ch->desc )
         write_to_buffer( ch->desc, txt, strlen(txt) );
@@ -2198,7 +2198,7 @@ void send_to_char_bw( const char *txt, CHAR_DATA *ch )
 /*
  * Write to one char, new colour version, by Lope.
  */
-void send_to_char( const char *txt, CHAR_DATA *ch )
+void send_to_char( const char *txt, Character *ch )
 {
     const      char    *point;
                char    *point2;
@@ -2249,7 +2249,7 @@ void send_to_char( const char *txt, CHAR_DATA *ch )
 /*
  * Send a page to one char.
  */
-void page_to_char_bw( const char *txt, CHAR_DATA *ch )
+void page_to_char_bw( const char *txt, Character *ch )
 {
     if ( !txt || !ch->desc )
 
@@ -2273,7 +2273,7 @@ void page_to_char_bw( const char *txt, CHAR_DATA *ch )
 /*
  * Page to one char, new colour version, by Lope.
  */
-void page_to_char( const char *txt, CHAR_DATA *ch )
+void page_to_char( const char *txt, Character *ch )
 {
     const      char    *point;
                char    *point2;
@@ -2384,13 +2384,110 @@ void show_string(struct descriptor_data *d, char *input)
 	
 
 /* quick sex fixer */
-void fix_sex(CHAR_DATA *ch)
+void fix_sex(Character *ch)
 {
     if (ch->sex < 0 || ch->sex > 2)
     	ch->sex = IS_NPC(ch) ? 0 : ch->pcdata->true_sex;
 }
 
-void act (const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
+void act_string( const char * format, Character *to, Character *ch, Character *vch, OBJ_DATA *obj1, OBJ_DATA *obj2, const void *arg1, const void *arg2 )
+{
+    static char * const he_she  [] = { (char*)"it",  (char*)"he",  (char*)"she" };
+    static char * const him_her [] = { (char*)"it",  (char*)"him", (char*)"her" };
+    static char * const his_her [] = { (char*)"its", (char*)"his", (char*)"her" };
+
+    const      	char	*str;
+    const 		char    *i = NULL;
+    char               	*point;
+    char               	buf[ MAX_STRING_LENGTH   ];
+    bool               	fColour = FALSE;
+    char               	fname[ MAX_INPUT_LENGTH  ];
+    char	      		*pbuff;
+    char               	buffer[ MAX_STRING_LENGTH*2 ];
+
+    point   = buf;
+    str     = format;
+    while( *str != '\0' )
+    {
+    	if( *str != '$' )
+    	{
+    		*point++ = *str++;
+    		continue;
+    	}
+    	fColour = TRUE;
+    	++str;
+    	i = " <@@@> ";
+    	if( !arg2 && *str >= 'A' && *str <= 'Z' )
+    	{
+    		bug( "Act: missing arg2 for code %d.", *str );
+    		i = " <@@@> ";
+        }
+        else
+        {
+            switch ( *str )
+            {
+            default:  bug( "Act: bad code %d.", *str );
+                      i = ""; break;
+            /* Thx alex for 't' idea */
+            case 't': i = (char *) arg1;                            break;
+            case 'T': i = (char *) arg2;                            break;
+            case 'n': i = (char *)PERS( ch,  to  );                 break;
+            case 'N': i = (char *)PERS( vch, to  );                 break;
+            case 'e': i = he_she  [URANGE(0, ch  ->sex, 2)];        break;
+            case 'E': i = he_she  [URANGE(0, vch ->sex, 2)];        break;
+            case 'm': i = him_her [URANGE(0, ch  ->sex, 2)];        break;
+            case 'M': i = him_her [URANGE(0, vch ->sex, 2)];        break;
+            case 's': i = his_her [URANGE(0, ch  ->sex, 2)];        break;
+            case 'S': i = his_her [URANGE(0, vch ->sex, 2)];        break;
+
+            case 'p':
+                i = can_see_obj( to, obj1 )
+                        ? obj1->short_descr
+                        : (char*)"something";
+                break;
+
+            case 'P':
+                i = can_see_obj( to, obj2 )
+                        ? obj2->short_descr
+                        : (char*)"something";
+                break;
+
+            case 'd':
+                if ( arg2 == NULL || ((char *) arg2)[0] == '\0' )
+                {
+                    i = "door";
+                }
+                else
+                {
+                    one_argument( (char *) arg2, fname );
+                    i = fname;
+                }
+                break;
+            }
+        }
+
+        ++str;
+        while ( ( *point = *i ) != '\0' ) {
+        	++point, ++i;
+        }
+
+    }
+
+    *point++ = '\n';
+    *point++ = '\r';
+    *point   = '\0';
+    buf[0]   = UPPER(buf[0]);
+    if (to->desc) {
+    	pbuff	 = buffer;
+    	colourconv( pbuff, buf, to );
+    	write_to_buffer( to->desc, buffer, 0 );
+    } else if ( MOBtrigger ) {
+    	mp_act_trigger( buf, to, ch, arg1, arg2, TRIG_ACT );
+    }
+}
+
+
+void act (const char *format, Character *ch, const void *arg1, const void *arg2,
 	  int type)
 {
     /* to be compatible with older code */
@@ -2400,25 +2497,13 @@ void act (const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2,
 /*
  * The colour version of the act_new( ) function, -Lope
  */
-void act_new( const char *format, CHAR_DATA *ch, const void *arg1, 
+void act_new( const char *format, Character *ch, const void *arg1, 
               const void *arg2, int type, int min_pos )
 {
-    static char * const he_she  [] = { (char*)"it",  (char*)"he",  (char*)"she" };
-    static char * const him_her [] = { (char*)"it",  (char*)"him", (char*)"her" };
-    static char * const his_her [] = { (char*)"its", (char*)"his", (char*)"her" };
- 
-    CHAR_DATA          *to;
-    CHAR_DATA          *vch = ( CHAR_DATA * ) arg2;
+    Character          *to;
+    Character          *vch = ( Character * ) arg2;
     OBJ_DATA           *obj1 = ( OBJ_DATA  * ) arg1;
     OBJ_DATA           *obj2 = ( OBJ_DATA  * ) arg2;
-    const      char    *str;
-    const char               *i = NULL;
-    char               *point;
-    char	       *pbuff;
-    char               buffer[ MAX_STRING_LENGTH*2 ];
-    char               buf[ MAX_STRING_LENGTH   ];
-    char               fname[ MAX_INPUT_LENGTH  ];
-    bool               fColour = FALSE;
  
     /*
      * Discard null and zero-length messages.
@@ -2430,115 +2515,51 @@ void act_new( const char *format, CHAR_DATA *ch, const void *arg1,
     if( !ch || !ch->in_room )
  	return;
  
-     to = ch->in_room->people;
-    if( type == TO_VICT )
-     {
-        if( !vch )
-         {
+    to = ch->in_room->people;
+	if( type == TO_VICT )
+    {
+    	if( !vch )
+        {
              bug( "Act: null vch with TO_VICT.", 0 );
              return;
-         }
- 
-       if( !vch->in_room )
- 	    return;
- 
-         to = vch->in_room->people;
-     }
-  
-    for( ; to ; to = to->next_in_room )
-     {
-        if( !to->desc || to->position < min_pos )
-             continue;
-  
-        if( ( type == TO_CHAR ) && to != ch )
-             continue;
-        if( type == TO_VICT && ( to != vch || to == ch ) )
-             continue;
-        if( type == TO_ROOM && to == ch )
-             continue;
-        if( type == TO_NOTVICT && (to == ch || to == vch) )
-             continue;
-  
-         point   = buf;
-         str     = format;
-        while( *str != '\0' )
-         {
-            if( *str != '$' )
-             {
-                 *point++ = *str++;
-                 continue;
-             }
-           fColour = TRUE;
-           ++str;
-           i = " <@@@> ";
-            if( !arg2 && *str >= 'A' && *str <= 'Z' )
-            {
-                bug( "Act: missing arg2 for code %d.", *str );
-                i = " <@@@> ";
-            }
-            else
-            {
-                switch ( *str )
-                {
-                default:  bug( "Act: bad code %d.", *str );
-                          i = ""; break;
-                /* Thx alex for 't' idea */
-                case 't': i = (char *) arg1;                            break;
-                case 'T': i = (char *) arg2;                            break;
-                case 'n': i = (char *)PERS( ch,  to  );                 break;
-                case 'N': i = (char *)PERS( vch, to  );                 break;
-                case 'e': i = he_she  [URANGE(0, ch  ->sex, 2)];        break;
-                case 'E': i = he_she  [URANGE(0, vch ->sex, 2)];        break;
-                case 'm': i = him_her [URANGE(0, ch  ->sex, 2)];        break;
-                case 'M': i = him_her [URANGE(0, vch ->sex, 2)];        break;
-                case 's': i = his_her [URANGE(0, ch  ->sex, 2)];        break;
-                case 'S': i = his_her [URANGE(0, vch ->sex, 2)];        break;
- 
-                case 'p':
-                    i = can_see_obj( to, obj1 )
-                            ? obj1->short_descr
-                            : (char*)"something";
-                    break;
- 
-                case 'P':
-                    i = can_see_obj( to, obj2 )
-                            ? obj2->short_descr
-                            : (char*)"something";
-                    break;
- 
-                case 'd':
-                    if ( arg2 == NULL || ((char *) arg2)[0] == '\0' )
-                    {
-                        i = "door";
-                    }
-                    else
-                    {
-                        one_argument( (char *) arg2, fname );
-                        i = fname;
-                    }
-                    break;
-                }
-            }
- 
-            ++str;
-            while ( ( *point = *i ) != '\0' )
-                ++point, ++i;
         }
  
-        *point++ = '\n';
-        *point++ = '\r';
-	*point   = '\0';
-        buf[0]   = UPPER(buf[0]);
-	if (to->desc)
-	{
-	pbuff	 = buffer;
-	colourconv( pbuff, buf, to );
-	write_to_buffer( to->desc, buffer, 0 );
-	}
-	else
-	if ( MOBtrigger )
-	    mp_act_trigger( buf, to, ch, arg1, arg2, TRIG_ACT );
+        if( !vch->in_room )
+ 	    	return;
+ 
+        to = vch->in_room->people;
     }
+  
+  	if ( type == TO_AREA || type == TO_AREA_OUTSIDE_ROOM ) {
+	    for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++) {
+	    	to = *it;
+            if ( to->in_room == NULL )
+            	continue;
+
+            if ( to == ch ) continue;
+            if ( type == TO_AREA_OUTSIDE_ROOM && to->in_room == ch->in_room ) continue;
+	    	if ( to->in_room->area != ch->in_room->area ) continue;
+
+	         act_string( format, to, ch, vch, obj1, obj2, arg1, arg2 );
+    	}
+  	} else {
+	    for( ; to ; to = to->next_in_room )
+	    {
+	        if( !to->desc || to->position < min_pos )
+	             continue;
+	  
+	        if( ( type == TO_CHAR ) && to != ch )
+	             continue;
+	        if( type == TO_VICT && ( to != vch || to == ch ) )
+	             continue;
+	        if( type == TO_ROOM && to == ch )
+	             continue;
+	        if( type == TO_NOTVICT && (to == ch || to == vch) )
+	             continue;
+
+	         act_string( format, to, ch, vch, obj1, obj2, arg1, arg2 );
+	    }
+  	}
     return;
 }
 
@@ -2555,7 +2576,7 @@ int gettimeofday( struct timeval *tp, void *tzp )
 }
 #endif
 
-int colour( char type, CHAR_DATA *ch, char *string )
+int colour( char type, Character *ch, char *string )
 {
     char       code[ 20 ];
     char       *p = '\0';
@@ -2689,7 +2710,7 @@ int colour( char type, CHAR_DATA *ch, char *string )
     return( strlen( code ) );
 }
 
-void colourconv( char *buffer, const char *txt, CHAR_DATA *ch )
+void colourconv( char *buffer, const char *txt, Character *ch )
 {
     const      char    *point;
                int     skip = 0;
@@ -2771,7 +2792,7 @@ int strlen_color(char *argument)
 }
 
 /* source: EOD, by John Booth <???> */
-void printf_to_char (CHAR_DATA *ch, const char *fmt, ...)
+void printf_to_char (Character *ch, const char *fmt, ...)
 {
 	char buf [MAX_STRING_LENGTH];
 	va_list args;

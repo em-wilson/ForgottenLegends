@@ -1,5 +1,5 @@
-#if !defined(CHARDATA_H)
-#define CHARDATA_H
+#if !defined(CHARACTER_H)
+#define CHARACTER_H
 
 #include <list>
 #include <string>
@@ -8,18 +8,18 @@
 /*
  * One character (PC or NPC).
  */
-class CHAR_DATA
+class Character
 {
 public:
-    CHAR_DATA *		next;
-    CHAR_DATA *		next_in_room;
-    CHAR_DATA *		master;
-    CHAR_DATA *		leader;
-    CHAR_DATA *		fighting;
-    CHAR_DATA *		reply;
-    CHAR_DATA *		pet;
-    CHAR_DATA *		mprog_target;
-    CHAR_DATA *		hunting;
+    Character *		next;
+    Character *		next_in_room;
+    Character *		master;
+    Character *		leader;
+    Character *		fighting;
+    Character *		reply;
+    Character *		pet;
+    Character *		mprog_target;
+    Character *		hunting;
     MEM_DATA *		memory;
     SPEC_FUN *		spec_fun;
     MOB_INDEX_DATA *	pIndexData;
@@ -122,8 +122,8 @@ public:
     int			adrenaline;
     int			jkilled; // If they were just killed
 
-    CHAR_DATA();
-    ~CHAR_DATA();
+    Character();
+    ~Character();
     /*
      * Advancement stuff.
      */

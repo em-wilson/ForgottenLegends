@@ -20,7 +20,7 @@ void save_area_objects args( ( AREA_DATA *pArea ) );
 char *fix_string args( ( const char *str ) );
 void save_item_level args( ( const char *title, int type, long int wear ) );
 
-void do_wdump( CHAR_DATA *ch, char *argument )
+void do_wdump( Character *ch, char *argument )
 {
     FILE *fp;
     ROOM_INDEX_DATA *room;
@@ -176,7 +176,7 @@ void save_item_level( const char *title, int type, long int wear )
     return;
 }
 
-void do_odump( CHAR_DATA *ch, char *argument )
+void do_odump( Character *ch, char *argument )
 {
     /* Save html files */
     save_item_level( "Exotic", ITEM_WEAPON, WEAPON_EXOTIC );    
@@ -348,7 +348,7 @@ void who_html_update (void)
   log_string("First part ok");
   for ( d = descriptor_list; d != NULL ; d = d->next )
   {
-    CHAR_DATA *wch;
+    Character *wch;
     char const *class_name;
     char *race;
     

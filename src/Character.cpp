@@ -2,10 +2,10 @@
 #include <sys/types.h>
 #include "merc.h"
 #include "recycle.h"
-#include "char_data.h"
+#include "Character.h"
 #include "Wiznet.h"
 
-CHAR_DATA::CHAR_DATA()
+Character::Character()
 {
     this->next_in_room = NULL;
     this->master = NULL;
@@ -119,7 +119,7 @@ CHAR_DATA::CHAR_DATA()
     VALIDATE(this);
 }
 
-CHAR_DATA::~CHAR_DATA()
+Character::~Character()
 {
 	OBJ_DATA *obj_next;
 	AFFECT_DATA *paf_next;
@@ -153,22 +153,22 @@ CHAR_DATA::~CHAR_DATA()
     INVALIDATE(this);
 }
 
-void CHAR_DATA::setName( const char * name )
+void Character::setName( const char * name )
 {
     _name = name;
 }
 
-char * CHAR_DATA::getName()
+char * Character::getName()
 {
     return _name.empty() ? NULL : (char*)_name.c_str();
 }
 
-void CHAR_DATA::setDescription( const char * description )
+void Character::setDescription( const char * description )
 {
     _description = description;
 }
 
-char * CHAR_DATA::getDescription()
+char * Character::getDescription()
 {
     return _description.empty() ? NULL : (char*)_description.c_str();
 }
@@ -176,7 +176,7 @@ char * CHAR_DATA::getDescription()
 /*
  * Advancement stuff.
  */
-void CHAR_DATA::advance_level( bool hide )
+void Character::advance_level( bool hide )
 {
     char buf[MAX_STRING_LENGTH];
     int add_hp, add_mana, add_move, dracnum, add_prac;
@@ -258,7 +258,7 @@ void CHAR_DATA::advance_level( bool hide )
 
 
 
-void CHAR_DATA::gain_exp( int gain )
+void Character::gain_exp( int gain )
 {
     char buf[MAX_STRING_LENGTH];
 
@@ -286,7 +286,7 @@ void CHAR_DATA::gain_exp( int gain )
 /*
  * Regeneration stuff.
  */
-int CHAR_DATA::hit_gain( )
+int Character::hit_gain( )
 {
     int gain;
     int number;
@@ -360,7 +360,7 @@ int CHAR_DATA::hit_gain( )
 
 
 
-int CHAR_DATA::mana_gain( )
+int Character::mana_gain( )
 {
     int gain;
     int number;
@@ -431,7 +431,7 @@ int CHAR_DATA::mana_gain( )
 
 
 
-int CHAR_DATA::move_gain( )
+int Character::move_gain( )
 {
     int gain;
 
@@ -481,7 +481,7 @@ int CHAR_DATA::move_gain( )
 
 
 
-void CHAR_DATA::gain_condition( int iCond, int value )
+void Character::gain_condition( int iCond, int value )
 {
     int condition;
 

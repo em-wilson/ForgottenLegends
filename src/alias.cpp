@@ -38,7 +38,7 @@
 /* does aliasing and other fun stuff */
 void substitute_alias(DESCRIPTOR_DATA *d, char *argument)
 {
-    CHAR_DATA *ch;
+    Character *ch;
     char buf[MAX_STRING_LENGTH],prefix[MAX_INPUT_LENGTH],name[MAX_INPUT_LENGTH];
     char *point;
     int alias;
@@ -93,15 +93,15 @@ void substitute_alias(DESCRIPTOR_DATA *d, char *argument)
     interpret(d->character,buf);
 }
 
-void do_alia(CHAR_DATA *ch, char *argument)
+void do_alia(Character *ch, char *argument)
 {
     send_to_char("I'm sorry, alias must be entered in full.\n\r",ch);
     return;
 }
 
-void do_alias(CHAR_DATA *ch, char *argument)
+void do_alias(Character *ch, char *argument)
 {
-    CHAR_DATA *rch;
+    Character *rch;
     char arg[MAX_INPUT_LENGTH],buf[MAX_STRING_LENGTH];
     int pos;
 
@@ -209,9 +209,9 @@ void do_alias(CHAR_DATA *ch, char *argument)
 }
 
 
-void do_unalias(CHAR_DATA *ch, char *argument)
+void do_unalias(Character *ch, char *argument)
 {
-    CHAR_DATA *rch;
+    Character *rch;
     char arg[MAX_INPUT_LENGTH];
     int pos;
     bool found = FALSE;

@@ -39,7 +39,7 @@
 /*
  * New typedefs.
  */
-typedef	bool OLC_FUN		args( ( CHAR_DATA *ch, char *argument ) );
+typedef	bool OLC_FUN		args( ( Character *ch, char *argument ) );
 #define DECLARE_OLC_FUN( fun )	OLC_FUN    fun
 
 
@@ -66,11 +66,11 @@ DECLARE_SPELL_FUN( spell_null );
 /*
  * Interpreter Prototypes
  */
-void    aedit           args( ( CHAR_DATA *ch, char *argument ) );
-void    redit           args( ( CHAR_DATA *ch, char *argument ) );
-void    medit           args( ( CHAR_DATA *ch, char *argument ) );
-void    oedit           args( ( CHAR_DATA *ch, char *argument ) );
-void	mpedit		args( ( CHAR_DATA *ch, char *argument ) );
+void    aedit           args( ( Character *ch, char *argument ) );
+void    redit           args( ( Character *ch, char *argument ) );
+void    medit           args( ( Character *ch, char *argument ) );
+void    oedit           args( ( Character *ch, char *argument ) );
+void	mpedit		args( ( Character *ch, char *argument ) );
 
 
 /*
@@ -140,10 +140,10 @@ DECLARE_DO_FUN( do_mpedit	);
 /*
  * General Functions
  */
-bool show_commands		args ( ( CHAR_DATA *ch, char *argument ) );
-bool show_help			args ( ( CHAR_DATA *ch, char *argument ) );
-bool edit_done			args ( ( CHAR_DATA *ch ) );
-bool show_version		args ( ( CHAR_DATA *ch, char *argument ) );
+bool show_commands		args ( ( Character *ch, char *argument ) );
+bool show_help			args ( ( Character *ch, char *argument ) );
+bool edit_done			args ( ( Character *ch ) );
+bool show_version		args ( ( Character *ch, char *argument ) );
 
 
 
@@ -302,8 +302,8 @@ MOB_INDEX_DATA	*new_mob_index		args ( ( void ) );
 void		free_mob_index		args ( ( MOB_INDEX_DATA *pMob ) );
 #undef	ED
 
-void		show_liqlist		args ( ( CHAR_DATA *ch ) );
-void		show_damlist		args ( ( CHAR_DATA *ch ) );
+void		show_liqlist		args ( ( Character *ch ) );
+void		show_damlist		args ( ( Character *ch ) );
 
 const char *		mprog_type_to_name	args ( ( int type ) );
 MPROG_LIST      *new_mprog              args ( ( void ) );

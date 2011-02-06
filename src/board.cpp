@@ -87,39 +87,11 @@ long last_note_stamp = 0; /* To generate unique timestamps on notes */
 #define BOARD_NOACCESS -1
 #define BOARD_NOTFOUND -1
 
-static bool next_board (CHAR_DATA *ch);
+static bool next_board (Character *ch);
 
-
-/* recycle a note */
-NOTE_DATA::~NOTE_DATA()
-{
-	if (this->sender)
-		free_string (this->sender);
-	if (this->to_list)
-		free_string (this->to_list);
-	if (this->subject)
-		free_string (this->subject);
-	if (this->date) /* was note->datestamp for some reason */
-		free_string (this->date);
-	if (this->text)
-		free_string (this->text);
-}
-
-/* allocate memory for a new note or recycle */
-NOTE_DATA::NOTE_DATA()
-{
-	this->next = NULL;
-	this->sender = NULL;		
-	this->expire = 0;
-	this->to_list = NULL;
-	this->subject = NULL;
-	this->date = NULL;
-	this->date_stamp = 0;
-	this->text = NULL;
-}
 
 /* append this note to the given file */
-static void append_note (FILE *fp, NOTE_DATA *note)
+static void append_note (FILE *fp, Note *note)
 {
 	fprintf (fp, "Sender  %s~\n", note->sender);
 	fprintf (fp, "Date    %s~\n", note->date);
@@ -127,14 +99,14 @@ static void append_note (FILE *fp, NOTE_DATA *note)
 	fprintf (fp, "Expire  %ld\n", note->expire);
 	fprintf (fp, "To      %s~\n", note->to_list);
 	fprintf (fp, "Subject %s~\n", note->subject);
-	fprintf (fp, "Text\n%s~\n\n", note->text);
+	fprintf (fp, "Text\n%s~\n\n", note->getText().c_str());
 }
 
 /* Save a note in a given board */
-void finish_note (BOARD_DATA *board, NOTE_DATA *note)
+void finish_note (BOARD_DATA *board, Note *note)
 {
 	FILE *fp;
-	NOTE_DATA *p;
+	Note *p;
 	char filename[200];
 	
 	/* The following is done in order to generate unique date_stamps */
@@ -198,9 +170,9 @@ int board_lookup (const char *name)
 }
 
 /* Remove list from the list. Do not free note */
-static void unlink_note (BOARD_DATA *board, NOTE_DATA *note)
+static void unlink_note (BOARD_DATA *board, Note *note)
 {
-	NOTE_DATA *p;
+	Note *p;
 	
 	if (board->note_first == note)
 		board->note_first = note->next;
@@ -215,10 +187,10 @@ static void unlink_note (BOARD_DATA *board, NOTE_DATA *note)
 }
 
 /* Find the nth note on a board. Return NULL if ch has no access to that note */
-static NOTE_DATA* find_note (CHAR_DATA *ch, BOARD_DATA *board, int num)
+static Note* find_note (Character *ch, BOARD_DATA *board, int num)
 {
 	int count = 0;
-	NOTE_DATA *p;
+	Note *p;
 	
 	for (p = board->note_first; p ; p = p->next)
 			if (++count == num)
@@ -237,7 +209,7 @@ static void save_board (BOARD_DATA *board)
 	FILE *fp;
 	char filename[200];
 	char buf[200];
-	NOTE_DATA *note;
+	Note *note;
 	
 	sprintf (filename, "%s%s%s", DATA_DIR, NOTE_DIR, board->short_name);
 	
@@ -257,7 +229,7 @@ static void save_board (BOARD_DATA *board)
 }
 
 /* Show one not to a character */
-static void show_note_to_char (CHAR_DATA *ch, NOTE_DATA *note, int num)
+static void show_note_to_char (Character *ch, Note *note, int num)
 {
 	char buf[4*MAX_STRING_LENGTH];
 	BUFFER *output;
@@ -273,7 +245,7 @@ static void show_note_to_char (CHAR_DATA *ch, NOTE_DATA *note, int num)
 	         num, note->sender, note->subject,
 	         note->date,
 	         note->to_list,
-	         note->text);
+	         note->getText().c_str());
 	add_buf(output,buf);
 
 	page_to_char (buf_string(output),ch);	         
@@ -293,7 +265,7 @@ void save_notes ()
 static void load_board (BOARD_DATA *board)
 {
 	FILE *fp, *fp_archive;
-	NOTE_DATA *last_note;
+	Note *last_note;
 	char filename[200];
 	
 	sprintf (filename, "%s%s%s", DATA_DIR, NOTE_DIR, board->short_name);
@@ -310,7 +282,7 @@ static void load_board (BOARD_DATA *board)
 
     for ( ; ; )
     {
-        NOTE_DATA *pnote;
+        Note *pnote;
         char letter;
 
         do
@@ -325,7 +297,7 @@ static void load_board (BOARD_DATA *board)
         while ( isspace(letter) );
         ungetc( letter, fp );
 
-        pnote             = new NOTE_DATA();
+        pnote             = new Note();
 
         if ( str_cmp( fread_word( fp ), "sender" ) )
             break;
@@ -353,7 +325,9 @@ static void load_board (BOARD_DATA *board)
 
         if ( str_cmp( fread_word( fp ), "text" ) )
             break;
-        pnote->text       = fread_string( fp );
+        char *note_text		= fread_string( fp );
+        pnote->setText( note_text );
+        free_string( note_text );
         
         pnote->next = NULL; /* jic */
         
@@ -402,7 +376,7 @@ void load_boards ()
 }
 
 /* Returns TRUE if the specified note is address to ch */
-bool is_note_to (CHAR_DATA *ch, NOTE_DATA *note)
+bool is_note_to (Character *ch, Note *note)
 {
 	if (!str_cmp (ch->getName(), note->sender))
 		return TRUE;
@@ -443,9 +417,9 @@ bool is_note_to (CHAR_DATA *ch, NOTE_DATA *note)
 
 /* Return the number of unread notes 'ch' has in 'board' */
 /* Returns BOARD_NOACCESS if ch has no access to board */
-int unread_notes (CHAR_DATA *ch, BOARD_DATA *board)
+int unread_notes (Character *ch, BOARD_DATA *board)
 {
-	NOTE_DATA *note;
+	Note *note;
 	time_t last_read;
 	int count = 0;
 	
@@ -466,7 +440,7 @@ int unread_notes (CHAR_DATA *ch, BOARD_DATA *board)
  */
 
 /* Start writing a note */
-static void do_nwrite (CHAR_DATA *ch, char *argument)
+static void do_nwrite (Character *ch, char *argument)
 {
 	char *strtime;
 	char buf[200];
@@ -487,7 +461,7 @@ static void do_nwrite (CHAR_DATA *ch, char *argument)
 	}
 	
 	/* continue previous note, if any text was written*/ 
-	if (ch->pcdata->in_progress && (!ch->pcdata->in_progress->text))
+	if (ch->pcdata->in_progress && (ch->pcdata->in_progress->getText().empty()))
 	{
 		send_to_char ("Note in progress cancelled because you did not manage to write any text \n\r"
 		              "before losing link.\n\r\n\r",ch);
@@ -498,7 +472,7 @@ static void do_nwrite (CHAR_DATA *ch, char *argument)
 	
 	if (!ch->pcdata->in_progress)
 	{
-		ch->pcdata->in_progress = new NOTE_DATA();
+		ch->pcdata->in_progress = new Note();
 		ch->pcdata->in_progress->sender = str_dup (ch->getName());
 
 		/* convert to ascii. ctime returns a string which last character is \n, so remove that */	
@@ -522,14 +496,14 @@ static void do_nwrite (CHAR_DATA *ch, char *argument)
 	/* Begin writing the note ! */
 	sprintf (buf, "You are now %s a new note on the " BOLD "%s" NO_COLOR " board.\n\r"
 	              "If you are using tintin, type #verbose to turn off alias expansion!\n\r\n\r",
-	               ch->pcdata->in_progress->text ? "continuing" : "posting",
+	               ch->pcdata->in_progress->getText().empty() ? "posting" : "continuing",
 	               ch->pcdata->board->short_name);
 	send_to_char (buf,ch);
 	
 	sprintf (buf, BOLD YELLOW "From" NO_COLOR ":    %s\n\r\n\r", ch->getName());
 	send_to_char (buf,ch);
 
-	if (!ch->pcdata->in_progress->text) /* Are we continuing an old note or not? */
+	if (ch->pcdata->in_progress->getText().empty()) /* Are we continuing an old note or not? */
 	{
 		switch (ch->pcdata->board->force_type)
 		{
@@ -566,7 +540,7 @@ static void do_nwrite (CHAR_DATA *ch, char *argument)
 		               ch->pcdata->in_progress->subject);
 		send_to_char (buf,ch);
 		send_to_char (BOLD GREEN "Your note so far:\n\r" NO_COLOR,ch);
-		send_to_char (ch->pcdata->in_progress->text,ch);
+		send_to_char (ch->pcdata->in_progress->getText().c_str(),ch);
 		
 		send_to_char ("\n\rEnter text. Type " BOLD "~" NO_COLOR " or " BOLD "END" NO_COLOR " on an empty line to end note.\n\r"
 		                    "=======================================================\n\r",ch);
@@ -580,9 +554,9 @@ static void do_nwrite (CHAR_DATA *ch, char *argument)
 
 
 /* Read next note in current group. If no more notes, go to next board */
-static void do_nread (CHAR_DATA *ch, char *argument)
+static void do_nread (Character *ch, char *argument)
 {
-	NOTE_DATA *p;
+	Note *p;
 	int count = 0, number;
 	time_t *last_note = &ch->pcdata->last_note[board_number(ch->pcdata->board)];
 	
@@ -642,9 +616,9 @@ static void do_nread (CHAR_DATA *ch, char *argument)
 }
 
 /* Remove a note */
-static void do_nremove (CHAR_DATA *ch, char *argument)
+static void do_nremove (Character *ch, char *argument)
 {
-	NOTE_DATA *p;
+	Note *p;
 	
 	if (!is_number(argument))
 	{
@@ -675,11 +649,11 @@ static void do_nremove (CHAR_DATA *ch, char *argument)
 
 /* List all notes or if argument given, list N of the last notes */
 /* Shows REAL note numbers! */
-static void do_nlist (CHAR_DATA *ch, char *argument)
+static void do_nlist (Character *ch, char *argument)
 {
 	int count= 0, show = 0, num = 0, has_shown = 0;
 	time_t last_note;
-	NOTE_DATA *p;
+	Note *p;
 	char buf[MAX_STRING_LENGTH];
 	
 	
@@ -717,9 +691,9 @@ static void do_nlist (CHAR_DATA *ch, char *argument)
 }
 
 /* catch up with some notes */
-static void do_ncatchup (CHAR_DATA *ch, char *argument)
+static void do_ncatchup (Character *ch, char *argument)
 {
-	NOTE_DATA *p;
+	Note *p;
 
 	/* Find last note */	
 	for (p = ch->pcdata->board->note_first; p && p->next; p = p->next);
@@ -734,7 +708,7 @@ static void do_ncatchup (CHAR_DATA *ch, char *argument)
 }
 
 /* Dispatch function for backwards compatibility */
-void do_note (CHAR_DATA *ch, char *argument)
+void do_note (Character *ch, char *argument)
 {
 	char arg[MAX_INPUT_LENGTH];
 
@@ -770,7 +744,7 @@ void do_note (CHAR_DATA *ch, char *argument)
 /* Show all accessible boards with their numbers of unread messages OR
    change board. New board name can be given as a number or as a name (e.g.
     board personal or board 4 */
-void do_board (CHAR_DATA *ch, char *argument)
+void do_board (Character *ch, char *argument)
 {
 	int i, count, number;
 	char buf[200];
@@ -881,7 +855,7 @@ void make_note (const char* board_name, const char *sender, const char *to, cons
 {
 	int board_index = board_lookup (board_name);
 	BOARD_DATA *board;
-	NOTE_DATA *note;
+	Note *note;
 	char *strtime;
 	
 	if (board_index == BOARD_NOTFOUND)
@@ -899,13 +873,13 @@ void make_note (const char* board_name, const char *sender, const char *to, cons
 	
 	board = &boards [board_index];
 	
-	note = new NOTE_DATA(); /* allocate new note */
+	note = new Note(); /* allocate new note */
 	
 	note->sender = str_dup (sender);
 	note->to_list = str_dup(to);
 	note->subject = str_dup (subject);
 	note->expire = current_time + expire_days * 60 * 60 * 24;
-	note->text = str_dup (text);
+	note->setText( text );
 
 	/* convert to ascii. ctime returns a string which last character is \n, so remove that */	
 	strtime = ctime (&current_time);
@@ -918,7 +892,7 @@ void make_note (const char* board_name, const char *sender, const char *to, cons
 }
 
 /* tries to change to the next accessible board */
-static bool next_board (CHAR_DATA *ch)
+static bool next_board (Character *ch)
 {
 	int i = board_number (ch->pcdata->board) + 1;
 	
@@ -937,7 +911,7 @@ static bool next_board (CHAR_DATA *ch)
 void handle_con_note_to (DESCRIPTOR_DATA *d, char * argument)
 {
 	char buf [MAX_INPUT_LENGTH];
-	CHAR_DATA *ch = d->character;
+	Character *ch = d->character;
 
 	if (!ch->pcdata->in_progress)
 	{
@@ -1008,7 +982,7 @@ void handle_con_note_to (DESCRIPTOR_DATA *d, char * argument)
 void handle_con_note_subject (DESCRIPTOR_DATA *d, char * argument)
 {
 	char buf [MAX_INPUT_LENGTH];
-	CHAR_DATA *ch = d->character;
+	Character *ch = d->character;
 
 	if (!ch->pcdata->in_progress)
 	{
@@ -1062,7 +1036,7 @@ void handle_con_note_subject (DESCRIPTOR_DATA *d, char * argument)
 
 void handle_con_note_expire(DESCRIPTOR_DATA *d, char * argument)
 {
-	CHAR_DATA *ch = d->character;
+	Character *ch = d->character;
 	char buf[MAX_STRING_LENGTH];
 	time_t expire;
 	int days;
@@ -1116,7 +1090,7 @@ void handle_con_note_expire(DESCRIPTOR_DATA *d, char * argument)
 
 void handle_con_note_text (DESCRIPTOR_DATA *d, char * argument)
 {
-	CHAR_DATA *ch = d->character;
+	Character *ch = d->character;
 	char buf[MAX_STRING_LENGTH];
 	char letter[4*MAX_STRING_LENGTH];
 	
@@ -1152,11 +1126,10 @@ void handle_con_note_text (DESCRIPTOR_DATA *d, char * argument)
 	/* Not end of note. Copy current text into temp buffer, add new line, and copy back */
 
 	/* How would the system react to strcpy( , NULL) ? */		
-	if (ch->pcdata->in_progress->text)
+	if (!ch->pcdata->in_progress->getText().empty())
 	{
-		strcpy (letter, ch->pcdata->in_progress->text);
-		free_string (ch->pcdata->in_progress->text);
-		ch->pcdata->in_progress->text = NULL; /* be sure we don't free it twice */
+		strcpy (letter, ch->pcdata->in_progress->getText().c_str());
+		ch->pcdata->in_progress->setText("");
 	}
 	else
 		strcpy (letter, "");
@@ -1178,13 +1151,13 @@ void handle_con_note_text (DESCRIPTOR_DATA *d, char * argument)
 	strcat (letter, "\r\n"); /* new line. \r first to make note files better readable */
 
 	/* allocate dynamically */		
-	ch->pcdata->in_progress->text = str_dup (letter);
+	ch->pcdata->in_progress->setText(letter);
 }
 
 void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
 {
 	char buf[MSL];
-	CHAR_DATA *ch = d->character;
+	Character *ch = d->character;
 	
 		if (!ch->pcdata->in_progress)
 		{
@@ -1201,11 +1174,11 @@ void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
 				break;
 
 			case 'v': /* view note so far */
-				if (ch->pcdata->in_progress->text)
+				if (!ch->pcdata->in_progress->getText().empty())
 				{
 					sprintf(buf, GREEN "Your note so far:" NO_COLOR "\n\r");
 					send_to_char(buf,ch);
-					send_to_char(ch->pcdata->in_progress->text, ch);
+					send_to_char(ch->pcdata->in_progress->getText().c_str(), ch);
 				}
 				else
 					write_to_buffer (d,"You haven't written a thing!\n\r\n\r",0);

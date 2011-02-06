@@ -1,3 +1,6 @@
+#include "Note.h"
+
+
 /* Includes for board system */
 /* This is version 2 of the board system, (c) 1995-96 erwin@pip.dknet.dk */
 
@@ -18,31 +21,6 @@
 						
 #define BOARD_NOTFOUND -1 /* Error code from board_lookup() and board_number */
 
-/*
- * Data structure for notes.
- */
-class NOTE_DATA
-{
-public:
-    NOTE_DATA *	next;
-    bool 	valid;
-    sh_int	type;
-    char *	sender;
-    char *	date;
-    char *	to_list;
-    char *	subject;
-    char *	text;
-    time_t  	date_stamp;
-    time_t      expire;
-
-    NOTE_DATA();
-    ~NOTE_DATA();
-};
-
-
-
-
-
 /* Data about a board */
 struct board_data
 {
@@ -59,7 +37,7 @@ struct board_data
 
 	/* Non-constant data */
 		
-	NOTE_DATA *note_first; /* pointer to board's first note */
+	Note *note_first; /* pointer to board's first note */
 	bool changed; /* currently unused */
 		
 };
@@ -73,10 +51,10 @@ extern BOARD_DATA boards[MAX_BOARD]; /* Declare */
 
 /* Prototypes */
 
-void finish_note (BOARD_DATA *board, NOTE_DATA *note); /* attach a note to a board */
+void finish_note (BOARD_DATA *board, Note *note); /* attach a note to a board */
 void load_boards (void); /* load all boards */
 int board_lookup (const char *name); /* Find a board with that name */
-bool is_note_to (CHAR_DATA *ch, NOTE_DATA *note); /* is tha note to ch? */
+bool is_note_to (Character *ch, Note *note); /* is tha note to ch? */
 void personal_message (const char *sender, const char *to, const char *subject, const int expire_days, const char *text);
 void make_note (const char* board_name, const char *sender, const char *to, const char *subject, const int expire_days, const char *text);
 void save_notes ();

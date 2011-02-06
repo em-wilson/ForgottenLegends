@@ -24,7 +24,7 @@
 
 #define MAX_NEST	100
 //static	OBJ_DATA *	rgObjNest	[MAX_NEST];
-void show_flag_cmds( CHAR_DATA *ch, const struct flag_type *flag_table );
+void show_flag_cmds( Character *ch, const struct flag_type *flag_table );
 CLAN_DATA * first_clan;
 CLAN_DATA * last_clan;
 
@@ -320,7 +320,7 @@ bool load_clan_file( char *clanfile )
  * This allows imms to delete clans
  * -Blizzard
  */
-void do_delclan( CHAR_DATA *ch, char *argument )
+void do_delclan( Character *ch, char *argument )
 {
     CLAN_DATA *clan;
     char strsave[MAX_STRING_LENGTH];
@@ -379,10 +379,10 @@ void load_clans( )
     return;
 }
 
-void do_induct( CHAR_DATA *ch, char *argument )
+void do_induct( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
+    Character *victim;
     CLAN_DATA *clan;
 
     if ( IS_NPC( ch ) || !ch->pcdata->clan )
@@ -454,10 +454,10 @@ void do_induct( CHAR_DATA *ch, char *argument )
     return;
 }
 
-void do_outcast( CHAR_DATA *ch, char *argument )
+void do_outcast( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
+    Character *victim;
     CLAN_DATA *clan;
 
     if ( IS_NPC( ch ) || !ch->pcdata->clan )
@@ -536,7 +536,7 @@ void do_outcast( CHAR_DATA *ch, char *argument )
     return;
 }
 
-void do_setclan( CHAR_DATA *ch, char *argument )
+void do_setclan( Character *ch, char *argument )
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
@@ -692,7 +692,7 @@ void do_setclan( CHAR_DATA *ch, char *argument )
     return;
 }
 
-void do_makeclan( CHAR_DATA *ch, char *argument )
+void do_makeclan( Character *ch, char *argument )
 {
     CLAN_DATA *clan;
     bool found;
@@ -700,7 +700,7 @@ void do_makeclan( CHAR_DATA *ch, char *argument )
 if (get_trust(ch) < MAX_LEVEL)
 {
     char filename[MAX_STRING_LENGTH];
-    CHAR_DATA *leader, *rec1, *rec2, *mem1, *mem2;
+    Character *leader, *rec1, *rec2, *mem1, *mem2;
     char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
 	 arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH],
 	 arg5[MAX_INPUT_LENGTH];
@@ -882,7 +882,7 @@ else if (get_trust(ch) == MAX_LEVEL)
  * Added multiple level pkill and pdeath support. --Shaddai
  */
 
-void do_clist( CHAR_DATA *ch, char *argument )
+void do_clist( Character *ch, char *argument )
 {
     CLAN_DATA *clan;
     DESCRIPTOR_DATA *d;

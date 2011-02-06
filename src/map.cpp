@@ -35,10 +35,10 @@ const char *map[MAX_MAP][MAX_MAP];
 int offsets[4][2] ={ {-1, 0},{ 0, 1},{ 1, 0},{ 0,-1} };
 
 void MapArea 
-(ROOM_INDEX_DATA *room, CHAR_DATA *ch, int x, int y, int min, int max)
+(ROOM_INDEX_DATA *room, Character *ch, int x, int y, int min, int max)
 {
 ROOM_INDEX_DATA *prospect_room;
-CHAR_DATA *rch;
+Character *rch;
 EXIT_DATA *pexit;
 int door;
 
@@ -99,7 +99,7 @@ default: 		map[x][y]="{yo{x";
 return;
 }
 
-void ShowMap( CHAR_DATA *ch, int min, int max)
+void ShowMap( Character *ch, int min, int max)
 {
 int x,y;
 
@@ -116,7 +116,7 @@ int x,y;
 return;
 }
 
-void do_map( CHAR_DATA *ch, char *argument )
+void do_map( Character *ch, char *argument )
 {
 int size,center,x,y,min,max;
 char arg1[10];

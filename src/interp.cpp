@@ -40,7 +40,7 @@
 #include "recycle.h"
 #include "Wiznet.h"
 
-bool	check_social	args( ( CHAR_DATA *ch, char *command,
+bool	check_social	args( ( Character *ch, char *command,
 			    char *argument ) );
 char *	return_wizhelp	args( ( int level ) );
 
@@ -447,7 +447,7 @@ const	struct	cmd_type	cmd_table	[] =
  * The main entry point for executing commands.
  * Can be recursively called from 'at', 'order', 'force'.
  */
-void interpret( CHAR_DATA *ch, char *argument )
+void interpret( Character *ch, char *argument )
 {
     char command[MAX_INPUT_LENGTH];
     char logline[MAX_INPUT_LENGTH];
@@ -595,10 +595,10 @@ void interpret( CHAR_DATA *ch, char *argument )
 
 
 
-bool check_social( CHAR_DATA *ch, char *command, char *argument )
+bool check_social( Character *ch, char *command, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
+    Character *victim;
     int cmd;
     bool found;
 
@@ -814,7 +814,7 @@ char *one_argument( char *argument, char *arg_first )
 /*
  * Contributed by Alander.
  */
-void do_commands( CHAR_DATA *ch, char *argument )
+void do_commands( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     int cmd;
@@ -839,7 +839,7 @@ void do_commands( CHAR_DATA *ch, char *argument )
     return;
 }
 
-void do_wizhelp( CHAR_DATA *ch, char *argument )
+void do_wizhelp( Character *ch, char *argument )
 {
     BUFFER *output;
 

@@ -54,7 +54,7 @@ void acid_effect(void *vo, int level, int dam, int target)
 
     if (target == TARGET_CHAR)  /* do the effect on a victim */
     {
-	CHAR_DATA *victim = (CHAR_DATA *) vo;
+	Character *victim = (Character *) vo;
 	OBJ_DATA *obj, *obj_next;
 	
 	/* let's toast some gear */
@@ -211,7 +211,7 @@ void cold_effect(void *vo, int level, int dam, int target)
 
     if (target == TARGET_CHAR) /* whack a character */
     {
-	CHAR_DATA *victim = (CHAR_DATA *) vo;
+	Character *victim = (Character *) vo;
 	OBJ_DATA *obj, *obj_next;
 	
 	/* chill touch effect */
@@ -315,7 +315,7 @@ void fire_effect(void *vo, int level, int dam, int target)
  
     if (target == TARGET_CHAR)   /* do the effect on a victim */
     {
-	CHAR_DATA *victim = (CHAR_DATA *) vo;
+	Character *victim = (Character *) vo;
 	OBJ_DATA *obj, *obj_next;
 
 	/* chance of blindness */
@@ -458,7 +458,7 @@ void poison_effect(void *vo,int level, int dam, int target)
  
     if (target == TARGET_CHAR)   /* do the effect on a victim */
     {
-        CHAR_DATA *victim = (CHAR_DATA *) vo;
+        Character *victim = (Character *) vo;
         OBJ_DATA *obj, *obj_next;
 
 	/* chance of poisoning */
@@ -548,7 +548,7 @@ void shock_effect(void *vo,int level, int dam, int target)
 
     if (target == TARGET_CHAR)
     {
-	CHAR_DATA *victim = (CHAR_DATA *) vo;
+	Character *victim = (Character *) vo;
 	OBJ_DATA *obj, *obj_next;
 
 	/* daze and confused? */

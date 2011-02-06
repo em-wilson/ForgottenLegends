@@ -47,11 +47,11 @@ DECLARE_DO_FUN(do_say		);
 
 
 /* used to get new skills */
-void do_gain(CHAR_DATA *ch, char *argument)
+void do_gain(Character *ch, char *argument)
 {
     char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
-    CHAR_DATA *trainer;
+    Character *trainer;
     int gn = 0, sn = 0;
 
     if (IS_NPC(ch))
@@ -260,7 +260,7 @@ void do_gain(CHAR_DATA *ch, char *argument)
 
 /* RT spells and skills show the players spells (or skills) */
 
-void do_spells(CHAR_DATA *ch, char *argument)
+void do_spells(Character *ch, char *argument)
 {
     BUFFER *buffer;
     char arg[MAX_INPUT_LENGTH];
@@ -380,7 +380,7 @@ void do_spells(CHAR_DATA *ch, char *argument)
     free_buf(buffer);
 }
 
-void do_skills(CHAR_DATA *ch, char *argument)
+void do_skills(Character *ch, char *argument)
 {
     BUFFER *buffer;
     char arg[MAX_INPUT_LENGTH];
@@ -498,7 +498,7 @@ void do_skills(CHAR_DATA *ch, char *argument)
 }
 
 /* shows skills, groups and costs (only if not bought) */
-void list_group_costs(CHAR_DATA *ch)
+void list_group_costs(Character *ch)
 {
     char buf[100];
     int gn,sn,col;
@@ -566,7 +566,7 @@ void list_group_costs(CHAR_DATA *ch)
 }
 
 
-void list_group_chosen(CHAR_DATA *ch)
+void list_group_chosen(Character *ch)
 {
     char buf[100];
     int gn,sn,col;
@@ -630,7 +630,7 @@ void list_group_chosen(CHAR_DATA *ch)
     return;
 }
 
-int exp_per_level(CHAR_DATA *ch, int points)
+int exp_per_level(Character *ch, int points)
 {
     int count;
 
@@ -643,7 +643,7 @@ int exp_per_level(CHAR_DATA *ch, int points)
 }
 
 /* this procedure handles the input parsing for the skill generator */
-bool parse_gen_groups(CHAR_DATA *ch,char *argument)
+bool parse_gen_groups(Character *ch,char *argument)
 {
     char arg[MAX_INPUT_LENGTH];
     char buf[100];
@@ -802,7 +802,7 @@ bool parse_gen_groups(CHAR_DATA *ch,char *argument)
         
 
 /* shows all groups, or the sub-members of a group */
-void do_groups(CHAR_DATA *ch, char *argument)
+void do_groups(Character *ch, char *argument)
 {
     char buf[100];
     int gn,sn,col;
@@ -875,7 +875,7 @@ void do_groups(CHAR_DATA *ch, char *argument)
 }
 
 /* checks for skill improvement */
-void check_improve( CHAR_DATA *ch, int sn, bool success, int multiplier )
+void check_improve( Character *ch, int sn, bool success, int multiplier )
 {
     int chance;
     char buf[100];
@@ -949,7 +949,7 @@ int group_lookup( const char *name )
 }
 
 /* recursively adds a group given its number -- uses group_add */
-void gn_add( CHAR_DATA *ch, int gn)
+void gn_add( Character *ch, int gn)
 {
     int i;
     
@@ -963,7 +963,7 @@ void gn_add( CHAR_DATA *ch, int gn)
 }
 
 /* recusively removes a group given its number -- uses group_remove */
-void gn_remove( CHAR_DATA *ch, int gn)
+void gn_remove( Character *ch, int gn)
 {
     int i;
 
@@ -978,7 +978,7 @@ void gn_remove( CHAR_DATA *ch, int gn)
 }
 	
 /* use for processing a skill or group for addition  */
-void group_add( CHAR_DATA *ch, const char *name, bool deduct)
+void group_add( Character *ch, const char *name, bool deduct)
 {
     int sn,gn;
 
@@ -1018,7 +1018,7 @@ void group_add( CHAR_DATA *ch, const char *name, bool deduct)
 
 /* used for processing a skill or group for deletion -- no points back! */
 
-void group_remove(CHAR_DATA *ch, const char *name)
+void group_remove(Character *ch, const char *name)
 {
     int sn, gn;
     
@@ -1042,7 +1042,7 @@ void group_remove(CHAR_DATA *ch, const char *name)
 }
 
 /* Make exceptions for skill level check */
-int skill_level( CHAR_DATA *ch, int sn )
+int skill_level( Character *ch, int sn )
 {
     /* First check is to see if they're a wereperson */
     if (ch->race == race_lookup("werefolk"))
@@ -1183,7 +1183,7 @@ int skill_level( CHAR_DATA *ch, int sn )
 
 
 /* Make exceptions for skill purchase cost */
-int skill_rating( CHAR_DATA *ch, int sn )
+int skill_rating( Character *ch, int sn )
 {
     /* First check is to see if they're a wereperson */
     if (ch->race == race_lookup("werefolk"))

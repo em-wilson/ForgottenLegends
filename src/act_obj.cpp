@@ -50,23 +50,23 @@ DECLARE_DO_FUN(do_wake		);
 /*
  * Local functions.
  */
-#define CD CHAR_DATA
+#define CD Character
 #define OD OBJ_DATA
-bool	remove_obj	args( (CHAR_DATA *ch, int iWear, bool fReplace ) );
-void	wear_obj	args( (CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace ) );
-CD *	find_keeper	args( (CHAR_DATA *ch ) );
-int	get_cost	args( (CHAR_DATA *keeper, OBJ_DATA *obj, bool fBuy ) );
-void 	obj_to_keeper	args( (OBJ_DATA *obj, CHAR_DATA *ch ) );
-OD *	get_obj_keeper	args( (CHAR_DATA *ch,CHAR_DATA *keeper,char *argument));
+bool	remove_obj	args( (Character *ch, int iWear, bool fReplace ) );
+void	wear_obj	args( (Character *ch, OBJ_DATA *obj, bool fReplace ) );
+CD *	find_keeper	args( (Character *ch ) );
+int	get_cost	args( (Character *keeper, OBJ_DATA *obj, bool fBuy ) );
+void 	obj_to_keeper	args( (OBJ_DATA *obj, Character *ch ) );
+OD *	get_obj_keeper	args( (Character *ch,Character *keeper,char *argument));
 
 #undef OD
 #undef	CD
 
 /* RT part of the corpse looting code */
 
-bool can_loot(CHAR_DATA *ch, OBJ_DATA *obj)
+bool can_loot(Character *ch, OBJ_DATA *obj)
 {
-    CHAR_DATA *owner, *wch;
+    Character *owner, *wch;
 
     if (IS_IMMORTAL(ch))
 	return TRUE;
@@ -75,7 +75,7 @@ bool can_loot(CHAR_DATA *ch, OBJ_DATA *obj)
 	return TRUE;
 
     owner = NULL;
-    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
+    for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
     	wch = *it;
         if (!str_cmp(wch->getName(),obj->owner))
@@ -98,10 +98,10 @@ bool can_loot(CHAR_DATA *ch, OBJ_DATA *obj)
 }
 
 
-void get_obj( CHAR_DATA *ch, OBJ_DATA *obj, OBJ_DATA *container )
+void get_obj( Character *ch, OBJ_DATA *obj, OBJ_DATA *container )
 {
     /* variables for AUTOSPLIT */
-    CHAR_DATA *gch;
+    Character *gch;
     int members;
     char buffer[100];
 
@@ -201,7 +201,7 @@ void get_obj( CHAR_DATA *ch, OBJ_DATA *obj, OBJ_DATA *container )
 
 
 
-void do_get( CHAR_DATA *ch, char *argument )
+void do_get( Character *ch, char *argument )
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
@@ -353,7 +353,7 @@ void do_get( CHAR_DATA *ch, char *argument )
 
 
 
-void do_put( CHAR_DATA *ch, char *argument )
+void do_put( Character *ch, char *argument )
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
@@ -502,7 +502,7 @@ void do_put( CHAR_DATA *ch, char *argument )
 
 
 
-void do_drop( CHAR_DATA *ch, char *argument )
+void do_drop( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
@@ -666,12 +666,12 @@ void do_drop( CHAR_DATA *ch, char *argument )
 
 
 
-void do_give( CHAR_DATA *ch, char *argument )
+void do_give( Character *ch, char *argument )
 {
     char arg1 [MAX_INPUT_LENGTH];
     char arg2 [MAX_INPUT_LENGTH];
     char buf[MAX_STRING_LENGTH];
-    CHAR_DATA *victim;
+    Character *victim;
     OBJ_DATA  *obj;
 
     argument = one_argument( argument, arg1 );
@@ -854,7 +854,7 @@ void do_give( CHAR_DATA *ch, char *argument )
 
 
 /* for poisoning weapons and food/drink */
-void do_envenom(CHAR_DATA *ch, char *argument)
+void do_envenom(Character *ch, char *argument)
 {
     OBJ_DATA *obj;
     AFFECT_DATA af;
@@ -968,7 +968,7 @@ void do_envenom(CHAR_DATA *ch, char *argument)
     return;
 }
 
-void do_fill( CHAR_DATA *ch, char *argument )
+void do_fill( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     char buf[MAX_STRING_LENGTH];
@@ -1036,11 +1036,11 @@ void do_fill( CHAR_DATA *ch, char *argument )
     return;
 }
 
-void do_pour (CHAR_DATA *ch, char *argument)
+void do_pour (Character *ch, char *argument)
 {
     char arg[MAX_STRING_LENGTH],buf[MAX_STRING_LENGTH];
     OBJ_DATA *out, *in;
-    CHAR_DATA *vch = NULL;
+    Character *vch = NULL;
     int amount;
 
     argument = one_argument(argument,arg);
@@ -1163,7 +1163,7 @@ void do_pour (CHAR_DATA *ch, char *argument)
     }
 }
 
-void do_drink( CHAR_DATA *ch, char *argument )
+void do_drink( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
@@ -1282,7 +1282,7 @@ void do_drink( CHAR_DATA *ch, char *argument )
 
 
 
-void do_eat( CHAR_DATA *ch, char *argument )
+void do_eat( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
@@ -1370,7 +1370,7 @@ void do_eat( CHAR_DATA *ch, char *argument )
 /*
  * Remove an object.
  */
-bool remove_obj( CHAR_DATA *ch, int iWear, bool fReplace )
+bool remove_obj( Character *ch, int iWear, bool fReplace )
 {
     OBJ_DATA *obj;
 
@@ -1399,7 +1399,7 @@ bool remove_obj( CHAR_DATA *ch, int iWear, bool fReplace )
  * Optional replacement of existing objects.
  * Big repetitive code, ick.
  */
-void wear_obj( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace )
+void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
 {
     char buf[MAX_STRING_LENGTH];
 
@@ -1714,7 +1714,7 @@ void wear_obj( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace )
     return;
 }
 
-void do_second (CHAR_DATA *ch, char *argument)
+void do_second (Character *ch, char *argument)
 /* wear object as a secondary weapon */
 {
     OBJ_DATA *obj;
@@ -1792,7 +1792,7 @@ void do_second (CHAR_DATA *ch, char *argument)
     return;
 }
 
-void do_wear( CHAR_DATA *ch, char *argument )
+void do_wear( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
@@ -1833,7 +1833,7 @@ void do_wear( CHAR_DATA *ch, char *argument )
 
 
 
-void do_remove( CHAR_DATA *ch, char *argument )
+void do_remove( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
@@ -1858,7 +1858,7 @@ void do_remove( CHAR_DATA *ch, char *argument )
 
 
 
-void do_sacrifice( CHAR_DATA *ch, char *argument )
+void do_sacrifice( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     char buf[MAX_STRING_LENGTH];
@@ -1866,7 +1866,7 @@ void do_sacrifice( CHAR_DATA *ch, char *argument )
     int silver;
     
     /* variables for AUTOSPLIT */
-    CHAR_DATA *gch;
+    Character *gch;
     int members;
     char buffer[100];
 
@@ -1959,7 +1959,7 @@ void do_sacrifice( CHAR_DATA *ch, char *argument )
 
 
 
-void do_quaff( CHAR_DATA *ch, char *argument )
+void do_quaff( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
@@ -2003,11 +2003,11 @@ void do_quaff( CHAR_DATA *ch, char *argument )
 
 
 
-void do_recite( CHAR_DATA *ch, char *argument )
+void do_recite( Character *ch, char *argument )
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
+    Character *victim;
     OBJ_DATA *scroll;
     OBJ_DATA *obj;
 
@@ -2071,10 +2071,10 @@ void do_recite( CHAR_DATA *ch, char *argument )
 
 
 
-void do_brandish( CHAR_DATA *ch, char *argument )
+void do_brandish( Character *ch, char *argument )
 {
-    CHAR_DATA *vch;
-    CHAR_DATA *vch_next;
+    Character *vch;
+    Character *vch_next;
     OBJ_DATA *staff;
     int sn;
 
@@ -2160,10 +2160,10 @@ void do_brandish( CHAR_DATA *ch, char *argument )
 
 
 
-void do_zap( CHAR_DATA *ch, char *argument )
+void do_zap( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
+    Character *victim;
     OBJ_DATA *wand;
     OBJ_DATA *obj;
 
@@ -2253,12 +2253,12 @@ void do_zap( CHAR_DATA *ch, char *argument )
 
 
 
-void do_steal( CHAR_DATA *ch, char *argument )
+void do_steal( Character *ch, char *argument )
 {
     char buf  [MAX_STRING_LENGTH];
     char arg1 [MAX_INPUT_LENGTH];
     char arg2 [MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
+    Character *victim;
     OBJ_DATA *obj;
     int percent;
 
@@ -2432,10 +2432,10 @@ void do_steal( CHAR_DATA *ch, char *argument )
 /*
  * Shopping commands.
  */
-CHAR_DATA *find_keeper( CHAR_DATA *ch )
+Character *find_keeper( Character *ch )
 {
     /*char buf[MAX_STRING_LENGTH];*/
-    CHAR_DATA *keeper;
+    Character *keeper;
     SHOP_DATA *pShop;
 
     pShop = NULL;
@@ -2479,7 +2479,7 @@ CHAR_DATA *find_keeper( CHAR_DATA *ch )
 }
 
 /* insert an object at the right spot for the keeper */
-void obj_to_keeper( OBJ_DATA *obj, CHAR_DATA *ch )
+void obj_to_keeper( OBJ_DATA *obj, Character *ch )
 {
     OBJ_DATA *t_obj, *t_obj_next;
 
@@ -2521,7 +2521,7 @@ void obj_to_keeper( OBJ_DATA *obj, CHAR_DATA *ch )
 }
 
 /* get an object from a shopkeeper's list */
-OBJ_DATA *get_obj_keeper( CHAR_DATA *ch, CHAR_DATA *keeper, char *argument )
+OBJ_DATA *get_obj_keeper( Character *ch, Character *keeper, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
@@ -2551,7 +2551,7 @@ OBJ_DATA *get_obj_keeper( CHAR_DATA *ch, CHAR_DATA *keeper, char *argument )
     return NULL;
 }
 
-int get_cost( CHAR_DATA *keeper, OBJ_DATA *obj, bool fBuy )
+int get_cost( Character *keeper, OBJ_DATA *obj, bool fBuy )
 {
     SHOP_DATA *pShop;
     int cost;
@@ -2613,7 +2613,7 @@ int get_cost( CHAR_DATA *keeper, OBJ_DATA *obj, bool fBuy )
 
 
 
-void do_buy( CHAR_DATA *ch, char *argument )
+void do_buy( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     int cost,roll;
@@ -2628,7 +2628,7 @@ void do_buy( CHAR_DATA *ch, char *argument )
     {
 	char arg[MAX_INPUT_LENGTH];
 	char buf[MAX_STRING_LENGTH];
-	CHAR_DATA *pet;
+	Character *pet;
 	ROOM_INDEX_DATA *pRoomIndexNext;
 	ROOM_INDEX_DATA *in_room;
 
@@ -2721,7 +2721,7 @@ void do_buy( CHAR_DATA *ch, char *argument )
     }
     else
     {
-	CHAR_DATA *keeper;
+	Character *keeper;
 	OBJ_DATA *obj,*t_obj;
 	char arg[MAX_INPUT_LENGTH];
 	int number, count = 1;
@@ -2851,14 +2851,14 @@ void do_buy( CHAR_DATA *ch, char *argument )
 
 
 
-void do_list( CHAR_DATA *ch, char *argument )
+void do_list( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
 
     if ( IS_SET(ch->in_room->room_flags, ROOM_PET_SHOP) )
     {
 	ROOM_INDEX_DATA *pRoomIndexNext;
-	CHAR_DATA *pet;
+	Character *pet;
 	bool found;
 
         /* hack to make new thalos pets work */
@@ -2897,7 +2897,7 @@ void do_list( CHAR_DATA *ch, char *argument )
     }
     else
     {
-	CHAR_DATA *keeper;
+	Character *keeper;
 	OBJ_DATA *obj;
 	int cost,count;
 	bool found;
@@ -2952,11 +2952,11 @@ void do_list( CHAR_DATA *ch, char *argument )
 
 
 
-void do_sell( CHAR_DATA *ch, char *argument )
+void do_sell( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
-    CHAR_DATA *keeper;
+    Character *keeper;
     OBJ_DATA *obj;
     int cost,roll;
 
@@ -3042,11 +3042,11 @@ void do_sell( CHAR_DATA *ch, char *argument )
 
 
 
-void do_value( CHAR_DATA *ch, char *argument )
+void do_value( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
-    CHAR_DATA *keeper;
+    Character *keeper;
     OBJ_DATA *obj;
     int cost;
 
@@ -3097,7 +3097,7 @@ void do_value( CHAR_DATA *ch, char *argument )
 }
 
 /* put an item on auction, or see the stats on the current item or bet */
-void do_auction (CHAR_DATA *ch, char *argument)
+void do_auction (Character *ch, char *argument)
 {
     char arg1[MAX_INPUT_LENGTH];
 

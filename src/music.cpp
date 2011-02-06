@@ -41,12 +41,12 @@
 
 int channel_songs[MAX_GLOBAL + 1];
 struct song_data song_table[MAX_SONGS];
-CHAR_DATA *dedicate;
+Character *dedicate;
 
 void song_update(void)
 {
     OBJ_DATA *obj;
-    CHAR_DATA *victim;
+    Character *victim;
     ROOM_INDEX_DATA *room;
     DESCRIPTOR_DATA *d;
     char buf[MAX_STRING_LENGTH];
@@ -216,7 +216,7 @@ void load_songs(void)
     }
 }
 
-void do_play(CHAR_DATA *ch, char *argument)
+void do_play(Character *ch, char *argument)
 {
     OBJ_DATA *juke;
     char *str,arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
@@ -351,7 +351,7 @@ void do_play(CHAR_DATA *ch, char *argument)
 
 	    for (d = descriptor_list; d != NULL; d = d->next)
 	    {
-		CHAR_DATA *victim;
+		Character *victim;
 		victim = d->original ? d->original : d->character;
 
         	if ( d->connected == CON_PLAYING &&

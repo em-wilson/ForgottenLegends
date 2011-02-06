@@ -68,12 +68,12 @@ int	save_number = 0;
  */
 void mobile_update( void )
 {
-    CHAR_DATA *ch;
+    Character *ch;
     EXIT_DATA *pexit;
     int door;
 
     /* Examine all mobs. */
-    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
+    for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
 	ch = *it;
 
@@ -330,7 +330,7 @@ void info_update( void )
 
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
-        CHAR_DATA *victim;
+        Character *victim;
 
 	victim = d->character;
 
@@ -350,8 +350,8 @@ void info_update( void )
  */
 void char_update( void )
 {   
-    CHAR_DATA *ch;
-    CHAR_DATA *ch_quit;
+    Character *ch;
+    Character *ch_quit;
 
     ch_quit	= NULL;
 
@@ -361,7 +361,7 @@ void char_update( void )
     if (save_number > 29)
 	save_number = 0;
 
-    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
+    for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
     	ch = *it;
 	AFFECT_DATA *paf;
@@ -492,7 +492,7 @@ void char_update( void )
         if (is_affected(ch, gsn_plague) && ch != NULL)
         {
             AFFECT_DATA *af, plague;
-            CHAR_DATA *vch;
+            Character *vch;
             int dam;
 
 	    if (ch->in_room == NULL)
@@ -572,7 +572,7 @@ void char_update( void )
      * Autosave and autoquit.
      * Check that these chars still exist.
      */
-    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
+    for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
         ch = *it;
 
@@ -601,7 +601,7 @@ void obj_update( void )
 
     for ( obj = object_list; obj != NULL; obj = obj_next )
     {
-	CHAR_DATA *rch;
+	Character *rch;
 	char *message;
 
 	obj_next = obj->next;
@@ -754,14 +754,14 @@ void obj_update( void )
  */
 void aggr_update( void )
 {
-    CHAR_DATA *wch;
-    CHAR_DATA *ch;
-    CHAR_DATA *ch_next;
-    CHAR_DATA *vch;
-    CHAR_DATA *vch_next;
-    CHAR_DATA *victim;
+    Character *wch;
+    Character *ch;
+    Character *ch_next;
+    Character *vch;
+    Character *vch_next;
+    Character *victim;
 
-    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
+    for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
 	wch = *it;
 	if ( IS_NPC(wch)

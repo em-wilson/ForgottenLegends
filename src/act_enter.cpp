@@ -37,8 +37,8 @@
 #include <stdlib.h>
 #include "merc.h"
 
-void    raw_kill        args( ( CHAR_DATA *victim ) );
-int     xp_compute      args( ( CHAR_DATA *gch, CHAR_DATA *victim, int
+void    raw_kill        args( ( Character *victim ) );
+int     xp_compute      args( ( Character *gch, Character *victim, int
 total_levels ) );
 
 /* command procedures needed */
@@ -46,7 +46,7 @@ DECLARE_DO_FUN(do_look		);
 DECLARE_DO_FUN(do_stand		);
 
 /* random room generation procedure */
-ROOM_INDEX_DATA  *get_random_room(CHAR_DATA *ch)
+ROOM_INDEX_DATA  *get_random_room(Character *ch)
 {
     ROOM_INDEX_DATA *room;
 
@@ -68,7 +68,7 @@ ROOM_INDEX_DATA  *get_random_room(CHAR_DATA *ch)
 }
 
 /* RT Enter portals */
-void do_enter( CHAR_DATA *ch, char *argument)
+void do_enter( Character *ch, char *argument)
 {    
     ROOM_INDEX_DATA *location; 
 
@@ -80,7 +80,7 @@ void do_enter( CHAR_DATA *ch, char *argument)
     {
         ROOM_INDEX_DATA *old_room;
 	OBJ_DATA *portal;
-	CHAR_DATA *fch, *fch_next;
+	Character *fch, *fch_next;
 
         old_room = ch->in_room;
 
@@ -230,11 +230,11 @@ void do_enter( CHAR_DATA *ch, char *argument)
     return;
 }
 
-void do_detonate( CHAR_DATA *ch, char *argument )
+void do_detonate( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     OBJ_DATA *nuke;
-    CHAR_DATA *victim, *gch;
+    Character *victim, *gch;
     DESCRIPTOR_DATA *d;
     ROOM_INDEX_DATA *room;
     int count = 0;

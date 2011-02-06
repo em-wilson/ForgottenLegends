@@ -242,9 +242,9 @@ int num_eval( int lval, int oper, int rval )
 /*
  * Get a random PC in the room (for $r parameter)
  */
-CHAR_DATA *get_random_char( CHAR_DATA *mob )
+Character *get_random_char( Character *mob )
 {
-    CHAR_DATA *vch, *victim = NULL;
+    Character *vch, *victim = NULL;
     int now = 0, highest = 0;
     for( vch = mob->in_room->people; vch; vch = vch->next_in_room )
     {
@@ -264,9 +264,9 @@ CHAR_DATA *get_random_char( CHAR_DATA *mob )
  * How many other players / mobs are there in the room
  * iFlag: 0: all, 1: players, 2: mobiles 3: mobs w/ same vnum 4: same group
  */
-int count_people_room( CHAR_DATA *mob, int iFlag )
+int count_people_room( Character *mob, int iFlag )
 {
-    CHAR_DATA *vch;
+    Character *vch;
     int count;
     for ( count = 0, vch = mob->in_room->people; vch; vch = vch->next_in_room )
 	if ( mob != vch 
@@ -286,9 +286,9 @@ int count_people_room( CHAR_DATA *mob, int iFlag )
  * a room have the same trigger and you want only the first of them
  * to act 
  */
-int get_order( CHAR_DATA *ch )
+int get_order( Character *ch )
 {
-    CHAR_DATA *vch;
+    Character *vch;
     int i;
 
     if ( !IS_NPC(ch) )
@@ -310,7 +310,7 @@ int get_order( CHAR_DATA *ch )
  * item_type: item type or -1
  * fWear: TRUE: item must be worn, FALSE: don't care
  */
-bool has_item( CHAR_DATA *ch, sh_int vnum, sh_int item_type, bool fWear )
+bool has_item( Character *ch, sh_int vnum, sh_int item_type, bool fWear )
 {
     OBJ_DATA *obj;
     for ( obj = ch->carrying; obj; obj = obj->next_content )
@@ -324,9 +324,9 @@ bool has_item( CHAR_DATA *ch, sh_int vnum, sh_int item_type, bool fWear )
 /*
  * Check if there's a mob with given vnum in the room
  */
-bool get_mob_vnum_room( CHAR_DATA *ch, sh_int vnum )
+bool get_mob_vnum_room( Character *ch, sh_int vnum )
 {
-    CHAR_DATA *mob;
+    Character *mob;
     for ( mob = ch->in_room->people; mob; mob = mob->next_in_room )
 	if ( IS_NPC( mob ) && mob->pIndexData->vnum == vnum )
 	    return TRUE;
@@ -336,7 +336,7 @@ bool get_mob_vnum_room( CHAR_DATA *ch, sh_int vnum )
 /*
  * Check if there's an object with given vnum in the room
  */
-bool get_obj_vnum_room( CHAR_DATA *ch, sh_int vnum )
+bool get_obj_vnum_room( Character *ch, sh_int vnum )
 {
     OBJ_DATA *obj;
     for ( obj = ch->in_room->contents; obj; obj = obj->next_content )
@@ -358,11 +358,11 @@ bool get_obj_vnum_room( CHAR_DATA *ch, sh_int vnum )
  *----------------------------------------------------------------------
  */
 int cmd_eval( sh_int vnum, char *line, int check,
-	CHAR_DATA *mob, CHAR_DATA *ch, 
-	const void *arg1, const void *arg2, CHAR_DATA *rch )
+	Character *mob, Character *ch, 
+	const void *arg1, const void *arg2, Character *rch )
 {
-    CHAR_DATA *lval_char = mob;
-    CHAR_DATA *vch = (CHAR_DATA *) arg2;
+    Character *lval_char = mob;
+    Character *vch = (Character *) arg2;
     OBJ_DATA *obj1 = (OBJ_DATA  *) arg1;
     OBJ_DATA *obj2 = (OBJ_DATA  *) arg2;
     OBJ_DATA  *lval_obj = NULL;
@@ -658,8 +658,8 @@ int cmd_eval( sh_int vnum, char *line, int check,
  */
 void expand_arg( char *buf, 
 	const char *format, 
-	CHAR_DATA *mob, CHAR_DATA *ch, 
-	const void *arg1, const void *arg2, CHAR_DATA *rch )
+	Character *mob, Character *ch, 
+	const void *arg1, const void *arg2, Character *rch )
 {
     static const char * he_she  [] = { "it",  "he",  "she" };
     static const char * him_her [] = { "it",  "him", "her" };
@@ -669,7 +669,7 @@ void expand_arg( char *buf,
     const char *someones = "someone's";
  
     char fname[MAX_INPUT_LENGTH];
-    CHAR_DATA *vch = (CHAR_DATA *) arg2;
+    Character *vch = (Character *) arg2;
     OBJ_DATA *obj1 = (OBJ_DATA  *) arg1;
     OBJ_DATA *obj2 = (OBJ_DATA  *) arg2;
     const char *str;
@@ -857,9 +857,9 @@ void expand_arg( char *buf,
 void program_flow( 
         sh_int pvnum,  /* For diagnostic purposes */
 	char *source,  /* the actual MOBprog code */
-	CHAR_DATA *mob, CHAR_DATA *ch, const void *arg1, const void *arg2 )
+	Character *mob, Character *ch, const void *arg1, const void *arg2 )
 {
-    CHAR_DATA *rch = NULL;
+    Character *rch = NULL;
     char *code, *line;
     char buf[MAX_STRING_LENGTH];
     char control[MAX_INPUT_LENGTH], data[MAX_STRING_LENGTH];
@@ -1084,7 +1084,7 @@ void program_flow(
  * phrase.
  */
 void mp_act_trigger( 
-	char *argument, CHAR_DATA *mob, CHAR_DATA *ch, 
+	char *argument, Character *mob, Character *ch, 
 	const void *arg1, const void *arg2, int type )
 {
     MPROG_LIST *prg;
@@ -1106,7 +1106,7 @@ void mp_act_trigger(
  * number is less than trigger phrase
  */
 bool mp_percent_trigger( 
-	CHAR_DATA *mob, CHAR_DATA *ch, 
+	Character *mob, Character *ch, 
 	const void *arg1, const void *arg2, int type )
 {
     MPROG_LIST *prg;
@@ -1123,7 +1123,7 @@ bool mp_percent_trigger(
     return ( FALSE );
 }
 
-void mp_bribe_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
+void mp_bribe_trigger( Character *mob, Character *ch, int amount )
 {
     MPROG_LIST *prg;
 
@@ -1144,9 +1144,9 @@ void mp_bribe_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
     return;
 }
 
-bool mp_exit_trigger( CHAR_DATA *ch, int dir )
+bool mp_exit_trigger( Character *ch, int dir )
 {
-    CHAR_DATA *mob;
+    Character *mob;
     MPROG_LIST   *prg;
 
     for ( mob = ch->in_room->people; mob != NULL; mob = mob->next_in_room )
@@ -1182,7 +1182,7 @@ bool mp_exit_trigger( CHAR_DATA *ch, int dir )
     return FALSE;
 }
 
-void mp_give_trigger( CHAR_DATA *mob, CHAR_DATA *ch, OBJ_DATA *obj )
+void mp_give_trigger( Character *mob, Character *ch, OBJ_DATA *obj )
 {
 
     char        buf[MAX_INPUT_LENGTH], *p;
@@ -1223,9 +1223,9 @@ void mp_give_trigger( CHAR_DATA *mob, CHAR_DATA *ch, OBJ_DATA *obj )
 	}
 }
 
-void mp_greet_trigger( CHAR_DATA *ch )
+void mp_greet_trigger( Character *ch )
 {
-    CHAR_DATA *mob;
+    Character *mob;
 
     for ( mob = ch->in_room->people; mob != NULL; mob = mob->next_in_room )
     {    
@@ -1249,7 +1249,7 @@ void mp_greet_trigger( CHAR_DATA *ch )
     return;
 }
 
-void mp_hprct_trigger( CHAR_DATA *mob, CHAR_DATA *ch )
+void mp_hprct_trigger( Character *mob, Character *ch )
 {
     MPROG_LIST *prg;
 

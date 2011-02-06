@@ -2223,8 +2223,8 @@ Grove---Galaxy              Midgaard   G'harne       |            \Holy
                                 |    \Midgaard   Thalos    Forest         |
        Redferne's---Chain---Southern    River                |  \      Keep of
        Residence            Midgaard         \       Wyvern--+  Drow   Mahn-tor
-           |                  / | \          Sands of Tower  |  City
-         Clouds      Gang Land  | Graveyard  Sorrow          |
+           |                    | \          Sands of Tower  |  City
+         Clouds                 | Graveyard  Sorrow          |
         (Harpies)               |      \           \       Elemental
                             Miden'nir   Church   Mega-City  Canyon
                             (Goblins)  Catacombs    One
@@ -2264,10 +2264,10 @@ Concourse     Park              Park-----Park     Ave----Penny--Penny--Concourse
     |  Guard  Park     Park     The      Park   Emerald   Town             |
     |   HQ----Road---Entrance---Park---Entrance---Ave-----Hall             |
     |           |                                  |                       |
-    |         Park              Emerald---------Emerald--------------Gang  |
-    |         Road                Ave             Ave                |  |  |
-    |           |                  |                                 |  |  |
-    |         Park----------------Road----------Park            Elm--Land  |
+    |         Park              Emerald---------Emerald                    |
+    |         Road                Ave             Ave                      |
+    |           |                  |                                       |
+    |         Park----------------Road----------Park            Elm        |
     |         Road             /Crossing        Road           Street      |
     |                     Chain    |              |              |         |
 Concourse                /         |            Park----Elm-----Elm----Concourse
@@ -3392,19 +3392,12 @@ S
 #3119
 Emerald Avenue~
 You are standing at a bend on Emerald Avenue.  The road leads north and west.
-To the east, you see some run-down slums...it looks like the bad part of
-town.
 ~
 0 262144 1
 D0
 ~
 ~
 0 -1 3117
-D1
-You see some dangerous looking slums...just the right place for a gang.
-~
-~
-0 -1 2101
 D3
 ~
 ~
@@ -3870,16 +3863,9 @@ door~
 S
 #3144
 The end of Elm Street~
-Elm street ends here, next to a dangerous-looking run down neighborhood.
-You can enter the slums to the east, or head towards the graveyard to the
-south.  It occurs to you that this isn't the happiest section of town.
+Elm street ends here - there is a graveyard to the south.
 ~
 0 262144 1
-D1
-You see a run-down slum neighborood.
-~
-~
-0 -1 2160
 D2
 Elm street continues towards a graveyard.
 ~

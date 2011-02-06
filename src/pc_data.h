@@ -35,7 +35,7 @@ public:
     int 		security;	/* OLC */ /* Builder security */
     BOARD_DATA *        board;                  /* The current board        */
     time_t              last_note[MAX_BOARD];   /* last note for the boards */
-    NOTE_DATA *         in_progress;
+    Note *         in_progress;
 
     PC_DATA();
     ~PC_DATA();

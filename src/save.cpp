@@ -88,13 +88,13 @@ static	OBJ_DATA *	rgObjNest	[MAX_NEST];
 /*
  * Local functions.
  */
-void	fwrite_char	args( ( CHAR_DATA *ch,  FILE *fp ) );
-void	fwrite_obj	args( ( CHAR_DATA *ch,  OBJ_DATA  *obj,
+void	fwrite_char	args( ( Character *ch,  FILE *fp ) );
+void	fwrite_obj	args( ( Character *ch,  OBJ_DATA  *obj,
 			    FILE *fp, int iNest ) );
-void	fwrite_pet	args( ( CHAR_DATA *pet, FILE *fp) );
-void	fread_char	args( ( CHAR_DATA *ch,  FILE *fp ) );
-void    fread_pet	args( ( CHAR_DATA *ch,  FILE *fp ) );
-void	fread_obj	args( ( CHAR_DATA *ch,  FILE *fp ) );
+void	fwrite_pet	args( ( Character *pet, FILE *fp) );
+void	fread_char	args( ( Character *ch,  FILE *fp ) );
+void    fread_pet	args( ( Character *ch,  FILE *fp ) );
+void	fread_obj	args( ( Character *ch,  FILE *fp ) );
 
 
 
@@ -103,7 +103,7 @@ void	fread_obj	args( ( CHAR_DATA *ch,  FILE *fp ) );
  * Would be cool to save NPC's too for quest purposes,
  *   some of the infrastructure is provided.
  */
-void save_char_obj( CHAR_DATA *ch )
+void save_char_obj( Character *ch )
 {
     char strsave[MAX_INPUT_LENGTH];
     FILE *fp;
@@ -159,7 +159,7 @@ void save_char_obj( CHAR_DATA *ch )
 /*
  * Write the char.
  */
-void fwrite_char( CHAR_DATA *ch, FILE *fp )
+void fwrite_char( Character *ch, FILE *fp )
 {
     AFFECT_DATA *paf;
     int sn, gn, pos, i;
@@ -354,7 +354,7 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
 }
 
 /* write a pet */
-void fwrite_pet( CHAR_DATA *pet, FILE *fp)
+void fwrite_pet( Character *pet, FILE *fp)
 {
     AFFECT_DATA *paf;
     
@@ -427,7 +427,7 @@ void fwrite_pet( CHAR_DATA *pet, FILE *fp)
 /*
  * Write an object and its contents.
  */
-void fwrite_obj( CHAR_DATA *ch, OBJ_DATA *obj, FILE *fp, int iNest )
+void fwrite_obj( Character *ch, OBJ_DATA *obj, FILE *fp, int iNest )
 {
     EXTRA_DESCR_DATA *ed;
     AFFECT_DATA *paf;
@@ -565,12 +565,12 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 {
     char strsave[MAX_INPUT_LENGTH];
     char buf[100];
-    CHAR_DATA *ch;
+    Character *ch;
     FILE *fp;
     bool found;
     int stat;
 
-    ch = new CHAR_DATA();
+    ch = new Character();
     ch->pcdata = new PC_DATA();
 
     d->character			= ch;
@@ -766,7 +766,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
                     break;                          \
                 }
 
-void fread_char( CHAR_DATA *ch, FILE *fp )
+void fread_char( Character *ch, FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];
     char *word;
@@ -1235,10 +1235,10 @@ void fread_char( CHAR_DATA *ch, FILE *fp )
 }
 
 /* load a pet from the forgotten reaches */
-void fread_pet( CHAR_DATA *ch, FILE *fp )
+void fread_pet( Character *ch, FILE *fp )
 {
     char *word;
-    CHAR_DATA *pet;
+    Character *pet;
     bool fMatch;
     int lastlogoff = current_time;
     int percent;
@@ -1449,7 +1449,7 @@ void fread_pet( CHAR_DATA *ch, FILE *fp )
 
 extern	OBJ_DATA	*obj_free;
 
-void fread_obj( CHAR_DATA *ch, FILE *fp )
+void fread_obj( Character *ch, FILE *fp )
 {
     OBJ_DATA *obj;
     char *word;

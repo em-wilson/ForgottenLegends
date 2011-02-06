@@ -75,12 +75,12 @@ HELP_AREA *		had_list;
 SHOP_DATA *		shop_first;
 SHOP_DATA *		shop_last;
 
-NOTE_DATA *		note_free;
+Note *		note_free;
 
 MPROG_CODE *		mprog_list;
 
 char			bug_buf		[2*MAX_INPUT_LENGTH];
-std::list<CHAR_DATA *> char_list;
+std::list<Character *> char_list;
 char *			help_greeting;
 char			log_buf		[2*MAX_INPUT_LENGTH];
 KILL_DATA		kill_table	[MAX_LEVEL];
@@ -1573,10 +1573,10 @@ void area_update( void )
 void reset_room( ROOM_INDEX_DATA *pRoom )
 {
     RESET_DATA  *pReset;
-    CHAR_DATA   *pMob;
-    CHAR_DATA	*mob;
+    Character   *pMob;
+    Character	*mob;
     OBJ_DATA    *pObj;
-    CHAR_DATA   *LastMob = NULL;
+    Character   *LastMob = NULL;
     OBJ_DATA    *LastObj = NULL;
     int iExit;
     int level = 0;
@@ -1917,9 +1917,9 @@ void reset_area( AREA_DATA *pArea )
 /*
  * Create an instance of a mobile.
  */
-CHAR_DATA *create_mobile( MOB_INDEX_DATA *pMobIndex )
+Character *create_mobile( MOB_INDEX_DATA *pMobIndex )
 {
-    CHAR_DATA *mob;
+    Character *mob;
     int i;
     AFFECT_DATA af;
 
@@ -1931,7 +1931,7 @@ CHAR_DATA *create_mobile( MOB_INDEX_DATA *pMobIndex )
 	exit( 1 );
     }
 
-    mob = new CHAR_DATA();
+    mob = new Character();
 
     mob->pIndexData	= pMobIndex;
 
@@ -2145,7 +2145,7 @@ CHAR_DATA *create_mobile( MOB_INDEX_DATA *pMobIndex )
 }
 
 /* duplicate a mobile exactly -- except inventory */
-void clone_mobile(CHAR_DATA *parent, CHAR_DATA *clone)
+void clone_mobile(Character *parent, Character *clone)
 {
     int i;
     AFFECT_DATA *paf;
@@ -3026,7 +3026,7 @@ void free_string( char *pstr )
 
 
 
-void do_areas( CHAR_DATA *ch, char *argument )
+void do_areas( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
     AREA_DATA *pArea1;
@@ -3061,7 +3061,7 @@ void do_areas( CHAR_DATA *ch, char *argument )
 
 
 
-void do_memory( CHAR_DATA *ch, char *argument )
+void do_memory( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
 
@@ -3091,10 +3091,10 @@ void do_memory( CHAR_DATA *ch, char *argument )
     return;
 }
 
-void do_dump( CHAR_DATA *ch, char *argument )
+void do_dump( Character *ch, char *argument )
 {
     int count,count2,num_pcs,aff_count;
-    CHAR_DATA *fch;
+    Character *fch;
     MOB_INDEX_DATA *pMobIndex;
     OBJ_DATA *obj;
     OBJ_INDEX_DATA *pObjIndex;
@@ -3120,7 +3120,7 @@ void do_dump( CHAR_DATA *ch, char *argument )
 
     /* mobs */
     count = 0;  count2 = 0;
-    for (std::list<CHAR_DATA*>::iterator it = char_list.begin(); it != char_list.end(); it++)
+    for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
     	fch = *it;
 	count++;
@@ -3551,7 +3551,7 @@ char *capitalize( const char *str )
 /*
  * Append a string to a file.
  */
-void append_file( CHAR_DATA *ch, const char *file, const char *str )
+void append_file( Character *ch, const char *file, const char *str )
 {
     FILE *fp;
 

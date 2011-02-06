@@ -968,7 +968,7 @@ void save_area( AREA_DATA *pArea )
  Purpose:	Entry point for saving area data.
  Called by:	interpreter(interp.c)
  ****************************************************************************/
-void do_asave( CHAR_DATA *ch, char *argument )
+void do_asave( Character *ch, char *argument )
 {
     char arg1 [MAX_INPUT_LENGTH];
     AREA_DATA *pArea;

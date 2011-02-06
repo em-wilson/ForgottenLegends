@@ -149,7 +149,7 @@ int liq_lookup (const char *name)
     return -1;
 }
 
-int nw_lookup( CHAR_DATA *ch )
+int nw_lookup( Character *ch )
 {
     OBJ_DATA *obj;
     long nw;

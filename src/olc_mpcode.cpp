@@ -16,7 +16,7 @@
 #include "olc.h"
 #include "recycle.h"
 
-#define MPEDIT( fun )           bool fun(CHAR_DATA *ch, char*argument)
+#define MPEDIT( fun )           bool fun(Character *ch, char*argument)
 
 
 const struct olc_cmd_type mpedit_table[] =
@@ -33,7 +33,7 @@ const struct olc_cmd_type mpedit_table[] =
 	{	NULL,		0		}
 };
 
-void mpedit( CHAR_DATA *ch, char *argument)
+void mpedit( Character *ch, char *argument)
 {
     MPROG_CODE *pMcode;
     char arg[MAX_INPUT_LENGTH];
@@ -93,7 +93,7 @@ void mpedit( CHAR_DATA *ch, char *argument)
     return;
 }
 
-void do_mpedit(CHAR_DATA *ch, char *argument)
+void do_mpedit(Character *ch, char *argument)
 {
     MPROG_CODE *pMcode;
     char command[MAX_INPUT_LENGTH];
