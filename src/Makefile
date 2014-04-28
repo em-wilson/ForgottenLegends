@@ -17,3 +17,7 @@ rom: $(O_FILES)
 
 .cpp.o: merc.h
 	$(CC) -c $(C_FLAGS) $<
+
+clean: merc.h
+	rm -f *.o
+	rm -f rom

@@ -619,9 +619,9 @@ struct	kill_data
 #define Q			65536
 #define R			131072
 #define S			262144
-#define T			524288
+#define FLAG_T			524288
 #define U			1048576
-#define V			2097152
+#define FLAG_V			2097152
 #define W			4194304
 #define X			8388608
 
@@ -651,9 +651,9 @@ struct	kill_data
 #define ACT_CLERIC		(Q)
 #define ACT_MAGE		(R)
 #define ACT_THIEF		(S)
-#define ACT_WARRIOR		(T)
+#define ACT_WARRIOR		(FLAG_T)
 #define ACT_NOALIGN		(U)
-#define ACT_NOPURGE		(V)
+#define ACT_NOPURGE		(FLAG_V)
 #define ACT_OUTDOORS		(W)
 #define ACT_INDOORS		(Y)
 #define ACT_IS_HEALER		(aa)
@@ -703,7 +703,7 @@ struct	kill_data
 #define ASSIST_ALIGN	        (Q)
 #define ASSIST_RACE    	     	(R)
 #define ASSIST_PLAYERS      	(S)
-#define ASSIST_GUARD        	(T)
+#define ASSIST_GUARD        	(FLAG_T)
 #define ASSIST_VNUM		(U)
 
 /* return values for check_imm */
@@ -732,7 +732,7 @@ struct	kill_data
 #define IMM_DISEASE             (Q)
 #define IMM_DROWNING            (R)
 #define IMM_LIGHT		(S)
-#define IMM_SOUND		(T)
+#define IMM_SOUND		(FLAG_T)
 #define IMM_WOOD                (X)
 #define IMM_SILVER              (Y)
 #define IMM_IRON                (Z)
@@ -757,7 +757,7 @@ struct	kill_data
 #define RES_DISEASE             (Q)
 #define RES_DROWNING            (R)
 #define RES_LIGHT		(S)
-#define RES_SOUND		(T)
+#define RES_SOUND		(FLAG_T)
 #define RES_WOOD                (X)
 #define RES_SILVER              (Y)
 #define RES_IRON                (Z)
@@ -782,7 +782,7 @@ struct	kill_data
 #define VULN_DISEASE            (Q)
 #define VULN_DROWNING           (R)
 #define VULN_LIGHT		(S)
-#define VULN_SOUND		(T)
+#define VULN_SOUND		(FLAG_T)
 #define VULN_WOOD               (X)
 #define VULN_SILVER             (Y)
 #define VULN_IRON		(Z)
@@ -810,7 +810,7 @@ struct	kill_data
 #define FORM_WORM               (R)
 #define FORM_BLOB		(S)
  
-#define FORM_MAMMAL             (V)
+#define FORM_MAMMAL             (FLAG_V)
 #define FORM_BIRD               (W)
 #define FORM_REPTILE            (X)
 #define FORM_SNAKE              (Y)
@@ -839,7 +839,7 @@ struct	kill_data
 #define PART_TAIL               (Q)
 /* for combat */
 #define PART_CLAWS              (U)
-#define PART_FANGS              (V)
+#define PART_FANGS              (FLAG_V)
 #define PART_HORNS              (W)
 #define PART_SCALES             (X)
 #define PART_TUSKS		(Y)
@@ -877,9 +877,9 @@ struct	kill_data
 #define AFF_HIDE		(Q)
 #define AFF_SLEEP		(R)
 #define AFF_CHARM		(S)
-#define AFF_FLYING		(T)
+#define AFF_FLYING		(FLAG_T)
 #define AFF_PASS_DOOR		(U)
-#define AFF_HASTE		(V)
+#define AFF_HASTE		(FLAG_V)
 #define AFF_CALM		(W)
 #define AFF_PLAGUE		(X)
 #define AFF_WEAKEN		(Y)
@@ -1033,9 +1033,9 @@ struct	kill_data
 #define ITEM_VIS_DEATH		(Q)
 #define ITEM_NOSHOW		(R)
 #define ITEM_NONMETAL		(S)
-#define ITEM_NOLOCATE		(T)
+#define ITEM_NOLOCATE		(FLAG_T)
 #define ITEM_MELT_DROP		(U)
-#define ITEM_HAD_TIMER		(V)
+#define ITEM_HAD_TIMER		(FLAG_V)
 #define ITEM_SELL_EXTRACT	(W)
 #define ITEM_BURN_PROOF		(Y)
 #define ITEM_NOUNCURSE		(Z)
@@ -1194,7 +1194,7 @@ struct	kill_data
 #define ROOM_HEROES_ONLY	(Q)
 #define ROOM_NEWBIES_ONLY	(R)
 #define ROOM_LAW		(S)
-#define ROOM_NOWHERE		(T)
+#define ROOM_NOWHERE		(FLAG_T)
 
 
 
@@ -1334,7 +1334,7 @@ struct	kill_data
 /*
  * Colour stuff by Lope of Loping Through The MUD
  */
-#define PLR_COLOUR             (T)    /* Colour Flag By Lope */
+#define PLR_COLOUR             (FLAG_T)    /* Colour Flag By Lope */
 /* 1 bit reserved, S */
 
 /* penalty flags */
@@ -1368,9 +1368,9 @@ struct	kill_data
 #define COMM_NOGRATS		(R)
 
 /* penalties */
-#define COMM_NOEMOTE		(T)
+#define COMM_NOEMOTE		(FLAG_T)
 #define COMM_NOSHOUT		(U)
-#define COMM_NOTELL		(V)
+#define COMM_NOTELL		(FLAG_V)
 #define COMM_NOCHANNELS		(W) 
 #define COMM_SNOOP_PROOF	(Y)
 #define COMM_AFK		(Z)
@@ -1395,9 +1395,9 @@ struct	kill_data
 #define WIZ_LOAD		(Q)
 #define WIZ_NEWBIE		(R)
 #define WIZ_PREFIX		(S)
-#define WIZ_SPAM		(T)
+#define WIZ_SPAM		(FLAG_T)
 #define WIZ_LOG			(U)
-#define WIZ_CLANS		(V)
+#define WIZ_CLANS		(FLAG_V)
 
 /*
  * Class flags.

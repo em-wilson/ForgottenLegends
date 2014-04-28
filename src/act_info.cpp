@@ -51,32 +51,6 @@ DECLARE_DO_FUN( do_play		);
 
 void show_eq_char( Character *ch, Character *ch1 );
 
-const char *	const	where_name	[] =
-{
-    "<used as light>     ",
-    "<worn on finger>    ",
-    "<worn on finger>    ",
-    "<worn around neck>  ",
-    "<worn around neck>  ",
-    "<worn on torso>     ",
-    "<worn on head>      ",
-    "<worn on legs>      ",
-    "<worn on feet>      ",
-    "<worn on hands>     ",
-    "<worn on arms>      ",
-    "<worn as shield>    ",
-    "<worn about body>   ",
-    "<worn about waist>  ",
-    "<worn around wrist> ",
-    "<worn around wrist> ",
-    "<wielded>           ",
-    "<held>              ",
-    "<floating nearby>   ",
-    "<worn on back>      ",
-    "<secondary weapon>  "  
-};
-
-
 /* for do_count */
 int max_on = 0;
 
