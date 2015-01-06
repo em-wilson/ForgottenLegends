@@ -41,6 +41,7 @@
 #include "tables.h"
 #include "lookup.h"
 #include "Wiznet.h"
+#include "NonPlayerCharacter.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_rstat		);
@@ -2517,7 +2518,7 @@ void do_clone(Character *ch, char *argument )
 	    return;
 	}
 
-	clone = create_mobile(mob->pIndexData);
+	clone = new NonPlayerCharacter(mob->pIndexData);
 	clone_mobile(mob,clone); 
 	
 	for (obj = mob->carrying; obj != NULL; obj = obj->next_content)
@@ -2593,7 +2594,7 @@ void do_mload( Character *ch, char *argument )
 	return;
     }
 
-    victim = create_mobile( pMobIndex );
+    victim = new NonPlayerCharacter( pMobIndex );
     char_to_room( victim, ch->in_room );
     act( "$n has created $N!", ch, NULL, victim, TO_ROOM );
     sprintf(buf,"$N loads %s.",victim->short_descr);

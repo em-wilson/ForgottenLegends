@@ -37,6 +37,7 @@
 #include "merc.h"
 #include "magic.h"
 #include "recycle.h"
+#include "NonPlayerCharacter.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_look		);
@@ -4719,7 +4720,7 @@ void spell_call_ent( int sn, int level, Character *ch, void *vo,int target)
     }
 
     /* Chew on the ent a little bit, recalculate level-dependant stats */
-    mob = create_mobile( get_mob_index( MOB_VNUM_ENT ) );
+    mob = new NonPlayerCharacter( get_mob_index( MOB_VNUM_ENT ) );
     mob->level                  = ch->level / 1.5;
     mob->max_hit                = mob->level * 8 + number_range(
                                         mob->level * mob->level/4,

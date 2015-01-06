@@ -30,16 +30,13 @@
 #else
 #include <sys/types.h>
 #endif
-#include <ctype.h>
 #include <stdio.h>
-#include <string.h>
-#include <time.h>
 #include <stdlib.h>
 #include "merc.h"
 #include "recycle.h"
-#include "tables.h"
-#include "lookup.h"
- 
+#include "PlayerCharacter.h"
+#include "NonPlayerCharacter.h"
+
 #if !defined(macintosh)
 extern  int     _filbuf         args( (FILE *) );
 #endif
@@ -570,7 +567,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
     bool found;
     int stat;
 
-    ch = new Character();
+    ch = new PlayerCharacter();
     ch->pcdata = new PC_DATA();
 
     d->character			= ch;
@@ -1253,15 +1250,15 @@ void fread_pet( Character *ch, FILE *fp )
     	if (get_mob_index(vnum) == NULL)
 	{
     	    bug("Fread_pet: bad vnum %d.",vnum);
-	    pet = create_mobile(get_mob_index(MOB_VNUM_FIDO));
+	    pet = new NonPlayerCharacter(get_mob_index(MOB_VNUM_FIDO));
 	}
     	else
-    	    pet = create_mobile(get_mob_index(vnum));
+    	    pet = new NonPlayerCharacter(get_mob_index(vnum));
     }
     else
     {
         bug("Fread_pet: no vnum in file.",0);
-        pet = create_mobile(get_mob_index(MOB_VNUM_FIDO));
+        pet = new NonPlayerCharacter(get_mob_index(MOB_VNUM_FIDO));
     }
     
     for ( ; ; )

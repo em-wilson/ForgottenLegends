@@ -99,6 +99,7 @@ typedef struct  mprog_code		MPROG_CODE;
 typedef struct  clan_data		CLAN_DATA;
 
 class Character;
+
 /*
  * Function types.
  */
@@ -2293,7 +2294,6 @@ void	reset_room	args( ( ROOM_INDEX_DATA *pRoom ) );	/* OLC */
 char *	print_flags	args( ( int flag ));
 void	boot_db		args( ( void ) );
 void	area_update	args( ( void ) );
-CD *	create_mobile	args( ( MOB_INDEX_DATA *pMobIndex ) );
 void	clone_mobile	args( ( Character *parent, Character *clone) );
 OD *	create_object	args( ( OBJ_INDEX_DATA *pObjIndex, int level ) );
 void	clone_object	args( ( OBJ_DATA *parent, OBJ_DATA *clone ) );

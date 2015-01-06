@@ -28,6 +28,7 @@
 #include "olc.h"
 #include "recycle.h"
 #include "lookup.h"
+#include "NonPlayerCharacter.h"
 
 /* Return TRUE if area changed, FALSE if not. */
 #define REDIT( fun )		bool fun( Character *ch, char *argument )
@@ -1941,7 +1942,7 @@ REDIT( redit_mreset )
     /*
      * Create the mobile.
      */
-    newmob = create_mobile( pMobIndex );
+    newmob = new NonPlayerCharacter( pMobIndex );
     char_to_room( newmob, pRoom );
 
     sprintf( output, "%s (%d) has been loaded and added to resets.\n\r"

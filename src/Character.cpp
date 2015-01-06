@@ -1,8 +1,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include "merc.h"
-#include "recycle.h"
-#include "Character.h"
 #include "Wiznet.h"
 
 Character::Character()
@@ -129,10 +127,6 @@ Character::~Character()
     if ( this->prefix ) free_string( this->prefix );
     if ( this->material ) free_string( this->material );
 
-    if (IS_NPC(this)) {
-		mobile_count--;
-    }
-
     for (OBJ_DATA *obj = this->carrying; obj != NULL; obj = obj_next)
     {
 		obj_next = obj->next_content;
@@ -151,6 +145,10 @@ Character::~Character()
     }
 
     INVALIDATE(this);
+}
+
+void Character::gain_exp( int gain ) {
+    return;
 }
 
 void Character::setName( const char * name )
@@ -255,31 +253,6 @@ void Character::advance_level( bool hide )
     }
     return;
 }   
-
-
-
-void Character::gain_exp( int gain )
-{
-    char buf[MAX_STRING_LENGTH];
-
-    if ( IS_NPC(this) || this->level >= LEVEL_HERO )
-    return;
-
-    this->exp = UMAX( exp_per_level(this,this->pcdata->points), this->exp + gain );
-    while ( this->level < LEVEL_HERO && this->exp >= exp_per_level(this,this->pcdata->points) * (this->level+1) )
-    {
-        send_to_char( "You raise a level!!  ", this );
-        this->level += 1;
-        sprintf(buf,"%s gained level %d",this->getName(),this->level);
-        log_string(buf);
-        sprintf(buf,"$N has attained level %d!",this->level);
-        this->advance_level(FALSE);
-        save_char_obj(this);
-        Wiznet::instance()->report( buf, this, NULL, WIZ_LEVELS, 0, 0 );
-    }
-
-    return;
-}
 
 
 

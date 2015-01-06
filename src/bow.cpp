@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "merc.h"
+#include "NonPlayerCharacter.h"
 
 Character * find_target args( ( Character *ch, int dir, char * search ) );
 Character * find_char	args( ( Character *ch, char *search, ROOM_INDEX_DATA *scan_room ) );
@@ -121,7 +122,7 @@ void do_shoot( Character *ch, char *argument )
 	{
 	    Character *mob;
 
-	    mob = create_mobile( get_mob_index( MOB_VNUM_CITYGUARD ) );
+	    mob = new NonPlayerCharacter( get_mob_index( MOB_VNUM_CITYGUARD ) );
 	    char_to_room( mob, victim->in_room );
 
 	    mob->hunting = ch;

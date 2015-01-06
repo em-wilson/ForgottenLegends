@@ -123,12 +123,12 @@ public:
     int			jkilled; // If they were just killed
 
     Character();
-    ~Character();
+    virtual ~Character();
     /*
      * Advancement stuff.
      */
     void advance_level( bool hide );
-    void gain_exp( int gain );
+    virtual void gain_exp( int gain );
     int hit_gain( );
     int mana_gain( );
     int move_gain( );

@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "Wiznet.h"
+#include "NonPlayerCharacter.h"
 
 /* command procedures needed */
 DECLARE_SPELL_FUN(      spell_identify          );
@@ -2695,7 +2696,7 @@ void do_buy( Character *ch, char *argument )
 	}
 
 	deduct_cost(ch,cost);
-	pet			= create_mobile( pet->pIndexData );
+	pet			= new NonPlayerCharacter( pet->pIndexData );
 	SET_BIT(pet->act, ACT_PET);
 	SET_BIT(pet->affected_by, AFF_CHARM);
 	pet->comm = COMM_NOTELL|COMM_NOSHOUT|COMM_NOCHANNELS;

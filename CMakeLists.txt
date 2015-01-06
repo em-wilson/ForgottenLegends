@@ -50,6 +50,8 @@ set(SOURCE_FILES
     src/mob_prog.cpp
     src/music.cpp
     src/music.h
+    src/NonPlayerCharacter.cpp
+    src/NonPlayerCharacter.h
     src/Note.cpp
     src/Note.h
     src/olc.cpp
@@ -59,6 +61,8 @@ set(SOURCE_FILES
     src/olc_save.cpp
     src/pc_data.cpp
     src/pc_data.h
+    src/PlayerCharacter.cpp
+    src/PlayerCharacter.h
     src/recycle.cpp
     src/recycle.h
     src/save.cpp

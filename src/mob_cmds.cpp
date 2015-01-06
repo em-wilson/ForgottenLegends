@@ -39,6 +39,7 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "mob_cmds.h"
+#include "NonPlayerCharacter.h"
 
 DECLARE_DO_FUN( do_look 	);
 extern ROOM_INDEX_DATA *find_location( Character *, char * );
@@ -511,7 +512,7 @@ void do_mpmload( Character *ch, char *argument )
 	bug( arg, 0 );
 	return;
     }
-    victim = create_mobile( pMobIndex );
+    victim = new NonPlayerCharacter( pMobIndex );
     char_to_room( victim, ch->in_room );
     return;
 }
