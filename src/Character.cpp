@@ -45,7 +45,6 @@ Character::Character()
     this->drac = 0;
     this->breathe = 0;
     this->played = 0;
-    this->auction = NULL;
     this->lines = PAGELEN;
     this->logon = current_time;
     this->timer = 0;
