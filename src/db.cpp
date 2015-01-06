@@ -204,12 +204,6 @@ int			newobjs = 0;
 #define			MAX_PERM_BLOCK	131072
 #define			MAX_MEM_LIST	11
 
-void *			rgFreeList	[MAX_MEM_LIST];
-const int		rgSizeList	[MAX_MEM_LIST]	=
-{
-    16, 32, 64, 128, 256, 1024, 2048, 4096, 8192, 16384, 32768-64
-};
-
 int			nAllocString;
 int			sAllocString;
 int			nAllocPerm;
@@ -1841,14 +1835,19 @@ void reset_room( ROOM_INDEX_DATA *pRoom )
 		    pObj = create_object( pObjIndex, 
 			   UMIN( number_fuzzy( level ), LEVEL_HERO - 1 ) );
 		    /* error message if it is too high */
-		    if (pObj->level > LastMob->level + 3
-		    ||  (pObj->item_type == ITEM_WEAPON 
+		    if (pObj->level > LastMob->level + 3) {
+				fprintf(stderr,
+						"Err: obj %s (%d) -- %d, mob %s (%d) -- %d (obj level > mob + 3 )\n",
+						pObj->short_descr,pObj->pIndexData->vnum,pObj->level,
+						LastMob->short_descr,LastMob->pIndexData->vnum,LastMob->level);
+			} else if (pObj->item_type == ITEM_WEAPON
 		    &&   pReset->command == 'E' 
-		    &&   pObj->level < LastMob->level -5 && pObj->level < 45))
-			fprintf(stderr,
-			    "Err: obj %s (%d) -- %d, mob %s (%d) -- %d\n",
-			    pObj->short_descr,pObj->pIndexData->vnum,pObj->level,
-			    LastMob->short_descr,LastMob->pIndexData->vnum,LastMob->level);
+		    &&   pObj->level < LastMob->level -5 && pObj->level < 45) {
+				fprintf(stderr,
+						"Err: obj %s (%d) -- %d, mob %s (%d) -- %d (weapon level 5 or less than mob)\n",
+						pObj->short_descr,pObj->pIndexData->vnum,pObj->level,
+						LastMob->short_descr,LastMob->pIndexData->vnum,LastMob->level);
+			}
 		}
 		else
 		    break;

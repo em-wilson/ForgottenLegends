@@ -2670,7 +2670,7 @@ const   struct  group_type      group_table     [MAX_GROUP]     =
 
     {
         "archer basics",
-        { -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1. -1 },
+        { -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1 },
         { "dagger", "bow" }
     },
 

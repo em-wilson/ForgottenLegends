@@ -50,8 +50,9 @@ void do_shoot( Character *ch, char *argument )
 	return;
     }
 
-    if (arg2 == '\0')
-	strcpy(arg2, "random");
+    if (arg2[0] == '\0') {
+        strcpy(arg2, "random");
+    }
 
     if ((victim = find_target( ch, door, arg2 )) == NULL)
     {

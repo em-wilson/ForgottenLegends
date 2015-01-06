@@ -200,8 +200,7 @@ const char *fn_evals[] =
  */
 int keyword_lookup( const char **table, char *keyword )
 {
-    register int i;
-    for( i = 0; table[i][0] != '\n'; i++ )
+    for( int i = 0; table[i][0] != '\n'; i++ )
         if( !str_cmp( table[i], keyword ) )
             return( i );
     return -1;

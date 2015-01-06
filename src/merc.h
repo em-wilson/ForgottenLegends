@@ -291,7 +291,7 @@ struct	descriptor_data
     sh_int		descriptor;
     sh_int		connected;
     bool		fcommand;
-    char		inbuf		[4 * MAX_INPUT_LENGTH];
+    unsigned char		inbuf		[4 * MAX_INPUT_LENGTH];
     char		incomm		[MAX_INPUT_LENGTH];
     char		inlast		[MAX_INPUT_LENGTH];
     int			repeat;
@@ -2205,6 +2205,7 @@ char *	crypt		args( ( const char *key, const char *salt ) );
 #define MUSIC_FILE	"../data/misc/music.txt"
 #define HELP_ERR	"../data/misc/help.txt" /* For bad helps */
 #define UPGRADE_FILE	"../data/misc/upgrade.txt" /* Keeps track of clan upgrades */
+#define ONLINE_FILE "../data/misc/online.html" /* WHO list for players online */
 
 
 

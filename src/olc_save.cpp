@@ -50,17 +50,15 @@
 char *fix_string( const char *str )
 {
     static char strfix[MAX_STRING_LENGTH * 2];
-    int i;
+    int i = 0;
     int o;
 
-    if ( str == NULL )
-        return '\0';
-
-    for ( o = i = 0; str[i+o] != '\0'; i++ )
-    {
-        if (str[i+o] == '\r' || str[i+o] == '~')
-            o++;
-        strfix[i] = str[i+o];
+    if ( str != NULL ) {
+        for (o = i = 0; str[i + o] != '\0'; i++) {
+            if (str[i + o] == '\r' || str[i + o] == '~')
+                o++;
+            strfix[i] = str[i + o];
+        }
     }
     strfix[i] = '\0';
     return strfix;

@@ -36,6 +36,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <time.h>
+#include <unistd.h>
 #include "merc.h"
 #include "magic.h"
 #include "recycle.h"
@@ -2734,7 +2735,7 @@ void do_password( Character *ch, char *argument )
     /*
      * No tilde allowed because of player file format.
      */
-    pwdnew = crypt( arg2, ch->name );
+    pwdnew = crypt( arg2, ch->getName() );
     for ( p = pwdnew; *p != '\0'; p++ )
     {
 	if ( *p == '~' )

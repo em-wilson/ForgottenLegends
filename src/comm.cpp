@@ -112,9 +112,9 @@ extern	int	malloc_verify	args( ( void ) );
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include "telnet.h"
-const	char	echo_off_str	[] = { IAC, WILL, TELOPT_ECHO, '\0' };
-const	char	echo_on_str	[] = { IAC, WONT, TELOPT_ECHO, '\0' };
-const	char 	go_ahead_str	[] = { IAC, GA, '\0' };
+const	unsigned char	echo_off_str	[] = { IAC, WILL, TELOPT_ECHO, '\0' };
+const	unsigned char	echo_on_str	[] = { IAC, WONT, TELOPT_ECHO, '\0' };
+const	unsigned char 	go_ahead_str	[] = { IAC, GA, '\0' };
 
 
 
@@ -690,7 +690,7 @@ bool read_from_descriptor( DESCRIPTOR_DATA *d )
 	return TRUE;
 
     /* Check for overflow. */
-    iStart = strlen(d->inbuf);
+    iStart = strlen((const char*)d->inbuf);
     if ( iStart >= sizeof(d->inbuf) - 10 )
     {
 	sprintf( log_buf, "%s input overflow!", d->host );
@@ -939,7 +939,7 @@ bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
 		bust_a_prompt( d->character );
 
 	    if (IS_SET(ch->comm,COMM_TELNET_GA))
-		write_to_buffer(d,go_ahead_str,0);
+		write_to_buffer(d,(const char *)go_ahead_str,0);
 	}
 
 	/*
@@ -1295,7 +1295,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	{
 	    /* Old player */
 	    write_to_buffer( d, "Password: ", 0 );
-	    write_to_buffer( d, echo_off_str, 0 );
+	    write_to_buffer( d, (const char*)echo_off_str, 0 );
 	    d->connected = CON_GET_OLD_PASSWORD;
 	    return;
 	}
@@ -1334,7 +1334,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    return;
 	}
  
-	write_to_buffer( d, echo_on_str, 0 );
+	write_to_buffer( d, (const char*)echo_on_str, 0 );
 
 	if (check_playing(d,ch->getName()))
 	    return;
@@ -1437,7 +1437,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    return;
 	}
 
-	pwdnew = crypt( argument, ch->name );
+	pwdnew = crypt( argument, ch->getName() );
 	for ( p = pwdnew; *p != '\0'; p++ )
 	{
 	    if ( *p == '~' )
@@ -1466,7 +1466,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    return;
 	}
 
-	write_to_buffer( d, echo_on_str, 0 );
+	write_to_buffer( d, (const char*)echo_on_str, 0 );
 	write_to_buffer(d,"The following races are available:\n\r  ",0);
 	for ( race = 1; race_table[race].name != NULL; race++ )
 	{
@@ -2333,7 +2333,7 @@ void show_string(struct descriptor_data *d, char *input)
 {
     char buffer[4*MAX_STRING_LENGTH];
     char buf[MAX_INPUT_LENGTH];
-    register char *scan, *chk;
+    char *scan, *chk;
     int lines = 0, toggle = 1;
     int show_lines;
 
@@ -2355,30 +2355,28 @@ void show_string(struct descriptor_data *d, char *input)
 	show_lines = 0;
 
     for (scan = buffer; ; scan++, d->showstr_point++)
-    {
-	if (((*scan = *d->showstr_point) == '\n' || *scan == '\r')
-	    && (toggle = -toggle) < 0)
-	    lines++;
-
-	else if (!*scan || (show_lines > 0 && lines >= show_lines))
 	{
-	    *scan = '\0';
-	    write_to_buffer(d,buffer,strlen(buffer));
-	    for (chk = d->showstr_point; isspace(*chk); chk++);
-	    {
-		if (!*chk)
+		if (((*scan = *d->showstr_point) == '\n' || *scan == '\r')
+				&& (toggle = -toggle) < 0)
+			lines++;
+
+		else if (!*scan || (show_lines > 0 && lines >= show_lines))
 		{
-		    if (d->showstr_head)
-        	    {
-            		delete d->showstr_head;
-            		d->showstr_head = NULL;
-        	    }
-        	    d->showstr_point  = 0;
-    		}
-	    }
-	    return;
+			*scan = '\0';
+			write_to_buffer(d,buffer,strlen(buffer));
+			for (chk = d->showstr_point; isspace(*chk); chk++);
+			if (!*chk)
+			{
+				if (d->showstr_head)
+				{
+					delete d->showstr_head;
+					d->showstr_head = NULL;
+				}
+				d->showstr_point  = 0;
+			}
+			return;
+		}
 	}
-    }
     return;
 }
 	
@@ -2579,7 +2577,6 @@ int gettimeofday( struct timeval *tp, void *tzp )
 int colour( char type, Character *ch, char *string )
 {
     char       code[ 20 ];
-    char       *p = '\0';
 
     if( IS_NPC( ch ) )
        return( 0 );
@@ -2700,7 +2697,7 @@ int colour( char type, Character *ch, char *string )
            break;
     }
 
-    p = code;
+    char *p = code;
     while( *p != '\0' )
     {
        *string = *p++;

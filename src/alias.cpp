@@ -224,12 +224,12 @@ void do_unalias(Character *ch, char *argument)
     if (IS_NPC(rch))
 	return;
  
-    argument = one_argument(argument,arg);
+    one_argument(argument,arg);
 
-    if (arg == '\0')
+    if (arg[0] == '\0')
     {
-	send_to_char("Unalias what?\n\r",ch);
-	return;
+		send_to_char("Unalias what?\n\r",ch);
+		return;
     }
 
     for (pos = 0; pos < MAX_ALIAS; pos++)

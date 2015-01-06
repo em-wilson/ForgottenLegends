@@ -323,13 +323,11 @@ void who_html_update (void)
   int count = 0;
 
   fclose(fpReserve);
-  if ( (fp = fopen("/home/blackavar/public_html/online.htm", "w") ) == NULL)
+  if ( (fp = fopen(ONLINE_FILE, "w") ) == NULL)
   {
-     bug( "online.htm: fopen", 0 );
-     perror( "online.htm" );
-  }
-  else
-  {
+      perror( ONLINE_FILE );
+      exit( 1 );
+  } else {
   char buf[MAX_STRING_LENGTH];
   fprintf(fp, "<html>\n");
   fprintf(fp, "<head>\n");
@@ -345,7 +343,6 @@ void who_html_update (void)
   fprintf(fp, "[<font color=""#FF0000"">Lev  <font color=""#808000"">Race <font color=""#FFFFFF"">Cla<FONT COLOR=""#C0C0C0"">] Name\n");
   fprintf(fp, "<font color=""#0000FF"">_________________________________________________________________\n");
   
-  log_string("First part ok");
   for ( d = descriptor_list; d != NULL ; d = d->next )
   {
     Character *wch;
