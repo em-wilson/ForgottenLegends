@@ -112,6 +112,8 @@ extern	int	malloc_verify	args( ( void ) );
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include "telnet.h"
+#include "PlayerCharacter.h"
+
 const	unsigned char	echo_off_str	[] = { IAC, WILL, TELOPT_ECHO, '\0' };
 const	unsigned char	echo_on_str	[] = { IAC, WONT, TELOPT_ECHO, '\0' };
 const	unsigned char 	go_ahead_str	[] = { IAC, GA, '\0' };
@@ -1766,7 +1768,7 @@ case CON_RECLASS_CUST:
             ch->gen_data = NULL;
             send_to_char(buf,ch);
 	    char_from_room(ch);
-	    char_to_room(ch, ch->getWasNoteRoom());
+	    char_to_room(ch, ((PlayerCharacter*)ch)->getWasNoteRoom());
             d->connected = CON_PLAYING;
             break;
         }

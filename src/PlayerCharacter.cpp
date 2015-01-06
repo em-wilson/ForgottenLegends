@@ -35,6 +35,10 @@ void PlayerCharacter::gain_exp( int gain ) {
         return;
 }
 
+bool PlayerCharacter::isNPC() {
+        return false;
+}
+
 ROOM_INDEX_DATA * PlayerCharacter::getWasNoteRoom() {
         return this->was_note_room;
 }

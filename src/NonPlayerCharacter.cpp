@@ -231,3 +231,8 @@ NonPlayerCharacter::NonPlayerCharacter(MOB_INDEX_DATA *pMobIndex)
 NonPlayerCharacter::~NonPlayerCharacter() {
         mobile_count--;
 }
+
+
+bool NonPlayerCharacter::isNPC() {
+        return true;
+}

@@ -124,8 +124,8 @@ public:
     virtual ~Character();
 
     // Abstract functions
-    virtual ROOM_INDEX_DATA * getWasNoteRoom();
-    virtual void setWasNoteRoom( ROOM_INDEX_DATA *room );
+//    virtual ROOM_INDEX_DATA * getWasNoteRoom();
+//    virtual void setWasNoteRoom( ROOM_INDEX_DATA *room );
     /*
      * Advancement stuff.
      */
@@ -139,6 +139,8 @@ public:
     char * getName();
     void setDescription( const char * description );
     char * getDescription();
+
+    virtual bool isNPC() = 0;
 
 private:
     std::string _name;

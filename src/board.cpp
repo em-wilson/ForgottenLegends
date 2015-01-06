@@ -29,6 +29,7 @@
 #include "recycle.h"
 /* #include "do.h" */ /* My do_XXX functions are declared in this file */
 #include "colordef.h"
+#include "PlayerCharacter.h"
 
 DECLARE_DO_FUN( do_help                );
 
@@ -440,13 +441,15 @@ int unread_notes (Character *ch, BOARD_DATA *board)
  */
 
 /* Start writing a note */
-static void do_nwrite (Character *ch, char *argument)
+static void do_nwrite (Character *caller, char *argument)
 {
 	char *strtime;
 	char buf[200];
 	
-	if (IS_NPC(ch)) /* NPC cannot post notes */
+	if (caller->isNPC()) /* NPC cannot post notes */
 		return;
+
+	PlayerCharacter *ch = (PlayerCharacter*)caller;
 		
 	if ( ch->adrenaline > 0 )
 	{
@@ -1157,7 +1160,7 @@ void handle_con_note_text (DESCRIPTOR_DATA *d, char * argument)
 void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
 {
 	char buf[MSL];
-	Character *ch = d->character;
+	PlayerCharacter *ch = (PlayerCharacter*)d->character;
 	
 		if (!ch->pcdata->in_progress)
 		{

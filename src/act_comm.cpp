@@ -41,6 +41,7 @@
 #include "recycle.h"
 #include "tables.h"
 #include "Wiznet.h"
+#include "PlayerCharacter.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_quit	);
@@ -1997,8 +1998,14 @@ void do_noauction( Character *ch, char *argument )
     }
 }
 
-void do_reclass( Character *ch, char *argument)
+void do_reclass( Character *caller, char *argument)
 {
+    if ( caller->isNPC() ) {
+        send_to_char("Only players may reclass\n\r", caller);
+        return;
+    }
+
+    PlayerCharacter *ch = (PlayerCharacter*)caller;
 
     char buf[MAX_STRING_LENGTH];
     int iClass;

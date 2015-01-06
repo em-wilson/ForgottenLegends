@@ -485,12 +485,3 @@ void Character::gain_condition( int iCond, int value )
 
     return;
 }
-
-ROOM_INDEX_DATA * Character::getWasNoteRoom() {
-    return NULL;
-}
-
-
-void Character::setWasNoteRoom( ROOM_INDEX_DATA *room ) {
-    return;
-}
