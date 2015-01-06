@@ -50,7 +50,6 @@ public:
     sh_int		drac;
     sh_int		breathe;
     int			played;
-    AUCTION_DATA *	auction;
     int			lines;  /* for the pager */
     time_t		logon;
     sh_int		timer;

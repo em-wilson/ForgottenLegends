@@ -74,7 +74,6 @@ typedef short   int			sh_int;
  */
 typedef struct	affect_data		AFFECT_DATA;
 typedef struct	area_data		AREA_DATA;
-typedef struct  auction_data		AUCTION_DATA;
 typedef struct	ban_data		BAN_DATA;
 typedef struct 	buf_type	 	BUFFER;
 typedef struct	descriptor_data		DESCRIPTOR_DATA;
@@ -474,16 +473,6 @@ struct race_type
     long	vuln;			/* vuln bits for the race */
     long	form;			/* default form flag for the race */
     long	parts;			/* default parts for the race */
-};
-
-struct  auction_data
-{
-    OBJ_DATA  * item;   /* a pointer to the item */
-    Character * seller; /* a pointer to the seller - which may NOT quit */
-    Character * buyer;  /* a pointer to the buyer - which may NOT quit */
-    int         bet;    /* last bet - or 0 if noone has bet anything */
-    sh_int      going;  /* 1,2, sold */
-    sh_int      pulse;  /* how many pulses (.25 sec) until another call-out ? */
 };
 
 struct  clan_data

@@ -88,7 +88,6 @@ KILL_DATA		kill_table	[MAX_LEVEL];
 OBJ_DATA *		object_list;
 TIME_INFO_DATA		time_info;
 WEATHER_DATA		weather_info;
-AUCTION_DATA		*auction;
 
 sh_int			gsn_backstab;
 sh_int			gsn_dodge;
@@ -274,44 +273,37 @@ void boot_db()
     /*
      * Set time and weather.
      */
-    {
-	long lhour, lday, lmonth;
+	{
+		long lhour, lday, lmonth;
 
-	lhour		= (current_time - 650336715)
-			/ (PULSE_TICK / PULSE_PER_SECOND);
-	time_info.hour	= lhour  % 24;
-	lday		= lhour  / 24;
-	time_info.day	= lday   % 35;
-	lmonth		= lday   / 35;
-	time_info.month	= lmonth % 17;
-	time_info.year	= lmonth / 17;
+		lhour		= (current_time - 650336715)
+				/ (PULSE_TICK / PULSE_PER_SECOND);
+		time_info.hour	= lhour  % 24;
+		lday		= lhour  / 24;
+		time_info.day	= lday   % 35;
+		lmonth		= lday   / 35;
+		time_info.month	= lmonth % 17;
+		time_info.year	= lmonth / 17;
 
-	     if ( time_info.hour <  5 ) weather_info.sunlight = SUN_DARK;
-	else if ( time_info.hour <  6 ) weather_info.sunlight = SUN_RISE;
-	else if ( time_info.hour < 19 ) weather_info.sunlight = SUN_LIGHT;
-	else if ( time_info.hour < 20 ) weather_info.sunlight = SUN_SET;
-	else                            weather_info.sunlight = SUN_DARK;
+		if ( time_info.hour <  5 ) weather_info.sunlight = SUN_DARK;
+		else if ( time_info.hour <  6 ) weather_info.sunlight = SUN_RISE;
+		else if ( time_info.hour < 19 ) weather_info.sunlight = SUN_LIGHT;
+		else if ( time_info.hour < 20 ) weather_info.sunlight = SUN_SET;
+		else                            weather_info.sunlight = SUN_DARK;
 
-	weather_info.change	= 0;
-	weather_info.mmhg	= 960;
-	if ( time_info.month >= 7 && time_info.month <=12 )
-	    weather_info.mmhg += number_range( 1, 50 );
-	else
-	    weather_info.mmhg += number_range( 1, 80 );
+		weather_info.change	= 0;
+		weather_info.mmhg	= 960;
+		if ( time_info.month >= 7 && time_info.month <=12 )
+			weather_info.mmhg += number_range( 1, 50 );
+		else
+			weather_info.mmhg += number_range( 1, 80 );
 
-	     if ( weather_info.mmhg <=  980 ) weather_info.sky = SKY_LIGHTNING;
-	else if ( weather_info.mmhg <= 1000 ) weather_info.sky = SKY_RAINING;
-	else if ( weather_info.mmhg <= 1020 ) weather_info.sky = SKY_CLOUDY;
-	else                                  weather_info.sky = SKY_CLOUDLESS;
+		if ( weather_info.mmhg <=  980 ) weather_info.sky = SKY_LIGHTNING;
+		else if ( weather_info.mmhg <= 1000 ) weather_info.sky = SKY_RAINING;
+		else if ( weather_info.mmhg <= 1020 ) weather_info.sky = SKY_CLOUDY;
+		else                                  weather_info.sky = SKY_CLOUDLESS;
 
-		auction = (AUCTION_DATA *) malloc (sizeof(AUCTION_DATA)); /* DOH!!! */
-		if (auction == NULL)
-		{
-			bug ("malloc'ing AUCTION_DATA didn't give %d bytes",sizeof(AUCTION_DATA));
-			exit (1);
-		}
-
-    }
+	}
 
     /*
      * Assign gsn's for skills which have them.
