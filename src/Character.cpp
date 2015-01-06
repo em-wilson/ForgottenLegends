@@ -1,7 +1,7 @@
 #include <string.h>
 #include <sys/types.h>
+#include <ForceFeedback/ForceFeedback.h>
 #include "merc.h"
-#include "Wiznet.h"
 
 Character::Character()
 {
@@ -101,17 +101,6 @@ Character::Character()
     this->morph_form = 0;
     this->orig_form = 0;
     this->xp = 0;
-    this->confirm_pk = false;
-    this->makeclan = false;;
-    this->join = NULL;
-    this->pkills = 0;
-    this->pkilled = 0;
-    this->mkills = 0;
-    this->mkilled = 0;
-    this->range = 0;
-    this->clan_cust = 0;
-    this->adrenaline = 0;
-    this->jkilled = 0;
     VALIDATE(this);
 }
 
@@ -484,4 +473,152 @@ void Character::gain_condition( int iCond, int value )
     }
 
     return;
+}
+
+int Character::getRange() {
+    return 0;
+}
+
+bool Character::didJustDie() {
+    return false;
+}
+
+void Character::update() {
+    AFFECT_DATA *paf;
+    AFFECT_DATA *paf_next;
+
+    if ( this->desc && this->desc->connected == CON_PLAYING )
+        send_to_char("\n\r",this);
+
+    if ( this->position >= POS_STUNNED )
+    {
+        if ( this->hit  < this->max_hit )
+            this->hit  += this->hit_gain();
+        else
+            this->hit = this->max_hit;
+
+        if ( this->mana < this->max_mana )
+            this->mana += this->mana_gain();
+        else
+            this->mana = this->max_mana;
+
+        if ( this->move < this->max_move )
+            this->move += this->move_gain();
+        else
+            this->move = this->max_move;
+    }
+
+    if ( this->position == POS_STUNNED )
+        update_pos( this );
+
+    for ( paf = this->affected; paf != NULL; paf = paf_next )
+    {
+        paf_next	= paf->next;
+        if ( paf->duration > 0 )
+        {
+            paf->duration--;
+            if (number_range(0,4) == 0 && paf->level > 0)
+                paf->level--;  /* spell strength fades with time */
+        }
+        else if ( paf->duration < 0 )
+            ;
+        else
+        {
+            if ( paf_next == NULL
+                    ||   paf_next->type != paf->type
+                    ||   paf_next->duration > 0 )
+            {
+                if ( paf->type > 0 && skill_table[paf->type].msg_off )
+                {
+                    send_to_char( skill_table[paf->type].msg_off, this );
+                    send_to_char( "\n\r", this );
+                }
+            }
+
+            affect_remove( this, paf );
+        }
+    }
+
+    /*
+     * Careful with the damages here,
+     *   MUST NOT refer to ch after damage taken,
+     *   as it may be lethal damage (on NPC).
+     */
+
+    if (is_affected(this, gsn_plague) && this != NULL)
+    {
+        if (this->in_room == NULL)
+            return;
+
+        ::act("$n writhes in agony as plague sores erupt from $s skin.",
+                this,NULL,NULL,TO_ROOM);
+        send_to_char("You writhe in agony from the plague.\n\r",this);
+
+        AFFECT_DATA *af;
+        for ( af = this->affected; af != NULL; af = af->next )
+        {
+            if (af->type == gsn_plague)
+                break;
+        }
+
+        if (af == NULL)
+        {
+            REMOVE_BIT(this->affected_by,AFF_PLAGUE);
+            return;
+        }
+
+        if (af->level == 1)
+            return;
+
+        AFFECT_DATA plague;
+        plague.where		= TO_AFFECTS;
+        plague.type 		= gsn_plague;
+        plague.level 		= af->level - 1;
+        plague.duration 	= number_range(1,2 * plague.level);
+        plague.location		= APPLY_STR;
+        plague.modifier 	= -5;
+        plague.bitvector 	= AFF_PLAGUE;
+
+        for ( Character* vch = this->in_room->people; vch != NULL; vch = vch->next_in_room)
+        {
+            if (!saves_spell(plague.level - 2,vch,DAM_DISEASE)
+                    &&  !IS_IMMORTAL(vch)
+                    &&  !IS_AFFECTED(vch,AFF_PLAGUE) && number_bits(4) == 0)
+            {
+                send_to_char("You feel hot and feverish.\n\r",vch);
+                ::act("$n shivers and looks very ill.",vch,NULL,NULL,TO_ROOM);
+                affect_join(vch,&plague);
+            }
+        }
+
+        int dam = UMIN(this->level,af->level/5+1);
+        this->mana -= dam;
+        this->move -= dam;
+        damage_old( this, this, dam, gsn_plague,DAM_DISEASE,FALSE);
+    }
+    else if ( IS_AFFECTED(this, AFF_POISON) && this != NULL
+            &&   !IS_AFFECTED(this,AFF_SLOW))
+
+    {
+        AFFECT_DATA *poison;
+
+        poison = affect_find(this->affected,gsn_poison);
+
+        if (poison != NULL)
+        {
+            ::act( "$n shivers and suffers.", this, NULL, NULL, TO_ROOM );
+            send_to_char( "You shiver and suffer.\n\r", this );
+            damage_old(this,this,poison->level/10 + 1,gsn_poison,
+                    DAM_POISON,FALSE);
+        }
+    }
+
+    else if ( this->position == POS_INCAP && number_range(0,1) == 0)
+    {
+        ::damage( this, this, 1, TYPE_UNDEFINED, DAM_NONE,FALSE);
+    }
+    else if ( this->position == POS_MORTAL )
+    {
+        ::damage( this, this, 1, TYPE_UNDEFINED, DAM_NONE,FALSE);
+    }
 }

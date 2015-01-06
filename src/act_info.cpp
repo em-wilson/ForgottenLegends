@@ -42,6 +42,7 @@
 #include "recycle.h"
 #include "tables.h"
 #include "lookup.h"
+#include "PlayerCharacter.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(	do_exits	);
@@ -1895,7 +1896,7 @@ void do_whois (Character *ch, char *argument)
  	     wch->invis_level >= LEVEL_HERO ? "(Wizi) " : "",
 	     IS_CLANNED(wch) && (IS_IMMORTAL(ch) || wch->pcdata->clan == ch->pcdata->clan || wch->in_room == ch->in_room) ? wch->pcdata->clan->whoname : "",
 	     IS_SET(wch->comm, COMM_AFK) ? "[AFK] " : "",
-             (IS_CLANNED(ch) && IS_CLANNED(wch) && IS_SET(wch->pcdata->clan->flags, CLAN_PK) && IS_SET(ch->pcdata->clan->flags, CLAN_PK) && wch->level + wch->range >= ch->level ) ? "{R({rPK{R){x " : "",
+             (IS_CLANNED(ch) && IS_CLANNED(wch) && IS_SET(wch->pcdata->clan->flags, CLAN_PK) && IS_SET(ch->pcdata->clan->flags, CLAN_PK) && wch->level + wch->getRange() >= ch->level ) ? "{R({rPK{R){x " : "",
              IS_SET(wch->act,PLR_THIEF) ? "{B({YTHIEF{B){x " : "",
 		wch->getName(), IS_NPC(wch) ? "" : wch->pcdata->title);
 	    add_buf(output,buf);
@@ -2100,7 +2101,7 @@ void do_who( Character *ch, char *argument )
 	    wch->invis_level >= LEVEL_HERO ? "(Wizi) " : "",
 	    IS_CLANNED(wch) && (IS_IMMORTAL(ch) || wch->pcdata->clan == ch->pcdata->clan || wch->in_room == ch->in_room) ? wch->pcdata->clan->whoname : "",
 	    IS_SET(wch->comm, COMM_AFK) ? "[AFK] " : "",
-             (IS_CLANNED(ch) && IS_CLANNED(wch) && IS_SET(wch->pcdata->clan->flags, CLAN_PK) && IS_SET(ch->pcdata->clan->flags, CLAN_PK) && wch->level + wch->range >= ch->level ) ? "{R({rPK{R){x " : "",
+             (IS_CLANNED(ch) && IS_CLANNED(wch) && IS_SET(wch->pcdata->clan->flags, CLAN_PK) && IS_SET(ch->pcdata->clan->flags, CLAN_PK) && wch->level + wch->getRange() >= ch->level ) ? "{R({rPK{R){x " : "",
             IS_SET(wch->act, PLR_THIEF)  ? "{B({YTHIEF{B){x "  : "",
 	    wch->getName(),
 	    IS_NPC(wch) ? "" : wch->pcdata->title );
@@ -2789,7 +2790,6 @@ void do_nw( Character *ch, char *argument )
 {
     DESCRIPTOR_DATA *d;
     CLAN_DATA *clan;
-    Character *wch;
     char buf[MAX_STRING_LENGTH];
 
     if (IS_NPC(ch))
@@ -2812,13 +2812,13 @@ void do_nw( Character *ch, char *argument )
     send_to_char(buf,ch);
     for (d = descriptor_list; d != NULL; d = d->next)
     {
-	wch = d->character;
+        PlayerCharacter* wch = (PlayerCharacter*)d->character;
 
-	if (d->connected != CON_PLAYING || !can_see(ch,wch))
-	    continue;
+        if (d->connected != CON_PLAYING || !can_see(ch,wch))
+            continue;
 
-	sprintf(buf, "%-15s %-15d\n\r", wch->getName(), nw_lookup(wch));
-	send_to_char(buf,ch);
+        sprintf(buf, "%-15s %-15d\n\r", wch->getName(), nw_lookup(wch));
+        send_to_char(buf,ch);
     }
 }
 

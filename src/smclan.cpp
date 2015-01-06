@@ -21,6 +21,7 @@
 #include "merc.h"
 #include "interp.h"
 #include "tables.h"
+#include "PlayerCharacter.h"
 
 #define MAX_NEST	100
 //static	OBJ_DATA *	rgObjNest	[MAX_NEST];
@@ -382,7 +383,6 @@ void load_clans( )
 void do_induct( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    Character *victim;
     CLAN_DATA *clan;
 
     if ( IS_NPC( ch ) || !ch->pcdata->clan )
@@ -411,13 +411,14 @@ void do_induct( Character *ch, char *argument )
 	return;
     }
 
+	Character *victim;
     if ( ( victim = get_char_world( ch, arg ) ) == NULL )
     {
-	send_to_char( "That player is not here.\n\r", ch);
-	return;
+		send_to_char( "That player is not here.\n\r", ch);
+		return;
     }
 
-    if ( IS_NPC(victim) )
+    if ( victim->isNPC() )
     {
 	send_to_char( "Not on NPC's.\n\r", ch );
 	return;
@@ -431,16 +432,16 @@ void do_induct( Character *ch, char *argument )
 
     if ( victim->pcdata->clan )
     {
-	if (victim->pcdata->clan == ch->pcdata->clan)
-	{
-		send_to_char("They are already in your clan!\n\r",ch);
-		return;
-	}
-	if (victim->join != ch->pcdata->clan)
-	{
-		send_to_char("They do not wish to join your clan.\n\r",ch);
-		return;
-	}
+		if (victim->pcdata->clan == ch->pcdata->clan)
+		{
+			send_to_char("They are already in your clan!\n\r",ch);
+			return;
+		}
+		if (!((PlayerCharacter *) victim)->wantsToJoinClan(ch->pcdata->clan))
+		{
+			send_to_char("They do not wish to join your clan.\n\r",ch);
+			return;
+		}
 	--victim->pcdata->clan->members;
 	save_clan( victim->pcdata->clan );
     }
@@ -697,164 +698,11 @@ void do_makeclan( Character *ch, char *argument )
     CLAN_DATA *clan;
     bool found;
 
-if (get_trust(ch) < MAX_LEVEL)
-{
-    char filename[MAX_STRING_LENGTH];
-    Character *leader, *rec1, *rec2, *mem1, *mem2;
-    char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
-	 arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH],
-	 arg5[MAX_INPUT_LENGTH];
+	if (get_trust(ch) < MAX_LEVEL ) {
+		send_to_char("Only implementors can run this command.", ch);
+		return;
+	}
 
-    argument = one_argument( argument, arg1 ); 	// Clan name
-    argument = one_argument( argument, arg2 ); 	// Clan leader
-    argument = one_argument( argument, arg3 ); 	// Recruiter 1
-    argument = one_argument( argument, arg4 ); 	// Recruiter 2
-    argument = one_argument( argument, arg5 ); 	// Member 1, member 2 will
-						// be what's left of the argument
-
-    if ( !argument || argument[0] == '\0' || arg1[0] == '\0'
-	 || arg2[0] == '\0' || arg3[0] == '\0' || arg4[0] == '\0'
-	 || arg5[0] == '\0' )
-    {
-	send_to_char( "Usage: makeclan <clan name> <leader> <recruiter1> <recruiter2> <member1> <member2>\n\r", ch );
-	send_to_char( "The leader will then be sent into clan customization menu.\n\r",ch);
-	return;
-    }
-
-    found = FALSE;
-
-    // Check the players now, everyone must be online and above level 40,
-    // AND from different sites (later)
-    if ((leader = get_char_world(ch,arg2)) == NULL || leader->level < 40)
-    {
-	send_to_char("Your leader does not appear to be here.\n\r",ch);
-	send_to_char("Also, their level must be 40 or greater.\n\r",ch);
-	return;
-    }
-
-    if ((rec1 = get_char_world(ch,arg3)) == NULL || rec1->level < 40)
-    {
-	send_to_char("Your first recruiter does not appear to be here.\n\r",ch);
-	send_to_char("Also, their level must be 40 or greater.\n\r",ch);
-	return;
-    }
-
-    if ((rec2 = get_char_world(ch,arg4)) == NULL || rec2->level < 40)
-    {
-	send_to_char("Your second recruiter does not appear to be here.\n\r",ch);
-	send_to_char("Also, their level must be 40 or greater.\n\r",ch);
-	return;
-    }
-
-    if ((mem1 = get_char_world(ch,arg5)) == NULL || mem1->level < 40)
-    {
-	send_to_char("Your first member does not appear to be here, or may be under level 40.\n\r",ch);
-	return;
-    }
-
-    if ((mem2 = get_char_world(ch,argument)) == NULL || mem2->level < 40)
-    {
-	send_to_char("Your second member does not appear to be here, or may be under level 40.\n\r",ch);
-	return;
-    }
-
-    if (leader == rec1 || leader == rec2 || leader == mem1 || leader == mem2 ||
-	rec1 == rec2 || rec1 == mem1 || rec1 == mem2 ||
-	rec2 == mem1 || rec2 == mem2 || mem1 == mem2)
-    {
-	send_to_char("All members of the clan must be different.\n\r",ch);
-	return;
-    }
-
-    // Now, has everyone typed this command, for they must before the
-    // process will begin
-    ch->makeclan = TRUE;
-    if (leader->makeclan == FALSE || rec1->makeclan == FALSE || rec2->makeclan == FALSE || mem1->makeclan == FALSE || mem2->makeclan == FALSE )
-    {
-	send_to_char("Everyone must type this command before the process will begin.\n\r",ch);
-	return;
-    }
-    // One final check to protect the leader
-    if (ch != leader)
-    {
-	send_to_char("Alright, now the leader must type this command once more to confirm.\n\r",ch);
-	return;
-    }
-
-    sprintf( filename, "%s%s", PLAYER_DIR, capitalize(arg1) );
-
-    if (get_clan(arg1) || fopen( filename, "r" ))
-
-    {
-	send_to_char("That clan name is already in use.\n\r",ch);
-	return;
-    }
-
-    sprintf( filename, "%s.cln", arg1 );
-
-    CREATE( clan, CLAN_DATA, 1 );
-    LINK( clan, first_clan, last_clan, next, prev );
-
-    // Ditch old clans
-    if (leader->pcdata->clan)
-    {
-	leader->pcdata->clan->members--;
-	save_clan(leader->pcdata->clan);
-    }
-    if (rec1->pcdata->clan)
-    {
-	rec1->pcdata->clan->members--;
-	save_clan(rec1->pcdata->clan);
-    }
-    if (rec2->pcdata->clan)
-    {
-	rec2->pcdata->clan->members--;
-	save_clan(rec2->pcdata->clan);
-    }
-    if (mem1->pcdata->clan)
-    {
-	mem1->pcdata->clan->members--;
-	save_clan(mem1->pcdata->clan);
-    }
-    if (mem2->pcdata->clan)
-    {
-	mem2->pcdata->clan->members--;
-	save_clan(mem2->pcdata->clan);
-    }
-
-    // Now guild the first 5 members
-    leader->pcdata->clan = clan;
-    rec1->pcdata->clan = clan;
-    rec2->pcdata->clan = clan;
-    mem1->pcdata->clan = clan;
-    mem2->pcdata->clan = clan;
-
-    clan->name		= str_dup( arg1 );
-    clan->members	= 5;
-    clan->motto		= str_dup( "" );
-    clan->description	= str_dup( "" );
-    free_string( clan->leader );
-    clan->leader	= str_dup( leader->getName() );
-    free_string( clan->number1 );
-    clan->number1	= str_dup( rec1->getName() );
-    free_string( clan->number2 );
-    clan->number2	= str_dup( rec2->getName() );
-    free_string( clan->filename );
-    clan->filename	= str_dup( filename );
-    SET_BIT( clan->flags, CLAN_PK );
-    save_clan(clan);
-    write_clan_list( );
-
-    // last but not least, drop the leader into clan cust prompt
-    leader->clan_cust = 0;
-    send_to_char("Type your clan name as it will appear in brackets: ", leader);
-    leader->desc->connected = CON_CLAN_CREATE;
-    return;
-} // end if (get_trust(ch) < MAX_LEVEL)
-
-// Implementors have free say -Blizzard
-else if (get_trust(ch) == MAX_LEVEL)
-{
     if ( !argument || argument[0] == '\0' )
     {
 	send_to_char( "Usage: makeclan <clan name>\n\r", ch );
@@ -874,8 +722,6 @@ else if (get_trust(ch) == MAX_LEVEL)
     clan->number1	= str_dup( "" );
     clan->number2	= str_dup( "" );
     return;
-} // End if (get_trust(ch) == MAX_LEVEL)
-
 }
 
 /*

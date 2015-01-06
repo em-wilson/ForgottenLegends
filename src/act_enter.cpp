@@ -36,6 +36,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "merc.h"
+#include "PlayerCharacter.h"
 
 void    raw_kill        args( ( Character *victim ) );
 int     xp_compute      args( ( Character *gch, Character *victim, int
@@ -269,7 +270,9 @@ void do_detonate( Character *ch, char *argument )
 	
 		count++;
 		pcount++;
-		gch->pkills++;
+			if ( !gch->isNPC()) {
+				((PlayerCharacter*)gch)->incrementPlayerKills(1);
+			}
 
 	        gch->xp += xp_compute( gch, victim, 8 );
 	
@@ -340,8 +343,8 @@ void do_detonate( Character *ch, char *argument )
         sprintf( buf, "%d people have been killed by the bomb blast detonated by %s. (%d PC's)\n\rYou receive %d experience points, before the heat from the bomb incinerates you.\n\r", count, ch->getName(), pcount, gch->xp);
         send_to_char( buf, gch );
         gch->gain_exp( gch->xp );
-	gch->mkills += count;
-	gch->pkills += pcount;
+		((PlayerCharacter*)gch)->incrementMobKills(count);
+		((PlayerCharacter*)gch)->incrementPlayerKills(pcount);
         gch->xp = 0;
 	if (!IS_IMMORTAL(gch))
         raw_kill( gch );
@@ -350,8 +353,8 @@ void do_detonate( Character *ch, char *argument )
     sprintf( buf, "%d people have been killed by the blast. (%d PC's)\n\rYou receive %d experience points, before the heat from the bomb incinerates you.\n\r", count, pcount, ch->xp );
     send_to_char( buf, ch );
     ch->gain_exp( ch->xp );
-    ch->mkills += count;
-    ch->pkills += pcount;
+	((PlayerCharacter*)ch)->incrementMobKills(count);
+	((PlayerCharacter*)ch)->incrementPlayerKills(pcount);
     ch->xp = 0;
     obj_from_char( nuke );
     if (!IS_IMMORTAL(ch))

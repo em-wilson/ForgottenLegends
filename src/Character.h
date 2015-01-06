@@ -3,6 +3,7 @@
 
 #include <list>
 #include <string>
+#include <ForceFeedback/ForceFeedback.h>
 #include "pc_data.h"
 
 /*
@@ -107,25 +108,9 @@ public:
     sh_int		orig_form;
     int			xp;
 
-    /* clan stuff */
-    bool		confirm_pk;
-    bool		makeclan;
-    CLAN_DATA *		join;
-    int			pkills;
-    int			pkilled;
-    int			mkills;
-    int			mkilled;
-    int			range;
-    int			clan_cust;
-    int			adrenaline;
-    int			jkilled; // If they were just killed
-
     Character();
     virtual ~Character();
 
-    // Abstract functions
-//    virtual ROOM_INDEX_DATA * getWasNoteRoom();
-//    virtual void setWasNoteRoom( ROOM_INDEX_DATA *room );
     /*
      * Advancement stuff.
      */
@@ -141,6 +126,12 @@ public:
     char * getDescription();
 
     virtual bool isNPC() = 0;
+    virtual int getRange();
+
+    virtual bool didJustDie();
+
+
+    virtual void update();
 
 private:
     std::string _name;

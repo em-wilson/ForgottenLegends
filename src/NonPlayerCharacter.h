@@ -5,4 +5,6 @@ public:
     NonPlayerCharacter(MOB_INDEX_DATA *pMobIndex);
     ~NonPlayerCharacter();
     bool isNPC();
+
+    virtual void update() override;
 };

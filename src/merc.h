@@ -98,6 +98,7 @@ typedef struct  mprog_code		MPROG_CODE;
 typedef struct  clan_data		CLAN_DATA;
 
 class Character;
+class PlayerCharacter;
 
 /*
  * Function types.
@@ -2519,7 +2520,7 @@ int	morph_lookup	args( ( const char *name) );
 int	race_lookup	args( ( const char *name) );
 int	item_lookup	args( ( const char *name) );
 int	liq_lookup	args( ( const char *name) );
-int	nw_lookup	args( ( Character *ch ) );
+int	nw_lookup	args( ( PlayerCharacter *ch ) );
 long	clan_nw_lookup	args( ( CLAN_DATA *clan ) );
 
 #undef	CD

@@ -85,7 +85,6 @@ static	OBJ_DATA *	rgObjNest	[MAX_NEST];
 /*
  * Local functions.
  */
-void	fwrite_char	args( ( Character *ch,  FILE *fp ) );
 void	fwrite_obj	args( ( Character *ch,  OBJ_DATA  *obj,
 			    FILE *fp, int iNest ) );
 void	fwrite_pet	args( ( Character *pet, FILE *fp) );
@@ -137,7 +136,7 @@ void save_char_obj( Character *ch )
     }
     else
     {
-	fwrite_char( ch, fp );
+        ((PlayerCharacter*)ch)->writeToFile(fp);
 	if ( ch->carrying != NULL )
 	    fwrite_obj( ch, ch->carrying, fp, 0 );
 	/* save the pets */
@@ -152,203 +151,6 @@ void save_char_obj( Character *ch )
 }
 
 
-
-/*
- * Write the char.
- */
-void fwrite_char( Character *ch, FILE *fp )
-{
-    AFFECT_DATA *paf;
-    int sn, gn, pos, i;
-
-    fprintf( fp, "#%s\n", IS_NPC(ch) ? "MOB" : "PLAYER"	);
-
-    fprintf( fp, "Name %s~\n",	ch->getName()		);
-    fprintf( fp, "Id   %ld\n", ch->id			);
-    fprintf( fp, "LogO %ld\n",	current_time		);
-    fprintf( fp, "Vers %d\n",   5			);
-    if (ch->short_descr[0] != '\0')
-      	fprintf( fp, "ShD  %s~\n",	ch->short_descr	);
-    if( ch->long_descr[0] != '\0')
-	fprintf( fp, "LnD  %s~\n",	ch->long_descr	);
-    if ( ch->getDescription() )
-    	fprintf( fp, "Desc %s~\n",	ch->getDescription()	);
-    if (ch->prompt != NULL || !str_cmp(ch->prompt,"<%X to level>%c<%h/%Hhp %m/%Mm %v/%Vmv> "))
-        fprintf( fp, "Prom %s~\n",      ch->prompt  	);
-    fprintf( fp, "Race %s~\n", pc_race_table[ch->race].name );
-
-    if (ch->race == race_lookup("werefolk"))
-    {
-	fprintf( fp, "O_fo %d\n", ch->orig_form		);
-	fprintf( fp, "M_fo %d\n", ch->morph_form		);
-    }
-
-    if (ch->race == race_lookup("draconian") && ch->level >= 10)
-    {
-	fprintf( fp, "Drac %d\n", ch->drac );
-	fprintf( fp, "Brea %d\n", ch->breathe);
-    }
-
-    fprintf( fp, "Kills %d %d %d %d\n", ch->pkills, ch->pkilled,
-					ch->mkills, ch->mkilled);
-    if (ch->pcdata->clan)
-    	fprintf( fp, "Clan %s~\n", ch->pcdata->clan->name);
-    fprintf( fp, "Sex  %d\n",	ch->sex			);
-    fprintf( fp, "Cla  %d\n",	ch->class_num		);
-    fprintf( fp, "Levl %d\n",	ch->level		);
-    if (ch->trust != 0)
-	fprintf( fp, "Tru  %d\n",	ch->trust	);
-    fprintf( fp, "Sec  %d\n",    ch->pcdata->security	);	/* OLC */
-    fprintf( fp, "Plyd %d\n",
-	ch->played + (int) (current_time - ch->logon)	);
-    fprintf( fp, "Scro %d\n", 	ch->lines		);
-    fprintf( fp, "Room %d\n",
-        (  ch->in_room == get_room_index( ROOM_VNUM_LIMBO )
-        && ch->was_in_room != NULL )
-            ? ch->was_in_room->vnum
-            : ch->in_room == NULL ? 3001 : ch->in_room->vnum );
-
-    fprintf( fp, "HMV  %d %d %d %d %d %d\n",
-	ch->hit, ch->max_hit, ch->mana, ch->max_mana, ch->move, ch->max_move );
-    if (ch->gold > 0)
-      fprintf( fp, "Gold %ld\n",	ch->gold		);
-    else
-      fprintf( fp, "Gold %d\n", 0			); 
-    if (ch->silver > 0)
-	fprintf( fp, "Silv %ld\n",ch->silver		);
-    else
-	fprintf( fp, "Silv %d\n",0			);
-    fprintf( fp, "Exp  %d\n",	ch->exp			);
-    if (ch->act != 0)
-	fprintf( fp, "Act  %s\n",   print_flags(ch->act));
-    if (ch->affected_by != 0)
-	fprintf( fp, "AfBy %s\n",   print_flags(ch->affected_by));
-    if (ch->reclass_num > 0)
-	fprintf( fp, "Rnum %d\n",	ch->reclass_num);
-    if (ch->done != 0)
-	fprintf( fp, "Done %s\n",   print_flags(ch->done));
-    fprintf( fp, "Comm %s\n",       print_flags(ch->comm));
-    if (ch->wiznet)
-    	fprintf( fp, "Wizn %s\n",   print_flags(ch->wiznet));
-    if (ch->invis_level)
-	fprintf( fp, "Invi %d\n", 	ch->invis_level	);
-    if (ch->incog_level)
-	fprintf(fp,"Inco %d\n",ch->incog_level);
-    fprintf( fp, "Pos  %d\n",	
-	ch->position == POS_FIGHTING ? POS_STANDING : ch->position );
-    if (ch->practice != 0)
-    	fprintf( fp, "Prac %d\n",	ch->practice	);
-    if (ch->train != 0)
-	fprintf( fp, "Trai %d\n",	ch->train	);
-    if (ch->saving_throw != 0)
-	fprintf( fp, "Save  %d\n",	ch->saving_throw);
-    fprintf( fp, "Alig  %d\n",	ch->alignment		);
-    if (ch->hitroll != 0)
-	fprintf( fp, "Hit   %d\n",	ch->hitroll	);
-    if (ch->damroll != 0)
-	fprintf( fp, "Dam   %d\n",	ch->damroll	);
-    fprintf( fp, "ACs %d %d %d %d\n",	
-	ch->armor[0],ch->armor[1],ch->armor[2],ch->armor[3]);
-    if (ch->wimpy !=0 )
-	fprintf( fp, "Wimp  %d\n",	ch->wimpy	);
-    fprintf( fp, "Attr %d %d %d %d %d\n",
-	ch->perm_stat[STAT_STR],
-	ch->perm_stat[STAT_INT],
-	ch->perm_stat[STAT_WIS],
-	ch->perm_stat[STAT_DEX],
-	ch->perm_stat[STAT_CON] );
-
-    fprintf (fp, "AMod %d %d %d %d %d\n",
-	ch->mod_stat[STAT_STR],
-	ch->mod_stat[STAT_INT],
-	ch->mod_stat[STAT_WIS],
-	ch->mod_stat[STAT_DEX],
-	ch->mod_stat[STAT_CON] );
-
-    if ( IS_NPC(ch) )
-    {
-	fprintf( fp, "Vnum %d\n",	ch->pIndexData->vnum	);
-    }
-    else
-    {
-	fprintf( fp, "Pass %s~\n",	ch->pcdata->pwd		);
-	if (ch->pcdata->bamfin[0] != '\0')
-	    fprintf( fp, "Bin  %s~\n",	ch->pcdata->bamfin);
-	if (ch->pcdata->bamfout[0] != '\0')
-		fprintf( fp, "Bout %s~\n",	ch->pcdata->bamfout);
-	fprintf( fp, "Titl %s~\n",	ch->pcdata->title	);
-
-	if (IS_CLANNED(ch))
-	    fprintf( fp, "Rang %d\n",	ch->range		);
-
-    	fprintf( fp, "Pnts %d\n",   	ch->pcdata->points      );
-	fprintf( fp, "TSex %d\n",	ch->pcdata->true_sex	);
-	fprintf( fp, "LLev %d\n",	ch->pcdata->last_level	);
-	fprintf( fp, "HMVP %d %d %d\n", ch->pcdata->perm_hit, 
-						   ch->pcdata->perm_mana,
-						   ch->pcdata->perm_move);
-	fprintf( fp, "Cnd  %d %d %d %d\n",
-	    ch->pcdata->condition[0],
-	    ch->pcdata->condition[1],
-	    ch->pcdata->condition[2],
-	    ch->pcdata->condition[3] );
-
-	/* write alias */
-        for (pos = 0; pos < MAX_ALIAS; pos++)
-	{
-	    if (ch->pcdata->alias[pos] == NULL
-	    ||  ch->pcdata->alias_sub[pos] == NULL)
-		break;
-
-	    fprintf(fp,"Alias %s %s~\n",ch->pcdata->alias[pos],
-		    ch->pcdata->alias_sub[pos]);
-	}
-
-       /* Save note board status */
-       /* Save number of boards in case that number changes */
-       fprintf (fp, "Boards       %d ", MAX_BOARD);
-       for (i = 0; i < MAX_BOARD; i++)
-           fprintf (fp, "%s %ld ", boards[i].short_name, ch->pcdata->last_note[i]);
-       fprintf (fp, "\n");
-
-	for ( sn = 0; sn < MAX_SKILL; sn++ )
-	{
-	    if ( skill_table[sn].name != NULL && ch->pcdata->learned[sn] > 0 )
-	    {
-		fprintf( fp, "Skill %d %d %d '%s'\n",
-		    ch->pcdata->learned[sn], ch->pcdata->sk_level[sn],
-		    ch->pcdata->sk_rating[sn], skill_table[sn].name );
-	    }
-	}
-
-	for ( gn = 0; gn < MAX_GROUP; gn++ )
-        {
-            if ( group_table[gn].name != NULL && ch->pcdata->group_known[gn])
-            {
-                fprintf( fp, "Gr '%s'\n",group_table[gn].name);
-            }
-        }
-    }
-
-    for ( paf = ch->affected; paf != NULL; paf = paf->next )
-    {
-	if (paf->type < 0 || paf->type>= MAX_SKILL)
-	    continue;
-	
-	fprintf( fp, "Affc '%s' %3d %3d %3d %3d %3d %10d\n",
-	    skill_table[paf->type].name,
-	    paf->where,
-	    paf->level,
-	    paf->duration,
-	    paf->modifier,
-	    paf->location,
-	    paf->bitvector
-	    );
-    }
-
-    fprintf( fp, "End\n\n" );
-    return;
-}
 
 /* write a pet */
 void fwrite_pet( Character *pet, FILE *fp)
@@ -562,37 +364,13 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 {
     char strsave[MAX_INPUT_LENGTH];
     char buf[100];
-    Character *ch;
+    PlayerCharacter *ch = new PlayerCharacter();
     FILE *fp;
     bool found;
-    int stat;
-
-    ch = new PlayerCharacter();
-    ch->pcdata = new PC_DATA();
 
     d->character			= ch;
     ch->desc				= d;
     ch->setName(name);
-    ch->id				= get_pc_id();
-    ch->race				= race_lookup("human");
-    ch->act				= PLR_NOSUMMON;
-    ch->comm				= COMM_COMBINE 
-					| COMM_PROMPT;
-    ch->prompt 				= str_dup("<%X to level>%c<%h/%Hhp %m/%Mm %v/%Vmv> ");
-    ch->range				= 5;
-    ch->reclass_num			= 0;
-    ch->pcdata->confirm_delete		= FALSE;
-    ch->pcdata->board                   = &boards[DEFAULT_BOARD];
-    ch->pcdata->pwd			= str_dup( "" );
-    ch->pcdata->bamfin			= str_dup( "" );
-    ch->pcdata->bamfout			= str_dup( "" );
-    ch->pcdata->title			= str_dup( "" );
-    for (stat =0; stat < MAX_STATS; stat++)
-	ch->perm_stat[stat]		= 13;
-    ch->pcdata->condition[COND_THIRST]	= 48; 
-    ch->pcdata->condition[COND_FULL]	= 48;
-    ch->pcdata->condition[COND_HUNGER]	= 48;
-    ch->pcdata->security		= 0;	/* OLC */
 
     found = FALSE;
     fclose( fpReserve );
@@ -1056,13 +834,14 @@ void fread_char( Character *ch, FILE *fp )
 	    break;
 
 	case 'K':
-	    if (!str_cmp(word,"Kills"))
+	    if (!ch->isNPC() && !str_cmp(word,"Kills"))
 	    {
-		fMatch = TRUE;
-		ch->pkills	=	fread_number(fp);
-		ch->pkilled	=	fread_number(fp);
-		ch->mkills	=	fread_number(fp);
-		ch->mkilled	=	fread_number(fp);
+            fMatch = TRUE;
+            int pkills	=	fread_number(fp);
+            int pkilled	=	fread_number(fp);
+            int mkills	=	fread_number(fp);
+            int mkilled	=	fread_number(fp);
+            ((PlayerCharacter*)ch)->setKills(pkills, pkilled, mkills, mkilled);
 	    }
 	    break;
 
@@ -1105,10 +884,13 @@ void fread_char( Character *ch, FILE *fp )
 	    break;
 
 	case 'R':
-	    KEY( "Rang",	ch->range,		fread_number( fp ) );
-	    KEY( "Race",        ch->race,	
+	    KEY( "Race",        ch->race,
 				race_lookup(fread_string( fp )) );
 	    KEY( "Rnum",	ch->reclass_num,	fread_number( fp ) );
+
+            if ( !str_cmp( word, "Range" ) ) {
+                ((PlayerCharacter*)ch)->setRange( fread_number( fp ) );
+            }
 
 	    if ( !str_cmp( word, "Room" ) )
 	    {

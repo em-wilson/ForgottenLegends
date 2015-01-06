@@ -35,6 +35,7 @@
 #include <time.h>
 #include "merc.h"
 #include "Wiznet.h"
+#include "PlayerCharacter.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_backstab	);
@@ -946,7 +947,7 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
         if (IS_NPC(victim))
 	{
 	    if (!IS_NPC(ch))
-		ch->mkills++;
+			((PlayerCharacter*)ch)->incrementMobKills(1);
 
             Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_MOBDEATHS,0,0);
 	}
@@ -954,16 +955,16 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
 	{
 	    if (!IS_NPC(ch))
 	    {
-		ch->pkills++;
-		ch->range++;
+			((PlayerCharacter*)ch)->incrementPlayerKills(1);
+			((PlayerCharacter*)ch)->incrementRange(1);
 		if (IS_CLANNED(ch))
 		{
 		    ch->pcdata->clan->pkills++;
 		    save_clan(ch->pcdata->clan);
 		}
-		victim->pkilled++;
-		victim->jkilled = 5;
-		--victim->range;
+			((PlayerCharacter*)victim)->incrementKilledByPlayerCount(1);
+			((PlayerCharacter*)victim)->setJustKilled(5);
+			((PlayerCharacter*)victim)->incrementRange(-1);
 		if (IS_CLANNED(victim))
 		{
 		    victim->pcdata->clan->pdeaths++;
@@ -971,8 +972,8 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
 		}
 	    }
 	    else
-		ch->mkilled++;
-		victim->jkilled = 5;
+			((PlayerCharacter*)ch)->incrementKilledByMobCount(1);
+			((PlayerCharacter*)ch)->setJustKilled(5);
 
             Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_DEATHS,0,0);
 	}
@@ -1398,7 +1399,7 @@ bool is_safe(Character *ch, Character *victim)
     if (IS_IMMORTAL(ch) && ch->level > LEVEL_IMMORTAL)
 	return FALSE;
 
-	if (ch->jkilled > 0 || victim->jkilled > 0)
+	if (ch->didJustDie() || victim->didJustDie() )
 	{
 	    send_to_char("Players may not fight for 5 minutes after they die.\n\r",ch);
 	    return TRUE;
@@ -1506,7 +1507,7 @@ bool is_safe(Character *ch, Character *victim)
 	    if (IS_SET(victim->act,PLR_THIEF))
 		return FALSE;
 
-	    if (ch->level > victim->level + victim->range)
+	    if (ch->level > victim->level + victim->getRange() )
 	    {
 		send_to_char("Pick on someone your own size.\n\r",ch);
 		return TRUE;
@@ -1530,7 +1531,7 @@ bool is_safe_spell(Character *ch, Character *victim, bool area )
     if (IS_IMMORTAL(ch) && ch->level > LEVEL_IMMORTAL && !area)
 	return FALSE;
 
-	if (ch->jkilled > 0 || victim->jkilled > 0)
+	if ( ch->didJustDie() || victim->didJustDie() )
 	{
 	    send_to_char("Players may not fight for 5 minutes after they die.\n\r",ch);
 	    return TRUE;
@@ -1612,7 +1613,7 @@ bool is_safe_spell(Character *ch, Character *victim, bool area )
 	    if (IS_SET(victim->act,PLR_THIEF))
 		return FALSE;
 
-	    if (ch->level > victim->level + victim->range)
+	    if (ch->level > victim->level + victim->getRange())
 		return TRUE;
 	}
 
@@ -1641,8 +1642,8 @@ void check_killer( Character *ch, Character *victim )
 
     if (!IS_NPC(victim) && !IS_NPC(ch))
     {
-	ch->adrenaline = 5;
-	victim->adrenaline = 5;
+		((PlayerCharacter*)ch)->setAdrenaline(5);
+		((PlayerCharacter*)victim)->setAdrenaline(5);
     }
 
     if (IS_SET(victim->act, PLR_THIEF))

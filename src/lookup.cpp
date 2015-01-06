@@ -34,6 +34,7 @@
 #include <time.h>
 #include "merc.h"
 #include "tables.h"
+#include "PlayerCharacter.h"
 
 int flag_lookup (const char *name, const struct flag_type *flag_table)
 {
@@ -149,24 +150,20 @@ int liq_lookup (const char *name)
     return -1;
 }
 
-int nw_lookup( Character *ch )
+int nw_lookup( PlayerCharacter *ch )
 {
     OBJ_DATA *obj;
     long nw;
-
-    // We don't care about mobs
-    if (IS_NPC(ch))
-	return 0;
 
     /* First, monetary value */
     nw = ch->gold * 100;
     nw +=  ch->silver;
 
     // Pkills are worth +/- 10 gold, mkills are worth +/- 5 gold
-    nw += 100 * (ch->pkills * 10);
-    nw -= 100 * (ch->pkilled * 10);
-    nw += 100 * (ch->mkills * 5);
-    nw -= 100 * (ch->mkilled * 5);
+    nw += 100 * (ch->getPlayerKillCount() * 10);
+    nw -= 100 * (ch->getKilledByPlayersCount() * 10);
+    nw += 100 * (ch->getMobKillCount() * 5);
+    nw -= 100 * (ch->getKilledByMobCount() * 5);
 
     /* Next, lets get their item costs */
     for (obj = ch->carrying; obj != NULL; obj = obj->next_content)

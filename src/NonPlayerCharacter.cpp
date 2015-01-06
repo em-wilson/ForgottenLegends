@@ -236,3 +236,17 @@ NonPlayerCharacter::~NonPlayerCharacter() {
 bool NonPlayerCharacter::isNPC() {
         return true;
 }
+
+void NonPlayerCharacter::update() {
+        if ( this->position >= POS_STUNNED ) {
+                /* check to see if we need to go home */
+                if (IS_NPC(this) && this->zone != NULL && this->zone != this->in_room->area
+                        && this->desc == NULL && this->fighting == NULL
+                        && !IS_AFFECTED(this, AFF_CHARM) && number_percent() < 5) {
+                        ::act("$n wanders on home.", this, NULL, NULL, TO_ROOM);
+                        extract_char(this, TRUE);
+                        return;
+                }
+        }
+        Character::update();
+}

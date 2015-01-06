@@ -42,6 +42,7 @@
 #include "lookup.h"
 #include "Wiznet.h"
 #include "NonPlayerCharacter.h"
+#include "PlayerCharacter.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_rstat		);
@@ -1698,11 +1699,14 @@ void do_mstat( Character *ch, char *argument )
 	victim->wimpy );
     send_to_char( buf, ch );
 
-    if (!IS_NPC(victim))
+    if (!victim->isNPC())
     {
 	sprintf( buf,
 	    "Mobkillls: %d  Mobkilled: %d  Pkills: %d  Pkilled: %d\n\r",
-	    victim->mkills, victim->mkilled, victim->pkills, victim->pkilled );
+            ((PlayerCharacter*)victim)->getMobKillCount(),
+            ((PlayerCharacter*)victim)->getKilledByMobCount(),
+            ((PlayerCharacter*)victim)->getPlayerKillCount(),
+            ((PlayerCharacter*)victim)->getKilledByPlayersCount());
 	send_to_char(buf,ch);
     }
 

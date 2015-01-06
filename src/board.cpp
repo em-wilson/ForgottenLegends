@@ -451,7 +451,7 @@ static void do_nwrite (Character *caller, char *argument)
 
 	PlayerCharacter *ch = (PlayerCharacter*)caller;
 		
-	if ( ch->adrenaline > 0 )
+	if ( ch->getAdrenaline() > 0 )
 	{
 	    send_to_char("You are too excited from the chase to write a legible note.\n\r",ch);
 	    return;

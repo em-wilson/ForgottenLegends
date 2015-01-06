@@ -269,17 +269,7 @@ void free_obj(OBJ_DATA *obj)
 
 
 /* stuff for setting ids */
-long	last_pc_id;
 long	last_mob_id;
-
-long get_pc_id(void)
-{
-    int val;
-
-    val = (current_time <= last_pc_id) ? last_pc_id + 1 : current_time;
-    last_pc_id = val;
-    return val;
-}
 
 long get_mob_id(void)
 {

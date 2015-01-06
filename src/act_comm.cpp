@@ -1362,13 +1362,15 @@ void do_qui( Character *ch, char *argument )
 
 
 
-void do_quit( Character *ch, char *argument )
+void do_quit( Character *caller, char *argument )
 {
     DESCRIPTOR_DATA *d,*d_next;
     int id;
 
-    if ( IS_NPC(ch) )
+    if ( caller->isNPC() )
 	return;
+
+    PlayerCharacter *ch = (PlayerCharacter*)caller;
 
     if ( ch->position == POS_FIGHTING )
     {
@@ -1376,7 +1378,7 @@ void do_quit( Character *ch, char *argument )
 	return;
     }
 
-    if ( ch->adrenaline > 0 )
+    if ( ch->getAdrenaline() > 0 )
     {
 	send_to_char("You are too excited from the chase.\n\r", ch );
 	return;

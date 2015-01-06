@@ -42,11 +42,18 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "tables.h"
+#include "PlayerCharacter.h"
 
 DECLARE_DO_FUN( do_clist	);
 
-void do_join( Character *ch, char *argument )
+void do_join( Character *caller, char *argument )
 {
+	if ( caller->isNPC() ) {
+		send_to_char("NPCs may not join clans\n\r", caller);
+		return;
+	}
+
+	PlayerCharacter *ch = (PlayerCharacter*)caller;
     char buf[MAX_STRING_LENGTH];
 
     if (argument[0] == '\0')
@@ -68,21 +75,28 @@ void do_join( Character *ch, char *argument )
     }
 */
 
-    if (!get_clan(argument))
+	CLAN_DATA *join = get_clan(argument);
+    if (!join)
     {
 	sprintf(buf, "%s: that clan does not exist.\n\r",argument);
 	send_to_char(buf,ch);
 	return;
     }
 
-    ch->join = get_clan(argument);
-    sprintf(buf, "You are now eligable to join %s.\n\r",ch->join->name);
+    ch->setJoin(join);
+    sprintf(buf, "You are now eligable to join %s.\n\r",join->name);
     send_to_char(buf,ch);
     return;
 }
 
-void do_cedit( Character *ch, char *argument )
+void do_cedit( Character *caller, char *argument )
 {
+	if ( caller->isNPC() ) {
+		send_to_char("NPCs may not join clans\n\r", caller);
+		return;
+	}
+
+	PlayerCharacter *ch = (PlayerCharacter*)caller;
     if (!IS_CLANNED(ch) || str_cmp(ch->getName(),ch->pcdata->clan->leader))
     {
 	send_to_char("Only clan leaders may use this command.",ch);
@@ -96,7 +110,7 @@ void do_cedit( Character *ch, char *argument )
 		    "3: Mobile Options\n\r"
 		    "4: Shop Options\n\r"
 		    "5: Exit Editor\n\r", ch);
-	ch->clan_cust = 3;
+	ch->setClanCust(3);
 	ch->desc->connected = CON_CLAN_CREATE;
 	return;
     }

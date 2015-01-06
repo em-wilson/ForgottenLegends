@@ -78,7 +78,6 @@ void	free_obj args( (OBJ_DATA *obj) );
 
 /* mob id and memory procedures */
 #define MD MEM_DATA
-long 	get_pc_id args( (void) );
 long	get_mob_id args( (void) );
 //MD	*new_mem_data args( (void) );
 //void	free_mem_data args( ( MEM_DATA *memory) );
