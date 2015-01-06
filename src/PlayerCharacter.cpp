@@ -6,7 +6,7 @@
 
 PlayerCharacter::PlayerCharacter()
         : Character() {
-
+        this->was_note_room = NULL;
 }
 
 PlayerCharacter::~PlayerCharacter() {
@@ -32,5 +32,14 @@ void PlayerCharacter::gain_exp( int gain ) {
                 Wiznet::instance()->report( buf, this, NULL, WIZ_LEVELS, 0, 0 );
         }
 
+        return;
+}
+
+ROOM_INDEX_DATA * PlayerCharacter::getWasNoteRoom() {
+        return this->was_note_room;
+}
+
+void PlayerCharacter::setWasNoteRoom( ROOM_INDEX_DATA *room ) {
+        this->was_note_room = room;
         return;
 }

@@ -1766,7 +1766,7 @@ case CON_RECLASS_CUST:
             ch->gen_data = NULL;
             send_to_char(buf,ch);
 	    char_from_room(ch);
-	    char_to_room(ch, ch->was_note_room);
+	    char_to_room(ch, ch->getWasNoteRoom());
             d->connected = CON_PLAYING;
             break;
         }

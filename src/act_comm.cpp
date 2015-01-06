@@ -1999,6 +1999,7 @@ void do_noauction( Character *ch, char *argument )
 
 void do_reclass( Character *ch, char *argument)
 {
+
     char buf[MAX_STRING_LENGTH];
     int iClass;
     int count = 0;
@@ -2066,7 +2067,7 @@ void do_reclass( Character *ch, char *argument)
     /* If any messages get sent to them, mud will crash, so we'll
      * prevent that right here.
      */
-    ch->was_note_room = ch->in_room;
+    ch->setWasNoteRoom(ch->in_room);
     char_from_room( ch );
     char_to_room( ch, get_room_index(ROOM_VNUM_NOTE));
 

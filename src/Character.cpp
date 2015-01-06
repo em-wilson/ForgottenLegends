@@ -22,7 +22,6 @@ Character::Character()
     this->on = NULL;
     this->in_room = NULL;
     this->was_in_room = NULL;
-    this->was_note_room = NULL;
     this->zone = NULL;
     this->pcdata = NULL;
     this->gen_data = NULL;
@@ -484,5 +483,14 @@ void Character::gain_condition( int iCond, int value )
     }
     }
 
+    return;
+}
+
+ROOM_INDEX_DATA * Character::getWasNoteRoom() {
+    return NULL;
+}
+
+
+void Character::setWasNoteRoom( ROOM_INDEX_DATA *room ) {
     return;
 }

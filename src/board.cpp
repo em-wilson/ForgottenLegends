@@ -489,7 +489,7 @@ static void do_nwrite (Character *ch, char *argument)
 	    SET_BIT(ch->comm, COMM_AFK);
 
 	/* Change their rooms so no one can crash the mud */
-	ch->was_note_room = ch->in_room;
+	ch->setWasNoteRoom(ch->in_room);
 	char_from_room( ch );
 	char_to_room( ch, get_room_index(ROOM_VNUM_NOTE));
 	
@@ -1196,7 +1196,7 @@ void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
 
 				/* Send them home */
 				char_from_room(ch);
-				char_to_room(ch, ch->was_note_room);
+				char_to_room(ch, ch->getWasNoteRoom());
 
 				ch->pcdata->in_progress = NULL;
 				act (BOLD GREEN "$n finishes $s note." NO_COLOR , ch, NULL, NULL, TO_ROOM);
@@ -1212,7 +1212,7 @@ void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
 
 				/* Send them home */
 				char_from_room(ch);
-				char_to_room(ch, ch->was_note_room);
+				char_to_room(ch, ch->getWasNoteRoom());
 				act (BOLD GREEN "$n decided not to finish $s note." NO_COLOR , ch, NULL, NULL, TO_ROOM);
 				break;
 			

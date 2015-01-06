@@ -29,7 +29,6 @@ public:
     OBJ_DATA *		on;
     ROOM_INDEX_DATA *	in_room;
     ROOM_INDEX_DATA *	was_in_room;
-    ROOM_INDEX_DATA *	was_note_room;
     AREA_DATA *		zone;
     PC_DATA *		pcdata;
     GEN_DATA *		gen_data;
@@ -123,6 +122,10 @@ public:
 
     Character();
     virtual ~Character();
+
+    // Abstract functions
+    virtual ROOM_INDEX_DATA * getWasNoteRoom();
+    virtual void setWasNoteRoom( ROOM_INDEX_DATA *room );
     /*
      * Advancement stuff.
      */
@@ -136,6 +139,7 @@ public:
     char * getName();
     void setDescription( const char * description );
     char * getDescription();
+
 private:
     std::string _name;
     std::string _description;
