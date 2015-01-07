@@ -9,6 +9,9 @@ public:
     ROOM_INDEX_DATA * getWasNoteRoom();
     void setWasNoteRoom( ROOM_INDEX_DATA *room );
     virtual bool isNPC() override;
+    virtual int hit_gain() override;
+    virtual int mana_gain( ) override;
+    virtual int move_gain( ) override;
 
     void setClanCust(int i);
 
@@ -28,7 +31,7 @@ public:
 
     int getKilledByMobCount();
 
-    int getRange();
+    virtual int getRange() override;
 
     void incrementRange(int amount);
 
@@ -44,17 +47,15 @@ public:
 
 private:
     /* clan stuff */
-    bool		confirm_pk;
-    bool		makeclan;
     CLAN_DATA *		join;
-    int			pkills;
-    int			pkilled;
-    int			mkills;
-    int			mkilled;
-    int			range;
-    int			clan_cust;
-    int			adrenaline;
-    int			jkilled; // If they were just killed
+    int			    pkills;
+    int			    pkilled;
+    int			    mkills;
+    int		    	mkilled;
+    int			    range;
+    int		    	clan_cust;
+    int			    adrenaline;
+    int			    jkilled; // If they were just killed
 
     ROOM_INDEX_DATA *	was_note_room;
 public:

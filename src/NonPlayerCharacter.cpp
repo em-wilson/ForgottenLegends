@@ -250,3 +250,108 @@ void NonPlayerCharacter::update() {
         }
         Character::update();
 }
+
+/*
+ * Regeneration stuff.
+ */
+int NonPlayerCharacter::hit_gain( )
+{
+        if (this->in_room == NULL)
+                return 0;
+
+        int gain =  5 + this->level;
+        if (IS_AFFECTED(this,AFF_REGENERATION))
+                gain *= 2;
+
+        switch(this->position)
+        {
+                default :       gain /= 2;          break;
+                case POS_SLEEPING:  gain = 3 * gain/2;      break;
+                case POS_RESTING:                   break;
+                case POS_FIGHTING:  gain /= 3;          break;
+        }
+
+
+        gain = gain * this->in_room->heal_rate / 100;
+
+        if (this->on != NULL && this->on->item_type == ITEM_FURNITURE)
+                gain = gain * this->on->value[3] / 100;
+
+        if ( IS_AFFECTED(this, AFF_POISON) )
+                gain /= 4;
+
+        if (IS_AFFECTED(this, AFF_PLAGUE))
+                gain /= 8;
+
+        if (IS_AFFECTED(this,AFF_HASTE) || IS_AFFECTED(this,AFF_SLOW))
+                gain /=2 ;
+
+        if (!IS_NPC(this) && this->pcdata->clan)
+                gain *= 1.5;
+
+        return UMIN(gain, this->max_hit - this->hit);
+}
+
+
+
+
+
+int NonPlayerCharacter::mana_gain( )
+{
+        if (this->in_room == NULL)
+                return 0;
+
+        int gain = 5 + this->level;
+        switch (this->position)
+        {
+                default:        gain /= 2;      break;
+                case POS_SLEEPING:  gain = 3 * gain/2;  break;
+                case POS_RESTING:               break;
+                case POS_FIGHTING:  gain /= 3;      break;
+        }
+
+
+        gain = gain * this->in_room->mana_rate / 100;
+
+        if (this->on != NULL && this->on->item_type == ITEM_FURNITURE)
+                gain = gain * this->on->value[4] / 100;
+
+        if ( IS_AFFECTED( this, AFF_POISON ) )
+                gain /= 4;
+
+        if (IS_AFFECTED(this, AFF_PLAGUE))
+                gain /= 8;
+
+        if (IS_AFFECTED(this,AFF_HASTE) || IS_AFFECTED(this,AFF_SLOW))
+                gain /=2 ;
+
+        return UMIN(gain, this->max_mana - this->mana);
+}
+
+
+
+int NonPlayerCharacter::move_gain( )
+{
+        int gain;
+
+        if (this->in_room == NULL)
+                return 0;
+
+        gain = this->level;
+
+        gain = gain * this->in_room->heal_rate/100;
+
+        if (this->on != NULL && this->on->item_type == ITEM_FURNITURE)
+                gain = gain * this->on->value[3] / 100;
+
+        if ( IS_AFFECTED(this, AFF_POISON) )
+                gain /= 4;
+
+        if (IS_AFFECTED(this, AFF_PLAGUE))
+                gain /= 8;
+
+        if (IS_AFFECTED(this,AFF_HASTE) || IS_AFFECTED(this,AFF_SLOW))
+                gain /=2 ;
+
+        return UMIN(gain, this->max_move - this->move);
+}

@@ -67,7 +67,7 @@ public:
     long		act;
     long		comm;   /* RT added to pad the vector */
     long		done;   /* What classes have they completed? */
-    int			reclass_num; /* How many times have the reclassed? */
+    sh_int		reclass_num; /* How many times have the reclassed? */
     long		wiznet; /* wiz stuff */
     long		imm_flags;
     long		res_flags;
@@ -116,9 +116,9 @@ public:
      */
     void advance_level( bool hide );
     virtual void gain_exp( int gain );
-    int hit_gain( );
-    int mana_gain( );
-    int move_gain( );
+    virtual int hit_gain( ) = 0;
+    virtual int mana_gain( ) = 0;
+    virtual int move_gain( ) = 0;
     void gain_condition( int iCond, int value );
     void setName( const char * name );
     char * getName();
