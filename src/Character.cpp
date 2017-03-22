@@ -347,7 +347,7 @@ void Character::update() {
      *   as it may be lethal damage (on NPC).
      */
 
-    if (is_affected(this, gsn_plague) && this != NULL)
+    if (is_affected(this, gsn_plague) )
     {
         if (this->in_room == NULL)
             return;
@@ -398,7 +398,7 @@ void Character::update() {
         this->move -= dam;
         damage_old( this, this, dam, gsn_plague,DAM_DISEASE,FALSE);
     }
-    else if ( IS_AFFECTED(this, AFF_POISON) && this != NULL
+    else if ( IS_AFFECTED(this, AFF_POISON)
             &&   !IS_AFFECTED(this,AFF_SLOW))
 
     {

@@ -1,7 +1,7 @@
 CC      = g++
 PROF    = -O -ggdb
 NOCRYPT = -DNOCRYPT
-C_FLAGS =  -Wall $(PROF) $(NOCRYPT)
+C_FLAGS =  -Wall -Wno-c++11-extensions $(PROF) $(NOCRYPT)
 L_FLAGS =  $(PROF)
 
 O_FILES = act_clan.o act_comm.o act_enter.o act_info.o act_move.o act_obj.o \

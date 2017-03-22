@@ -4,7 +4,7 @@ class NonPlayerCharacter : public Character {
 public:
     NonPlayerCharacter(MOB_INDEX_DATA *pMobIndex);
     ~NonPlayerCharacter();
-    bool isNPC();
+    bool isNPC() override;
 
     virtual void update() override;
     virtual int hit_gain() override;
