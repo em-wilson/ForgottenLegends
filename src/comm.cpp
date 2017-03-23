@@ -134,7 +134,6 @@ bool		    god;		/* All new chars are gods!	*/
 bool		    merc_down;		/* Shutdown			*/
 bool		    wizlock;		/* Game is wizlocked		*/
 bool		    newlock;		/* Game is newlocked		*/
-char		    str_boot_time[MAX_INPUT_LENGTH];
 time_t		    current_time;	/* time of this pulse */	
 bool		    MOBtrigger = TRUE;  /* act() switch                 */
 
@@ -158,7 +157,6 @@ bool	check_parse_name	args( ( char *name ) );
 bool	check_reconnect		args( ( DESCRIPTOR_DATA *d, char *name,
 				    bool fConn ) );
 bool	check_playing		args( ( DESCRIPTOR_DATA *d, char *name ) );
-int	main			args( ( int argc, char **argv ) );
 void	nanny			args( ( DESCRIPTOR_DATA *d, char *argument ) );
 bool	process_output		args( ( DESCRIPTOR_DATA *d, bool fPrompt ) );
 void	read_from_buffer	args( ( DESCRIPTOR_DATA *d ) );
@@ -166,86 +164,7 @@ void	stop_idling		args( ( Character *ch ) );
 void    bust_a_prompt           args( ( Character *ch ) );
 
 /* Needs to be global because of do_copyover */
-int port, control;
-
-int main( int argc, char **argv )
-{
-    struct timeval now_time;
-    bool fCopyOver = FALSE;
-
-    /*
-     * Memory debugging if needed.
-     */
-#if defined(MALLOC_DEBUG)
-    malloc_debug( 2 );
-#endif
-
-    /*
-     * Init time.
-     */
-    gettimeofday( &now_time, NULL );
-    current_time 	= (time_t) now_time.tv_sec;
-    strcpy( str_boot_time, ctime( &current_time ) );
-
-    /*
-     * Reserve one channel for our use.
-     */
-    if ( ( fpReserve = fopen( NULL_FILE, "r" ) ) == NULL )
-    {
-	perror( NULL_FILE );
-	exit( 1 );
-    }
-
-    /*
-     * Get the port number.
-     */
-    port = 4000;
-    if ( argc > 1 )
-    {
-	if ( !is_number( argv[1] ) )
-	{
-	    fprintf( stderr, "Usage: %s [port #]\n", argv[0] );
-	    exit( 1 );
-	}
-	else if ( ( port = atoi( argv[1] ) ) <= 1024 )
-	{
-	    fprintf( stderr, "Port number must be above 1024.\n" );
-	    exit( 1 );
-	}
- 
-       /* Are we recovering from a copyover? */
-       if (argv[2] && argv[2][0])
-       {
-               fCopyOver = TRUE;
-               control = atoi(argv[3]);
-       }
-       else
-               fCopyOver = FALSE;
-    }
-
-    /*
-     * Run the game.
-     */
-    if (!fCopyOver)
-         control = init_socket( port );
-
-    boot_db();
-    sprintf( log_buf, "ROM is ready to rock on port %d.", port );
-    log_string( log_buf );
-    if (fCopyOver)
-       copyover_recover();
-    game_loop_unix( control );
-    close (control);
-
-    /*
-     * That's all, folks.
-     */
-    log_string( "Normal termination of game." );
-    exit( 0 );
-    return 0;
-}
-
-
+extern int port, control;
 
 int init_socket( int port )
 {

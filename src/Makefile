@@ -13,13 +13,24 @@ O_FILES = act_clan.o act_comm.o act_enter.o act_info.o act_move.o act_obj.o \
           PlayerCharacter.o recycle.o save.o scan.o \
           search.o skills.o smclan.o special.o string.o tables.o update.o Wiznet.o
 
-rom: $(O_FILES)
-	rm -f rom
-	$(CC) $(L_FLAGS) -o rom $(O_FILES)
+all: rom
+
+rom:main.o librom.a
+	$(CC) -lm -o rom librom.a main.o
+
+#rom: $(O_FILES)
+#	rm -f rom
+#	$(CC) $(L_FLAGS) -o rom $(O_FILES)
+
+#main.o: main.cpp
+#	$(CC) $(L_FLAGS) -c main.cpp
+
+
+librom.a: $(O_FILES)
+	ar rcu librom.a $(O_FILES)
 
 .cpp.o: merc.h
 	$(CC) -c $(C_FLAGS) $<
 
 clean: merc.h
-	rm -f *.o
-	rm -f rom
+	rm -f *.o *.a rom
