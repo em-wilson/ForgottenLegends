@@ -5,6 +5,11 @@
 #include "recycle.h"
 #include "NonPlayerCharacter.h"
 
+NonPlayerCharacter::NonPlayerCharacter()
+	: Character() {
+	mobile_count++;
+}
+
 NonPlayerCharacter::NonPlayerCharacter(MOB_INDEX_DATA *pMobIndex)
         : Character() {
         int i;

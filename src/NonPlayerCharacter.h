@@ -2,6 +2,7 @@
 
 class NonPlayerCharacter : public Character {
 public:
+    NonPlayerCharacter();
     NonPlayerCharacter(MOB_INDEX_DATA *pMobIndex);
     ~NonPlayerCharacter();
     bool isNPC() override;
