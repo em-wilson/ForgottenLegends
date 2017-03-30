@@ -79,4 +79,13 @@ set(SOURCE_FILES
     src/Wiznet.cpp
     src/Wiznet.h)
 
-add_executable(ForgottenLegends ${SOURCE_FILES})
+set(TEST_FILES
+    test/main.cpp
+    test/NonPlayerCharacter.cpp)
+
+include_directories(src)
+add_library(librom STATIC ${SOURCE_FILES})
+add_executable(ForgottenLegends src/main.cpp)
+target_link_libraries(ForgottenLegends librom)
+add_executable(ForgottenLegendsTest ${TEST_FILES})
+target_link_libraries(ForgottenLegendsTest librom)

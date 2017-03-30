@@ -5,3 +5,4 @@
 test/tests
 src/rom
 .idea
+cmake-build-debug/
