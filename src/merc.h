@@ -420,6 +420,7 @@ struct	class_type
 {
     const char *	name;			/* the full name of the class 	*/
     const char 	who_name	[4];	/* Three-letter name for 'who'	*/
+    bool    enabled;                /* whether the class is available at all */
     sh_int	attr_prime;		/* Prime attribute		*/
     sh_int	weapon;			/* First weapon			*/
     sh_int	guild[MAX_GUILD];	/* Vnum of guild rooms		*/
@@ -432,6 +433,7 @@ struct	class_type
     const char *	base_group;		/* base skills gained		*/
     const char *	default_group;		/* default skills gained	*/
     long	flag;			/* saves into pfile for reclass */
+    long    requirements;   /* reclass requirements */
 };
 
 struct item_type
@@ -1873,6 +1875,7 @@ extern sh_int  gsn_blackjack;
 #define LOWER(c)		((c) >= 'A' && (c) <= 'Z' ? (c)+'a'-'A' : (c))
 #define UPPER(c)		((c) >= 'a' && (c) <= 'z' ? (c)+'A'-'a' : (c))
 #define IS_SET(flag, bit)	((flag) & (bit))
+#define ALL_BITS(flag, bits) (((flag) & (bits)) == (bits))
 #define SET_BIT(var, bit)	((var) |= (bit))
 #define REMOVE_BIT(var, bit)	((var) &= ~(bit))
 #define IS_NULLSTR(str)		((str) == NULL || (str)[0] == '\0')

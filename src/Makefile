@@ -1,8 +1,9 @@
 CC      = g++
 PROF    = -O -ggdb
+DEBUG	= -DNDEBUG
 NOCRYPT = -DCRYPT
 #C_FLAGS =  -Wall -Wno-c++11-extensions $(PROF) $(NOCRYPT)
-C_FLAGS =  -Wall $(PROF) $(NOCRYPT) -std=c++11
+C_FLAGS =  -Wall $(PROF) $(DEBUG) $(NOCRYPT) -std=c++11
 L_FLAGS =  $(PROF)
 
 O_FILES = act_clan.o act_comm.o act_enter.o act_info.o act_move.o act_obj.o \

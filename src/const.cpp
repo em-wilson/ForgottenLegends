@@ -532,75 +532,75 @@ const	struct	pc_race_type	pc_race_table	[]	=
 const	struct	class_type	class_table	[MAX_CLASS]	=
 {
     {
-	"mage", "Mag",  STAT_INT,  OBJ_VNUM_SCHOOL_DAGGER,
+	"mage", "Mag",  TRUE,   STAT_INT,  OBJ_VNUM_SCHOOL_DAGGER,
 	{ 3018, 9618 },  75,  20, 6,  6,  8, TRUE,
-	"mage basics", "mage default", A
+	"mage basics", "mage default", DONE_MAGE, 0
     },
 
     {
-	"cleric", "Cle",  STAT_WIS,  OBJ_VNUM_SCHOOL_MACE,
+	"cleric", "Cle",  TRUE,   STAT_WIS,  OBJ_VNUM_SCHOOL_MACE,
 	{ 3003, 9619 },  75,  20, 2,  7, 10, TRUE,
-	"cleric basics", "cleric default", B
+	"cleric basics", "cleric default", DONE_CLERIC, 0
     },
 
     {
-	"thief", "Thi",  STAT_DEX,  OBJ_VNUM_SCHOOL_DAGGER,
+	"thief", "Thi",  TRUE,   STAT_DEX,  OBJ_VNUM_SCHOOL_DAGGER,
 	{ 3028, 9639 },  75,  20,  -4,  8, 13, FALSE,
-	"thief basics", "thief default", C
+	"thief basics", "thief default", DONE_THIEF, 0
     },
 
     {
-	"warrior", "War",  STAT_STR,  OBJ_VNUM_SCHOOL_SWORD,
+	"warrior", "War",  TRUE,   STAT_STR,  OBJ_VNUM_SCHOOL_SWORD,
 	{ 3022, 9633 },  75,  20,  -10,  11, 15, FALSE,
-	"warrior basics", "warrior default", D
+	"warrior basics", "warrior default", DONE_WARRIOR, 0
     },
 
     {
-        "archer", "Arc", STAT_CON, OBJ_VNUM_SCHOOL_DAGGER,
+        "archer", "Arc", TRUE,   STAT_CON, OBJ_VNUM_SCHOOL_DAGGER,
         { 3036, 9711 }, 75, 20, -4, 8, 13, FALSE,
-        "archer basics", "archer default", E
+        "archer basics", "archer default", DONE_ARCHER, 0
     },
 
     {
-	"ranger", "Ran", STAT_CON, OBJ_VNUM_SCHOOL_AXE,
+	"ranger", "Ran", TRUE,   STAT_CON, OBJ_VNUM_SCHOOL_AXE,
 	{ 329 }, 75, 20, -15, 15, 20, FALSE,
-	"ranger basics", "ranger default", F
+	"ranger basics", "ranger default", DONE_RANGER, DONE_WARRIOR|DONE_ARCHER
     },
 
     {
-        "druid", "Dru", STAT_WIS, OBJ_VNUM_SCHOOL_STAFF,
+        "druid", "Dru", TRUE,   STAT_WIS, OBJ_VNUM_SCHOOL_STAFF,
         { 8920 },  75,  20, 6,  6,  8, TRUE,
-        "druid basics", "druid default", G
+        "druid basics", "druid default", DONE_DRUID, DONE_MAGE|DONE_RANGER
     },
 
     {
-	"paladin", "Pal",  STAT_STR,  OBJ_VNUM_SCHOOL_MACE,
+	"paladin", "Pal",  FALSE,   STAT_STR,  OBJ_VNUM_SCHOOL_MACE,
 	{ 3037 },  75,  20,  -10,  11, 15, FALSE,
-	"paladin basics", "paladin default", H
+	"paladin basics", "paladin default", DONE_PALADIN, 0
     },
 
     {
-	"invoker", "Inv",  STAT_INT,  OBJ_VNUM_SCHOOL_DAGGER,
+	"invoker", "Inv",  FALSE,   STAT_INT,  OBJ_VNUM_SCHOOL_DAGGER,
 	{ 3055 },  75,  20, 6,  6,  8, TRUE,
-	"invoker basics", "invoker default", I
+	"invoker basics", "invoker default", DONE_INVOKER, 0
     },
 
     {
-	"psioniscist", "Psi",  STAT_INT,  OBJ_VNUM_SCHOOL_DAGGER,
+	"psioniscist", "Psi",  FALSE,   STAT_INT,  OBJ_VNUM_SCHOOL_DAGGER,
 	{ 3058 },  75,  20, 6,  6,  8, TRUE,
-	"psioniscist basics", "psioniscist default", J
+	"psioniscist basics", "psioniscist default", DONE_PSIONISCIST, 0
     },
 
     {
-	"rogue", "Rog",  STAT_DEX,  OBJ_VNUM_SCHOOL_DAGGER,
+	"rogue", "Rog",  FALSE,   STAT_DEX,  OBJ_VNUM_SCHOOL_DAGGER,
 	{ 3038 },  75,  20,  -4,  8, 13, FALSE,
-	"rogue basics", "rogue default", K
+	"rogue basics", "rogue default", DONE_ROGUE, 0
     },
 
     {
-	"illusionist", "Ill",  STAT_INT,  OBJ_VNUM_SCHOOL_DAGGER,
+	"illusionist", "Ill",  FALSE,   STAT_INT,  OBJ_VNUM_SCHOOL_DAGGER,
 	{ 3039 },  75,  20, 6,  6,  8, TRUE,
-	"illusionist basics", "illusionist default", L
+	"illusionist basics", "illusionist default", DONE_ILLUSIONIST, 0
     }
 };
 

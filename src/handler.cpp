@@ -3011,51 +3011,10 @@ Character *get_char_area( Character *ch, char *argument )
 
 bool can_be_class( Character *ch, int class_num )
 {
-    if (IS_SET(class_table[class_num].flag, DONE_RANGER)
-	&& (!IS_SET(ch->done, DONE_WARRIOR)
-	|| !IS_SET(ch->done, DONE_ARCHER)))
-	return FALSE;
-
-    // Can ch be a druid?
-    if (IS_SET(class_table[class_num].flag, DONE_DRUID)
-	&& ( (!IS_SET(ch->done, DONE_RANGER) || !IS_SET(ch->done, DONE_MAGE))
-	|| (!IS_SET(ch->done, DONE_RANGER) || !IS_SET(ch->done, DONE_MAGE))))
-	return FALSE;
-
-    if (IS_SET(class_table[class_num].flag, DONE_PALADIN))
+    auto classData = class_table[class_num];
+    if ( !classData.enabled ) {
         return FALSE;
+    }
 
-    if (IS_SET(class_table[class_num].flag, DONE_PSIONISCIST))
-	return FALSE;
-
-    if (IS_SET(class_table[class_num].flag, DONE_ROGUE))
-	return FALSE;
-
-    if (IS_SET(class_table[class_num].flag, DONE_ILLUSIONIST))
-	return FALSE;
-
-    if (IS_SET(class_table[class_num].flag, DONE_INVOKER))
-	return FALSE;
-/*
-    if (IS_SET(class_table[class_num].flag, DONE_PALADIN)
-	&& ( !IS_SET(ch->done, DONE_WARRIOR) || !IS_SET(ch->done, DONE_CLERIC) ) )
-	return FALSE;
-
-    if (IS_SET(class_table[class_num].flag, DONE_INVOKER)
-	&& ( !IS_SET(ch->done, DONE_WARRIOR) || !IS_SET(ch->done, DONE_MAGE) ) )
-	return FALSE;
-
-    if (IS_SET(class_table[class_num].flag, DONE_ROGUE)
-	&& ( !IS_SET(ch->done, DONE_WARRIOR) || !IS_SET(ch->done, DONE_THIEF) ) )
-	return FALSE;
-
-    if (IS_SET(class_table[class_num].flag, DONE_PSIONISCIST)
-	&& ( !IS_SET(ch->done, DONE_CLERIC) || !IS_SET(ch->done, DONE_MAGE) ) )
-	return FALSE;
-
-    if (IS_SET(class_table[class_num].flag, DONE_ILLUSIONIST)
-	&& ( !IS_SET(ch->done, DONE_THIEF) || !IS_SET(ch->done, DONE_MAGE) ) )
-	return FALSE;
-*/
-    return TRUE;
+    return ALL_BITS( ch->done, classData.requirements );
 }
