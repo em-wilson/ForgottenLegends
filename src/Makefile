@@ -1,6 +1,6 @@
 CC      = g++
 PROF    = -O -ggdb
-NOCRYPT = -DNOCRYPT
+NOCRYPT = -DCRYPT
 #C_FLAGS =  -Wall -Wno-c++11-extensions $(PROF) $(NOCRYPT)
 C_FLAGS =  -Wall $(PROF) $(NOCRYPT) -std=c++11
 L_FLAGS =  $(PROF)
