@@ -39,7 +39,7 @@ Character::Character()
     this->sex = 0;
     this->class_num = 0;
     this->race = 0;
-    this->level = 1;
+    this->level = 0;
     this->trust = 0;
     this->drac = 0;
     this->breathe = 0;

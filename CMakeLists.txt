@@ -81,7 +81,7 @@ set(SOURCE_FILES
 
 set(TEST_FILES
     test/main.cpp
-    test/NonPlayerCharacter.cpp)
+    test/NonPlayerCharacter.cpp test/PlayerCharacter.cpp)
 
 include_directories(src)
 add_library(librom STATIC ${SOURCE_FILES})
