@@ -539,22 +539,25 @@ void do_cast( Character *ch, char *argument )
 	say_spell( ch, sn );
       
     WAIT_STATE( ch, skill_table[sn].beats );
-      
-    if ( number_percent( ) > get_skill(ch,sn) )
+
+    bool successful_cast = number_percent( ) > get_skill(ch,sn);
+
+    // If your cast failed, it'll still land but be much less powerful
+    if ( successful_cast )
     {
-	send_to_char( "You lost your concentration.\n\r", ch );
-	check_improve(ch,sn,FALSE,1);
-	ch->mana -= mana / 2;
+        send_to_char( "You lost your concentration, your spell fizzles.\n\r", ch );
+        (*skill_table[sn].spell_fun)(sn, UMAX(1, ch->level / 8), ch, vo, target);
+        ch->mana -= mana / 2;
     }
     else
     {
         ch->mana -= mana;
-        if (IS_NPC(ch) || class_table[ch->class_num].fMana) 
-	/* class has spells */
-            (*skill_table[sn].spell_fun) ( sn, ch->level, ch, vo,target);
-        else
-            (*skill_table[sn].spell_fun) (sn, 3 * ch->level/4, ch, vo,target);
-        check_improve(ch,sn,TRUE,1);
+        if (IS_NPC(ch) || class_table[ch->class_num].fMana) {
+            /* class has spells */
+            (*skill_table[sn].spell_fun)(sn, ch->level, ch, vo, target);
+        } else {
+            (*skill_table[sn].spell_fun)(sn, 3 * ch->level / 4, ch, vo, target);
+        }
     }
 
     if ((skill_table[sn].target == TAR_CHAR_OFFENSIVE
@@ -575,6 +578,8 @@ void do_cast( Character *ch, char *argument )
 	    }
 	}
     }
+
+    check_improve(ch,sn,successful_cast,1);
 
     return;
 }

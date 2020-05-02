@@ -809,13 +809,6 @@ const	struct	size_type	info_table	[MAX_INFO] =
 	},
 
 	{
-		"The Forgotten Legends web site contains a great "
-		"deal of goodies, from area directions to a complete "
-		"and up to date equipment list.  For more information, "
-		"visit http://bb8.betterbox.net/~blackavar."
-	},
-
-	{
 		"The healer north of recall is equipped with many "
 		"spells at a cost with which she can heal what ails "
 		"ye!"
@@ -843,79 +836,22 @@ const	struct	size_type	info_table	[MAX_INFO] =
 	},
 
 	{
-		"The current focus for the MUD is on helping new "
-		"players.  Please feel free to post ideas on how "
-		"this could be done effectively."
-	},
-
-	{
-		"Forgotten Legends is now available in a club from Yahoo!  "
-		"Everyone is free to access it.  The web address is "
-		"http://clubs.yahoo.com/clubs/forgottenlegends."
-	},
-
-	{
 		"Upon reaching level 51, players may choose to reclass "
 		"in order to enhance their abilities.  See HELP RECLASS "
 		"for more information."
 	},
 
 	{
-		"Kids in the back seat cause accidents, accidents in "
-		"the back seat cause kids."
+		"Man who run in front of car get tired. Man who run behind car get exhausted."
 	},
 
 	{
-		"Life is sexually transmitted."
-	},
-
-	{
-		"The problem with the gene pool is that there are no "
-		"lifeguards."
-	},
-
-	{
-		"Man who run in front of car get tired."
-	},
-
-	{
-		"We're born naked, wet and hungry.  From there things "
-		"get worse."
-	},
-
-	{
-		"If you suceed in failing, what have you done?"
-	},
-
-	{
-		"Man who run behind car get exhausted."
-	},
-
-	{
-		"Man who have hand in pocket feel cocky all day."
+		"If you succeed in failing, what have you done?"
 	},
 
 	{
 		"What do you call a bunch of bunnies running backwards?  "
 		"A receeding hareline."
-	},
-
-
-	{
-		"If a synchronized swimmer drowns, do the rest have to?"
-	},
-
-	{
-		"Friendly fire isn't."
-	},
-
-	{
-		"For questions about clans, please refer to ChibiUsa."
-	},
-
-	{
-		"Directions to areas can be found on the web page ("
-		"http://bb8.betterbox.net/~blackavar)."
 	},
 
 	{
@@ -924,11 +860,6 @@ const	struct	size_type	info_table	[MAX_INFO] =
 		"a period (.), say can be used with a single quote "
 		"('), etc.  For more information, see the hepfiles for "
 		"the individual channels."
-	},
-
-	{
-		"Everybody's doing it: picking their nose and chewing "
-		"it.  Some people think it's candy, but its snot."
 	},
 
 	{

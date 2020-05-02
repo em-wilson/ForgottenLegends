@@ -894,10 +894,10 @@ void check_improve( Character *ch, int sn, bool success, int multiplier )
 		*	4);
     chance += ch->level;
 
-    if (ch->pcdata->clan)
-	chance *= 1.5;
+    // Improved odds at lower levels
+    chance += 100 - ch->pcdata->learned[sn];
 
-    if (number_range(1,1000) > chance)
+    if (number_range(1,750) > chance)
 	return;
 
     /* now that the character has a CHANCE to learn, see if they really have */	

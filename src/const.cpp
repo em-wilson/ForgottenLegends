@@ -556,7 +556,7 @@ const	struct	class_type	class_table	[MAX_CLASS]	=
     },
 
     {
-        "archer", "Arc", TRUE,   STAT_CON, OBJ_VNUM_SCHOOL_DAGGER,
+        "archer", "Arc", FALSE,   STAT_CON, OBJ_VNUM_SCHOOL_DAGGER,
         { 3036, 9711 }, 75, 20, -4, 8, 13, FALSE,
         "archer basics", "archer default", DONE_ARCHER, 0
     },

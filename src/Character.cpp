@@ -197,6 +197,10 @@ void Character::advance_level( bool hide )
     this->max_hit     += add_hp;
     this->max_mana    += add_mana;
     this->max_move    += add_move;
+    // Refresh your health
+    this->hit          = UMAX(this->hit, this->max_hit);
+    this->mana          = UMAX(this->mana, this->max_mana);
+    this->move          = UMAX(this->move, this->max_move);
     this->practice    += add_prac;
     this->train       += 1;
 
