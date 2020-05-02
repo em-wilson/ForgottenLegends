@@ -1016,13 +1016,6 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
 		     != NULL)
 	      	    do_get(ch, (char*)"all.gcash corpse");
             
-	    /* A high-energy night by spirited teens! */
-	    if (IS_SET(ch->act, PLR_AUTOPISS) )
-	    {
-		act("{Y$n pisses on $p.{x", ch, corpse, NULL, TO_ROOM);
-		act("{YYou piss on $p.{x", ch, corpse, NULL, TO_CHAR);
-	    }
-
 	    if ( IS_SET(ch->act, PLR_AUTOSAC) )
 	    {
        	      if ( IS_SET(ch->act,PLR_AUTOLOOT) && corpse && corpse->contains)

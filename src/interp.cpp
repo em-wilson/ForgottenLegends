@@ -150,7 +150,6 @@ const	struct	cmd_type	cmd_table	[] =
     { "autoexit",	do_autoexit,	POS_DEAD,        0,  LOG_NORMAL, 1 },
     { "autogold",	do_autogold,	POS_DEAD,        0,  LOG_NORMAL, 1 },
     { "autoloot",	do_autoloot,	POS_DEAD,        0,  LOG_NORMAL, 1 },
-    { "autopiss",	do_autopiss,	POS_DEAD,	 0,  LOG_NORMAL, 1 },
     { "autosac",	do_autosac,	POS_DEAD,        0,  LOG_NORMAL, 1 },
     { "autosplit",	do_autosplit,	POS_DEAD,        0,  LOG_NORMAL, 1 },
     { "brief",		do_brief,	POS_DEAD,        0,  LOG_NORMAL, 1 },

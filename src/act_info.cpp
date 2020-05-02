@@ -691,44 +691,18 @@ void do_autolist(Character *ch, char *argument)
 	send_to_char("You do not welcome followers.\n\r",ch);
     else
 	send_to_char("You accept followers.\n\r",ch);
-
-    if (IS_SET(ch->act,PLR_AUTOPISS))
-	send_to_char("You piss on the corpses of your enemies.\n\r",ch);
-    else
-	send_to_char("You do not piss on your enemies' corpses.\n\r",ch);
 }
 
-void do_autoassist(Character *ch, char *argument)
-{
+void do_autoassist(Character *ch, char *argument) {
     if (IS_NPC(ch))
-      return;
-    
-    if (IS_SET(ch->act,PLR_AUTOASSIST))
-    {
-      send_to_char("Autoassist removed.\n\r",ch);
-      REMOVE_BIT(ch->act,PLR_AUTOASSIST);
-    }
-    else
-    {
-      send_to_char("You will now assist when needed.\n\r",ch);
-      SET_BIT(ch->act,PLR_AUTOASSIST);
-    }
-}
+        return;
 
-void do_autopiss(Character *ch, char *argument)
-{
-    if (IS_NPC(ch))
-      return;
-    
-    if (IS_SET(ch->act,PLR_AUTOPISS))
-    {
-      send_to_char("Autopissing removed.\n\r",ch);
-      REMOVE_BIT(ch->act,PLR_AUTOPISS);
-    }
-    else
-    {
-      send_to_char("You will now piss when needed.\n\r",ch);
-      SET_BIT(ch->act,PLR_AUTOPISS);
+    if (IS_SET(ch->act, PLR_AUTOASSIST)) {
+        send_to_char("Autoassist removed.\n\r", ch);
+        REMOVE_BIT(ch->act, PLR_AUTOASSIST);
+    } else {
+        send_to_char("You will now assist when needed.\n\r", ch);
+        SET_BIT(ch->act, PLR_AUTOASSIST);
     }
 }
 
