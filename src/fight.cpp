@@ -1811,8 +1811,7 @@ void set_fighting( Character *ch, Character *victim )
 {
     if ( ch->fighting != NULL )
     {
-	bug( "Set_fighting: already fighting", 0 );
-	return;
+    	return;
     }
 
     if ( IS_AFFECTED(ch, AFF_SLEEP) )

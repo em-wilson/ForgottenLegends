@@ -186,6 +186,11 @@ void Character::advance_level( bool hide )
                   + get_curr_stat(this,STAT_DEX))/6 );
     add_prac    = wis_app[get_curr_stat(this,STAT_WIS)].practice;
 
+    // high exp characters get a cumulative bonus
+    add_hp += this->exp / 10000;
+    add_mana += this->exp / 10000;
+    add_move += this->exp / 10000;
+
     add_hp = add_hp * 9/10;
     add_mana = add_mana * 9/10;
     add_move = add_move * 9/10;
