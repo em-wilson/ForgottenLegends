@@ -1942,12 +1942,8 @@ do                                                              \
  */
 #define IS_NPC(ch)		(IS_SET((ch)->act, ACT_IS_NPC) && (ch)->desc == NULL)
 #define IS_IMMORTAL(ch)		(get_trust(ch) >= LEVEL_IMMORTAL)
-#define IS_HERO(ch)		(get_trust(ch) >= LEVEL_HERO)
 #define IS_TRUSTED(ch,level)	(get_trust((ch)) >= (level))
 #define IS_AFFECTED(ch, sn)	(IS_SET((ch)->affected_by, (sn)))
-
-#define GET_AGE(ch)		((int) (17 + ((ch)->played \
-				    + current_time - (ch)->logon )/72000))
 
 #define IS_GOOD(ch)		(ch->alignment >= 350)
 #define IS_EVIL(ch)		(ch->alignment <= -350)

@@ -356,8 +356,6 @@ const	struct	cmd_type	cmd_table	[] =
      */
     { "at",             do_at,          POS_DEAD,       L6,  LOG_NORMAL, 1 },
     { "echo",		do_recho,	POS_DEAD,	L6,  LOG_ALWAYS, 1 },
-    { "odump",		do_odump,	POS_RESTING,	L6,  LOG_NORMAL, 1 },
-    { "wdump",		do_wdump,	POS_RESTING,	L6,  LOG_NORMAL, 1 },
     { "return",         do_return,      POS_DEAD,       L6,  LOG_NORMAL, 1 },
     { "switch",		do_switch,	POS_DEAD,	L6,  LOG_ALWAYS, 1 },
 

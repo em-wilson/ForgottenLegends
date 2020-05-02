@@ -37,6 +37,7 @@
 
 #include "merc.h"
 #include "db.h"
+#include "EquipmentListGenerator.h"
 #include "recycle.h"
 #include "music.h"
 #include "tables.h"
@@ -408,6 +409,7 @@ void boot_db()
         save_notes();
 	load_bans();
 	load_songs();
+    EquipmentListGenerator::Generate();
     }
 
     return;

@@ -77,7 +77,7 @@ set(SOURCE_FILES
     src/telnet.h
     src/update.cpp
     src/Wiznet.cpp
-    src/Wiznet.h)
+    src/Wiznet.h src/EquipmentListGenerator.cpp src/EquipmentListGenerator.h)
 
 set(TEST_FILES
     test/main.cpp
