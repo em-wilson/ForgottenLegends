@@ -43,10 +43,10 @@ AHMV ABCDEFGHIJK medium unknown
 #10403
 oldstyle male dee demon~
 the male Dee~
-The male demon Dee lies on the bed, waiting to please you.
+The male demon Dee lies in wait for his unsuspecting victim.
 ~
 This is the most handsome male you have ever seen.  The well-defined
-muscles on his naked body make your mouth water.
+muscles on his body are trained for fighting.
 ~
 human~
 ABF JV -1000 0
@@ -58,10 +58,11 @@ AHMV ABCDEFGHIJK medium unknown
 #10404
 oldstyle female dee demon~
 the female Dee~
-The female demon Dee lies on the bed, waiting to please you.
+The female demon Dee hides under a floorboard.
 ~
-This is the most beautiful female you have ever seen. The curves of her
-naked body make you sweat and babble uncontrollably.
+She is vaguely beautiful but seems to shimmer before your eyes.
+Alternating between man-sized and pixie-sized, she's hard to
+focus on - simultaneously ephemeral and tangible.
 ~
 human~
 ABF JV -1000 0
@@ -349,7 +350,7 @@ A sad looking individual sits here, awaiting torture.
 ~
 She is sad-looking, indeed:  cuts and scrapes all over her.  Many scars
 and burns cover her face and arms.  The appalling condition of her once-lovely
-breasts makes you avert your eyes.
+visage makes you avert your eyes.
 ~
 human~
 AB JV -800 0
@@ -524,7 +525,7 @@ oldstyle trapped soul ice~
 the trapped soul~
 A soul trapped under the ice gasps desperately for air.
 ~
-This poor soul has been incased in ice, almost as though it were caught
+This poor soul has been encased in ice, almost as though it were caught
 under an iceflow.  It will desperately gasp for air for a few minutes,
 then will seem to die briefly.  Always, it is restored and begins thrashing
 about again.
@@ -541,7 +542,7 @@ oldstyle half frozen body~
 the half frozen body~
 A half frozen body hangs on a meat hook.
 ~
-A large meat hook is imbedded deep within the back of the corpse. You
+A large meat hook is embedded deep within the back of the corpse. You
 see small white maggots eating away at the body. The flesh seems to
 move and wriggle with a life of its own...
 ~
@@ -627,7 +628,7 @@ oldstyle Secretary of Hell~
 Secretary of Hell~
 The Secretary of Hell sits here, watching the phones ring.
 ~
-This very sexy secretary seems to be just sitting here amusing herself
+This very pretty secretary seems to be just sitting here amusing herself
 by watching the little lights on the telephone blink. She is oblivious
 to your presence and seems fascinated by the phones.
 ~
@@ -658,7 +659,7 @@ oldstyle records worker~
 records worker~
 A records worker is here, filing bad reports.
 ~
-You see a rather plain-looking office personel here, filing paperwork on
+You see a rather plain-looking office personnel here, filing paperwork on
 someone.
 ~
 human~
@@ -746,7 +747,7 @@ oldstyle lawyer hell~
 Lawyer from Hell~
 The Lawyer from Hell sits here, playing games on his laptop computer.
 ~
-Slimy, sleezy, and with very sharp teeth... A lawyer all right...
+Slimy, sleazy, and with very sharp teeth... A lawyer all right...
 ~
 human~
 AB DFJV -1000 0
@@ -772,9 +773,9 @@ EFNU 0 0 0
 stand stand female 5000
 AHMV ABCDEFGHIJK medium unknown
 #10451
-oldstyle bastard hiramoto~
-bastard hiramoto~
-The Bastard Hiramoto stands here, trying to learn Kung Fu from a book.
+oldstyle foolish hiramoto~
+foolish hiramoto~
+The Foolish Hiramoto stands here, trying to learn Kung Fu from a book.
 ~
 He looks at you and says, 'I think my Kung Fu is no good'
 and then goes back to practicing.
@@ -1516,7 +1517,8 @@ black jumpsuit~
 a black jumpsuit~
 You see a black jumpsuit on the ground.~
 A
-oldstyle~
+
+oldstyle~
 armor A AD
 CD CD CD D 0
 45 40 13700 P
@@ -2141,7 +2143,7 @@ It is too dark to see.
 S
 #10423
 Room of Lost Souls~
-This looks like a waiting room or sorts. Dust and cobwebs are everywhere.
+This looks like a waiting room of sorts. Dust and cobwebs are everywhere.
 Wooden benches line the walls. A digital number sign is posted on the wall.
 It currently reads, 'Now Serving Number 1'.
 A ticket dispenser is bolted to the wall.
@@ -2221,7 +2223,7 @@ It is too dark to see.
 S
 #10426
 Blackened Hallway~
-This dark hallway looks as if it was made by a lavaworm...All the surfaces
+This dark hallway looks as if it was made by a lava worm...All the surfaces
 in it are melted and burnt. The smell of brimstone and sulfur fill the air.
 ~
 0 9 0
