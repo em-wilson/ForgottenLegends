@@ -298,8 +298,7 @@ int mana_cost (Character *ch, int min_mana, int level)
  */
 char *target_name;
 
-void do_cast( Character *ch, char *argument )
-{
+void do_cast( Character *ch, char *argument ) {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
     Character *victim;
@@ -312,74 +311,65 @@ void do_cast( Character *ch, char *argument )
     /*
      * Switched NPC's can cast spells, but others can't.
      */
-    if ( IS_NPC(ch) && ch->desc == NULL)
-	return;
+    if (IS_NPC(ch) && ch->desc == NULL)
+        return;
 
-    target_name = one_argument( argument, arg1 );
-    one_argument( target_name, arg2 );
+    target_name = one_argument(argument, arg1);
+    one_argument(target_name, arg2);
 
-    if ( arg1[0] == '\0' )
-    {
-	send_to_char( "Cast which what where?\n\r", ch );
-	return;
+    if (arg1[0] == '\0') {
+        send_to_char("Cast which what where?\n\r", ch);
+        return;
     }
 
-    if ((sn = find_spell(ch,arg1)) < 1
-    ||  skill_table[sn].spell_fun == spell_null
-    || (!IS_NPC(ch) && (ch->level < ch->pcdata->sk_level[sn]
-    ||   		 ch->pcdata->learned[sn] == 0)))
-    {
-	send_to_char( "You don't know any spells of that name.\n\r", ch );
-	return;
+    if ((sn = find_spell(ch, arg1)) < 1
+        || skill_table[sn].spell_fun == spell_null
+        || (!IS_NPC(ch) && (ch->level < ch->pcdata->sk_level[sn]
+                            || ch->pcdata->learned[sn] == 0))) {
+        send_to_char("You don't know any spells of that name.\n\r", ch);
+        return;
     }
-  
-    if ( ch->position < skill_table[sn].minimum_position )
-    {
-	send_to_char( "You can't concentrate enough.\n\r", ch );
-	return;
+
+    if (ch->position < skill_table[sn].minimum_position) {
+        send_to_char("You can't concentrate enough.\n\r", ch);
+        return;
     }
 
     if (ch->level + 2 == ch->pcdata->sk_level[sn])
-	mana = 50;
+        mana = 50;
     else
-    	mana = UMAX(
-	    skill_table[sn].min_mana,
-	    100 / ( 2 + ch->level - ch->pcdata->sk_level[sn] ) );
+        mana = UMAX(
+                skill_table[sn].min_mana,
+                100 / (2 + ch->level - ch->pcdata->sk_level[sn]));
 
     /*
      * Locate targets.
      */
-    victim	= NULL;
-    obj		= NULL;
-    vo		= NULL;
-    target	= TARGET_NONE;
-      
-    switch ( skill_table[sn].target )
-    {
-    default:
-	bug( "Do_cast: bad target for sn %d.", sn );
-	return;
+    victim = NULL;
+    obj = NULL;
+    vo = NULL;
+    target = TARGET_NONE;
 
-    case TAR_IGNORE:
-	break;
+    switch (skill_table[sn].target) {
+        default:
+            bug("Do_cast: bad target for sn %d.", sn);
+            return;
 
-    case TAR_CHAR_OFFENSIVE:
-	if ( arg2[0] == '\0' )
-	{
-	    if ( ( victim = ch->fighting ) == NULL )
-	    {
-		send_to_char( "Cast the spell on whom?\n\r", ch );
-		return;
-	    }
-	}
-	else
-	{
-	    if ( ( victim = get_char_room( ch, target_name ) ) == NULL )
-	    {
-		send_to_char( "They aren't here.\n\r", ch );
-		return;
-	    }
-	}
+        case TAR_IGNORE:
+            break;
+
+        case TAR_CHAR_OFFENSIVE:
+            if (arg2[0] == '\0') {
+                if ((victim = ch->fighting) == NULL) {
+                    send_to_char("Cast the spell on whom?\n\r", ch);
+                    return;
+                }
+            } else {
+                if ((victim = get_char_room(ch, target_name)) == NULL) {
+                    send_to_char("They aren't here.\n\r", ch);
+                    return;
+                }
+            }
 /*
         if ( ch == victim )
         {
@@ -389,168 +379,133 @@ void do_cast( Character *ch, char *argument )
 */
 
 
-	if ( !IS_NPC(ch) )
-	{
+            if (!IS_NPC(ch)) {
 
-            if (is_safe(ch,victim) && victim != ch)
-	    {
-		send_to_char("Not on that target.\n\r",ch);
-		return; 
-	    }
-	check_killer(ch,victim);
-	}
+                if (is_safe(ch, victim) && victim != ch) {
+                    send_to_char("Not on that target.\n\r", ch);
+                    return;
+                }
+                check_killer(ch, victim);
+            }
 
-        if ( IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim )
-	{
-	    send_to_char( "You can't do that on your own follower.\n\r",
-		ch );
-	    return;
-	}
-
-	vo = (void *) victim;
-	target = TARGET_CHAR;
-	break;
-
-    case TAR_CHAR_DEFENSIVE:
-	if ( arg2[0] == '\0' )
-	{
-	    victim = ch;
-	}
-	else
-	{
-	    if ( ( victim = get_char_room( ch, target_name ) ) == NULL )
-	    {
-		send_to_char( "They aren't here.\n\r", ch );
-		return;
-	    }
-	}
-
-	vo = (void *) victim;
-	target = TARGET_CHAR;
-	break;
-
-    case TAR_CHAR_SELF:
-	if ( arg2[0] != '\0' && !is_name( target_name, ch->getName() ) )
-	{
-	    send_to_char( "You cannot cast this spell on another.\n\r", ch );
-	    return;
-	}
-
-	vo = (void *) ch;
-	target = TARGET_CHAR;
-	break;
-
-    case TAR_OBJ_INV:
-	if ( arg2[0] == '\0' )
-	{
-	    send_to_char( "What should the spell be cast upon?\n\r", ch );
-	    return;
-	}
-
-	if ( ( obj = get_obj_carry( ch, target_name, ch ) ) == NULL )
-	{
-	    send_to_char( "You are not carrying that.\n\r", ch );
-	    return;
-	}
-
-	vo = (void *) obj;
-	target = TARGET_OBJ;
-	break;
-
-    case TAR_OBJ_CHAR_OFF:
-	if (arg2[0] == '\0')
-	{
-	    if ((victim = ch->fighting) == NULL)
-	    {
-		send_to_char("Cast the spell on whom or what?\n\r",ch);
-		return;
-	    }
-	
-	    target = TARGET_CHAR;
-	}
-	else if ((victim = get_char_room(ch,target_name)) != NULL)
-	{
-	    target = TARGET_CHAR;
-	}
-
-	if (target == TARGET_CHAR) /* check the sanity of the attack */
-	{
-	    if(is_safe_spell(ch,victim,FALSE) && victim != ch)
-	    {
-		send_to_char("Not on that target.\n\r",ch);
-		return;
-	    }
-
-            if ( IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim )
-            {
-                send_to_char( "You can't do that on your own follower.\n\r",
-                    ch );
+            if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim) {
+                send_to_char("You can't do that on your own follower.\n\r",
+                             ch);
                 return;
             }
 
-	    if (!IS_NPC(ch))
-		check_killer(ch,victim);
-
-	    vo = (void *) victim;
- 	}
-	else if ((obj = get_obj_here(ch,target_name)) != NULL)
-	{
-	    vo = (void *) obj;
-	    target = TARGET_OBJ;
-	}
-	else
-	{
-	    send_to_char("You don't see that here.\n\r",ch);
-	    return;
-	}
-	break; 
-
-    case TAR_OBJ_CHAR_DEF:
-        if (arg2[0] == '\0')
-        {
-            vo = (void *) ch;
-            target = TARGET_CHAR;                                                 
-        }
-        else if ((victim = get_char_room(ch,target_name)) != NULL)
-        {
             vo = (void *) victim;
             target = TARGET_CHAR;
-	}
-	else if ((obj = get_obj_carry(ch,target_name,ch)) != NULL)
-	{
-	    vo = (void *) obj;
-	    target = TARGET_OBJ;
-	}
-	else
-	{
-	    send_to_char("You don't see that here.\n\r",ch);
-	    return;
-	}
-	break;
-    }
-	    
-    if ( !IS_NPC(ch) && ch->mana < mana )
-    {
-	send_to_char( "You don't have enough mana.\n\r", ch );
-	return;
-    }
-      
-    if ( str_cmp( skill_table[sn].name, "ventriloquate" ) )
-	say_spell( ch, sn );
-      
-    WAIT_STATE( ch, skill_table[sn].beats );
+            break;
 
-    bool successful_cast = number_percent( ) > get_skill(ch,sn);
+        case TAR_CHAR_DEFENSIVE:
+            if (arg2[0] == '\0') {
+                victim = ch;
+            } else {
+                if ((victim = get_char_room(ch, target_name)) == NULL) {
+                    send_to_char("They aren't here.\n\r", ch);
+                    return;
+                }
+            }
+
+            vo = (void *) victim;
+            target = TARGET_CHAR;
+            break;
+
+        case TAR_CHAR_SELF:
+            if (arg2[0] != '\0' && !is_name(target_name, ch->getName())) {
+                send_to_char("You cannot cast this spell on another.\n\r", ch);
+                return;
+            }
+
+            vo = (void *) ch;
+            target = TARGET_CHAR;
+            break;
+
+        case TAR_OBJ_INV:
+            if (arg2[0] == '\0') {
+                send_to_char("What should the spell be cast upon?\n\r", ch);
+                return;
+            }
+
+            if ((obj = get_obj_carry(ch, target_name, ch)) == NULL) {
+                send_to_char("You are not carrying that.\n\r", ch);
+                return;
+            }
+
+            vo = (void *) obj;
+            target = TARGET_OBJ;
+            break;
+
+        case TAR_OBJ_CHAR_OFF:
+            if (arg2[0] == '\0') {
+                if ((victim = ch->fighting) == NULL) {
+                    send_to_char("Cast the spell on whom or what?\n\r", ch);
+                    return;
+                }
+
+                target = TARGET_CHAR;
+            } else if ((victim = get_char_room(ch, target_name)) != NULL) {
+                target = TARGET_CHAR;
+            }
+
+            if (target == TARGET_CHAR) /* check the sanity of the attack */
+            {
+                if (is_safe_spell(ch, victim, FALSE) && victim != ch) {
+                    send_to_char("Not on that target.\n\r", ch);
+                    return;
+                }
+
+                if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim) {
+                    send_to_char("You can't do that on your own follower.\n\r",
+                                 ch);
+                    return;
+                }
+
+                if (!IS_NPC(ch))
+                    check_killer(ch, victim);
+
+                vo = (void *) victim;
+            } else if ((obj = get_obj_here(ch, target_name)) != NULL) {
+                vo = (void *) obj;
+                target = TARGET_OBJ;
+            } else {
+                send_to_char("You don't see that here.\n\r", ch);
+                return;
+            }
+            break;
+
+        case TAR_OBJ_CHAR_DEF:
+            if (arg2[0] == '\0') {
+                vo = (void *) ch;
+                target = TARGET_CHAR;
+            } else if ((victim = get_char_room(ch, target_name)) != NULL) {
+                vo = (void *) victim;
+                target = TARGET_CHAR;
+            } else if ((obj = get_obj_carry(ch, target_name, ch)) != NULL) {
+                vo = (void *) obj;
+                target = TARGET_OBJ;
+            } else {
+                send_to_char("You don't see that here.\n\r", ch);
+                return;
+            }
+            break;
+    }
+
+    if (!IS_NPC(ch) && ch->mana < mana) {
+        send_to_char("You don't have enough mana.\n\r", ch);
+        return;
+    }
+
+    if (str_cmp(skill_table[sn].name, "ventriloquate"))
+        say_spell(ch, sn);
+
+    WAIT_STATE(ch, skill_table[sn].beats);
+
+    bool successful_cast = number_percent() <= get_skill(ch, sn);
 
     // If your cast failed, it'll still land but be much less powerful
-    if ( successful_cast )
-    {
-        send_to_char( "You lost your concentration, your spell fizzles.\n\r", ch );
-        (*skill_table[sn].spell_fun)(sn, UMAX(1, ch->level / 8), successful_cast, ch, vo, target);
-        ch->mana -= mana / 2;
-    }
-    else
-    {
+    if (successful_cast) {
         ch->mana -= mana;
         if (IS_NPC(ch) || class_table[ch->class_num].fMana) {
             /* class has spells */
@@ -558,28 +513,30 @@ void do_cast( Character *ch, char *argument )
         } else {
             (*skill_table[sn].spell_fun)(sn, 3 * ch->level / 4, successful_cast, ch, vo, target);
         }
+    } else {
+        send_to_char("You lost your concentration, your spell fizzles.\n\r", ch);
+        (*skill_table[sn].spell_fun)(sn, UMAX(1, ch->level / 8), successful_cast, ch, vo, target);
+        ch->mana -= mana / 2;
     }
 
     if ((skill_table[sn].target == TAR_CHAR_OFFENSIVE
-    ||   (skill_table[sn].target == TAR_OBJ_CHAR_OFF && target == TARGET_CHAR))
-    &&   victim != ch
-    &&   victim->master != ch)
-    {
-	Character *vch;
-	Character *vch_next;
+         || (skill_table[sn].target == TAR_OBJ_CHAR_OFF && target == TARGET_CHAR))
+        && victim != ch
+        && victim->master != ch) {
+        Character *vch;
+        Character *vch_next;
 
-	for ( vch = ch->in_room->people; vch; vch = vch_next )
-	{
-	    vch_next = vch->next_in_room;
-	    if ( victim == vch && victim->fighting == NULL )
-	    {	check_killer(victim,ch);
-		multi_hit( victim, ch, TYPE_UNDEFINED );
-		break;
-	    }
-	}
+        for (vch = ch->in_room->people; vch; vch = vch_next) {
+            vch_next = vch->next_in_room;
+            if (victim == vch && victim->fighting == NULL) {
+                check_killer(victim, ch);
+                multi_hit(victim, ch, TYPE_UNDEFINED);
+                break;
+            }
+        }
     }
 
-    check_improve(ch,sn,successful_cast,1);
+    check_improve(ch, sn, successful_cast, 1);
 
     return;
 }
@@ -2926,30 +2883,29 @@ void spell_gate( int sn, int level, bool succesful_cast, Character *ch, void *vo
 
 
 
-void spell_giant_strength(int sn,int level,bool succesful_cast, Character *ch,void *vo,int target)
-{
+void spell_giant_strength(int sn,int level,bool succesful_cast, Character *ch,void *vo,int target) {
     Character *victim = (Character *) vo;
     AFFECT_DATA af;
 
-    if ( is_affected( victim, sn ) )
-    {
-	if (victim == ch)
-	  send_to_char("You are already as strong as you can get!\n\r",ch);
-	else
-	  act("$N can't get any stronger.",ch,NULL,victim,TO_CHAR);
-	return;
+    if (is_affected(victim, sn)) {
+        affect_remove(victim, affect_get(victim, sn));
+        if (victim == ch)
+            send_to_char("You refresh your giant strength!\n\r", ch);
+        else
+            act("$N's giant strength is refreshed.", ch, NULL, victim, TO_CHAR);
+        return;
     }
 
-    af.where     = TO_AFFECTS;
-    af.type      = sn;
-    af.level	 = level;
-    af.duration  = level;
-    af.location  = APPLY_STR;
-    af.modifier  = 1 + (level >= 18) + (level >= 25) + (level >= 32);
+    af.where = TO_AFFECTS;
+    af.type = sn;
+    af.level = level;
+    af.duration = level;
+    af.location = APPLY_STR;
+    af.modifier = 1 + (level >= 18) + (level >= 25) + (level >= 32);
     af.bitvector = 0;
-    affect_to_char( victim, &af );
-    send_to_char( "Your muscles surge with heightened power!\n\r", victim );
-    act("$n's muscles surge with heightened power.",victim,NULL,NULL,TO_ROOM);
+    affect_to_char(victim, &af);
+    send_to_char("Your muscles surge with heightened power!\n\r", victim);
+    act("$n's muscles surge with heightened power.", victim, NULL, NULL, TO_ROOM);
     return;
 }
 
@@ -4398,8 +4354,13 @@ void spell_ventriloquate( int sn, int level, bool succesful_cast, Character *ch,
 
     target_name = one_argument( target_name, speaker );
 
-    sprintf( buf1, "%s says '%s'.\n\r",              speaker, target_name );
-    sprintf( buf2, "Someone makes %s say '%s'.\n\r", speaker, target_name );
+    if ( succesful_cast ) {
+        sprintf( buf1, "%s says '%s'.\n\r",              speaker, target_name );
+        sprintf( buf2, "Someone makes %s say '%s'.\n\r", speaker, target_name );
+    } else {
+        sprintf( buf1, "Someone tries to make %s say '%s'.\n\r", speaker, target_name );
+        sprintf( buf2, "Someone tries to make %s say '%s'.\n\r", speaker, target_name );
+    }
     buf1[0] = UPPER(buf1[0]);
 
     for ( vch = ch->in_room->people; vch != NULL; vch = vch->next_in_room )

@@ -1099,7 +1099,6 @@ void affect_to_obj(OBJ_DATA *obj, AFFECT_DATA *paf)
 }
 
 
-
 /*
  * Remove an affect from a char.
  */
@@ -1232,17 +1231,18 @@ void affect_strip( Character *ch, int sn )
 /*
  * Return true if a char is affected by a spell.
  */
-bool is_affected( Character *ch, int sn )
-{
-    AFFECT_DATA *paf;
+bool is_affected( Character *ch, int sn ) {
+    return affect_get(ch, sn) != NULL;
+}
 
-    for ( paf = ch->affected; paf != NULL; paf = paf->next )
+AFFECT_DATA * affect_get( Character *ch, int sn ) {
+    for ( AFFECT_DATA *paf = ch->affected; paf != NULL; paf = paf->next )
     {
 	if ( paf->type == sn )
-	    return TRUE;
+	    return paf;
     }
 
-    return FALSE;
+    return NULL;
 }
 
 
