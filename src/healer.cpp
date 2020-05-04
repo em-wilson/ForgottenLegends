@@ -191,5 +191,5 @@ void do_heal(Character *ch, char *argument)
      if (sn == -1)
 	return;
     
-     spell(sn,mob->level,mob,ch,TARGET_CHAR);
+     spell(sn,mob->level,true,mob,ch,TARGET_CHAR);
 }

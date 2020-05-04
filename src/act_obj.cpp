@@ -1356,9 +1356,9 @@ void do_eat( Character *ch, char *argument )
 	break;
 
     case ITEM_PILL:
-	obj_cast_spell( obj->value[1], obj->value[0], ch, ch, NULL );
-	obj_cast_spell( obj->value[2], obj->value[0], ch, ch, NULL );
-	obj_cast_spell( obj->value[3], obj->value[0], ch, ch, NULL );
+	obj_cast_spell( obj->value[1], obj->value[0], true, ch, ch, NULL );
+	obj_cast_spell( obj->value[2], obj->value[0], true, ch, ch, NULL );
+	obj_cast_spell( obj->value[3], obj->value[0], true, ch, ch, NULL );
 	break;
     }
 
@@ -1994,9 +1994,9 @@ void do_quaff( Character *ch, char *argument )
     act( "$n quaffs $p.", ch, obj, NULL, TO_ROOM );
     act( "You quaff $p.", ch, obj, NULL ,TO_CHAR );
 
-    obj_cast_spell( obj->value[1], obj->value[0], ch, ch, NULL );
-    obj_cast_spell( obj->value[2], obj->value[0], ch, ch, NULL );
-    obj_cast_spell( obj->value[3], obj->value[0], ch, ch, NULL );
+    obj_cast_spell( obj->value[1], obj->value[0], true, ch, ch, NULL );
+    obj_cast_spell( obj->value[2], obj->value[0], true, ch, ch, NULL );
+    obj_cast_spell( obj->value[3], obj->value[0], true, ch, ch, NULL );
 
     extract_obj( obj );
     return;
@@ -2004,69 +2004,57 @@ void do_quaff( Character *ch, char *argument )
 
 
 
-void do_recite( Character *ch, char *argument )
-{
+void do_recite( Character *ch, char *argument ) {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
     Character *victim;
     OBJ_DATA *scroll;
     OBJ_DATA *obj;
 
-    argument = one_argument( argument, arg1 );
-    argument = one_argument( argument, arg2 );
+    argument = one_argument(argument, arg1);
+    argument = one_argument(argument, arg2);
 
-    if ( ( scroll = get_obj_carry( ch, arg1, ch ) ) == NULL )
-    {
-	send_to_char( "You do not have that scroll.\n\r", ch );
-	return;
+    if ((scroll = get_obj_carry(ch, arg1, ch)) == NULL) {
+        send_to_char("You do not have that scroll.\n\r", ch);
+        return;
     }
 
-    if ( scroll->item_type != ITEM_SCROLL )
-    {
-	send_to_char( "You can recite only scrolls.\n\r", ch );
-	return;
+    if (scroll->item_type != ITEM_SCROLL) {
+        send_to_char("You can recite only scrolls.\n\r", ch);
+        return;
     }
 
-    if ( ch->level < scroll->level)
-    {
-	send_to_char(
-		"This scroll is too complex for you to comprehend.\n\r",ch);
-	return;
+    if (ch->level < scroll->level) {
+        send_to_char(
+                "This scroll is too complex for you to comprehend.\n\r", ch);
+        return;
     }
 
     obj = NULL;
-    if ( arg2[0] == '\0' )
-    {
-	victim = ch;
-    }
-    else
-    {
-	if ( ( victim = get_char_room ( ch, arg2 ) ) == NULL
-	&&   ( obj    = get_obj_here  ( ch, arg2 ) ) == NULL )
-	{
-	    send_to_char( "You can't find it.\n\r", ch );
-	    return;
-	}
+    if (arg2[0] == '\0') {
+        victim = ch;
+    } else {
+        if ((victim = get_char_room(ch, arg2)) == NULL
+            && (obj = get_obj_here(ch, arg2)) == NULL) {
+            send_to_char("You can't find it.\n\r", ch);
+            return;
+        }
     }
 
-    act( "$n recites $p.", ch, scroll, NULL, TO_ROOM );
-    act( "You recite $p.", ch, scroll, NULL, TO_CHAR );
+    act("$n recites $p.", ch, scroll, NULL, TO_ROOM);
+    act("You recite $p.", ch, scroll, NULL, TO_CHAR);
 
-    if (number_percent() >= 20 + get_skill(ch,gsn_scrolls) * 4/5)
-    {
-	send_to_char("You mispronounce a syllable.\n\r",ch);
-	check_improve(ch,gsn_scrolls,FALSE,2);
+    if (number_percent() >= 20 + get_skill(ch, gsn_scrolls) * 4 / 5) {
+        send_to_char("You mispronounce a syllable.\n\r", ch);
+        check_improve(ch, gsn_scrolls, FALSE, 2);
+    } else {
+        obj_cast_spell(scroll->value[1], scroll->value[0], true, ch, victim, obj);
+        obj_cast_spell(scroll->value[2], scroll->value[0], true, ch, victim, obj);
+        obj_cast_spell(scroll->value[3], scroll->value[0], true, ch, victim, obj);
+        check_improve(ch, gsn_scrolls, TRUE, 2);
     }
 
-    else
-    {
-    	obj_cast_spell( scroll->value[1], scroll->value[0], ch, victim, obj );
-    	obj_cast_spell( scroll->value[2], scroll->value[0], ch, victim, obj );
-    	obj_cast_spell( scroll->value[3], scroll->value[0], ch, victim, obj );
-	check_improve(ch,gsn_scrolls,TRUE,2);
-    }
-
-    extract_obj( scroll );
+    extract_obj(scroll);
     return;
 }
 
@@ -2144,7 +2132,7 @@ void do_brandish( Character *ch, char *argument )
 		break;
 	    }
 
-	    obj_cast_spell( staff->value[3], staff->value[0], ch, vch, NULL );
+	    obj_cast_spell( staff->value[3], staff->value[0], true, ch, vch, NULL );
 	    check_improve(ch,gsn_staves,TRUE,2);
 	}
     }
@@ -2237,7 +2225,7 @@ void do_zap( Character *ch, char *argument )
 	}
 	else
 	{
-	    obj_cast_spell( wand->value[3], wand->value[0], ch, victim, obj );
+	    obj_cast_spell( wand->value[3], wand->value[0], true, ch, victim, obj );
 	    check_improve(ch,gsn_wands,TRUE,2);
 	}
     }

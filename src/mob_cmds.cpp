@@ -1049,7 +1049,7 @@ void do_mpcast( Character *ch, char *argument )
 		return;
 	    victim = ( void * ) obj;
     }
-    (*skill_table[sn].spell_fun)( sn, ch->level, ch, victim,
+    (*skill_table[sn].spell_fun)( sn, ch->level, true, ch, victim,
 	skill_table[sn].target );
     return;
 }

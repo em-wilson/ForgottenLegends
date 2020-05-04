@@ -42,7 +42,7 @@ DECLARE_DO_FUN(do_scan);
 
 extern char *target_name;
 
-void spell_farsight( int sn, int level, Character *ch, void *vo,int target)
+void spell_farsight( int sn, int level, bool succesful_cast, Character *ch, void *vo,int target)
 {
     if (IS_AFFECTED(ch,AFF_BLIND))
     {
@@ -54,7 +54,7 @@ void spell_farsight( int sn, int level, Character *ch, void *vo,int target)
 }
 
 
-void spell_portal( int sn, int level, Character *ch, void *vo,int target)
+void spell_portal( int sn, int level, bool succesful_cast, Character *ch, void *vo,int target)
 {
     Character *victim;
     OBJ_DATA *portal, *stone;
@@ -103,7 +103,7 @@ void spell_portal( int sn, int level, Character *ch, void *vo,int target)
     act("$p rises up before you.",ch,portal,NULL,TO_CHAR);
 }
 
-void spell_nexus( int sn, int level, Character *ch, void *vo, int target)
+void spell_nexus( int sn, int level, bool succesful_cast, Character *ch, void *vo, int target)
 {
     Character *victim;
     OBJ_DATA *portal, *stone;

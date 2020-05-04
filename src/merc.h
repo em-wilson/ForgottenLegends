@@ -105,7 +105,7 @@ class PlayerCharacter;
  */
 typedef	void DO_FUN	args( ( Character *ch, char *argument ) );
 typedef bool SPEC_FUN	args( ( Character *ch ) );
-typedef void SPELL_FUN	args( ( int sn, int level, Character *ch, void *vo,
+typedef void SPELL_FUN	args( ( int sn, int level, bool succesful_cast, Character *ch, void *vo,
 				int target ) );
 
 
@@ -2446,7 +2446,7 @@ int 	mana_cost 	(Character *ch, int min_mana, int level);
 int	skill_lookup	args( ( const char *name ) );
 int	slot_lookup	args( ( int slot ) );
 bool	saves_spell	args( ( int level, Character *victim, int dam_type ) );
-void	obj_cast_spell	args( ( int sn, int level, Character *ch,
+void	obj_cast_spell	args( ( int sn, int level, bool succesful_cast, Character *ch,
 				    Character *victim, OBJ_DATA *obj ) );
 
 /* mob_prog.c */

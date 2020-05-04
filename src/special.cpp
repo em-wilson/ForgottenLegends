@@ -201,7 +201,7 @@ bool dragon( Character *ch, char *spell_name )
 
     if ( ( sn = skill_lookup( spell_name ) ) < 0 )
 	return FALSE;
-    (*skill_table[sn].spell_fun) ( sn, ch->level, ch, victim, TARGET_CHAR);
+    (*skill_table[sn].spell_fun) ( sn, ch->level, true, ch, victim, TARGET_CHAR);
     return TRUE;
 }
 
@@ -262,7 +262,7 @@ bool spec_breath_gas( Character *ch )
 
     if ( ( sn = skill_lookup( "gas breath" ) ) < 0 )
 	return FALSE;
-    (*skill_table[sn].spell_fun) ( sn, ch->level, ch, NULL,TARGET_CHAR);
+    (*skill_table[sn].spell_fun) ( sn, ch->level, true, ch, NULL,TARGET_CHAR);
     return TRUE;
 }
 
@@ -298,41 +298,41 @@ bool spec_cast_adept( Character *ch )
     {
     case 0:
 	act( "$n utters the word 'abrazak'.", ch, NULL, NULL, TO_ROOM );
-	spell_armor( skill_lookup( "armor" ), ch->level,ch,victim,TARGET_CHAR);
+	spell_armor( skill_lookup( "armor" ), ch->level, true, ch,victim,TARGET_CHAR);
 	return TRUE;
 
     case 1:
 	act( "$n utters the word 'fido'.", ch, NULL, NULL, TO_ROOM );
-	spell_bless( skill_lookup( "bless" ), ch->level,ch,victim,TARGET_CHAR);
+	spell_bless( skill_lookup( "bless" ), ch->level,true,ch,victim,TARGET_CHAR);
 	return TRUE;
 
     case 2:
 	act("$n utters the words 'judicandus noselacri'.",ch,NULL,NULL,TO_ROOM);
 	spell_cure_blindness( skill_lookup( "cure blindness" ),
-	    ch->level, ch, victim,TARGET_CHAR);
+	    ch->level, true, ch, victim,TARGET_CHAR);
 	return TRUE;
 
     case 3:
 	act("$n utters the words 'judicandus dies'.", ch,NULL, NULL, TO_ROOM );
 	spell_cure_light( skill_lookup( "cure light" ),
-	    ch->level, ch, victim,TARGET_CHAR);
+	    ch->level, true, ch, victim,TARGET_CHAR);
 	return TRUE;
 
     case 4:
 	act( "$n utters the words 'judicandus sausabru'.",ch,NULL,NULL,TO_ROOM);
 	spell_cure_poison( skill_lookup( "cure poison" ),
-	    ch->level, ch, victim,TARGET_CHAR);
+	    ch->level, true, ch, victim,TARGET_CHAR);
 	return TRUE;
 
     case 5:
 	act("$n utters the word 'candusima'.", ch, NULL, NULL, TO_ROOM );
-	spell_refresh( skill_lookup("refresh"),ch->level,ch,victim,TARGET_CHAR);
+	spell_refresh( skill_lookup("refresh"),ch->level,true,ch,victim,TARGET_CHAR);
 	return TRUE;
 
     case 6:
 	act("$n utters the words 'judicandus eugzagz'.",ch,NULL,NULL,TO_ROOM);
 	spell_cure_disease(skill_lookup("cure disease"),
-	    ch->level,ch,victim,TARGET_CHAR);
+	    ch->level,true,ch,victim,TARGET_CHAR);
     }
 
     return FALSE;
@@ -387,7 +387,7 @@ bool spec_cast_cleric( Character *ch )
 
     if ( ( sn = skill_lookup( spell ) ) < 0 )
 	return FALSE;
-    (*skill_table[sn].spell_fun) ( sn, ch->level, ch, victim,TARGET_CHAR);
+    (*skill_table[sn].spell_fun) ( sn, ch->level, true, ch, victim,TARGET_CHAR);
     return TRUE;
 }
 
@@ -414,7 +414,7 @@ bool spec_cast_judge( Character *ch )
     spell = (char*)"high explosive";
     if ( ( sn = skill_lookup( spell ) ) < 0 )
         return FALSE;
-    (*skill_table[sn].spell_fun) ( sn, ch->level, ch, victim,TARGET_CHAR);
+    (*skill_table[sn].spell_fun) ( sn, ch->level, true, ch, victim,TARGET_CHAR);
     return TRUE;
 }
 
@@ -466,7 +466,7 @@ bool spec_cast_mage( Character *ch )
 
     if ( ( sn = skill_lookup( spell ) ) < 0 )
 	return FALSE;
-    (*skill_table[sn].spell_fun) ( sn, ch->level, ch, victim,TARGET_CHAR);
+    (*skill_table[sn].spell_fun) ( sn, ch->level, true, ch, victim,TARGET_CHAR);
     return TRUE;
 }
 
@@ -516,7 +516,7 @@ bool spec_cast_undead( Character *ch )
 
     if ( ( sn = skill_lookup( spell ) ) < 0 )
 	return FALSE;
-    (*skill_table[sn].spell_fun) ( sn, ch->level, ch, victim,TARGET_CHAR);
+    (*skill_table[sn].spell_fun) ( sn, ch->level, true, ch, victim,TARGET_CHAR);
     return TRUE;
 }
 
@@ -785,7 +785,7 @@ bool spec_poison( Character *ch )
     act( "You bite $N!",  ch, NULL, victim, TO_CHAR    );
     act( "$n bites $N!",  ch, NULL, victim, TO_NOTVICT );
     act( "$n bites you!", ch, NULL, victim, TO_VICT    );
-    spell_poison( gsn_poison, ch->level, ch, victim,TARGET_CHAR);
+    spell_poison( gsn_poison, ch->level, true, ch, victim,TARGET_CHAR);
     return TRUE;
 }
 
