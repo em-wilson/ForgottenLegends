@@ -2290,7 +2290,7 @@ void show_string(struct descriptor_data *d, char *input)
 			{
 				if (d->showstr_head)
 				{
-					delete d->showstr_head;
+					delete [] d->showstr_head;
 					d->showstr_head = NULL;
 				}
 				d->showstr_point  = 0;

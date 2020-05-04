@@ -907,7 +907,7 @@ void check_improve( Character *ch, int sn, bool success, int multiplier )
 	chance = URANGE(5,100 - ch->pcdata->learned[sn], 95);
 	if (number_percent() < chance)
 	{
-	    sprintf(buf,"You have become better at %s!\n\r",
+	    sprintf(buf,"{BYou have become better at %s!{x\n\r",
 		    skill_table[sn].name);
 	    send_to_char(buf,ch);
 	    ch->pcdata->learned[sn]++;

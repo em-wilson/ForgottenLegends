@@ -708,6 +708,41 @@ void one_hit( Character *ch, Character *victim, int dt, bool secondary )
 }
 
 
+void perform_autoloot(Character *ch, OBJ_DATA *corpse) {
+    if (IS_NPC(ch) && IS_SET(ch->act,ACT_PET) && ch->master != NULL) {
+        // The master should be doing this
+        perform_autoloot(ch->master, corpse);
+    } else if (!IS_NPC(ch)
+        &&  (corpse = get_obj_list(ch,(char*)"corpse",ch->in_room->contents)) != NULL
+        &&  corpse->item_type == ITEM_CORPSE_NPC && can_see_obj(ch,corpse))
+    {
+        OBJ_DATA *coins;
+
+        corpse = get_obj_list( ch, (char*)"corpse", ch->in_room->contents );
+
+        if ( IS_SET(ch->act, PLR_AUTOLOOT) &&
+             corpse && corpse->contains) /* exists and not empty */
+            do_get( ch, (char*)"all corpse" );
+
+        if (IS_SET(ch->act,PLR_AUTOGOLD) &&
+            corpse && corpse->contains  && /* exists and not empty */
+            !IS_SET(ch->act,PLR_AUTOLOOT))
+            if ((coins = get_obj_list(ch,(char*)"gcash",corpse->contains))
+                != NULL)
+                do_get(ch, (char*)"all.gcash corpse");
+
+        if ( IS_SET(ch->act, PLR_AUTOSAC) )
+        {
+            if ( IS_SET(ch->act,PLR_AUTOLOOT) && corpse && corpse->contains) {
+                return;  /* leave if corpse has treasure */
+            } else {
+                do_sacrifice(ch, (char *) "corpse");
+            }
+        }
+    }
+}
+
+
 /*
  * Inflict damage from a hit.
  */
@@ -996,34 +1031,7 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
         }
 
         /* RT new auto commands */
-
-	if (!IS_NPC(ch)
-	&&  (corpse = get_obj_list(ch,(char*)"corpse",ch->in_room->contents)) != NULL
-	&&  corpse->item_type == ITEM_CORPSE_NPC && can_see_obj(ch,corpse))
-	{
-	    OBJ_DATA *coins;
-
-	    corpse = get_obj_list( ch, (char*)"corpse", ch->in_room->contents ); 
-
-	    if ( IS_SET(ch->act, PLR_AUTOLOOT) &&
-		 corpse && corpse->contains) /* exists and not empty */
-		do_get( ch, (char*)"all corpse" );
-
- 	    if (IS_SET(ch->act,PLR_AUTOGOLD) &&
-	        corpse && corpse->contains  && /* exists and not empty */
-		!IS_SET(ch->act,PLR_AUTOLOOT))
-		if ((coins = get_obj_list(ch,(char*)"gcash",corpse->contains))
-		     != NULL)
-	      	    do_get(ch, (char*)"all.gcash corpse");
-            
-	    if ( IS_SET(ch->act, PLR_AUTOSAC) )
-	    {
-       	      if ( IS_SET(ch->act,PLR_AUTOLOOT) && corpse && corpse->contains)
-		return TRUE;  /* leave if corpse has treasure */
-	      else
-		do_sacrifice( ch, (char*)"corpse" );
-	    }
-	}
+        perform_autoloot(ch, corpse);
 
 	return TRUE;
     }
@@ -1310,38 +1318,18 @@ dam_type, bool show ) {
         else
             Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_DEATHS,0,0);
 
-	raw_kill( victim );
-	/* dump the flags */
-	if (ch != victim && !IS_NPC(ch) && !is_same_clan(ch,victim))
-	{
-	    if (IS_SET(victim->act,PLR_THIEF))
-		REMOVE_BIT(victim->act,PLR_THIEF);
-	}
+        raw_kill( victim );
+        /* dump the flags */
+        if (ch != victim && !IS_NPC(ch) && !is_same_clan(ch,victim))
+        {
+            if (IS_SET(victim->act,PLR_THIEF))
+            REMOVE_BIT(victim->act,PLR_THIEF);
+        }
+
         /* RT new auto commands */
+        perform_autoloot(ch, corpse);
 
-	if ( !IS_NPC(ch) && IS_NPC(victim) )
-	{
-	    corpse = get_obj_list( ch, (char*)"corpse", ch->in_room->contents ); 
-
-	    if ( IS_SET(ch->act, PLR_AUTOLOOT) &&
-		 corpse && corpse->contains) /* exists and not empty */
-		do_get( ch, (char*)"all corpse" );
-
- 	    if (IS_SET(ch->act,PLR_AUTOGOLD) &&
-	        corpse && corpse->contains  && /* exists and not empty */
-		!IS_SET(ch->act,PLR_AUTOLOOT))
-	      do_get(ch, (char*)"gold corpse");
-            
-	    if ( IS_SET(ch->act, PLR_AUTOSAC) )
-	    {
-       	      if ( IS_SET(ch->act,PLR_AUTOLOOT) && corpse && corpse->contains)
-		return TRUE;  /* leave if corpse has treasure */
-	      else
-		do_sacrifice( ch, (char*)"corpse" );
-	    }
-	}
-
-	return TRUE;
+        return TRUE;
     }
 
     if ( victim == ch )

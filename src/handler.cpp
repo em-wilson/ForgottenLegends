@@ -1932,8 +1932,8 @@ void extract_char( Character *ch, bool fPull )
 
     if ( ch->desc != NULL && ch->desc->original != NULL )
     {
-	do_return( ch, (char*)"" );
-	ch->desc = NULL;
+        do_return( ch, (char*)"" );
+        ch->desc = NULL;
     }
 
     for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
@@ -2415,7 +2415,7 @@ bool can_see( Character *ch, Character *victim )
     if ( ch == victim )
 	return TRUE;
     
-    if ( get_trust(ch) < victim->invis_level)
+    if ( victim == NULL || get_trust(ch) < victim->invis_level)
 	return FALSE;
 
 

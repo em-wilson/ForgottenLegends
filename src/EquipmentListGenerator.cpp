@@ -106,6 +106,9 @@ std::vector<std::string> get_armour_types(long wear_flags) {
     if ( IS_SET(wear_flags, ITEM_WEAR_SHIELD)) {
         positions.emplace_back("shield");
     }
+    if ( IS_SET(wear_flags, ITEM_WEAR_FLOAT)) {
+        positions.emplace_back("float");
+    }
     if ( IS_SET(wear_flags, ITEM_WEAR_ABOUT)) {
         positions.emplace_back("about");
     }
@@ -211,9 +214,11 @@ std::string replace_quotes(const char *input) {
     for (auto i = 0; i <= nLen; i++)
     {
         if ( input[i] == '"' ) {
-            s << '\'';
+            s << '\\';
+            s << '\"';
+        } else if ( input[i] ) {
+            s << input[i];
         }
-        s << input[i];
     }
     return s.str();
 }
@@ -228,11 +233,26 @@ std::string EquipmentListGenerator::itemJson(OBJ_INDEX_DATA *obj) {
     json << R"(    "name": ")" << name << "\"," << std::endl;
     json << R"(    "area": ")" << obj->area->name << "\"," << std::endl;
     json << R"(    "level": ")" << obj->level << "\"," << std::endl;
-    json << R"(    "type": ")" << item_name(obj->item_type) << "\"" << std::endl;
+    json << R"(    "type": ")" << item_name(obj->item_type) << "\"," << std::endl;
 
     int avgDam;
     std::string bit_name;
     switch ( obj->item_type ) {
+        default:
+            char buf[100];
+            sprintf( buf, "%d/%d/%d/%d",
+                     obj->value[0],
+                     obj->value[1],
+                     obj->value[2],
+                     obj->value[3] );
+
+            if (!str_cmp(buf, "0/0/0/0" )) {
+                json << "    \"stats\": null," << std::endl;
+            } else {
+                json << R"(    "stats": ")" << buf << "\"," << std::endl;
+            }
+            break;
+
         case ITEM_WEAPON:
             bit_name = weapon_bit_name( obj->value[4]);
             avgDam = (1 + obj->value[2]) * obj->value[1] / 2;

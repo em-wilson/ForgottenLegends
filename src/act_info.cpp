@@ -37,6 +37,8 @@
 #include <ctype.h>
 #include <time.h>
 #include <unistd.h>
+#include <vector>
+#include <map>
 #include "merc.h"
 #include "magic.h"
 #include "recycle.h"
@@ -118,120 +120,86 @@ char *format_obj_to_char( OBJ_DATA *obj, Character *ch, bool fShort )
 void show_list_to_char( OBJ_DATA *list, Character *ch, bool fShort, bool fShowNothing )
 {
     char buf[MAX_STRING_LENGTH];
-    BUFFER *output;
-    char **prgpstrShow;
-    int *prgnShow;
+    std::string output;
+    std::vector<std::tuple<std::string, int>> prgpstrShow;
     char *pstrShow;
     OBJ_DATA *obj;
-    int nShow;
-    int iShow;
     int count;
     bool fCombine;
 
-    if ( ch->desc == NULL )
-	return;
-
-    /*
-     * Alloc space for output lines.
-     */
-    output = new_buf();
+    if ( ch->desc == NULL ) {
+        return;
+    }
 
     count = 0;
-    for ( obj = list; obj != NULL; obj = obj->next_content )
-	count++;
-    if ( count > 1000 )
-    {
-	send_to_char("That is WAY too much junk, drop some of it!\n\r",ch);
-	return;
+    for ( obj = list; obj != NULL; obj = obj->next_content ) {
+        count++;
     }
-    prgpstrShow = new char*[count];
-    prgnShow = new int;
-    nShow	= 0;
+
+    if ( count > 1000 ) {
+        send_to_char("That is WAY too much junk, drop some of it!\n\r",ch);
+        return;
+    }
 
     /*
      * Format the list of objects.
      */
-    for ( obj = list; obj != NULL; obj = obj->next_content )
-    { 
-	if ( obj->wear_loc == WEAR_NONE && can_see_obj( ch, obj )) 
-	{
-	    pstrShow = format_obj_to_char( obj, ch, fShort );
+    for ( obj = list; obj != NULL; obj = obj->next_content ) {
+        if ( obj->wear_loc == WEAR_NONE && can_see_obj( ch, obj )) {
+            pstrShow = format_obj_to_char( obj, ch, fShort );
 
-	    fCombine = FALSE;
+            fCombine = FALSE;
 
-	    if ( IS_NPC(ch) || IS_SET(ch->comm, COMM_COMBINE) )
-	    {
-		/*
-		 * Look for duplicates, case sensitive.
-		 * Matches tend to be near end so run loop backwords.
-		 */
-		for ( iShow = nShow - 1; iShow >= 0; iShow-- )
-		{
-		    if ( !strcmp( prgpstrShow[iShow], pstrShow ) )
-		    {
-			prgnShow[iShow]++;
-			fCombine = TRUE;
-			break;
-		    }
-		}
-	    }
+            if ( IS_NPC(ch) || IS_SET(ch->comm, COMM_COMBINE) ) {
+                /*
+                 * Look for duplicates, case sensitive.
+                 * Matches tend to be near end so run loop backwords.
+                 */
+                for ( auto it = prgpstrShow.begin(); it != prgpstrShow.end(); ++it ) {
+                    auto objName = std::get<0>(*it);
+                    if ( !objName.compare(pstrShow) ) {
+                        std::get<1>(*it)++;
+                        fCombine = TRUE;
+                        break;
+                    }
+                }
+            }
 
-	    /*
-	     * Couldn't combine, or didn't want to.
-	     */
-	    if ( !fCombine )
-	    {
-		prgpstrShow [nShow] = str_dup( pstrShow );
-		prgnShow    [nShow] = 1;
-		nShow++;
-	    }
-	}
+            /*
+             * Couldn't combine, or didn't want to.
+             */
+            if ( !fCombine ) {
+                prgpstrShow.push_back(std::make_tuple(pstrShow, 1));
+            }
+        }
     }
 
     /*
      * Output the formatted list.
      */
-    for ( iShow = 0; iShow < nShow; iShow++ )
-    {
-	if (prgpstrShow[iShow][0] == '\0')
-	{
-	    free_string(prgpstrShow[iShow]);
-	    continue;
-	}
+    for ( auto it = prgpstrShow.begin(); it != prgpstrShow.end(); ++it ) {
+        auto objName = std::get<0>(*it);
+        auto objCount = std::get<1>(*it);
+        if ( IS_NPC(ch) || IS_SET(ch->comm, COMM_COMBINE) ) {
+            if ( objCount != 1 ) {
+                sprintf( buf, "(%2d) ", objCount );
+                output.append(buf);
+            } else {
+                output.append("     ");
+            }
+        }
 
-	if ( IS_NPC(ch) || IS_SET(ch->comm, COMM_COMBINE) )
-	{
-	    if ( prgnShow[iShow] != 1 )
-	    {
-		sprintf( buf, "(%2d) ", prgnShow[iShow] );
-		add_buf(output,buf);
-	    }
-	    else
-	    {
-		add_buf(output,"     ");
-	    }
-	}
-
-	add_buf(output,prgpstrShow[iShow]);
-	add_buf(output,"\n\r");
-	free_string( prgpstrShow[iShow] );
+        output.append(objName);
+        output.append("\n\r");
     }
 
-    if ( fShowNothing && nShow == 0 )
-    {
-	if ( IS_NPC(ch) || IS_SET(ch->comm, COMM_COMBINE) )
-	    send_to_char( "     ", ch );
-	send_to_char( "Nothing.\n\r", ch );
+    if ( fShowNothing && prgpstrShow.size() == 0 ) {
+        if ( IS_NPC(ch) || IS_SET(ch->comm, COMM_COMBINE) ) {
+            send_to_char("     ", ch);
+        }
+        send_to_char( "Nothing.\n\r", ch );
     }
-    page_to_char(buf_string(output),ch);
-
-    /*
-     * Clean up.
-     */
-    free_buf(output);
-    delete [] prgpstrShow;
-    delete prgnShow;
-
+    page_to_char(output.c_str(),ch);
     return;
 }
 

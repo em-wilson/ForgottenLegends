@@ -802,7 +802,7 @@ const	struct	bit_type	bitvector_type	[]	=
 	{	weapon_type2,	"weapon"	}
 };
 
-const	struct	size_type	info_table	[MAX_INFO] =
+const	struct	size_type	info_table	[] =
 {
 	{
 		"Never pet a burning dog."

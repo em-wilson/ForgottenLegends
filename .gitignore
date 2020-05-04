@@ -6,3 +6,4 @@ test/tests
 src/rom
 .idea
 cmake-build-debug/
+data/misc/help.txt

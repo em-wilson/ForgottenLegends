@@ -321,9 +321,13 @@ void weather_update( void )
 void info_update( void )
 {
     DESCRIPTOR_DATA *d;
-    int num;
+    int num, nLen=0;
 
-    num = number_range(0, MAX_INFO);
+    for (auto i = 0; info_table[i].name; i++ ) {
+        nLen++;
+    }
+
+    num = number_range(0, nLen);
 
     if (info_table[num].name == NULL)
 	return;

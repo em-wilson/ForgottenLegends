@@ -138,7 +138,6 @@ typedef void SPELL_FUN	args( ( int sn, int level, Character *ch, void *vo,
 #define MAX_PC_RACE		    4
 #define MAX_DAMAGE_MESSAGE	   42
 #define MAX_LEVEL		   60
-#define MAX_INFO		   50
 #define LEVEL_HERO		   (MAX_LEVEL - 9)
 #define LEVEL_IMMORTAL		   (MAX_LEVEL - 8)
 

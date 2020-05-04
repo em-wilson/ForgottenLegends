@@ -6,6 +6,7 @@
 Character::Character()
 {
     this->next_in_room = NULL;
+    this->next = NULL;
     this->master = NULL;
     this->leader = NULL;
     this->fighting = NULL;
