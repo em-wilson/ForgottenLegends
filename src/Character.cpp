@@ -132,6 +132,10 @@ Character::~Character()
         this->pcdata = NULL;
     }
 
+    if ( this->desc ) {
+        this->desc = NULL;
+    }
+
     INVALIDATE(this);
 }
 

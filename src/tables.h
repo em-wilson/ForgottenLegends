@@ -68,7 +68,6 @@ extern	const	struct	flag_type	size_flags[];
 extern	const	struct	flag_type	position_flags[];
 extern	const	struct	flag_type	ac_type[];
 extern	const	struct	bit_type	bitvector_type[];
-extern  const	struct	size_type	info_table[];
 
 struct flag_type
 {

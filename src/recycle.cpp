@@ -92,7 +92,7 @@ DESCRIPTOR_DATA *new_descriptor(void)
     VALIDATE(d);
     
     d->connected       = CON_GET_NAME;
-    d->descriptor       = NULL;
+    d->descriptor       = 0;
     d->showstr_head    = NULL;
     d->showstr_point = NULL;
     d->outsize = 2000;

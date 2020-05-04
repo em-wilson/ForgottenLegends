@@ -2193,6 +2193,7 @@ char *	crypt		args( ( const char *key, const char *salt ) );
 #define CLAN_LIST       "clan.lst"      /* List of clan */
 #define MUSIC_FILE	"../data/misc/music.txt"
 #define HELP_ERR	"../data/misc/help.txt" /* For bad helps */
+#define INFO_FILE	"../data/misc/info_text.txt"
 #define UPGRADE_FILE	"../data/misc/upgrade.txt" /* Keeps track of clan upgrades */
 #define ONLINE_FILE "../data/misc/online.html" /* WHO list for players online */
 

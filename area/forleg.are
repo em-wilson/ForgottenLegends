@@ -1,0 +1,21 @@
+#HELPS
+0 INFO~
+Syntax: info
+
+Info is a special informative channel that periodically gives useful
+information about upcoming events or general playing tips.
+
+Typing this channel name will toggle it on and off.
+~
+52 INFO~
+Syntax: info    <message>
+
+As an immortal, INFO is no longer a random spring of information. You
+can communicate important information on it. Your name will not be
+revealed - instead your message will come up like any other information
+message.
+
+Type this channel name by itself to turn it off.
+~
+-1 $~
+#$

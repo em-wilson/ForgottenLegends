@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <vector>
+#include <fstream>
 #include "merc.h"
 #include "music.h"
 #include "tables.h"
@@ -66,109 +68,96 @@ int	save_number = 0;
  * This function takes 25% to 35% of ALL Merc cpu time.
  * -- Furey
  */
-void mobile_update( void )
-{
+void mobile_update( void ) {
     Character *ch;
     EXIT_DATA *pexit;
     int door;
 
     /* Examine all mobs. */
-    for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
-    {
-	ch = *it;
+    for (std::list<Character *>::iterator it = char_list.begin(); it != char_list.end(); it++) {
+        ch = *it;
 
-	if ( !IS_NPC(ch) || ch->in_room == NULL || IS_AFFECTED(ch,AFF_CHARM))
-	    continue;
+        if (!IS_NPC(ch) || ch->in_room == NULL || IS_AFFECTED(ch, AFF_CHARM))
+            continue;
 
-	if (ch->in_room->area->empty && !IS_SET(ch->act,ACT_UPDATE_ALWAYS))
-	    continue;
+        if (ch->in_room->area->empty && !IS_SET(ch->act, ACT_UPDATE_ALWAYS))
+            continue;
 
-	/* Examine call for special procedure */
-	if ( ch->spec_fun != 0 )
-	{
-	    if ( (*ch->spec_fun) ( ch ) )
-		continue;
-	}
+        /* Examine call for special procedure */
+        if (ch->spec_fun != 0) {
+            if ((*ch->spec_fun)(ch))
+                continue;
+        }
 
-	if (ch->pIndexData->pShop != NULL) /* give him some gold */
-	    if ((ch->gold * 100 + ch->silver) < ch->pIndexData->wealth)
-	    {
-		ch->gold += ch->pIndexData->wealth * number_range(1,20)/5000000;
-		ch->silver += ch->pIndexData->wealth * number_range(1,20)/50000;
-	    }
-	 
-	/*
-	 * Check triggers only if mobile still in default position
-	 */
-	if ( ch->position == ch->pIndexData->default_pos )
-	{
-	    /* Delay */
-	    if ( HAS_TRIGGER( ch, TRIG_DELAY) 
-	    &&   ch->mprog_delay > 0 )
-	    {
-		if ( --ch->mprog_delay <= 0 )
-		{
-		    mp_percent_trigger( ch, NULL, NULL, NULL, TRIG_DELAY );
-		    continue;
-		}
-	    } 
-	    if ( HAS_TRIGGER( ch, TRIG_RANDOM) )
-	    {
-		if( mp_percent_trigger( ch, NULL, NULL, NULL, TRIG_RANDOM ) )
-		continue;
-	    }
-	}
+        if (ch->pIndexData->pShop != NULL) /* give him some gold */
+            if ((ch->gold * 100 + ch->silver) < ch->pIndexData->wealth) {
+                ch->gold += ch->pIndexData->wealth * number_range(1, 20) / 5000000;
+                ch->silver += ch->pIndexData->wealth * number_range(1, 20) / 50000;
+            }
 
-	/* That's all for sleeping / busy monster, and empty zones */
-	if ( ch->position != POS_STANDING )
-	    continue;
+        /*
+         * Check triggers only if mobile still in default position
+         */
+        if (ch->position == ch->pIndexData->default_pos) {
+            /* Delay */
+            if (HAS_TRIGGER(ch, TRIG_DELAY)
+                && ch->mprog_delay > 0) {
+                if (--ch->mprog_delay <= 0) {
+                    mp_percent_trigger(ch, NULL, NULL, NULL, TRIG_DELAY);
+                    continue;
+                }
+            }
+            if (HAS_TRIGGER(ch, TRIG_RANDOM)) {
+                if (mp_percent_trigger(ch, NULL, NULL, NULL, TRIG_RANDOM))
+                    continue;
+            }
+        }
 
-	/* Scavenge */
-	if ( IS_SET(ch->act, ACT_SCAVENGER)
-	&&   ch->in_room->contents != NULL
-	&&   number_bits( 6 ) == 0 )
-	{
-	    OBJ_DATA *obj;
-	    OBJ_DATA *obj_best;
-	    int max;
+        /* That's all for sleeping / busy monster, and empty zones */
+        if (ch->position != POS_STANDING)
+            continue;
 
-	    max         = 1;
-	    obj_best    = 0;
-	    for ( obj = ch->in_room->contents; obj; obj = obj->next_content )
-	    {
-		if ( CAN_WEAR(obj, ITEM_TAKE) && can_loot(ch, obj)
-		     && obj->cost > max  && obj->cost > 0)
-		{
-		    obj_best    = obj;
-		    max         = obj->cost;
-		}
-	    }
+        /* Scavenge */
+        if (IS_SET(ch->act, ACT_SCAVENGER)
+            && ch->in_room->contents != NULL
+            && number_bits(6) == 0) {
+            OBJ_DATA *obj;
+            OBJ_DATA *obj_best;
+            int max;
 
-	    if ( obj_best )
-	    {
-		obj_from_room( obj_best );
-		obj_to_char( obj_best, ch );
-		act( "$n gets $p.", ch, obj_best, NULL, TO_ROOM );
-	    }
-	}
+            max = 1;
+            obj_best = 0;
+            for (obj = ch->in_room->contents; obj; obj = obj->next_content) {
+                if (CAN_WEAR(obj, ITEM_TAKE) && can_loot(ch, obj)
+                    && obj->cost > max && obj->cost > 0) {
+                    obj_best = obj;
+                    max = obj->cost;
+                }
+            }
 
-	/* Wander */
-	if ( !IS_SET(ch->act, ACT_SENTINEL) 
-	&& number_bits(3) == 0
-	&& ( door = number_bits( 5 ) ) <= 5
-	&& ( pexit = ch->in_room->exit[door] ) != NULL
-	&&   pexit->u1.to_room != NULL
-	&&   !IS_SET(pexit->exit_info, EX_CLOSED)
-	&&   !IS_SET(pexit->u1.to_room->room_flags, ROOM_NO_MOB)
-	&& ( !IS_SET(ch->act, ACT_STAY_AREA)
-	||   pexit->u1.to_room->area == ch->in_room->area ) 
-	&& ( !IS_SET(ch->act, ACT_OUTDOORS)
-	||   !IS_SET(pexit->u1.to_room->room_flags,ROOM_INDOORS)) 
-	&& ( !IS_SET(ch->act, ACT_INDOORS)
-	||   IS_SET(pexit->u1.to_room->room_flags,ROOM_INDOORS)))
-	{
-	    move_char( ch, door, FALSE );
-	}
+            if (obj_best) {
+                obj_from_room(obj_best);
+                obj_to_char(obj_best, ch);
+                act("$n gets $p.", ch, obj_best, NULL, TO_ROOM);
+            }
+        }
+
+        /* Wander */
+        if (!IS_SET(ch->act, ACT_SENTINEL)
+            && number_bits(3) == 0
+            && (door = number_bits(5)) <= 5
+            && (pexit = ch->in_room->exit[door]) != NULL
+            && pexit->u1.to_room != NULL
+            && !IS_SET(pexit->exit_info, EX_CLOSED)
+            && !IS_SET(pexit->u1.to_room->room_flags, ROOM_NO_MOB)
+            && (!IS_SET(ch->act, ACT_STAY_AREA)
+                || pexit->u1.to_room->area == ch->in_room->area)
+            && (!IS_SET(ch->act, ACT_OUTDOORS)
+                || !IS_SET(pexit->u1.to_room->room_flags, ROOM_INDOORS))
+            && (!IS_SET(ch->act, ACT_INDOORS)
+                || IS_SET(pexit->u1.to_room->room_flags, ROOM_INDOORS))) {
+            move_char(ch, door, FALSE);
+        }
     }
 
     return;
@@ -318,38 +307,41 @@ void weather_update( void )
 /*
  * Gives helpfull tips about the MUD.
  */
-void info_update( void )
-{
-    DESCRIPTOR_DATA *d;
-    int num, nLen=-1;
+void info_update( void ) {
+    static bool info_initialized = false;
+    static std::vector<std::string> info_text;
+    if (!info_initialized) {
+        std::string line;
+        info_initialized = true;
+        srand(time(NULL));
 
-    for (auto i = 0; info_table[i].name; i++ ) {
-        nLen++;
+        std::ifstream infile(INFO_FILE);
+        if ( !infile.is_open() ) {
+            return;
+        }
+
+        while(getline(infile, line)) {
+            info_text.push_back(line);
+        }
     }
 
-    if (nLen < 0) {
+    if ( info_text.size() == 0 ) {
         return;
     }
 
-    num = number_range(0, nLen);
+    int num = rand() % info_text.size();
 
-    if (info_table[num].name == NULL) {
-        return;
-    }
-
-    for ( d = descriptor_list; d != NULL; d = d->next )
-    {
+    for (DESCRIPTOR_DATA *d = descriptor_list; d != NULL; d = d->next) {
         Character *victim;
 
-	victim = d->character;
+        victim = d->character;
 
-        if ( d->connected == CON_PLAYING &&
-             !IS_SET(victim->comm,COMM_NOINFO) &&
-             !IS_SET(victim->comm,COMM_QUIET) )
-        {
-	    char buf[MAX_STRING_LENGTH];
-            sprintf(buf, "{YINFO: {C'%s{C'{x\n\r", info_table[num].name);
-	    send_to_char(buf,victim);
+        if (d->connected == CON_PLAYING &&
+            !IS_SET(victim->comm, COMM_NOINFO) &&
+            !IS_SET(victim->comm, COMM_QUIET)) {
+            char buf[MAX_STRING_LENGTH];
+            sprintf(buf, "{YINFO: {C'%s{C'{x\n\r", info_text[num].c_str());
+            send_to_char(buf, victim);
         }
     }
 }

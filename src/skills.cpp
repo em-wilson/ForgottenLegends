@@ -875,59 +875,56 @@ void do_groups(Character *ch, char *argument)
 }
 
 /* checks for skill improvement */
-void check_improve( Character *ch, int sn, bool success, int multiplier )
-{
+void check_improve( Character *ch, int sn, bool success, int multiplier ) {
     int chance;
     char buf[100];
 
     if (IS_NPC(ch))
-	return;
+        return;
 
-    if (ch->level < skill_level(ch,sn)
-    ||  ch->pcdata->learned[sn] == 0
-    ||  ch->pcdata->learned[sn] == 100)
-	return;  /* skill is not known */ 
+    if (ch->level < skill_level(ch, sn)
+        || ch->pcdata->learned[sn] == 0
+        || ch->pcdata->learned[sn] == 100)
+        return;  /* skill is not known */
 
     /* check to see if the character has a chance to learn */
-    chance = 10 * int_app[get_curr_stat(ch,STAT_INT)].learn;
-    chance /= (		multiplier
-		*	4);
+    chance = 10 * int_app[get_curr_stat(ch, STAT_INT)].learn;
+    chance /= (multiplier
+               * 4);
     chance += ch->level;
 
     // Improved odds at lower levels
     chance += 100 - ch->pcdata->learned[sn];
 
-    if (number_range(1,750) > chance)
-	return;
+    if (number_range(1, 750) > chance)
+        return;
 
-    /* now that the character has a CHANCE to learn, see if they really have */	
+    /* now that the character has a CHANCE to learn, see if they really have */
 
-    if (success)
-    {
-	chance = URANGE(5,100 - ch->pcdata->learned[sn], 95);
-	if (number_percent() < chance)
-	{
-	    sprintf(buf,"{BYou have become better at %s!{x\n\r",
-		    skill_table[sn].name);
-	    send_to_char(buf,ch);
-	    ch->pcdata->learned[sn]++;
-	    ch->gain_exp(2 + skill_rating(ch,sn));
-	}
+    if (success) {
+        chance = URANGE(5, 100 - ch->pcdata->learned[sn], 95);
+        if (number_percent() < chance) {
+            sprintf(buf, "{BYou have become better at %s!{x\n\r",
+                    skill_table[sn].name);
+            send_to_char(buf, ch);
+            ch->pcdata->learned[sn]++;
+            ch->gain_exp(2 + skill_rating(ch, sn));
+        }
+    } else {
+        chance = URANGE(5, ch->pcdata->learned[sn] / 2, 30);
+        if (number_percent() < chance) {
+            sprintf(buf,
+                    "{BYou learn from your mistakes, and your %s skill improves.{x\n\r",
+                    skill_table[sn].name);
+            send_to_char(buf, ch);
+            ch->pcdata->learned[sn] += number_range(1, 3);
+            ch->pcdata->learned[sn] = UMIN(ch->pcdata->learned[sn], 100);
+            ch->gain_exp(2 + skill_rating(ch, sn));
+        }
     }
 
-    else
-    {
-	chance = URANGE(5,ch->pcdata->learned[sn]/2,30);
-	if (number_percent() < chance)
-	{
-	    sprintf(buf,
-		"You learn from your mistakes, and your %s skill improves.\n\r",
-		skill_table[sn].name);
-	    send_to_char(buf,ch);
-	    ch->pcdata->learned[sn] += number_range(1,3);
-	    ch->pcdata->learned[sn] = UMIN(ch->pcdata->learned[sn],100);
-	    ch->gain_exp(2 + skill_rating(ch,sn));
-	}
+    if ( ch->pcdata->learned[sn] == 100 ) {
+        sprintf(buf, "{YYou have mastered %s!{x\n\r", skill_table[sn].name);
     }
 }
 
