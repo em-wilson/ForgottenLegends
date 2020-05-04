@@ -343,9 +343,8 @@ void game_loop_unix( int control )
 					    nanny( d, d->incomm );
 					    break;
 				    }
-
-					d->incomm[0]	= '\0';
 				}
+                d->incomm[0]	= '\0';
 		    }
 		}
 

@@ -142,8 +142,8 @@ void string_add( Character *ch, char *argument )
         if ( !str_cmp( arg1, ".c" ) )
         {
             send_to_char( "String cleared.\n\r", ch );
-	    free_string(*ch->desc->pString);
-	    *ch->desc->pString = str_dup( "" );
+            free_string(*ch->desc->pString);
+            *ch->desc->pString = str_dup( "" );
             return;
         }
 
@@ -195,7 +195,7 @@ void string_add( Character *ch, char *argument )
 	{
 		*ch->desc->pString = string_linedel( *ch->desc->pString, atoi(arg2) );
 		*ch->desc->pString = string_lineadd( *ch->desc->pString, tmparg3, atoi(arg2) );
-		send_to_char( "Linea reemplazada.\n\r", ch );
+		send_to_char( "Line replaced.\n\r", ch );
 		return;
 	}
 
@@ -208,9 +208,9 @@ void string_add( Character *ch, char *argument )
             send_to_char( ".s               - show string so far  \n\r", ch );
             send_to_char( ".f               - (word wrap) string  \n\r", ch );
             send_to_char( ".c               - clear string so far \n\r", ch );
-            send_to_char( ".ld <num>        - borra linea numero <num>\n\r", ch );
-            send_to_char( ".li <num> <str>  - anade <str> en linea <num>\n\r", ch );
-	    send_to_char( ".lr <num> <str>  - reemplaza linea <num> por <str>\n\r", ch );
+            send_to_char( ".ld <num>        - remove line <num>\n\r", ch );
+            send_to_char( ".li <num> <str>  - insert <str> to line number <num>\n\r", ch );
+	        send_to_char( ".lr <num> <str>  - replace line <num> with <str>\n\r", ch );
             send_to_char( "@                - end string          \n\r", ch );
             return;
         }

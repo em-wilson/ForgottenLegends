@@ -628,7 +628,7 @@ AEDIT( aedit_show )
     send_to_char( buf, ch );
 
     sprintf( buf, "Credits : [%s]\n\r", pArea->credits );
-    send_to_char( buf, ch );
+    send_to_char_bw( buf, ch );
 
     sprintf( buf, "Flags:    [%s]\n\r", flag_string( area_flags, pArea->area_flags ) );
     send_to_char( buf, ch );

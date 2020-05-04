@@ -66,26 +66,25 @@ char *olc_ed_name( Character *ch )
     static char buf[10];
     
     buf[0] = '\0';
-    switch (ch->desc->editor)
-    {
-    case ED_AREA:
-	sprintf( buf, "AEdit" );
-	break;
-    case ED_ROOM:
-	sprintf( buf, "REdit" );
-	break;
-    case ED_OBJECT:
-	sprintf( buf, "OEdit" );
-	break;
-    case ED_MOBILE:
-	sprintf( buf, "MEdit" );
-	break;
-    case ED_MPCODE:
-    	sprintf( buf, "MPEdit" );
-	break;
-    default:
-	sprintf( buf, " " );
-	break;
+    switch (ch->desc->editor) {
+        case ED_AREA:
+            sprintf(buf, "AEdit");
+            break;
+        case ED_ROOM:
+            sprintf(buf, "REdit");
+            break;
+        case ED_OBJECT:
+            sprintf(buf, "OEdit");
+            break;
+        case ED_MOBILE:
+            sprintf(buf, "MEdit");
+            break;
+        case ED_MPCODE:
+            sprintf(buf, "MPEdit");
+            break;
+        default:
+            sprintf(buf, " ");
+            break;
     }
     return buf;
 }
@@ -796,7 +795,7 @@ void do_redit( Character *ch, char *argument )
 
     if ( !IS_BUILDER(ch, pRoom->area) )
     {
-    	send_to_char( "REdit : Insuficiente seguridad para editar cuartos.\n\r", ch );
+    	send_to_char( "REdit : Insufficient security to edit room.\n\r", ch );
     	return;
     }
 
