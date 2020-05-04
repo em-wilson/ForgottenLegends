@@ -423,12 +423,12 @@ int PlayerCharacter::hit_gain( )
 
         int gain = UMAX(3,get_curr_stat(this,STAT_CON) - 3 + this->level/2);
         gain += class_table[this->class_num].hp_max - 10;
-        int number = number_percent();
-        if (number < get_skill(this,gsn_fast_healing))
-        {
+        if (this->hit < this->max_hit) {
+            int number = number_percent();
+            if (number < get_skill(this, gsn_fast_healing)) {
                 gain += number * gain / 100;
-                if (this->hit < this->max_hit)
-                        check_improve(this,gsn_fast_healing,TRUE,8);
+            }
+            check_improve(this, gsn_fast_healing, TRUE, 8);
         }
 
         switch ( this->position )
@@ -472,19 +472,19 @@ int PlayerCharacter::hit_gain( )
 int PlayerCharacter::mana_gain( )
 {
         int gain;
-        int number;
 
         if (this->in_room == NULL)
                 return 0;
 
         gain = (get_curr_stat(this,STAT_WIS)
                 + get_curr_stat(this,STAT_INT) + this->level) / 2;
-        number = number_percent();
-        if (number < get_skill(this,gsn_meditation))
-        {
+        if (this->mana < this->max_mana) {
+            int number = number_percent();
+            if (number < get_skill(this,gsn_meditation))
+            {
                 gain += number * gain / 100;
-                if (this->mana < this->max_mana)
-                        check_improve(this,gsn_meditation,TRUE,8);
+            }
+            check_improve(this,gsn_meditation,TRUE,8);
         }
         if (!class_table[this->class_num].fMana)
                 gain /= 2;
