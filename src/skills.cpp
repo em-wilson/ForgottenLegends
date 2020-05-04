@@ -909,6 +909,7 @@ void check_improve( Character *ch, int sn, bool success, int multiplier ) {
             send_to_char(buf, ch);
             ch->pcdata->learned[sn]++;
             ch->gain_exp(2 + skill_rating(ch, sn));
+            ch->gain_exp(number_range(25, 40) * skill_rating(ch, sn));
         }
     } else {
         chance = URANGE(5, ch->pcdata->learned[sn] / 2, 30);
@@ -919,7 +920,7 @@ void check_improve( Character *ch, int sn, bool success, int multiplier ) {
             send_to_char(buf, ch);
             ch->pcdata->learned[sn] += number_range(1, 3);
             ch->pcdata->learned[sn] = UMIN(ch->pcdata->learned[sn], 100);
-            ch->gain_exp(2 + skill_rating(ch, sn));
+            ch->gain_exp(number_range(15, 30) * skill_rating(ch, sn));
         }
     }
 

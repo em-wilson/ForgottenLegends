@@ -2,7 +2,7 @@
 Name the Abyss~
 Builders None~
 VNUMs 25000 25099
-Credits {30 50} Anon    The Abyss~
+Credits {30 50} Anon     The Abyss~
 Security 9
 Flags AC 
 End
@@ -1702,7 +1702,8 @@ D1
 D3
 ~
 door ruined
-~
+
+~
 1 25050 25034
 S
 #25034
@@ -2022,7 +2023,8 @@ through which you can see a path along a vast mountain range.
 D0
 ~
 door
-~
+
+~
 2 25056 25050
 S
 #25052
@@ -2094,8 +2096,10 @@ D1
 D3
 ~
 double door
-doors
-~
+
+doors
+
+~
 1 25053 25054
 S
 #25056
@@ -2325,7 +2329,8 @@ The altar seems to glow with a sort of inner light....
 D0
 ~
 door ajar
-~
+
+~
 1 -1 25082
 D1
 ~
@@ -2338,7 +2343,8 @@ D2
 D3
 ~
 door
-~
+
+~
 1 -1 25080
 D5
 ~

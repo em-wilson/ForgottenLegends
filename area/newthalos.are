@@ -2,7 +2,7 @@
 Name New Thalos~
 Builders None~
 VNUMs 9500 9799
-Credits {10 35} Conner  New Thalos~
+Credits {10 35} Conner   New Thalos~
 Security 9
 End
 
@@ -5875,7 +5875,8 @@ D2
 ~
 secret door
 
-~
+
+~
 1 -1 9688
 S
 #9690
@@ -6087,7 +6088,8 @@ D0
 ~
 cell
 
-cell~
+
+cell~
 2 9593 9694
 S
 #9704
@@ -6099,7 +6101,8 @@ D0
 ~
 cell
 
-cell~
+
+cell~
 2 9593 9695
 S
 #9705

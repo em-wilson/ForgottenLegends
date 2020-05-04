@@ -1367,71 +1367,66 @@ void spell_charm_person( int sn, int level, Character *ch, void *vo,int target )
 
 
 
-void spell_chill_touch( int sn, int level, Character *ch, void *vo,int target )
-{
+void spell_chill_touch( int sn, int level, Character *ch, void *vo,int target ) {
     Character *victim = (Character *) vo;
-    static const sh_int dam_each[] = 
-    {
-	 0,
-	 0,  0,  6,  7,  8,	 9, 12, 13, 13, 13,
-	14, 14, 14, 15, 15,	15, 16, 16, 16, 17,
-	17, 17, 18, 18, 18,	19, 19, 19, 20, 20,
-	20, 21, 21, 21, 22,	22, 22, 23, 23, 23,
-	24, 24, 24, 25, 25,	25, 26, 26, 26, 27
-    };
+    static const sh_int dam_each[] =
+            {
+                    0,
+                    0, 0, 6, 7, 8, 9, 12, 13, 13, 13,
+                    14, 14, 14, 15, 15, 15, 16, 16, 16, 17,
+                    17, 17, 18, 18, 18, 19, 19, 19, 20, 20,
+                    20, 21, 21, 21, 22, 22, 22, 23, 23, 23,
+                    24, 24, 24, 25, 25, 25, 26, 26, 26, 27
+            };
     AFFECT_DATA af;
     int dam;
 
-    level	= UMIN((unsigned)level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
-    level	= UMAX(0, level);
-    dam		= number_range( dam_each[level] / 2, dam_each[level] * 2 );
-    if ( !saves_spell( level, victim,DAM_COLD ) )
-    {
-	act("$n turns blue and shivers.",victim,NULL,NULL,TO_ROOM);
-	af.where     = TO_AFFECTS;
-	af.type      = sn;
-        af.level     = level;
-	af.duration  = 6;
-	af.location  = APPLY_STR;
-	af.modifier  = -1;
-	af.bitvector = 0;
-	affect_join( victim, &af );
-    }
-    else
-    {
-	dam /= 2;
+    level = UMIN((unsigned) level, sizeof(dam_each) / sizeof(dam_each[0]) - 1);
+    level = UMAX(0, level);
+    dam = number_range(dam_each[level] / 2, dam_each[level] * 2);
+    if (level > (ch->level / 4) && !saves_spell(level, victim, DAM_COLD)) {
+        act("$n turns blue and shivers.", victim, NULL, NULL, TO_ROOM);
+        af.where = TO_AFFECTS;
+        af.type = sn;
+        af.level = level;
+        af.duration = 6;
+        af.location = APPLY_STR;
+        af.modifier = -1;
+        af.bitvector = 0;
+        affect_join(victim, &af);
+    } else {
+        dam /= 2;
     }
 
-    damage_old( ch, victim, dam, sn, DAM_COLD,TRUE );
+    damage_old(ch, victim, dam, sn, DAM_COLD, TRUE);
     return;
 }
 
 
 
-void spell_colour_spray( int sn, int level, Character *ch, void *vo,int target )
-{
+void spell_colour_spray( int sn, int level, Character *ch, void *vo,int target ) {
     Character *victim = (Character *) vo;
-    static const sh_int dam_each[] = 
-    {
-	 0,
-	 0,  0,  0,  0,  0,	 0,  0,  0,  0,  0,
-	30, 35, 40, 45, 50,	55, 55, 55, 56, 57,
-	58, 58, 59, 60, 61,	61, 62, 63, 64, 64,
-	65, 66, 67, 67, 68,	69, 70, 70, 71, 72,
-	73, 73, 74, 75, 76,	76, 77, 78, 79, 79
-    };
+    static const sh_int dam_each[] =
+            {
+                    0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    30, 35, 40, 45, 50, 55, 55, 55, 56, 57,
+                    58, 58, 59, 60, 61, 61, 62, 63, 64, 64,
+                    65, 66, 67, 67, 68, 69, 70, 70, 71, 72,
+                    73, 73, 74, 75, 76, 76, 77, 78, 79, 79
+            };
     int dam;
 
-    level	= UMIN((unsigned)level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
-    level	= UMAX(0, level);
-    dam		= number_range( dam_each[level] / 2,  dam_each[level] * 2 );
-    if ( saves_spell( level, victim,DAM_LIGHT) )
-	dam /= 2;
-    else 
-	spell_blindness(skill_lookup("blindness"),
-	    level/2,ch,(void *) victim,TARGET_CHAR);
+    level = UMIN((unsigned) level, sizeof(dam_each) / sizeof(dam_each[0]) - 1);
+    level = UMAX(0, level);
+    dam = number_range(dam_each[level] / 2, dam_each[level] * 2);
+    if (saves_spell(level, victim, DAM_LIGHT))
+        dam /= 2;
+    else
+        spell_blindness(skill_lookup("blindness"),
+                        level / 2, ch, (void *) victim, TARGET_CHAR);
 
-    damage_old( ch, victim, dam, sn, DAM_LIGHT,TRUE );
+    damage_old(ch, victim, dam, sn, DAM_LIGHT, TRUE);
     return;
 }
 
@@ -3661,7 +3656,7 @@ void spell_locate_object( int sn, int level, Character *ch, void *vo,int target)
 void spell_magic_missile( int sn, int level, Character *ch,void *vo,int target)
 {
     Character *victim = (Character *) vo;
-    static const sh_int dam_each[] = 
+    static const sh_int dam_each[] =
     {
 	 0,
 	 3,  3,  4,  4,  5,	 6,  6,  6,  6,  6,
