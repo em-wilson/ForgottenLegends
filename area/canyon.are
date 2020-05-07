@@ -265,7 +265,7 @@ EFNU 0 0 0
 stand stand none 50
 AHMV ABCDEFGHIJK medium unknown
 #9220
-oldstyle lava elemental~
+oldstyle lava beast elemental~
 a lava beast~
 A lava beast spews from place to place.
 ~
@@ -321,7 +321,7 @@ EFNU 0 0 0
 stand stand none 0
 AHMV ABCDEFGHIJK medium unknown
 #9224
-oldstyle dust elemental~
+oldstyle dust cloud elemental~
 a dust cloud~
 A dust cloud blowing by makes you sneeze.
 ~
@@ -335,7 +335,7 @@ BEFJNU 0 0 0
 stand stand none 5
 AHMV ABCDEFGHIJK medium unknown
 #9225
-oldstyle eddie elemental~
+oldstyle eddie current elemental~
 an eddie~
 A small eddie current swirls junk around here.
 ~

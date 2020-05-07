@@ -6027,9 +6027,7 @@ S
 #3047
 Wall Road~
 You are standing on the road next to the western city wall which
-continues north.  South of here is a bridge across the river.  To the east,
-you see an odd looking building painted bright orange with purple trim...
-it must be the Mob Factory!
+continues north.  South of here is a bridge across the river.
 ~
 0 262144 1
 E
@@ -6042,11 +6040,6 @@ You see the road.
 ~
 ~
 0 -1 3043
-D1
-You see the purple-and-orange Mob Factory.  Someone has no taste.
-~
-~
-0 -1 9400
 D2
 You see the bridge.
 ~
