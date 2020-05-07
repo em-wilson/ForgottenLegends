@@ -139,20 +139,6 @@ If you want to know what is up there, you shall have to go look...
 ~
 0 -1 1
 S
-#1204
-Priscilla's Pleasure Palace ~
-As you look around you, you see the largest collection of erotic toys
-in the world!!!  On a table in the middle of the room lies a book titled :
-"All You Ever Wanted to Know About Sex..But Were Afraid to Ask"
-There are things here that you never even imagined in your wildest dreams!
-~
-0 33288 0
-D0
-Valhalla is to the north.
-~
-door~
-1 -1 1218
-S
 #1205
 The Eye of the Hurricane~
 The shrieking winds of a monstrous storm surround you, spinning you around
@@ -603,11 +589,6 @@ Valhalla continues east.
 ~
 ~
 0 -1 1219
-D2
-Priscilla's Pleasure Palace is south of here.
-~
-door~
-1 -1 1204
 D3
 Valhalla continues west.
 ~
@@ -706,7 +687,6 @@ S
 #RESETS
 D 0 1203 0 1
 D 0 1203 2 1
-D 0 1204 0 1
 D 0 1207 2 1
 D 0 1208 0 1
 D 0 1209 2 1
@@ -715,7 +695,6 @@ D 0 1211 2 1
 D 0 1217 0 1
 D 0 1217 2 1
 D 0 1218 0 1
-D 0 1218 2 1
 M 0 1200 1 1221 1
 S
 

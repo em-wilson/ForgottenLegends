@@ -351,41 +351,23 @@ void info_update( void ) {
  */
 void char_update( void )
 {
-	Character *ch;
-	Character *ch_quit;
-
-	ch_quit	= NULL;
-
-	/* update save counter */
-	save_number++;
-
-	if (save_number > 29)
-		save_number = 0;
+    std::vector <Character *> quitters;
 
 	for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
 	{
-		ch = *it;
-		if ( ch->timer > 30 )
-			ch_quit = ch;
-		ch->update();
+		Character *ch = *it;
+		if ( ch->timer > 30 ) {
+		    quitters.push_back(ch);
+		}
+        if (ch->desc != NULL) {
+            save_char_obj(ch);
+        }
+        ch->update();
 	}
 
-	/*
-     * Autosave and autoquit.
-     * Check that these chars still exist.
-     */
-	for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
-	{
-		ch = *it;
-
-		if (ch->desc != NULL && ch->desc->descriptor % 30 == save_number)
-			save_char_obj(ch);
-
-		if ( ch == ch_quit )
-			do_quit( ch, (char*)"" );
+	for (auto it = quitters.begin(); it != quitters.end(); ++it) {
+	    do_quit(*it, (char *)"");
 	}
-
-	return;
 }
 
 

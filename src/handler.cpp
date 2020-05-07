@@ -1951,7 +1951,6 @@ void extract_char( Character *ch, bool fPull )
         ch->desc->character = NULL;
     }
     delete ch;
-    ch = NULL;
     return;
 }
 

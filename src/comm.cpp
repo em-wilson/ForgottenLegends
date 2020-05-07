@@ -329,7 +329,7 @@ void game_loop_unix( int control )
 
 				/* OLC */
 				if ( d->showstr_point ) {
-				    show_string( d, d->incomm );
+				    show_string( d, d->incomm ) ;
 				} else if ( d->pString ) {
 				    string_add( d->character, d->incomm );
 				} else {
@@ -563,9 +563,11 @@ void close_socket( DESCRIPTOR_DATA *dclose )
 	else
 	{
 	    if ( dclose->original ) {
+	        char_list.remove(dclose->original);
 	    	delete dclose->original;
 	    	dclose->original = NULL;
 	    } else {
+	        char_list.remove(dclose->character);
 			delete dclose->character;
 			dclose->character = NULL;
 	    }
@@ -1301,6 +1303,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	    write_to_buffer(d,"Reconnect attempt failed.\n\rName: ",0);
             if ( d->character != NULL )
             {
+                char_list.remove(d->character);
                 delete d->character;
                 d->character = NULL;
             }

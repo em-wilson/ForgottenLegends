@@ -136,6 +136,8 @@ Character::~Character()
         this->desc = NULL;
     }
 
+    char_list.remove(this);
+
     INVALIDATE(this);
 }
 
@@ -217,6 +219,17 @@ void Character::advance_level( bool hide )
     this->pcdata->perm_hit    += add_hp;
     this->pcdata->perm_mana   += add_mana;
     this->pcdata->perm_move   += add_move;
+
+    for (int sn = 0; sn < MAX_SKILL; sn++) {
+        if (skill_table[sn].name == NULL)
+            break;
+
+        if (this->pcdata->learned[sn] > 0
+            && this->pcdata->learned[sn] < 100
+            && this->pcdata->sk_level[sn] < this->level ) {
+            this->pcdata->learned[sn]++;
+        }
+    }
 
     if (this->level == 10 && (this->race == race_lookup("draconian")))
     {

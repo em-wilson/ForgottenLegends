@@ -1362,38 +1362,34 @@ void do_qui( Character *ch, char *argument )
 
 
 
-void do_quit( Character *caller, char *argument )
-{
-    DESCRIPTOR_DATA *d,*d_next;
+void do_quit( Character *caller, char *argument ) {
+    DESCRIPTOR_DATA *d, *d_next;
     int id;
 
-    if ( caller->isNPC() )
-	return;
-
-    PlayerCharacter *ch = (PlayerCharacter*)caller;
-
-    if ( ch->position == POS_FIGHTING )
-    {
-	send_to_char( "No way! You are fighting.\n\r", ch );
-	return;
+    if (caller->isNPC()) {
+        return;
     }
 
-    if ( ch->getAdrenaline() > 0 )
-    {
-	send_to_char("You are too excited from the chase.\n\r", ch );
-	return;
+    PlayerCharacter *ch = (PlayerCharacter *) caller;
+
+    if (ch->position == POS_FIGHTING) {
+        send_to_char("No way! You are fighting.\n\r", ch);
+        return;
     }
 
-    if ( ch->position  < POS_STUNNED  )
-    {
-	send_to_char( "You're not DEAD yet.\n\r", ch );
-	return;
+    if (ch->getAdrenaline() > 0) {
+        send_to_char("You are too excited from the chase.\n\r", ch);
+        return;
     }
 
-    if (IS_CLANNED(ch))
-    {
-	ch->pcdata->clan->played += current_time - ch->logon;
-	save_clan(ch->pcdata->clan);
+    if (ch->position < POS_STUNNED) {
+        send_to_char("You're not DEAD yet.\n\r", ch);
+        return;
+    }
+
+    if (IS_CLANNED(ch)) {
+        ch->pcdata->clan->played += current_time - ch->logon;
+        save_clan(ch->pcdata->clan);
     }
 
 /*
@@ -1405,41 +1401,41 @@ And there {Rw{ra{Rs{x {CIndustrial {WLight{x and {MMagic{x\n\r"
 -OLD!  Taken out march 30
 */
 
-    send_to_char("'Good, bad, I'm the guy with the gun.' -Ash\n\r",ch);
-    act( "$n has left the game.", ch, NULL, NULL, TO_ROOM );
-    sprintf( log_buf, "%s has quit.", ch->getName() );
-    log_string( log_buf );
-     Wiznet::instance()->report("$N rejoins the real world.",ch,NULL,WIZ_LOGINS,0,get_trust(ch));
+    send_to_char("'Good, bad, I'm the guy with the gun.' -Ash\n\r", ch);
+    act("$n has left the game.", ch, NULL, NULL, TO_ROOM);
+    sprintf(log_buf, "%s has quit.", ch->getName());
+    log_string(log_buf);
+    Wiznet::instance()->report("$N rejoins the real world.", ch, NULL, WIZ_LOGINS, 0, get_trust(ch));
 
     /*
      * After extract_char the ch is no longer valid!
      */
-    save_char_obj( ch );
+    save_char_obj(ch);
 
     /* Free note that might be there somehow */
     if (ch->pcdata->in_progress) {
-       delete ch->pcdata->in_progress;
-       ch->pcdata->in_progress = NULL;
-     }
+        delete ch->pcdata->in_progress;
+        ch->pcdata->in_progress = NULL;
+    }
 
     id = ch->id;
     d = ch->desc;
-    extract_char( ch, TRUE );
-    if ( d != NULL )
-	close_socket( d );
+    extract_char(ch, TRUE);
+    if (d != NULL) {
+        close_socket(d);
+        ch->desc = NULL;
+    }
 
     /* toast evil cheating bastards */
-    for (d = descriptor_list; d != NULL; d = d_next)
-    {
-	Character *tch;
+    for (d = descriptor_list; d != NULL; d = d_next) {
+        Character *tch;
 
-	d_next = d->next;
-	tch = d->original ? d->original : d->character;
-	if (tch && tch->id == id)
-	{
-	    extract_char(tch,TRUE);
-	    close_socket(d);
-	} 
+        d_next = d->next;
+        tch = d->original ? d->original : d->character;
+        if (tch && tch->id == id) {
+            extract_char(tch, TRUE);
+            close_socket(d);
+        }
     }
 
     return;

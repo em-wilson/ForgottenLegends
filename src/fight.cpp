@@ -59,7 +59,9 @@ void	check_assist	args( ( Character *ch, Character *victim ) );
 bool	check_dodge	args( ( Character *ch, Character *victim ) );
 void	check_killer	args( ( Character *ch, Character *victim ) );
 bool	check_parry	args( ( Character *ch, Character *victim ) );
+bool    check_second_attack args( (Character *ch, Character *victim, int dt ) );
 bool    check_shield_block     args( ( Character *ch, Character *victim ) );
+bool    check_third_attack args( (Character *ch, Character *victim, int dt ) );
 void    dam_message 	args( ( Character *ch, Character *victim, int dam,
                             int dt, bool immune ) );
 void	death_cry	args( ( Character *ch ) );
@@ -207,73 +209,82 @@ void check_assist(Character *ch,Character *victim)
 /*
  * Do one group of attacks.
  */
-void multi_hit( Character *ch, Character *victim, int dt )
-{
-    int     chance;
+void multi_hit( Character *ch, Character *victim, int dt ) {
+    int chance;
 
     /* decrement the wait */
     if (ch->desc == NULL)
-	ch->wait = UMAX(0,ch->wait - PULSE_VIOLENCE);
+        ch->wait = UMAX(0, ch->wait - PULSE_VIOLENCE);
 
     if (ch->desc == NULL)
-	ch->daze = UMAX(0,ch->daze - PULSE_VIOLENCE); 
+        ch->daze = UMAX(0, ch->daze - PULSE_VIOLENCE);
 
 
     /* no attacks for stunnies -- just a check */
     if (ch->position < POS_RESTING)
-	return;
+        return;
 
-    if (IS_NPC(ch))
-    {
-	mob_hit(ch,victim,dt);
-	return;
+    if (IS_NPC(ch)) {
+        mob_hit(ch, victim, dt);
+        return;
     }
 
-    one_hit( ch, victim, dt, FALSE );
+    one_hit(ch, victim, dt, FALSE);
 
-        if ( ch->fighting != victim )
-            return;
-    
-    if (IS_AFFECTED(ch,AFF_HASTE))
-	one_hit(ch,victim,dt, FALSE);
+    if (ch->fighting != victim)
+        return;
 
-    if ( ch->fighting != victim || dt == gsn_backstab )
-	return;
+    if (IS_AFFECTED(ch, AFF_HASTE))
+        one_hit(ch, victim, dt, FALSE);
 
-    if (get_eq_char (ch, WEAR_SECONDARY))
-    {
-        one_hit( ch, victim, dt, TRUE );
-        if ( ch->fighting != victim )
+    if (ch->fighting != victim || dt == gsn_backstab)
+        return;
+
+    if (get_eq_char(ch, WEAR_SECONDARY)) {
+        one_hit(ch, victim, dt, TRUE);
+        if (ch->fighting != victim)
             return;
     }
 
-    chance = get_skill(ch,gsn_second_attack)/2;
+    if (check_second_attack(ch, victim, dt)) {
+        check_third_attack(ch, victim, dt);
+    }
+}
 
-    if (IS_AFFECTED(ch,AFF_SLOW))
-	chance /= 2;
+bool check_second_attack(Character *ch, Character *victim, int dt ) {
+    int chance = get_skill(ch, gsn_second_attack) / 2;
+    chance += 5;
 
-    if ( number_percent( ) < chance )
-    {
-	one_hit( ch, victim, dt, FALSE );
-	check_improve(ch,gsn_second_attack,TRUE,5);
-	if ( ch->fighting != victim )
-	    return;
+    if (IS_AFFECTED(ch, AFF_SLOW))
+        chance /= 2;
+
+    if (number_percent() < chance) {
+        one_hit(ch, victim, dt, FALSE);
+        check_improve(ch, gsn_second_attack, TRUE, 5);
+        if (ch->fighting == victim) {
+            // Still fighting and had a second attack? return true
+            return true;
+        }
     }
 
-    chance = get_skill(ch,gsn_third_attack)/4;
+    return false;
+}
 
-    if (IS_AFFECTED(ch,AFF_SLOW))
-	chance = 0;;
+bool check_third_attack(Character *ch, Character *victim, int dt ) {
+    int chance = get_skill(ch, gsn_third_attack) / 4;
+    chance += 5;
 
-    if ( number_percent( ) < chance )
-    {
-	one_hit( ch, victim, dt, FALSE );
-	check_improve(ch,gsn_third_attack,TRUE,6);
-	if ( ch->fighting != victim )
-	    return;
+    if (IS_AFFECTED(ch, AFF_SLOW))
+        chance = 0;
+
+    if (number_percent() < chance) {
+        one_hit(ch, victim, dt, FALSE);
+        check_improve(ch, gsn_third_attack, TRUE, 6);
+        if (ch->fighting == victim)
+            return true;
     }
 
-    return;
+    return false;
 }
 
 /* procedure for all mobile attacks */
@@ -3245,69 +3256,59 @@ void do_rescue( Character *ch, char *argument )
 
 
 
-void do_kick( Character *ch, char *argument )
-{
+void do_kick( Character *ch, char *argument ) {
     Character *victim;
 
     /* Have to have the skill, unless a bunny */
-    if ( !IS_NPC(ch)
-    &&   ch->level < ch->pcdata->sk_level[gsn_kick]
-    && !IS_BUNNY(ch))
-    {
-	send_to_char(
-	    "You better leave the martial arts to fighters.\n\r", ch );
-	return;
-    }
-
-    if (IS_NPC(ch) && !IS_SET(ch->off_flags,OFF_KICK))
-	return;
-
-    if (argument[0] == '\0')
-    {
-        victim = ch->fighting;
-        if (victim == NULL)
-        {
-            send_to_char("But you aren't fighting anyone!\n\r",ch);
-            return;
-        }
-    }
-    else if ((victim = get_char_room(ch,argument)) == NULL)
-    {
-        send_to_char("They aren't here.\n\r",ch);
+    if (!IS_NPC(ch)
+        && ch->level < ch->pcdata->sk_level[gsn_kick]
+        && !IS_BUNNY(ch)) {
+        send_to_char(
+                "You better leave the martial arts to fighters.\n\r", ch);
         return;
     }
 
-    WAIT_STATE( ch, skill_table[gsn_kick].beats );
-    if ( get_skill(ch,gsn_kick) > number_percent())
-    {
-	damage(ch,victim,number_range( 1, ch->level ), gsn_kick,DAM_BASH,TRUE);
-	check_improve(ch,gsn_kick,TRUE,1);
+    if (IS_NPC(ch) && !IS_SET(ch->off_flags, OFF_KICK))
+        return;
 
-	/* Hyperkick! */
-	if (IS_BUNNY(ch))
-	{
-	    damage(ch,victim,number_range( 1, ch->level / 2 ), gsn_kick,DAM_BASH,TRUE);
-	    check_improve(ch,gsn_kick,TRUE,2);
-	    damage(ch,victim,number_range( 1, ch->level / 3 ), gsn_kick,DAM_PIERCE,TRUE);
-	    check_improve(ch,gsn_kick,TRUE,4);
-	    damage(ch,victim,number_range( 1, ch->level / 4 ), gsn_kick,DAM_SLASH,TRUE);
-	    check_improve(ch,gsn_kick,TRUE,8);
-	    damage(ch,victim,number_range( 1, ch->level / 5 ), gsn_kick,DAM_BASH,TRUE);
-	    check_improve(ch,gsn_kick,TRUE,16);
-	    damage(ch,victim,number_range( 1, ch->level / 6 ), gsn_kick,DAM_BASH,TRUE);
-	    check_improve(ch,gsn_kick,TRUE,32);
-	    damage(ch,victim,number_range( 1, ch->level / 7 ), gsn_kick,DAM_BASH,TRUE);
-	    check_improve(ch,gsn_kick,TRUE,64);
-	    damage(ch,victim,number_range( 1, ch->level / 2 ), gsn_kick,DAM_BASH,TRUE);
-	    check_improve(ch,gsn_kick,TRUE,128);
-	}
+    if (argument[0] == '\0') {
+        victim = ch->fighting;
+        if (victim == NULL) {
+            send_to_char("But you aren't fighting anyone!\n\r", ch);
+            return;
+        }
+    } else if ((victim = get_char_room(ch, argument)) == NULL) {
+        send_to_char("They aren't here.\n\r", ch);
+        return;
     }
-    else
-    {
-	damage( ch, victim, 0, gsn_kick,DAM_BASH,TRUE);
-	check_improve(ch,gsn_kick,FALSE,1);
+
+    WAIT_STATE(ch, skill_table[gsn_kick].beats);
+    if (get_skill(ch, gsn_kick) > number_percent()) {
+        damage(ch, victim, number_range(1, ch->level), gsn_kick, DAM_BASH, TRUE);
+        check_improve(ch, gsn_kick, TRUE, 1);
+
+        /* Hyperkick! */
+        if (IS_BUNNY(ch)) {
+            damage(ch, victim, number_range(1, ch->level / 2), gsn_kick, DAM_BASH, TRUE);
+            check_improve(ch, gsn_kick, TRUE, 2);
+            damage(ch, victim, number_range(1, ch->level / 3), gsn_kick, DAM_PIERCE, TRUE);
+            check_improve(ch, gsn_kick, TRUE, 4);
+            damage(ch, victim, number_range(1, ch->level / 4), gsn_kick, DAM_SLASH, TRUE);
+            check_improve(ch, gsn_kick, TRUE, 8);
+            damage(ch, victim, number_range(1, ch->level / 5), gsn_kick, DAM_BASH, TRUE);
+            check_improve(ch, gsn_kick, TRUE, 16);
+            damage(ch, victim, number_range(1, ch->level / 6), gsn_kick, DAM_BASH, TRUE);
+            check_improve(ch, gsn_kick, TRUE, 32);
+            damage(ch, victim, number_range(1, ch->level / 7), gsn_kick, DAM_BASH, TRUE);
+            check_improve(ch, gsn_kick, TRUE, 64);
+            damage(ch, victim, number_range(1, ch->level / 2), gsn_kick, DAM_BASH, TRUE);
+            check_improve(ch, gsn_kick, TRUE, 128);
+        }
+    } else {
+        damage(ch, victim, 0, gsn_kick, DAM_BASH, TRUE);
+        check_improve(ch, gsn_kick, FALSE, 1);
     }
-	check_killer(ch,victim);
+    check_killer(ch, victim);
     return;
 }
 
