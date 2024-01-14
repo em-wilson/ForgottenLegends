@@ -340,7 +340,7 @@ void info_update( void ) {
             !IS_SET(victim->comm, COMM_NOINFO) &&
             !IS_SET(victim->comm, COMM_QUIET)) {
             char buf[MAX_STRING_LENGTH];
-            sprintf(buf, "{YINFO: {C'%s{C'{x\n\r", info_text[num].c_str());
+            snprintf(buf, sizeof(buf), "{YINFO: {C'%s{C'{x\n\r", info_text[num].c_str());
             send_to_char(buf, victim);
         }
     }

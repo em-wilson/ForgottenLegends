@@ -83,7 +83,7 @@ void do_bank_balance(Character *ch, char *argument)
 	return;
     }
 
-    sprintf(buf,"Balance on this note is %d gold and %d silver.\n\r", obj->value[0], obj->value[1]);
+    snprintf(buf, sizeof(buf),"Balance on this note is %d gold and %d silver.\n\r", obj->value[0], obj->value[1]);
     send_to_char(buf,ch);
 }
 
@@ -196,7 +196,7 @@ void do_bank_withdraw( Character *ch, char *argument )
 
         ch->gold += amount;  
         obj->value[0] -= amount;
-        sprintf(buf,"You withdraw %d gold.\n\r", amount);
+        snprintf(buf, sizeof(buf),"You withdraw %d gold.\n\r", amount);
 	send_to_char(buf,ch);
         act("$n withdraws some gold.", ch, NULL, NULL, TO_ROOM );
     return;
@@ -238,9 +238,9 @@ void do_bank_deposit( Character *ch, char *argument )
 
 	/* Lets convert our silver first */
 	obj->value[1] += ch->silver;
-        sprintf( buf, "%d", obj->value[1] );
+        snprintf(buf, sizeof(buf), "%d", obj->value[1] );
         do_bank_change(ch, buf );
-	sprintf(buf,"You deposit %ld silver and %ld gold into your bank note.\n\r", ch->silver, ch->gold );
+	snprintf(buf, sizeof(buf),"You deposit %ld silver and %ld gold into your bank note.\n\r", ch->silver, ch->gold );
 	send_to_char(buf,ch);
 	obj->value[0] += ch->gold;
 	ch->gold = 0;
@@ -266,9 +266,9 @@ void do_bank_deposit( Character *ch, char *argument )
 
         ch->silver -= amount;  
         obj->value[1] += amount;
-	sprintf(buf,"You deposit %d silver.\n\r", amount);
+	snprintf(buf, sizeof(buf),"You deposit %d silver.\n\r", amount);
 	send_to_char(buf,ch);
-	sprintf( buf, "%d", obj->value[1] );
+	snprintf(buf, sizeof(buf), "%d", obj->value[1] );
         do_bank_change(ch, buf );
         act("$n deposits some silver.", ch, NULL, NULL, TO_ROOM);
     return;
@@ -291,7 +291,7 @@ void do_bank_deposit( Character *ch, char *argument )
 
         ch->gold -= amount;  
         obj->value[0] += amount;
-	sprintf(buf, "You deposit %d gold.\n\r", amount);
+	snprintf(buf, sizeof(buf), "You deposit %d gold.\n\r", amount);
 	send_to_char(buf,ch);
         act("$n deposits some gold.", ch, NULL, NULL, TO_ROOM );
     return;

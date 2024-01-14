@@ -1,5 +1,8 @@
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 3.5)
 project(ForgottenLegends)
+
+# Add include path for cmake modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 set(LIB_LIST cryptlib.lib
             cryptlibd.lib)
@@ -87,5 +90,15 @@ include_directories(src)
 add_library(librom STATIC ${SOURCE_FILES})
 add_executable(ForgottenLegends src/main.cpp)
 target_link_libraries(ForgottenLegends librom)
+
+Include(FetchContent)
+
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG        v3.4.0 # or a later release
+)
+
+FetchContent_MakeAvailable(Catch2)
 add_executable(ForgottenLegendsTest ${TEST_FILES})
-target_link_libraries(ForgottenLegendsTest librom)
+target_link_libraries(ForgottenLegendsTest PRIVATE Catch2::Catch2WithMain librom)

@@ -198,8 +198,8 @@ void say_spell( Character *ch, int sn )
 	    length = 1;
     }
 
-    sprintf( buf2, "$n utters the words, '%s'.", buf );
-    sprintf( buf,  "$n utters the words, '%s'.", skill_table[sn].name );
+    snprintf(buf2, sizeof(buf2), "$n utters the words, '%s'.", buf );
+    snprintf(buf, sizeof(buf),  "$n utters the words, '%s'.", skill_table[sn].name );
 
     for ( rch = ch->in_room->people; rch; rch = rch->next_in_room )
     {
@@ -1505,7 +1505,7 @@ void spell_create_water( int sn, int level, bool succesful_cast, Character *ch, 
 	{
 	    char buf[MAX_STRING_LENGTH];
 
-	    sprintf( buf, "%s water", obj->name );
+	    snprintf(buf, sizeof(buf), "%s water", obj->name );
 	    free_string( obj->name );
 	    obj->name = str_dup( buf );
 	}
@@ -3186,7 +3186,7 @@ void spell_identify( int sn, int level, bool succesful_cast, Character *ch, void
     char buf[MAX_STRING_LENGTH];
     AFFECT_DATA *paf;
 
-    sprintf( buf,
+    snprintf(buf, sizeof(buf),
 	"Object '%s' is type %s, extra flags %s.\n\rWeight is %d, value is %d, level is %d.\n\r",
 
 	obj->name,
@@ -3203,7 +3203,7 @@ void spell_identify( int sn, int level, bool succesful_cast, Character *ch, void
     case ITEM_SCROLL: 
     case ITEM_POTION:
     case ITEM_PILL:
-	sprintf( buf, "Level %d spells of:", obj->value[0] );
+	snprintf(buf, sizeof(buf), "Level %d spells of:", obj->value[0] );
 	send_to_char( buf, ch );
 
 	if ( obj->value[1] >= 0 && obj->value[1] < MAX_SKILL )
@@ -3239,7 +3239,7 @@ void spell_identify( int sn, int level, bool succesful_cast, Character *ch, void
 
     case ITEM_WAND: 
     case ITEM_STAFF: 
-	sprintf( buf, "Has %d charges of level %d",
+	snprintf(buf, sizeof(buf), "Has %d charges of level %d",
 	    obj->value[2], obj->value[0] );
 	send_to_char( buf, ch );
       
@@ -3254,31 +3254,31 @@ void spell_identify( int sn, int level, bool succesful_cast, Character *ch, void
 	break;
 
     case ITEM_DRINK_CON:
-        sprintf(buf,"It holds %s-colored %s.\n\r",
+        snprintf(buf, sizeof(buf),"It holds %s-colored %s.\n\r",
             liq_table[obj->value[2]].liq_color,
             liq_table[obj->value[2]].liq_name);
         send_to_char(buf,ch);
         break;
 
     case ITEM_CONTAINER:
-	sprintf(buf,"Capacity: %d#  Maximum weight: %d#  flags: %s\n\r",
+	snprintf(buf, sizeof(buf),"Capacity: %d#  Maximum weight: %d#  flags: %s\n\r",
 	    obj->value[0], obj->value[3], cont_bit_name(obj->value[1]));
 	send_to_char(buf,ch);
 	if (obj->value[4] != 100)
 	{
-	    sprintf(buf,"Weight multiplier: %d%%\n\r",
+	    snprintf(buf, sizeof(buf),"Weight multiplier: %d%%\n\r",
 		obj->value[4]);
 	    send_to_char(buf,ch);
 	}
 	break;
 		
     case ITEM_BOW:
-	sprintf(buf, "Weapon range is %d.\n\r", obj->value[0]);
+	snprintf(buf, sizeof(buf), "Weapon range is %d.\n\r", obj->value[0]);
 	send_to_char(buf,ch);
 	break;
 
     case ITEM_ARROW:
-	sprintf(buf, "Arrows remaining: %d.\n\r", obj->value[0]);
+	snprintf(buf, sizeof(buf), "Arrows remaining: %d.\n\r", obj->value[0]);
 	send_to_char(buf,ch);
 	break;
 
@@ -3298,23 +3298,23 @@ void spell_identify( int sn, int level, bool succesful_cast, Character *ch, void
 	    default		: send_to_char("unknown.\n\r",ch);	break;
  	}
 	if (obj->pIndexData->new_format)
-	    sprintf(buf,"Damage is %dd%d (average %d).\n\r",
+	    snprintf(buf, sizeof(buf),"Damage is %dd%d (average %d).\n\r",
 		obj->value[1],obj->value[2],
 		(1 + obj->value[2]) * obj->value[1] / 2);
 	else
-	    sprintf( buf, "Damage is %d to %d (average %d).\n\r",
+	    snprintf(buf, sizeof(buf), "Damage is %d to %d (average %d).\n\r",
 	    	obj->value[1], obj->value[2],
 	    	( obj->value[1] + obj->value[2] ) / 2 );
 	send_to_char( buf, ch );
         if (obj->value[4])  /* weapon flags */
         {
-            sprintf(buf,"Weapons flags: %s\n\r",weapon_bit_name(obj->value[4]));
+            snprintf(buf, sizeof(buf),"Weapons flags: %s\n\r",weapon_bit_name(obj->value[4]));
             send_to_char(buf,ch);
         }
 	break;
 
     case ITEM_ARMOR:
-	sprintf( buf, 
+	snprintf(buf, sizeof(buf), 
 	"Armor class is %d pierce, %d bash, %d slash, and %d vs. magic.\n\r", 
 	    obj->value[0], obj->value[1], obj->value[2], obj->value[3] );
 	send_to_char( buf, ch );
@@ -3326,7 +3326,7 @@ void spell_identify( int sn, int level, bool succesful_cast, Character *ch, void
     {
 	if ( paf->location != APPLY_NONE && paf->modifier != 0 )
 	{
-	    sprintf( buf, "Affects %s by %d.\n\r",
+	    snprintf(buf, sizeof(buf), "Affects %s by %d.\n\r",
 		affect_loc_name( paf->location ), paf->modifier );
 	    send_to_char(buf,ch);
             if (paf->bitvector)
@@ -3334,27 +3334,27 @@ void spell_identify( int sn, int level, bool succesful_cast, Character *ch, void
                 switch(paf->where)
                 {
                     case TO_AFFECTS:
-                        sprintf(buf,"Adds %s affect.\n",
+                        snprintf(buf, sizeof(buf),"Adds %s affect.\n",
                             affect_bit_name(paf->bitvector));
                         break;
                     case TO_OBJECT:
-                        sprintf(buf,"Adds %s object flag.\n",
+                        snprintf(buf, sizeof(buf),"Adds %s object flag.\n",
                             extra_bit_name(paf->bitvector));
                         break;
                     case TO_IMMUNE:
-                        sprintf(buf,"Adds immunity to %s.\n",
+                        snprintf(buf, sizeof(buf),"Adds immunity to %s.\n",
                             imm_bit_name(paf->bitvector));
                         break;
                     case TO_RESIST:
-                        sprintf(buf,"Adds resistance to %s.\n\r",
+                        snprintf(buf, sizeof(buf),"Adds resistance to %s.\n\r",
                             imm_bit_name(paf->bitvector));
                         break;
                     case TO_VULN:
-                        sprintf(buf,"Adds vulnerability to %s.\n\r",
+                        snprintf(buf, sizeof(buf),"Adds vulnerability to %s.\n\r",
                             imm_bit_name(paf->bitvector));
                         break;
                     default:
-                        sprintf(buf,"Unknown bit %d: %d\n\r",
+                        snprintf(buf, sizeof(buf),"Unknown bit %d: %d\n\r",
                             paf->where,paf->bitvector);
                         break;
                 }
@@ -3367,44 +3367,44 @@ void spell_identify( int sn, int level, bool succesful_cast, Character *ch, void
     {
 	if ( paf->location != APPLY_NONE && paf->modifier != 0 )
 	{
-	    sprintf( buf, "Affects %s by %d",
+	    snprintf(buf, sizeof(buf), "Affects %s by %d",
 	    	affect_loc_name( paf->location ), paf->modifier );
 	    send_to_char( buf, ch );
             if ( paf->duration > -1)
-                sprintf(buf,", %d hours.\n\r",paf->duration);
+                snprintf(buf, sizeof(buf),", %d hours.\n\r",paf->duration);
             else
-                sprintf(buf,".\n\r");
+                snprintf(buf, sizeof(buf),".\n\r");
 	    send_to_char(buf,ch);
             if (paf->bitvector)
             {
                 switch(paf->where)
                 {
                     case TO_AFFECTS:
-                        sprintf(buf,"Adds %s affect.\n",
+                        snprintf(buf, sizeof(buf),"Adds %s affect.\n",
                             affect_bit_name(paf->bitvector));
                         break;
                     case TO_OBJECT:
-                        sprintf(buf,"Adds %s object flag.\n",
+                        snprintf(buf, sizeof(buf),"Adds %s object flag.\n",
                             extra_bit_name(paf->bitvector));
                         break;
 		    case TO_WEAPON:
-			sprintf(buf,"Adds %s weapon flags.\n",
+			snprintf(buf, sizeof(buf),"Adds %s weapon flags.\n",
 			    weapon_bit_name(paf->bitvector));
 			break;
                     case TO_IMMUNE:
-                        sprintf(buf,"Adds immunity to %s.\n",
+                        snprintf(buf, sizeof(buf),"Adds immunity to %s.\n",
                             imm_bit_name(paf->bitvector));
                         break;
                     case TO_RESIST:
-                        sprintf(buf,"Adds resistance to %s.\n\r",
+                        snprintf(buf, sizeof(buf),"Adds resistance to %s.\n\r",
                             imm_bit_name(paf->bitvector));
                         break;
                     case TO_VULN:
-                        sprintf(buf,"Adds vulnerability to %s.\n\r",
+                        snprintf(buf, sizeof(buf),"Adds vulnerability to %s.\n\r",
                             imm_bit_name(paf->bitvector));
                         break;
                     default:
-                        sprintf(buf,"Unknown bit %d: %d\n\r",
+                        snprintf(buf, sizeof(buf),"Unknown bit %d: %d\n\r",
                             paf->where,paf->bitvector);
                         break;
                 }
@@ -3576,16 +3576,16 @@ void spell_locate_object( int sn, int level, bool succesful_cast, Character *ch,
 
 	if ( in_obj->carried_by != NULL && can_see(ch,in_obj->carried_by))
 	{
-	    sprintf( buf, "one is carried by %s\n\r",
+	    snprintf(buf, sizeof(buf), "one is carried by %s\n\r",
 		PERS(in_obj->carried_by, ch) );
 	}
 	else
 	{
 	    if (IS_IMMORTAL(ch) && in_obj->in_room != NULL)
-		sprintf( buf, "one is in %s [Room %d]\n\r",
+		snprintf(buf, sizeof(buf), "one is in %s [Room %d]\n\r",
 		    in_obj->in_room->name, in_obj->in_room->vnum);
 	    else 
-	    	sprintf( buf, "one is in %s\n\r",
+	    	snprintf(buf, sizeof(buf), "one is in %s\n\r",
 		    in_obj->in_room == NULL
 		    	? "somewhere" : in_obj->in_room->name );
 	}
@@ -4355,11 +4355,11 @@ void spell_ventriloquate( int sn, int level, bool succesful_cast, Character *ch,
     target_name = one_argument( target_name, speaker );
 
     if ( succesful_cast ) {
-        sprintf( buf1, "%s says '%s'.\n\r",              speaker, target_name );
-        sprintf( buf2, "Someone makes %s say '%s'.\n\r", speaker, target_name );
+        snprintf(buf1, sizeof(buf1), "%s says '%s'.\n\r",              speaker, target_name );
+        snprintf(buf2, sizeof(buf2), "Someone makes %s say '%s'.\n\r", speaker, target_name );
     } else {
-        sprintf( buf1, "Someone tries to make %s say '%s'.\n\r", speaker, target_name );
-        sprintf( buf2, "Someone tries to make %s say '%s'.\n\r", speaker, target_name );
+        snprintf(buf1, sizeof(buf1), "Someone tries to make %s say '%s'.\n\r", speaker, target_name );
+        snprintf(buf2, sizeof(buf2), "Someone tries to make %s say '%s'.\n\r", speaker, target_name );
     }
     buf1[0] = UPPER(buf1[0]);
 

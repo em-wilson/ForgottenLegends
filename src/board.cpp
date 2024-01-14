@@ -132,7 +132,7 @@ void finish_note (BOARD_DATA *board, Note *note)
 
 	/* append note to note file */		
 	
-	sprintf (filename, "%s%s%s", DATA_DIR, NOTE_DIR, board->short_name);
+	snprintf(filename, sizeof(filename), "%s%s%s", DATA_DIR, NOTE_DIR, board->short_name);
 	
 	fp = fopen (filename, "a");
 	if (!fp)
@@ -212,12 +212,12 @@ static void save_board (BOARD_DATA *board)
 	char buf[200];
 	Note *note;
 	
-	sprintf (filename, "%s%s%s", DATA_DIR, NOTE_DIR, board->short_name);
+	snprintf(filename, sizeof(filename), "%s%s%s", DATA_DIR, NOTE_DIR, board->short_name);
 	
 	fp = fopen (filename, "w");
 	if (!fp)
 	{
-		sprintf (buf, "Error writing to: %s", filename);
+		snprintf(buf, sizeof(buf), "Error writing to: %s", filename);
 		bug (buf, 0);
 	}
 	else
@@ -237,7 +237,7 @@ static void show_note_to_char (Character *ch, Note *note, int num)
 
 	output = new_buf();
 	/* Ugly colors ? */	
-	sprintf (buf,
+	snprintf(buf, sizeof(buf),
 			 "[" BOLD "%4d" NO_COLOR "] " BOLD YELLOW "%s" NO_COLOR ": " GREEN "%s" NO_COLOR "\n\r"
 	         BOLD YELLOW "Date" NO_COLOR ":  %s\n\r"
 			 BOLD YELLOW "To" NO_COLOR ":    %s\n\r"
@@ -269,7 +269,7 @@ static void load_board (BOARD_DATA *board)
 	Note *last_note;
 	char filename[200];
 	
-	sprintf (filename, "%s%s%s", DATA_DIR, NOTE_DIR, board->short_name);
+	snprintf(filename, sizeof(filename), "%s%s%s", DATA_DIR, NOTE_DIR, board->short_name);
 	
 	fp = fopen (filename, "r");
 	
@@ -338,7 +338,7 @@ static void load_board (BOARD_DATA *board)
         {
 			char archive_name[200];
 
-			sprintf (archive_name, "%s%s%s.old", DATA_DIR, NOTE_DIR, board->short_name);
+			snprintf(archive_name, sizeof(archive_name), "%s%s%s.old", DATA_DIR, NOTE_DIR, board->short_name);
 			fp_archive = fopen (archive_name, "a");
 			if (!fp_archive)
 				bug ("Could not open archive boards for writing",0);
@@ -497,13 +497,13 @@ static void do_nwrite (Character *caller, char *argument)
 	char_to_room( ch, get_room_index(ROOM_VNUM_NOTE));
 	
 	/* Begin writing the note ! */
-	sprintf (buf, "You are now %s a new note on the " BOLD "%s" NO_COLOR " board.\n\r"
+	snprintf(buf, sizeof(buf), "You are now %s a new note on the " BOLD "%s" NO_COLOR " board.\n\r"
 	              "If you are using tintin, type #verbose to turn off alias expansion!\n\r\n\r",
 	               ch->pcdata->in_progress->getText().empty() ? "posting" : "continuing",
 	               ch->pcdata->board->short_name);
 	send_to_char (buf,ch);
 	
-	sprintf (buf, BOLD YELLOW "From" NO_COLOR ":    %s\n\r\n\r", ch->getName());
+	snprintf(buf, sizeof(buf), BOLD YELLOW "From" NO_COLOR ":    %s\n\r\n\r", ch->getName());
 	send_to_char (buf,ch);
 
 	if (ch->pcdata->in_progress->getText().empty()) /* Are we continuing an old note or not? */
@@ -511,16 +511,16 @@ static void do_nwrite (Character *caller, char *argument)
 		switch (ch->pcdata->board->force_type)
 		{
 		case DEF_NORMAL:
-			sprintf (buf, "If you press Return, default recipient \"" BOLD "%s" NO_COLOR "\" will be chosen.\n\r",
+			snprintf(buf, sizeof(buf), "If you press Return, default recipient \"" BOLD "%s" NO_COLOR "\" will be chosen.\n\r",
 					  ch->pcdata->board->names);
 			break;
 		case DEF_INCLUDE:
-			sprintf (buf, "The recipient list MUST include \"" BOLD "%s" NO_COLOR "\". If not, it will be added automatically.\n\r",
+			snprintf(buf, sizeof(buf), "The recipient list MUST include \"" BOLD "%s" NO_COLOR "\". If not, it will be added automatically.\n\r",
 						   ch->pcdata->board->names);
 			break;
 	
 		case DEF_EXCLUDE:
-			sprintf (buf, "The recipient of this note must NOT include: \"" BOLD "%s" NO_COLOR "\".",
+			snprintf(buf, sizeof(buf), "The recipient of this note must NOT include: \"" BOLD "%s" NO_COLOR "\".",
 						   ch->pcdata->board->names);
 	
 			break;
@@ -535,7 +535,7 @@ static void do_nwrite (Character *caller, char *argument)
 	}
 	else /* we are continuing, print out all the fields and the note so far*/
 	{
-		sprintf (buf, BOLD YELLOW "To" NO_COLOR ":      %s\n\r"
+		snprintf(buf, sizeof(buf), BOLD YELLOW "To" NO_COLOR ":      %s\n\r"
 		              BOLD YELLOW "Expires" NO_COLOR ": %s\n\r"
 		              BOLD YELLOW "Subject" NO_COLOR ": %s\n\r", 
 		               ch->pcdata->in_progress->to_list,
@@ -601,14 +601,14 @@ static void do_nread (Character *ch, char *argument)
 		
 		if (next_board (ch))
 			{
-			sprintf (buf, "Changed to next board, {M%s{x.\n\r", ch->pcdata->board->short_name);
+			snprintf(buf, sizeof(buf), "Changed to next board, {M%s{x.\n\r", ch->pcdata->board->short_name);
                         send_to_char(buf, ch);
                         do_nread (ch, (char*)"");
                         return;
                         }
                 else
                         {
-                        sprintf (buf, "There are no more boards.\n\r");
+                        snprintf(buf, sizeof(buf), "There are no more boards.\n\r");
 			send_to_char("\n\r",ch);
                         do_board (ch, (char*)"1");
                         return;
@@ -682,7 +682,7 @@ static void do_nlist (Character *ch, char *argument)
 			has_shown++; /* note that we want to see X VISIBLE note, not just last X */
 			if (!show || ((count-show) < has_shown))
 			{
-				sprintf (buf, BOLD "%3d" NO_COLOR ">" BLUE BOLD "%c" NO_COLOR YELLOW BOLD "%-13s" NO_COLOR YELLOW " %s" NO_COLOR " \n\r",
+				snprintf(buf, sizeof(buf), BOLD "%3d" NO_COLOR ">" BLUE BOLD "%c" NO_COLOR YELLOW BOLD "%-13s" NO_COLOR YELLOW " %s" NO_COLOR " \n\r",
 				               num, 
 				               last_note < p->date_stamp ? '*' : ' ',
 				               p->sender, p->subject);
@@ -767,7 +767,7 @@ void do_board (Character *ch, char *argument)
 			unread = unread_notes (ch,&boards[i]); /* how many unread notes? */
 			if (unread != BOARD_NOACCESS)
 			{ 
-				sprintf (buf, BOLD "%2d" NO_COLOR "> " GREEN BOLD "%12s" NO_COLOR " [%s%4d" NO_COLOR "] " YELLOW "%s" NO_COLOR "\n\r", 
+				snprintf(buf, sizeof(buf), BOLD "%2d" NO_COLOR "> " GREEN BOLD "%12s" NO_COLOR " [%s%4d" NO_COLOR "] " YELLOW "%s" NO_COLOR "\n\r", 
 				                   count, boards[i].short_name, unread ? RED : GREEN, 
 				                    unread, boards[i].long_name);
 				send_to_char (buf,ch);	                    
@@ -776,7 +776,7 @@ void do_board (Character *ch, char *argument)
 			
 		} /* for each board */
 		
-		sprintf (buf, "\n\rYou current board is " BOLD "%s" NO_COLOR ".\n\r", ch->pcdata->board->short_name);
+		snprintf(buf, sizeof(buf), "\n\rYou current board is " BOLD "%s" NO_COLOR ".\n\r", ch->pcdata->board->short_name);
 		send_to_char (buf,ch);
 
 		/* Inform of rights */		
@@ -809,7 +809,7 @@ void do_board (Character *ch, char *argument)
 		if (count == number) /* found the board.. change to it */
 		{
 			ch->pcdata->board = &boards[i];
-			sprintf (buf, "Current board changed to " BOLD "%s" NO_COLOR ". %s.\n\r",boards[i].short_name,
+			snprintf(buf, sizeof(buf), "Current board changed to " BOLD "%s" NO_COLOR ". %s.\n\r",boards[i].short_name,
 			              (get_trust(ch) < boards[i].write_level) 
 			              ? "You can only read here" 
 			              : "You can both read and write here");
@@ -841,7 +841,7 @@ void do_board (Character *ch, char *argument)
 	}
 	
 	ch->pcdata->board = &boards[i];
-	sprintf (buf, "Current board changed to " BOLD "%s" NO_COLOR ". %s.\n\r",boards[i].short_name,
+	snprintf(buf, sizeof(buf), "Current board changed to " BOLD "%s" NO_COLOR ". %s.\n\r",boards[i].short_name,
 	              (get_trust(ch) < boards[i].write_level) 
 	              ? "You can only read here" 
 	              : "You can both read and write here");
@@ -932,7 +932,7 @@ void handle_con_note_to (DESCRIPTOR_DATA *d, char * argument)
 			if (!buf[0]) /* empty string? */
 			{
 				ch->pcdata->in_progress->to_list = str_dup (ch->pcdata->board->names);
-				sprintf (buf, "Assumed default recipient: " BOLD "%s" NO_COLOR "\n\r", ch->pcdata->board->names);
+				snprintf(buf, sizeof(buf), "Assumed default recipient: " BOLD "%s" NO_COLOR "\n\r", ch->pcdata->board->names);
 				send_to_char(buf, ch);
 			}
 			else
@@ -947,7 +947,7 @@ void handle_con_note_to (DESCRIPTOR_DATA *d, char * argument)
 				strcat (buf, ch->pcdata->board->names);
 				ch->pcdata->in_progress->to_list = str_dup(buf);
 
-				sprintf (buf, "\n\rYou did not specify %s as recipient, so it was automatically added.\n\r"
+				snprintf(buf, sizeof(buf), "\n\rYou did not specify %s as recipient, so it was automatically added.\n\r"
 				         BOLD YELLOW "New To" NO_COLOR " :  %s\n\r",
 						 ch->pcdata->board->names, ch->pcdata->in_progress->to_list);
 				send_to_char(buf,ch);
@@ -959,14 +959,14 @@ void handle_con_note_to (DESCRIPTOR_DATA *d, char * argument)
 		case DEF_EXCLUDE: /* forced exclude */
 			if (!buf[0])
 			{
-				sprintf( buf, "You must specify a recipient.\n\r" BOLD YELLOW "To" NO_COLOR ":      ");
+				snprintf(buf, sizeof(buf), "You must specify a recipient.\n\r" BOLD YELLOW "To" NO_COLOR ":      ");
 				send_to_char(buf,ch);
 				return;
 			}
 			
 			if (is_full_name (ch->pcdata->board->names, buf))
 			{
-				sprintf (buf, "You are not allowed to send notes to %s on this board. Try again.\n\r"
+				snprintf(buf, sizeof(buf), "You are not allowed to send notes to %s on this board. Try again.\n\r"
 				         BOLD YELLOW "To" NO_COLOR ":      ", ch->pcdata->board->names);
 				send_to_char(buf,ch);
 				return; /* return from nanny, not changing to the next state! */
@@ -977,7 +977,7 @@ void handle_con_note_to (DESCRIPTOR_DATA *d, char * argument)
 		
 	}		
 
-	sprintf(buf, BOLD YELLOW "\n\rSubject" NO_COLOR ": ");
+	snprintf(buf, sizeof(buf), BOLD YELLOW "\n\rSubject" NO_COLOR ": ");
 	send_to_char(buf,ch);
 	d->connected = CON_NOTE_SUBJECT;
 }
@@ -1003,7 +1003,7 @@ void handle_con_note_subject (DESCRIPTOR_DATA *d, char * argument)
 	{
 		char buf1[MSL];
 		send_to_char("Please find a meaningful subject!\n\r",ch);
-		sprintf(buf1, BOLD YELLOW "Subject" NO_COLOR ": ");
+		snprintf(buf1, sizeof(buf1), BOLD YELLOW "Subject" NO_COLOR ": ");
 		send_to_char(buf1,ch);
 	}
 	else  if (strlen(buf)>60)
@@ -1016,7 +1016,7 @@ void handle_con_note_subject (DESCRIPTOR_DATA *d, char * argument)
 		ch->pcdata->in_progress->subject = str_dup(buf);
 		if (IS_IMMORTAL(ch)) /* immortals get to choose number of expire days */
 		{
-			sprintf (buf,"\n\rHow many days do you want this note to expire in?\n\r"
+			snprintf(buf, sizeof(buf),"\n\rHow many days do you want this note to expire in?\n\r"
 			             "Press Enter for default value for this board, " BOLD "%d" NO_COLOR " days.\n\r"
            				 BOLD YELLOW "Expire" NO_COLOR ":  ",
 		                 ch->pcdata->board->purge_days);
@@ -1027,9 +1027,9 @@ void handle_con_note_subject (DESCRIPTOR_DATA *d, char * argument)
 		{
 			ch->pcdata->in_progress->expire = 
 				current_time + ch->pcdata->board->purge_days * 24L * 3600L;				
-			sprintf (buf, "This note will expire %s\r",ctime(&ch->pcdata->in_progress->expire));
+			snprintf(buf, sizeof(buf), "This note will expire %s\r",ctime(&ch->pcdata->in_progress->expire));
 			write_to_buffer (d,buf,0);
-			sprintf(buf, "\n\rEnter text. Type " BOLD "~" NO_COLOR " or " BOLD "END" NO_COLOR " on an empty line to end note.\n\r"
+			snprintf(buf, sizeof(buf), "\n\rEnter text. Type " BOLD "~" NO_COLOR " or " BOLD "END" NO_COLOR " on an empty line to end note.\n\r"
 			                    "=======================================================\n\r");
 			send_to_char(buf,ch);
 			d->connected = CON_NOTE_TEXT;
@@ -1060,7 +1060,7 @@ void handle_con_note_expire(DESCRIPTOR_DATA *d, char * argument)
 		{
 			char buf1[MSL];
 			write_to_buffer (d,"Write the number of days!\n\r",0);
-			sprintf(buf1, BOLD YELLOW "Expire" NO_COLOR ":  ");
+			snprintf(buf1, sizeof(buf1), BOLD YELLOW "Expire" NO_COLOR ":  ");
 			send_to_char(buf1,ch);
 			return;
 		}
@@ -1071,7 +1071,7 @@ void handle_con_note_expire(DESCRIPTOR_DATA *d, char * argument)
 			{
 				char buf1[MSL];
 				write_to_buffer (d, "This is a positive MUD. Use positive numbers only! :)\n\r",0);
-				sprintf(buf1, BOLD YELLOW "Expire" NO_COLOR ":  ");
+				snprintf(buf1, sizeof(buf1), BOLD YELLOW "Expire" NO_COLOR ":  ");
 				return;
 			}
 		}
@@ -1082,7 +1082,7 @@ void handle_con_note_expire(DESCRIPTOR_DATA *d, char * argument)
 	
 	/* note that ctime returns XXX\n so we only need to add an \r */
 
-	sprintf(buf, "\n\rEnter text. Type " BOLD "~" NO_COLOR " or " BOLD "END" NO_COLOR " on an empty line to end note.\n\r"
+	snprintf(buf, sizeof(buf), "\n\rEnter text. Type " BOLD "~" NO_COLOR " or " BOLD "END" NO_COLOR " on an empty line to end note.\n\r"
 	                    "=======================================================\n\r");
 	send_to_char(buf,ch);
 
@@ -1179,7 +1179,7 @@ void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
 			case 'v': /* view note so far */
 				if (!ch->pcdata->in_progress->getText().empty())
 				{
-					sprintf(buf, GREEN "Your note so far:" NO_COLOR "\n\r");
+					snprintf(buf, sizeof(buf), GREEN "Your note so far:" NO_COLOR "\n\r");
 					send_to_char(buf,ch);
 					send_to_char(ch->pcdata->in_progress->getText().c_str(), ch);
 				}

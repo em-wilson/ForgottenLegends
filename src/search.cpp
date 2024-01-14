@@ -94,7 +94,7 @@ void who_html_update (void)
 	fprintf(fp, "%s", wch->getName());
 	buf[0] = '\0';
 	buf2 = str_dup(wch->pcdata->title);
-//      sprintf(buf2, "%s", wch->pcdata->title);
+//      snprintf(buf2, sizeof(buf2), "%s", wch->pcdata->title);
 
       html_colour(buf2,buf);
       fprintf(fp, "%s", buf);
@@ -111,7 +111,7 @@ void who_html_update (void)
   fprintf(fp, "<br>\n");
   fprintf(fp, "<font color=""#FFFFFF"" face=""Times New Roman"">\n");
   strftime( s, 100, "%I:%M%p", localtime( &current_time ) );
-  sprintf(buf, "This file last updated at %s Central Time.\n", s);
+  snprintf(buf, sizeof(buf), "This file last updated at %s Central Time.\n", s);
   fprintf(fp, "%s", buf);
   fprintf(fp, "<br>\n");
   fprintf(fp, "If this is more than a few moments old, the mud is likely to be down.\n");
@@ -312,7 +312,7 @@ void html_colour( char * in, char *out)
 	} //{end else if}
 	else
 	{
-	    sprintf(buf2, "%c", in[i]);
+	    snprintf(buf2, sizeof(buf2), "%c", in[i]);
 	    strcat(out, buf2);
 	}
     }

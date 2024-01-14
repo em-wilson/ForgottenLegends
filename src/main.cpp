@@ -80,7 +80,7 @@ int main( int argc, char **argv )
          control = init_socket( port );
 
     boot_db();
-    sprintf( log_buf, "ROM is ready to rock on port %d.", port );
+    snprintf(log_buf, 2*MAX_INPUT_LENGTH, "ROM is ready to rock on port %d.", port );
     log_string( log_buf );
     if (fCopyOver)
        copyover_recover();

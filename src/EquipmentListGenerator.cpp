@@ -30,9 +30,9 @@ bool EquipmentListGenerator::_DirectoryExists(const char *pathName) {
 void EquipmentListGenerator::Generate() {
     char log_buf[100];
     char objlist_dir[100];
-    sprintf(objlist_dir, "%s%s", DATA_DIR, OBJLIST_DIR);
+    snprintf(objlist_dir, sizeof(objlist_dir), "%s%s", DATA_DIR, OBJLIST_DIR);
     if ( !EquipmentListGenerator::_DirectoryExists( objlist_dir ) ) {
-        sprintf(log_buf, "Can't generate equipment list. Directory '%s' does not exists.", objlist_dir);
+        snprintf(log_buf, sizeof(log_buf), "Can't generate equipment list. Directory '%s' does not exists.", objlist_dir);
         log_string(log_buf);
         return;
     }
@@ -182,7 +182,7 @@ void EquipmentListGenerator::build_json_files(const char *objlist_dir) {
         this->storeItemCategory(objlist_dir, fileName, itemList);
     }
 
-    sprintf(log_buf, "Stored %lu categories of items.", itemDict.size());
+    snprintf(log_buf, sizeof(log_buf), "Stored %lu categories of items.", itemDict.size());
     log_string(log_buf);
     log_string("Done generating equipment list." );
 }
@@ -240,7 +240,7 @@ std::string EquipmentListGenerator::itemJson(OBJ_INDEX_DATA *obj) {
     switch ( obj->item_type ) {
         default:
             char buf[100];
-            sprintf( buf, "%d/%d/%d/%d",
+            snprintf(buf, sizeof(buf), "%d/%d/%d/%d",
                      obj->value[0],
                      obj->value[1],
                      obj->value[2],

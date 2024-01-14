@@ -52,7 +52,7 @@ void substitute_alias(DESCRIPTOR_DATA *d, char *argument)
 	    send_to_char("Line to long, prefix not processed.\r\n",ch);
 	else
 	{
-	    sprintf(prefix,"%s %s",ch->prefix,argument);
+	    snprintf(prefix, sizeof(prefix), "%s %s",ch->prefix,argument);
 	    argument = prefix;
 	}
     }
@@ -134,7 +134,7 @@ void do_alias(Character *ch, char *argument)
 	    ||	rch->pcdata->alias_sub[pos] == NULL)
 		break;
 
-	    sprintf(buf,"    %s:  %s\n\r",rch->pcdata->alias[pos],
+	    snprintf(buf, sizeof(buf),"    %s:  %s\n\r",rch->pcdata->alias[pos],
 		    rch->pcdata->alias_sub[pos]);
 	    send_to_char(buf,ch);
 	}
@@ -157,7 +157,7 @@ void do_alias(Character *ch, char *argument)
 
 	    if (!str_cmp(arg,rch->pcdata->alias[pos]))
 	    {
-		sprintf(buf,"%s aliases to '%s'.\n\r",rch->pcdata->alias[pos],
+		snprintf(buf, sizeof(buf),"%s aliases to '%s'.\n\r",rch->pcdata->alias[pos],
 			rch->pcdata->alias_sub[pos]);
 		send_to_char(buf,ch);
 		return;
@@ -189,7 +189,7 @@ void do_alias(Character *ch, char *argument)
 	{
 	    free_string(rch->pcdata->alias_sub[pos]);
 	    rch->pcdata->alias_sub[pos] = str_dup(argument);
-	    sprintf(buf,"%s is now realiased to '%s'.\n\r",arg,argument);
+	    snprintf(buf, sizeof(buf),"%s is now realiased to '%s'.\n\r",arg,argument);
 	    send_to_char(buf,ch);
 	    return;
 	}
@@ -204,7 +204,7 @@ void do_alias(Character *ch, char *argument)
      /* make a new alias */
      rch->pcdata->alias[pos]		= str_dup(arg);
      rch->pcdata->alias_sub[pos]	= str_dup(argument);
-     sprintf(buf,"%s is now aliased to '%s'.\n\r",arg,argument);
+     snprintf(buf, sizeof(buf),"%s is now aliased to '%s'.\n\r",arg,argument);
      send_to_char(buf,ch);
 }
 

@@ -1895,7 +1895,7 @@ do                                                              \
   char abc[100]; \
   if (!(point))                                                 \
   {                                                             \
-        sprintf(abc, "Freeing null pointer %s:%d", __FILE__, __LINE__ ); \
+        snprintf(abc, sizeof(abc), "Freeing null pointer %s:%d", __FILE__, __LINE__ ); \
         bug(abc,0); \
         fprintf( stderr, "DISPOSEing NULL in %s, line %d\n", __FILE__, __LINE__ ); \
   }                                                             \

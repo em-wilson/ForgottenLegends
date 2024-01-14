@@ -544,7 +544,7 @@ bool spec_executioner( Character *ch )
     if ( victim == NULL || IS_IMMORTAL(victim) )
 	return FALSE;
 
-    sprintf( buf, "%s is a %s!  PROTECT THE INNOCENT!  MORE BLOOOOD!!!",
+    snprintf(buf, sizeof(buf), "%s is a %s!  PROTECT THE INNOCENT!  MORE BLOOOOD!!!",
 	victim->getName(), crime );
     REMOVE_BIT(ch->comm,COMM_NOSHOUT);
     do_yell( ch, buf );
@@ -621,7 +621,7 @@ bool spec_guard( Character *ch )
 
     if ( victim != NULL && !IS_IMMORTAL(victim))
     {
-	sprintf( buf, "%s is a %s!  PROTECT THE INNOCENT!!  BANZAI!!",
+	snprintf(buf, sizeof(buf), "%s is a %s!  PROTECT THE INNOCENT!!  BANZAI!!",
 	    victim->getName(), crime );
  	REMOVE_BIT(ch->comm,COMM_NOSHOUT);
 	do_yell( ch, buf );

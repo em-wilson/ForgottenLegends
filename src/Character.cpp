@@ -177,7 +177,7 @@ void Character::advance_level( bool hide )
     ( this->played + (int) (current_time - this->logon) ) / 3600;
 
 /*
-    sprintf( buf, "the %s",
+    snprintf(buf, sizeof(buf), "the %s",
     title_table [this->class_num] [this->level] [this->sex == SEX_FEMALE ? 1 : 0] );
     set_title( this, buf );
 */
@@ -243,7 +243,7 @@ void Character::advance_level( bool hide )
 */
     dracnum = number_range(0,14);
     this->drac = dracnum;
-    sprintf(buf, "You scream in agony as %s scales pierce your tender skin!\n\r", draconian_table[this->drac].colour);
+    snprintf(buf, sizeof(buf), "You scream in agony as %s scales pierce your tender skin!\n\r", draconian_table[this->drac].colour);
     send_to_char(buf,this);
     if (this->perm_stat[STAT_STR] < 25)
         this->perm_stat[STAT_STR]++;
@@ -258,7 +258,7 @@ void Character::advance_level( bool hide )
 
     if (!hide)
     {
-        sprintf(buf,
+        snprintf(buf, sizeof(buf),
         "{BYou have leveled!{x\n\r"
         "You gain %d hit point%s, %d mana, %d move, and %d practice%s.\n\r",
         add_hp, add_hp == 1 ? "" : "s", add_mana, add_move,

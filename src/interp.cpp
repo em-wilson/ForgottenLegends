@@ -519,7 +519,7 @@ void interpret( Character *ch, char *argument )
     ||   fLogAll
     ||   cmd_table[cmd].log == LOG_ALWAYS )
     {
-	sprintf( log_buf, "Log %s: %s", ch->getName(), logline );
+	snprintf(log_buf, 2*MAX_INPUT_LENGTH, "Log %s: %s", ch->getName(), logline );
 	Wiznet::instance()->report(log_buf,ch,NULL,WIZ_SECURE,0,get_trust(ch));
 	log_string( log_buf );
     }
@@ -824,7 +824,7 @@ void do_commands( Character *ch, char *argument )
         &&   cmd_table[cmd].level <= get_trust( ch ) 
 	&&   cmd_table[cmd].show)
 	{
-	    sprintf( buf, "%-12s", cmd_table[cmd].name );
+	    snprintf(buf, sizeof(buf), "%-12s", cmd_table[cmd].name );
 	    send_to_char( buf, ch );
 	    if ( ++col % 6 == 0 )
 		send_to_char( "\n\r", ch );
@@ -917,7 +917,7 @@ char * return_wizhelp( int level )
 	    if (cmd_table[cmd].log == LOG_ALWAYS)
 		add_buf( output, "{r" );
 
-	    sprintf( buf, "%-12s", cmd_table[cmd].name );
+	    snprintf(buf, sizeof(buf), "%-12s", cmd_table[cmd].name );
 	    add_buf( output, buf );
 
 	    if (cmd_table[cmd].log == LOG_ALWAYS)

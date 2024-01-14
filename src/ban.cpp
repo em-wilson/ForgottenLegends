@@ -158,11 +158,11 @@ void ban_site(Character *ch, char *argument, bool fPerm)
         add_buf(buffer,"Banned sites  level  type     status\n\r");
         for (pban = ban_list;pban != NULL;pban = pban->next)
         {
-	    sprintf(buf2,"%s%s%s",
+	    snprintf(buf2, sizeof(buf2),"%s%s%s",
 		IS_SET(pban->ban_flags,BAN_PREFIX) ? "*" : "",
 		pban->name,
 		IS_SET(pban->ban_flags,BAN_SUFFIX) ? "*" : "");
-	    sprintf(buf,"%-12s    %-3d  %-7s  %s\n\r",
+	    snprintf(buf, sizeof(buf),"%-12s    %-3d  %-7s  %s\n\r",
 		buf2, pban->level,
 		IS_SET(pban->ban_flags,BAN_NEWBIES) ? "newbies" :
 		IS_SET(pban->ban_flags,BAN_PERMIT)  ? "permit"  :
@@ -248,7 +248,7 @@ void ban_site(Character *ch, char *argument, bool fPerm)
     pban->next  = ban_list;
     ban_list    = pban;
     save_bans();
-    sprintf(buf,"%s has been banned.\n\r",pban->name);
+    snprintf(buf, sizeof(buf),"%s has been banned.\n\r",pban->name);
     send_to_char( buf, ch );
     return;
 }
@@ -295,7 +295,7 @@ void do_allow( Character *ch, char *argument )
                 prev->next = curr->next;
 
             free_ban(curr);
-	    sprintf(buf,"Ban on %s lifted.\n\r",arg);
+	    snprintf(buf, sizeof(buf),"Ban on %s lifted.\n\r",arg);
             send_to_char( buf, ch );
 	    save_bans();
             return;

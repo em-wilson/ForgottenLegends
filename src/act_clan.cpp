@@ -78,13 +78,13 @@ void do_join( Character *caller, char *argument )
 	CLAN_DATA *join = get_clan(argument);
     if (!join)
     {
-	sprintf(buf, "%s: that clan does not exist.\n\r",argument);
+	snprintf(buf, sizeof(buf), "%s: that clan does not exist.\n\r",argument);
 	send_to_char(buf,ch);
 	return;
     }
 
     ch->setJoin(join);
-    sprintf(buf, "You are now eligable to join %s.\n\r",join->name);
+    snprintf(buf, sizeof(buf), "You are now eligable to join %s.\n\r",join->name);
     send_to_char(buf,ch);
     return;
 }

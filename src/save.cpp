@@ -114,7 +114,7 @@ void save_char_obj( Character *ch )
     if (IS_IMMORTAL(ch) || ch->level >= LEVEL_IMMORTAL)
     {
 	fclose(fpReserve);
-	sprintf(strsave, "%s%s",GOD_DIR, capitalize(ch->getName()));
+	snprintf(strsave, sizeof(strsave), "%s%s",GOD_DIR, capitalize(ch->getName()));
 	if ((fp = fopen(strsave,"w")) == NULL)
 	{
 	    bug("Save_char_obj: fopen",0);
@@ -128,7 +128,7 @@ void save_char_obj( Character *ch )
     }
 
     fclose( fpReserve );
-    sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( ch->getName() ) );
+    snprintf(strsave, sizeof(strsave), "%s%s", PLAYER_DIR, capitalize( ch->getName() ) );
     if ( ( fp = fopen( TEMP_FILE, "w" ) ) == NULL )
     {
 	bug( "Save_char_obj: fopen", 0 );
@@ -376,15 +376,15 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
     fclose( fpReserve );
     
     /* decompress if .gz file exists */
-    sprintf( strsave, "%s%s%s", PLAYER_DIR, capitalize(name),".gz");
+    snprintf(strsave, sizeof(strsave), "%s%s%s", PLAYER_DIR, capitalize(name),".gz");
     if ( ( fp = fopen( strsave, "r" ) ) != NULL )
     {
 	fclose(fp);
-	sprintf(buf,"gzip -dfq %s",strsave);
+	snprintf(buf, sizeof(buf),"gzip -dfq %s",strsave);
 	system(buf);
     }
 
-    sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( name ) );
+    snprintf(strsave, sizeof(strsave), "%s%s", PLAYER_DIR, capitalize( name ) );
     if ( ( fp = fopen( strsave, "r" ) ) != NULL )
     {
 	int iNest;
@@ -550,7 +550,7 @@ void fread_char( Character *ch, FILE *fp )
     int lastlogoff = current_time;
     int percent;
 
-    sprintf(buf,"Loading %s.",ch->getName());
+    snprintf(buf, sizeof(buf),"Loading %s.",ch->getName());
     log_string(buf);
 
     for ( ; ; )
@@ -710,7 +710,7 @@ void fread_char( Character *ch, FILE *fp )
                
                     if (i == BOARD_NOTFOUND) /* Does board still exist ? */
                      {
-                        sprintf (buf, "fread_char: %s had unknown board name: %s. Skipped.",
+                        snprintf(buf, sizeof(buf), "fread_char: %s had unknown board name: %s. Skipped.",
                             ch->getName(), boardname);
                         log_string (buf);
                         fread_number (fp); /* read last_note and skip info */
@@ -976,7 +976,7 @@ void fread_char( Character *ch, FILE *fp )
     		if (ch->pcdata->title[0] != '.' && ch->pcdata->title[0] != ',' 
 		&&  ch->pcdata->title[0] != '!' && ch->pcdata->title[0] != '?')
 		{
-		    sprintf( buf, " %s", ch->pcdata->title );
+		    snprintf(buf, sizeof(buf), " %s", ch->pcdata->title );
 		    free_string( ch->pcdata->title );
 		    ch->pcdata->title = str_dup( buf );
 		}
@@ -1006,7 +1006,7 @@ void fread_char( Character *ch, FILE *fp )
 
 	if ( !fMatch )
 	{
-	    sprintf(buf, "Fread_char: %s: no match in file.", word );
+	    snprintf(buf, sizeof(buf), "Fread_char: %s: no match in file.", word );
 	    bug( buf, 0 );
 	    fread_to_eol( fp );
 	}

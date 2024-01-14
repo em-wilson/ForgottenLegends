@@ -58,7 +58,7 @@ void write_clan_list( )
     FILE *fpout;
     char filename[256];
 
-    sprintf( filename, "%s%s", CLAN_DIR, CLAN_LIST );
+    snprintf(filename, sizeof(filename), "%s%s", CLAN_DIR, CLAN_LIST );
     fpout = fopen( filename, "w" );
     if ( !fpout )
     {
@@ -88,12 +88,12 @@ void save_clan( CLAN_DATA *clan )
         
     if ( !clan->filename || clan->filename[0] == '\0' )
     {
-	sprintf( buf, "save_clan: %s has no filename", clan->name );
+	snprintf(buf, sizeof(buf), "save_clan: %s has no filename", clan->name );
 	bug( buf, 0 );
 	return;
     }
     
-    sprintf( filename, "%s%s", CLAN_DIR, clan->filename );
+    snprintf(filename, sizeof(filename), "%s%s", CLAN_DIR, clan->filename );
     
     fclose( fpReserve );
     if ( ( fp = fopen( filename, "w" ) ) == NULL )
@@ -240,7 +240,7 @@ void fread_clan( CLAN_DATA *clan, FILE *fp )
 	
 	if ( !fMatch )
 	{
-	    sprintf( buf, "Fread_clan: no match: %s", word );
+	    snprintf(buf, sizeof(buf), "Fread_clan: no match: %s", word );
 	    bug( buf, 0 );
 	}
     }
@@ -264,7 +264,7 @@ bool load_clan_file( char *clanfile )
     clan->pkills = 0;
 
     found = FALSE;
-    sprintf( filename, "%s%s", CLAN_DIR, clanfile );
+    snprintf(filename, sizeof(filename), "%s%s", CLAN_DIR, clanfile );
 
     if ( ( fp = fopen( filename, "r" ) ) != NULL )
     {
@@ -301,7 +301,7 @@ bool load_clan_file( char *clanfile )
 	    {
 		char buf[MAX_STRING_LENGTH];
 
-		sprintf( buf, "Load_clan_file: bad section: %s.", word );
+		snprintf(buf, sizeof(buf), "Load_clan_file: bad section: %s.", word );
 		bug( buf, 0 );
 		break;
 	    }
@@ -333,7 +333,7 @@ void do_delclan( Character *ch, char *argument )
     }
 
     UNLINK( clan, first_clan, last_clan, next, prev );
-    sprintf(strsave, "%s%s%s", DATA_DIR, CLAN_DIR, clan->filename );
+    snprintf(strsave, sizeof(strsave), "%s%s%s", DATA_DIR, CLAN_DIR, clan->filename );
     DISPOSE( clan );
 }
 
@@ -353,7 +353,7 @@ void load_clans( )
 
     log_string( "Loading clans..." );
 
-    sprintf( clanlist, "%s%s", CLAN_DIR, CLAN_LIST );
+    snprintf(clanlist, sizeof(clanlist), "%s%s", CLAN_DIR, CLAN_LIST );
     fclose( fpReserve );
     if ( ( fpList = fopen( clanlist, "r" ) ) == NULL )
     {
@@ -370,7 +370,7 @@ void load_clans( )
 
 	if ( !load_clan_file( filename ) )
 	{
-	  sprintf( buf, "Cannot load clan file: %s", filename );
+	  snprintf(buf, sizeof(buf), "Cannot load clan file: %s", filename );
 	  bug( buf, 0 );
 	}
     }
@@ -743,9 +743,9 @@ void do_clist( Character *ch, char *argument )
         {
 	    if (IS_SET(clan->flags, CLAN_NOSHOW) || !IS_SET(clan->flags, CLAN_PK))
 		continue;
-            sprintf( buf, "%-13s %-13s", clan->name, clan->leader );
+            snprintf(buf, sizeof(buf), "%-13s %-13s", clan->name, clan->leader );
 	    send_to_char(buf,ch);
-            sprintf( buf, "%-13d%-13d\n\r", 
+            snprintf(buf, sizeof(buf), "%-13d%-13d\n\r", 
 		clan->pkills, clan->pdeaths );
 	    send_to_char(buf,ch);
             count++;
@@ -756,9 +756,9 @@ void do_clist( Character *ch, char *argument )
         {
 	    if (IS_SET(clan->flags, CLAN_PK) || IS_SET(clan->flags, CLAN_NOSHOW))
 		continue;
-            sprintf( buf, "%-13s %-13s", clan->name, clan->leader );
+            snprintf(buf, sizeof(buf), "%-13s %-13s", clan->name, clan->leader );
 	    send_to_char(buf,ch);
-            sprintf( buf, "%-13d%-13d\n\r", 
+            snprintf(buf, sizeof(buf), "%-13d%-13d\n\r", 
 		clan->pkills, clan->pdeaths );
 	    send_to_char(buf,ch);
             count++;
@@ -771,9 +771,9 @@ void do_clist( Character *ch, char *argument )
         {
 	    if (!IS_SET(clan->flags, CLAN_NOSHOW))
 		continue;
-            sprintf( buf, "%-13s %-13s", clan->name, clan->leader );
+            snprintf(buf, sizeof(buf), "%-13s %-13s", clan->name, clan->leader );
 	    send_to_char(buf,ch);
-            sprintf( buf, "%-13d%-13d\n\r", 
+            snprintf(buf, sizeof(buf), "%-13d%-13d\n\r", 
 		clan->pkills, clan->pdeaths );
 	    send_to_char(buf,ch);
             count++;
@@ -793,13 +793,13 @@ void do_clist( Character *ch, char *argument )
         return;
     }
 
-    sprintf( buf, "\n\r%s, %s\n\r'%s'\n\r\n\r", clan->name, clan->whoname, clan->motto );
+    snprintf(buf, sizeof(buf), "\n\r%s, %s\n\r'%s'\n\r\n\r", clan->name, clan->whoname, clan->motto );
     send_to_char(buf,ch);
-    sprintf(buf, "Pkills: %d\n\r", clan->pkills);
+    snprintf(buf, sizeof(buf), "Pkills: %d\n\r", clan->pkills);
     send_to_char(buf,ch);
-    sprintf(buf, "Pdeaths: %d\n\r", clan->pdeaths);
+    snprintf(buf, sizeof(buf), "Pdeaths: %d\n\r", clan->pdeaths);
     send_to_char(buf,ch);
-    sprintf( buf, "Leader:    %s\n\rRecruiter:  %s\n\rRecruiter: %s\n\rMembers    :  %d\n\r",
+    snprintf(buf, sizeof(buf), "Leader:    %s\n\rRecruiter:  %s\n\rRecruiter: %s\n\rMembers    :  %d\n\r",
                         clan->leader,
                         clan->number1,
                         clan->number2,
@@ -810,7 +810,7 @@ void do_clist( Character *ch, char *argument )
     {
 	if (IS_IMMORTAL(ch) || ch->pcdata->clan == clan)
 	{
-	    sprintf(buf, "Funds:    %ld (gold)\n\r", clan->money / 100);
+	    snprintf(buf, sizeof(buf), "Funds:    %ld (gold)\n\r", clan->money / 100);
 	    send_to_char(buf,ch);
 	}
 	else if (clan->money > ch->pcdata->clan->money)
@@ -828,7 +828,7 @@ void do_clist( Character *ch, char *argument )
     if (hour > 8760)
 	year = hour / 8760;
 
-    sprintf(buf, "Member Online Time: %d years %d hours\n\r", year, hour);
+    snprintf(buf, sizeof(buf), "Member Online Time: %d years %d hours\n\r", year, hour);
     send_to_char(buf,ch);
 
     if (IS_IMMORTAL(ch))
@@ -836,7 +836,7 @@ void do_clist( Character *ch, char *argument )
 	send_to_char("Immortal Stuff:\n\r",ch);
 	send_to_char("===============\n\r",ch);
 
-	sprintf(buf, "Flags: %s\n\r", flag_string( clan_flags, clan->flags));
+	snprintf(buf, sizeof(buf), "Flags: %s\n\r", flag_string( clan_flags, clan->flags));
 	send_to_char(buf,ch);
     }
     return;

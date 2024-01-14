@@ -111,7 +111,7 @@ AREA_DATA *new_area( void )
     pArea->age              =   0;
     pArea->nplayer          =   0;
     pArea->empty            =   TRUE;              /* ROM patch */
-    sprintf( buf, "area%d.are", pArea->vnum );
+    snprintf(buf, sizeof(buf), "area%d.are", pArea->vnum );
     pArea->file_name        =   str_dup( buf );
     pArea->vnum             =   top_area-1;
 

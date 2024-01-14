@@ -114,7 +114,7 @@ void mob_interpret( Character *ch, char *argument )
 	    return;
 	}
     }
-    sprintf( buf, "Mob_interpret: invalid cmd from mob %d: '%s'",
+    snprintf(buf, sizeof(buf), "Mob_interpret: invalid cmd from mob %d: '%s'",
 	IS_NPC(ch) ? ch->pIndexData->vnum : 0, command );
     bug( buf, 0 );
 }
@@ -181,11 +181,11 @@ void do_mpstat( Character *ch, char *argument )
 	return;
     }
 
-    sprintf( arg, "Mobile #%-6d [%s]\n\r",
+    snprintf(arg, sizeof(arg), "Mobile #%-6d [%s]\n\r",
 	victim->pIndexData->vnum, victim->short_descr );
     send_to_char( arg, ch );
 
-    sprintf( arg, "Delay   %-6d [%s]\n\r",
+    snprintf(arg, sizeof(arg), "Delay   %-6d [%s]\n\r",
 	victim->mprog_delay,
 	victim->mprog_target == NULL 
 		? "No target" : victim->mprog_target->getName() );
@@ -201,7 +201,7 @@ void do_mpstat( Character *ch, char *argument )
 	 mprg = mprg->next )
 
     {
-	sprintf( arg, "[%2d] Trigger [%-8s] Program [%4d] Phrase [%s]\n\r",
+	snprintf(arg, sizeof(arg), "[%2d] Trigger [%-8s] Program [%4d] Phrase [%s]\n\r",
 	      ++i,
 	      mprog_type_to_name( mprg->trig_type ),
 	      mprg->vnum,
@@ -507,7 +507,7 @@ void do_mpmload( Character *ch, char *argument )
     vnum = atoi(arg);
     if ( ( pMobIndex = get_mob_index( vnum ) ) == NULL )
     {
-	sprintf( arg, "Mpmload: bad mob index (%d) from mob %d",
+	snprintf(arg, sizeof(arg), "Mpmload: bad mob index (%d) from mob %d",
 	    vnum, IS_NPC(ch) ? ch->pIndexData->vnum : 0 );
 	bug( arg, 0 );
 	return;
@@ -785,7 +785,7 @@ void do_mptransfer( Character *ch, char *argument )
 	    victim_next = victim->next_in_room;
 	    if ( !IS_NPC(victim) )
 	    {
-		sprintf( buf, "%s %s", victim->getName(), arg2 );
+		snprintf(buf, sizeof(buf), "%s %s", victim->getName(), arg2 );
 		do_mptransfer( ch, buf );
 	    }
 	}
@@ -857,7 +857,7 @@ void do_mpgtransfer( Character *ch, char *argument )
     	victim_next = victim->next_in_room;
     	if( is_same_group( who,victim ) )
     	{
-	    sprintf( buf, "%s %s", victim->getName(), arg2 );
+	    snprintf(buf, sizeof(buf), "%s %s", victim->getName(), arg2 );
 	    do_mptransfer( ch, buf );
     	}
     }

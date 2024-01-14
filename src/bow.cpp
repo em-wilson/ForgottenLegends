@@ -83,7 +83,7 @@ void do_shoot( Character *ch, char *argument )
 	    }
 	    else
 	    {
-		sprintf(buf,"Arrows remaining in this quiver: %d\n\r", arrow->value[0] );
+		snprintf(buf, sizeof(buf),"Arrows remaining in this quiver: %d\n\r", arrow->value[0] );
 		send_to_char(buf,ch);
 	    }
 
@@ -130,15 +130,15 @@ void do_shoot( Character *ch, char *argument )
 
 	/* Send the message */
 	if (num < 2)
-	    sprintf(buf, "$n calls a guard upon $N!");
+	    snprintf(buf, sizeof(buf), "$n calls a guard upon $N!");
 	else
-	    sprintf(buf, "$n calls %d guards upon $N!", num);
+	    snprintf(buf, sizeof(buf), "$n calls %d guards upon $N!", num);
 	act( buf, victim, NULL, ch, TO_ROOM );
 
 	if (num < 2)
-	    sprintf(buf, "$n calls a guard upon you!");
+	    snprintf(buf, sizeof(buf), "$n calls a guard upon you!");
 	else
-	    sprintf(buf, "$n calls %d guards upon you!", num);
+	    snprintf(buf, sizeof(buf), "$n calls %d guards upon you!", num);
 	act( buf, victim, NULL, ch, TO_VICT );
     }
     else

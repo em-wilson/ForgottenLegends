@@ -55,9 +55,9 @@ void PlayerCharacter::gain_exp( int gain ) {
         {
                 send_to_char( "You raise a level!!  ", this );
                 this->level += 1;
-                sprintf(buf,"%s gained level %d",this->getName(),this->level);
+                snprintf(buf, sizeof(buf),"%s gained level %d",this->getName(),this->level);
                 log_string(buf);
-                sprintf(buf,"$N has attained level %d!",this->level);
+                snprintf(buf, sizeof(buf),"$N has attained level %d!",this->level);
                 this->advance_level(FALSE);
                 save_char_obj(this);
                 Wiznet::instance()->report( buf, this, NULL, WIZ_LEVELS, 0, 0 );

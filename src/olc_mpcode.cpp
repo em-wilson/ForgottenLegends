@@ -200,7 +200,7 @@ MPEDIT(mpedit_show)
 
     EDIT_MPCODE(ch,pMcode);
 
-    sprintf(buf,
+    snprintf(buf, sizeof(buf),
            "Vnum:       [%d]\n\r"
            "Code:\n\r%s\n\r",
            pMcode->vnum, pMcode->code);
@@ -249,7 +249,7 @@ MPEDIT( mpedit_list )
 		else
 			blah = ' ';
 
-		sprintf(buf, "[%3d] (%c) %5d\n\r", count, blah, mprg->vnum );
+		snprintf(buf, sizeof(buf), "[%3d] (%c) %5d\n\r", count, blah, mprg->vnum );
 		add_buf(buffer, buf);
 
 		count++;

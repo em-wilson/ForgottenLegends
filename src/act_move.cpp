@@ -209,7 +209,7 @@ void move_char( Character *ch, int door, bool follow )
 	    if (IS_BUNNY(fch))
 	    {
 		char buf[MSL];
-		sprintf(buf,"%s leaves %s.\n\r", can_see(ch,fch) ? ch->getName() : "someone", dir_name[door] );
+		snprintf(buf, sizeof(buf),"%s leaves %s.\n\r", can_see(ch,fch) ? ch->getName() : "someone", dir_name[door] );
 		send_to_char(buf,ch);
 	    }
 
@@ -1469,7 +1469,7 @@ void do_recall( Character *ch, char *argument ) {
         if (number_percent() < 80 * skill / 100) {
             check_improve(ch, gsn_recall, FALSE, 6);
             WAIT_STATE(ch, 4);
-            sprintf(buf, "You failed!.\n\r");
+            snprintf(buf, sizeof(buf), "You failed!.\n\r");
             send_to_char(buf, ch);
             return;
         }
@@ -1477,7 +1477,7 @@ void do_recall( Character *ch, char *argument ) {
         lose = (ch->desc != NULL) ? 25 : 50;
         ch->gain_exp(0 - lose);
         check_improve(ch, gsn_recall, TRUE, 4);
-        sprintf(buf, "You recall from combat!  You lose %d exps.\n\r", lose);
+        snprintf(buf, sizeof(buf), "You recall from combat!  You lose %d exps.\n\r", lose);
         send_to_char(buf, ch);
         stop_fighting(ch, TRUE);
 
@@ -1526,7 +1526,7 @@ void do_train( Character *ch, char *arguments ) {
     }
 
     if (arguments[0] == '\0') {
-        sprintf(buf, "You have %d training sessions.\n\r", ch->train);
+        snprintf(buf, sizeof(buf), "You have %d training sessions.\n\r", ch->train);
         send_to_char(buf, ch);
         strcpy(argument, "foo");
     } else {
@@ -1656,11 +1656,11 @@ void do_morph( Character *ch, char *argument )
 	
     if (IS_SET(ch->act, PLR_IS_MORPHED))
     {
-	sprintf(buf, "You morph into a%s %s.\n\r",
+	snprintf(buf, sizeof(buf), "You morph into a%s %s.\n\r",
 	    pc_race_table[ch->orig_form].name[0] == 'e' ? "n" : "",
 	    pc_race_table[ch->orig_form].name );
 	send_to_char(buf,ch);
-	sprintf(buf, "$n morphs into a%s %s.",
+	snprintf(buf, sizeof(buf), "$n morphs into a%s %s.",
 	    pc_race_table[ch->orig_form].name[0] == 'e' ? "n" : "",
 	    pc_race_table[ch->orig_form].name );
 	act(buf,ch,NULL,NULL,TO_ROOM);
@@ -1670,11 +1670,11 @@ void do_morph( Character *ch, char *argument )
     }
     else
     {
-        sprintf(buf, "You morph into a%s %s.\n\r",
+        snprintf(buf, sizeof(buf), "You morph into a%s %s.\n\r",
             morph_table[ch->morph_form].name[0] == 'e' ? "n" : "",
             morph_table[ch->morph_form].name );
         send_to_char(buf,ch);
-        sprintf(buf, "$n morphs into a%s %s.",
+        snprintf(buf, sizeof(buf), "$n morphs into a%s %s.",
             morph_table[ch->morph_form].name[0] == 'e' ? "n" : "",
             morph_table[ch->morph_form].name );
         act(buf,ch,NULL,NULL,TO_ROOM);

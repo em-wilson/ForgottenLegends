@@ -969,7 +969,7 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
 
 	if ( !IS_NPC(victim) )
 	{
-	    sprintf( log_buf, "%s killed by %s at %d",
+	    snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s killed by %s at %d",
 		victim->getName(),
 		(IS_NPC(ch) ? ch->short_descr : ch->getName()),
 		ch->in_room->vnum );
@@ -985,7 +985,7 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
 			         * victim->level - victim->exp)/3) + 50 );
 	}
 
-        sprintf( log_buf, "%s got toasted by %s at %s [room %d]",
+        snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s got toasted by %s at %s [room %d]",
             (IS_NPC(victim) ? victim->short_descr : victim->getName()),
             (IS_NPC(ch) ? ch->short_descr : ch->getName()),
             ch->in_room->name, ch->in_room->vnum);
@@ -1303,7 +1303,7 @@ dam_type, bool show ) {
 
 	if ( !IS_NPC(victim) )
 	{
-	    sprintf( log_buf, "%s killed by %s at %d",
+	    snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s killed by %s at %d",
 		victim->getName(),
 		(IS_NPC(ch) ? ch->short_descr : ch->getName()),
 		victim->in_room->vnum );
@@ -1319,7 +1319,7 @@ dam_type, bool show ) {
 			         * victim->level - victim->exp)/3) + 50 );
 	}
 
-        sprintf( log_buf, "%s got toasted by %s at %s [room %d]",
+        snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s got toasted by %s at %s [room %d]",
             (IS_NPC(victim) ? victim->short_descr : victim->getName()),
             (IS_NPC(ch) ? ch->short_descr : ch->getName()),
             ch->in_room->name, ch->in_room->vnum);
@@ -1650,7 +1650,7 @@ void check_killer( Character *ch, Character *victim )
 	{
 	    char buf[MAX_STRING_LENGTH];
 
-	    sprintf( buf, "Check_killer: %s bad AFF_CHARM",
+	    snprintf(buf, sizeof(buf), "Check_killer: %s bad AFF_CHARM",
 		IS_NPC(ch) ? ch->short_descr : ch->getName() );
 	    bug( buf, 0 );
 	    affect_strip( ch, gsn_charm_person );
@@ -1675,7 +1675,7 @@ void check_killer( Character *ch, Character *victim )
     ||	 ch->fighting  == victim)
 	return;
 
-    sprintf(buf,"$N is attempting to murder %s",victim->getName());
+    snprintf(buf, sizeof(buf),"$N is attempting to murder %s",victim->getName());
     Wiznet::instance()->report(buf,ch,NULL,WIZ_FLAGS,0,0);
     save_char_obj( ch );
     return;
@@ -1895,11 +1895,11 @@ void make_corpse( Character *ch )
 
     corpse->level = ch->level;
 
-    sprintf( buf, corpse->short_descr, name );
+    snprintf(buf, sizeof(buf), corpse->short_descr, name );
     free_string( corpse->short_descr );
     corpse->short_descr = str_dup( buf );
 
-    sprintf( buf, corpse->description, name );
+    snprintf(buf, sizeof(buf), corpse->description, name );
     free_string( corpse->description );
     corpse->description = str_dup( buf );
 
@@ -2039,11 +2039,11 @@ void death_cry( Character *ch )
 	obj		= create_object( get_obj_index( vnum ), 0 );
 	obj->timer	= number_range( 4, 7 );
 
-	sprintf( buf, obj->short_descr, name );
+	snprintf(buf, sizeof(buf), obj->short_descr, name );
 	free_string( obj->short_descr );
 	obj->short_descr = str_dup( buf );
 
-	sprintf( buf, obj->description, name );
+	snprintf(buf, sizeof(buf), obj->description, name );
 	free_string( obj->description );
 	obj->description = str_dup( buf );
 
@@ -2175,7 +2175,7 @@ void group_gain( Character *ch, Character *victim )
 */
 
 	xp = xp_compute( gch, victim, group_levels );  
-	sprintf( buf, "You receive %d experience points.\n\r", xp );
+	snprintf(buf, sizeof(buf), "You receive %d experience points.\n\r", xp );
 	send_to_char( buf, gch );
 	gch->gain_exp( xp );
 
@@ -2302,14 +2302,14 @@ void dam_message( Character *ch, Character *victim,int dam,int dt,bool immune )
     {
 	if (ch  == victim)
 	{
-	    sprintf( buf1, "$n %s $melf%c",vp,punct);
-	    sprintf( buf2, "You %s yourself%c",vs,punct);
+	    snprintf(buf1, sizeof(buf1), "$n %s $melf%c",vp,punct);
+	    snprintf(buf2, sizeof(buf2), "You %s yourself%c",vs,punct);
 	}
 	else
 	{
-	    sprintf( buf1, "$n %s $N%c",  vp, punct );
-	    sprintf( buf2, "You %s $N%c", vs, punct );
-	    sprintf( buf3, "$n %s you%c", vp, punct );
+	    snprintf(buf1, sizeof(buf1), "$n %s $N%c",  vp, punct );
+	    snprintf(buf2, sizeof(buf2), "You %s $N%c", vs, punct );
+	    snprintf(buf3, sizeof(buf3), "$n %s you%c", vp, punct );
 	}
     }
     else
@@ -2330,66 +2330,66 @@ void dam_message( Character *ch, Character *victim,int dam,int dt,bool immune )
 	{
 	    if (ch == victim)
 	    {
-		sprintf(buf1,"$n is unaffected by $s own %s.",attack);
-		sprintf(buf2,"Luckily, you are immune to that.");
+		snprintf(buf1, sizeof(buf1),"$n is unaffected by $s own %s.",attack);
+		snprintf(buf2, sizeof(buf2),"Luckily, you are immune to that.");
 	    } 
 	    else
 	    {
-	    	sprintf(buf1,"$N is unaffected by $n's %s!",attack);
-	    	sprintf(buf2,"$N is unaffected by your %s!",attack);
-	    	sprintf(buf3,"$n's %s is powerless against you.",attack);
+	    	snprintf(buf1, sizeof(buf1),"$N is unaffected by $n's %s!",attack);
+	    	snprintf(buf2, sizeof(buf2),"$N is unaffected by your %s!",attack);
+	    	snprintf(buf3, sizeof(buf3),"$n's %s is powerless against you.",attack);
 	    }
 	}
 	else if (skill_table[dt].pgsn != NULL)
 	{
 	    if (ch == victim)
 	    {
-		sprintf( buf1, "$n's %s %s %s $m%c",pm, attack,vp,punct);
-		sprintf( buf2, "Your %s %s %s you%c",pm, attack,vp,punct);
+		snprintf(buf1, sizeof(buf1), "$n's %s %s %s $m%c",pm, attack,vp,punct);
+		snprintf(buf2, sizeof(buf2), "Your %s %s %s you%c",pm, attack,vp,punct);
 	    }
 	    else if (IS_IMMORTAL(ch))
 	    {
-                sprintf( buf1, "$n's %s %s %s $N%c", pm, attack, vp, punct );
-            	sprintf( buf2, "Your %s %s %s $N%c (%d)", pm, attack, vp, punct, dam );
+                snprintf(buf1, sizeof(buf1), "$n's %s %s %s $N%c", pm, attack, vp, punct );
+            	snprintf(buf2, sizeof(buf2), "Your %s %s %s $N%c (%d)", pm, attack, vp, punct, dam );
 	    	if (IS_IMMORTAL(victim))
-	            sprintf( buf3, "$n's %s %s %s you%c (%d)", pm, attack, vp, punct, dam );
+	            snprintf(buf3, sizeof(buf3), "$n's %s %s %s you%c (%d)", pm, attack, vp, punct, dam );
 	    	else
-	            sprintf( buf3, "$n's %s %s %s you%c", pm, attack, vp, punct );
+	            snprintf(buf3, sizeof(buf3), "$n's %s %s %s you%c", pm, attack, vp, punct );
 	      }
 	    else
 	    {
-	    	sprintf( buf1, "$n's %s %s %s $N%c",  pm, attack, vp, punct );
-	    	sprintf( buf2, "Your %s %s %s $N%c",  pm, attack, vp, punct );
+	    	snprintf(buf1, sizeof(buf1), "$n's %s %s %s $N%c",  pm, attack, vp, punct );
+	    	snprintf(buf2, sizeof(buf2), "Your %s %s %s $N%c",  pm, attack, vp, punct );
 		if (IS_IMMORTAL(victim))
-		    sprintf( buf3, "$n's %s %s %s you%c (%d)", pm, attack, vp, punct, dam );
+		    snprintf(buf3, sizeof(buf3), "$n's %s %s %s you%c (%d)", pm, attack, vp, punct, dam );
 		else
-	    	    sprintf( buf3, "$n's %s %s %s you%c", pm, attack, vp, punct );
+	    	    snprintf(buf3, sizeof(buf3), "$n's %s %s %s you%c", pm, attack, vp, punct );
 	    }
 	}
 	else
 	{
 	    if (ch == victim)
 	    {
-		sprintf( buf1, "$n's %s %s $m%c", attack,vp,punct);
-		sprintf( buf2, "Your %s %s you%c", attack,vp,punct);
+		snprintf(buf1, sizeof(buf1), "$n's %s %s $m%c", attack,vp,punct);
+		snprintf(buf2, sizeof(buf2), "Your %s %s you%c", attack,vp,punct);
 	    }
 	    else if (IS_IMMORTAL(ch))
 	    {
-        	sprintf( buf1, "$n's %s %s $N%c", attack, vp, punct );
-        	sprintf( buf2, "Your %s %s $N%c (%d)", attack, vp, punct, dam );
+        	snprintf(buf1, sizeof(buf1), "$n's %s %s $N%c", attack, vp, punct );
+        	snprintf(buf2, sizeof(buf2), "Your %s %s $N%c (%d)", attack, vp, punct, dam );
 		if (IS_IMMORTAL(victim))
-        	    sprintf( buf3, "$n's %s %s you%c (%d)", attack, vp, punct, dam );
+        	    snprintf(buf3, sizeof(buf3), "$n's %s %s you%c (%d)", attack, vp, punct, dam );
 		else
-        	    sprintf( buf3, "$n's %s %s you%c", attack, vp, punct );
+        	    snprintf(buf3, sizeof(buf3), "$n's %s %s you%c", attack, vp, punct );
 	    }
 	    else
 	    {
-	    	sprintf( buf1, "$n's %s %s $N%c", attack, vp, punct );
-	    	sprintf( buf2, "Your %s %s $N%c", attack, vp, punct );
+	    	snprintf(buf1, sizeof(buf1), "$n's %s %s $N%c", attack, vp, punct );
+	    	snprintf(buf2, sizeof(buf2), "Your %s %s $N%c", attack, vp, punct );
 		if (IS_IMMORTAL(victim))
-		    sprintf( buf3, "$n's %s %s you%c (%d)", attack, vp, punct, dam );
+		    snprintf(buf3, sizeof(buf3), "$n's %s %s you%c (%d)", attack, vp, punct, dam );
 		else
-	    	    sprintf( buf3, "$n's %s %s you%c", attack, vp, punct );
+	    	    snprintf(buf3, sizeof(buf3), "$n's %s %s you%c", attack, vp, punct );
 	    }
 	}
     }
@@ -3034,9 +3034,9 @@ void do_murder( Character *ch, char *argument )
 
     WAIT_STATE( ch, 1 * PULSE_VIOLENCE );
     if (IS_NPC(ch))
-	sprintf(buf, "Help! I am being attacked by %s!",ch->short_descr);
+	snprintf(buf, sizeof(buf), "Help! I am being attacked by %s!",ch->short_descr);
     else
-    	sprintf( buf, "Help!  I am being attacked by %s!", ch->getName() );
+    	snprintf(buf, sizeof(buf), "Help!  I am being attacked by %s!", ch->getName() );
     do_yell( victim, buf );
     check_killer( ch, victim );
     multi_hit( ch, victim, TYPE_UNDEFINED );
@@ -3562,15 +3562,15 @@ void do_breath( Character *ch, char *argument )
     
 	bonus -= (ch->breathe * number_range( 10, 30) );
 
-    sprintf(buf,"You breathe your deadly %s at $N!",
+    snprintf(buf, sizeof(buf),"You breathe your deadly %s at $N!",
 	draconian_table[ch->drac].breath );
     act(buf,ch,NULL,victim,TO_CHAR);
 
-    sprintf(buf,"$n breathes $s deadly %s at $N!",
+    snprintf(buf, sizeof(buf),"$n breathes $s deadly %s at $N!",
 	draconian_table[ch->drac].breath );
     act(buf,ch,NULL,victim,TO_ROOM);
 
-    sprintf(buf,"$n breathes $s deadly %s at you!",
+    snprintf(buf, sizeof(buf),"$n breathes $s deadly %s at you!",
 	draconian_table[ch->drac].breath );
     act(buf,ch,NULL,victim,TO_VICT);
  
@@ -3782,7 +3782,7 @@ void do_assassinate( Character *ch, char *argument )
 	  do_yell(victim, (char*)"Help! Someone tried to assassinate me!");
 	else
 	  {
-	    sprintf( buf, "Help! %s tried to assassinate me!", ch->getName() );
+	    snprintf(buf, sizeof(buf), "Help! %s tried to assassinate me!", ch->getName() );
 	    do_yell( victim, buf );
 	  }
       }
@@ -3858,7 +3858,7 @@ void do_strangle(Character *ch, char *argument)
 	  do_yell(victim, (char*)"Help! I'm being strangled by someone!");
 	else
 	  {
-	    sprintf(buf, "Help! I'm being strangled by %s!", ch->getName() );
+	    snprintf(buf, sizeof(buf), "Help! I'm being strangled by %s!", ch->getName() );
 	    if (!IS_NPC(victim)) do_yell(victim,buf);
 	  }
       }
@@ -3947,7 +3947,7 @@ void do_blackjack(Character *ch, char *argument)
 	  do_yell(victim, (char*)"Help! I'm being blackjacked by someone!");
 	else
 	  {
-	    sprintf(buf, "Help! I'm being blackjacked by %s!", ch->getName() );
+	    snprintf(buf, sizeof(buf), "Help! I'm being blackjacked by %s!", ch->getName() );
 	    if (!IS_NPC(victim)) do_yell(victim,buf);
 	  }
 	}

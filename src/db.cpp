@@ -1420,7 +1420,7 @@ void fix_exits( void )
 		&&   pexit_rev->u1.to_room != pRoomIndex 
 		&&   (pRoomIndex->vnum < 1200 || pRoomIndex->vnum > 1299))
 		{
-		    sprintf( buf, "Fix_exits: %d:%d -> %d:%d -> %d.",
+		    snprintf(buf, sizeof(buf), "Fix_exits: %d:%d -> %d:%d -> %d.",
 			pRoomIndex->vnum, door,
 			to_room->vnum,    rev_dir[door],
 			(pexit_rev->u1.to_room == NULL)
@@ -1541,7 +1541,7 @@ void area_update( void )
 	    ROOM_INDEX_DATA *pRoomIndex;
 
 	    reset_area( pArea );
-	    sprintf(buf,"%s has just been reset.",pArea->name);
+	    snprintf(buf, sizeof(buf),"%s has just been reset.",pArea->name);
 	    Wiznet::instance()->report(buf,NULL,NULL,WIZ_RESETS,0,0);
 	
 	    pArea->age = number_range( 0, 3 );
@@ -1668,7 +1668,7 @@ void reset_room( ROOM_INDEX_DATA *pRoom )
             if ( !( pObjIndex = get_obj_index( pReset->arg1 ) ) )
             {
                 bug( "Reset_room: 'O' 1 : bad vnum %d", pReset->arg1 );
-                sprintf (buf,"%d %d %d %d",pReset->arg1, pReset->arg2, pReset->arg3,
+                snprintf(buf, sizeof(buf),"%d %d %d %d",pReset->arg1, pReset->arg2, pReset->arg3,
                 pReset->arg4 );
 		bug(buf,1);
                 continue;
@@ -1677,7 +1677,7 @@ void reset_room( ROOM_INDEX_DATA *pRoom )
             if ( !( pRoomIndex = get_room_index( pReset->arg3 ) ) )
             {
                 bug( "Reset_room: 'O' 2 : bad vnum %d.", pReset->arg3 );
-                sprintf (buf,"%d %d %d %d",pReset->arg1, pReset->arg2, pReset->arg3,
+                snprintf(buf, sizeof(buf),"%d %d %d %d",pReset->arg1, pReset->arg2, pReset->arg3,
                 pReset->arg4 );
 		bug(buf,1);
                 continue;
@@ -2812,7 +2812,7 @@ void do_areas( Character *ch, char *argument )
 
     for ( iArea = 0; iArea < iAreaHalf; iArea++ )
     {
-	sprintf( buf, "%-39s%-39s\n\r",
+	snprintf(buf, sizeof(buf), "%-39s%-39s\n\r",
 	    pArea1->credits, (pArea2 != NULL) ? pArea2->credits : "" );
         send_to_char_bw( buf, ch );
 	pArea1 = pArea1->next;
@@ -2829,26 +2829,26 @@ void do_memory( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
 
-    sprintf( buf, "Affects %5d\n\r", top_affect    ); send_to_char( buf, ch );
-    sprintf( buf, "Areas   %5d\n\r", top_area      ); send_to_char( buf, ch );
-    sprintf( buf, "ExDes   %5d\n\r", top_ed        ); send_to_char( buf, ch );
-    sprintf( buf, "Exits   %5d\n\r", top_exit      ); send_to_char( buf, ch );
-    sprintf( buf, "Helps   %5d\n\r", top_help      ); send_to_char( buf, ch );
-    sprintf( buf, "Socials %5d\n\r", social_count  ); send_to_char( buf, ch );
-    sprintf( buf, "Mobs    %5d(%d new format)\n\r", top_mob_index,newmobs ); 
+    snprintf(buf, sizeof(buf), "Affects %5d\n\r", top_affect    ); send_to_char( buf, ch );
+    snprintf(buf, sizeof(buf), "Areas   %5d\n\r", top_area      ); send_to_char( buf, ch );
+    snprintf(buf, sizeof(buf), "ExDes   %5d\n\r", top_ed        ); send_to_char( buf, ch );
+    snprintf(buf, sizeof(buf), "Exits   %5d\n\r", top_exit      ); send_to_char( buf, ch );
+    snprintf(buf, sizeof(buf), "Helps   %5d\n\r", top_help      ); send_to_char( buf, ch );
+    snprintf(buf, sizeof(buf), "Socials %5d\n\r", social_count  ); send_to_char( buf, ch );
+    snprintf(buf, sizeof(buf), "Mobs    %5d(%d new format)\n\r", top_mob_index,newmobs ); 
     send_to_char( buf, ch );
-    sprintf( buf, "(in use)%5d\n\r", mobile_count  ); send_to_char( buf, ch );
-    sprintf( buf, "Objs    %5d(%d new format)\n\r", top_obj_index,newobjs ); 
+    snprintf(buf, sizeof(buf), "(in use)%5d\n\r", mobile_count  ); send_to_char( buf, ch );
+    snprintf(buf, sizeof(buf), "Objs    %5d(%d new format)\n\r", top_obj_index,newobjs ); 
     send_to_char( buf, ch );
-    sprintf( buf, "Resets  %5d\n\r", top_reset     ); send_to_char( buf, ch );
-    sprintf( buf, "Rooms   %5d\n\r", top_room      ); send_to_char( buf, ch );
-    sprintf( buf, "Shops   %5d\n\r", top_shop      ); send_to_char( buf, ch );
+    snprintf(buf, sizeof(buf), "Resets  %5d\n\r", top_reset     ); send_to_char( buf, ch );
+    snprintf(buf, sizeof(buf), "Rooms   %5d\n\r", top_room      ); send_to_char( buf, ch );
+    snprintf(buf, sizeof(buf), "Shops   %5d\n\r", top_shop      ); send_to_char( buf, ch );
 
-    sprintf( buf, "Strings %5d strings of %7d bytes (max %d).\n\r",
+    snprintf(buf, sizeof(buf), "Strings %5d strings of %7d bytes (max %d).\n\r",
 	nAllocString, sAllocString, MAX_STRING );
     send_to_char( buf, ch );
 
-    sprintf( buf, "Perms   %5d blocks  of %7d bytes.\n\r",
+    snprintf(buf, sizeof(buf), "Perms   %5d blocks  of %7d bytes.\n\r",
 	nAllocPerm, sAllocPerm );
     send_to_char( buf, ch );
 
@@ -3369,7 +3369,7 @@ void bug( const char *str, int param )
 	    fseek( fpArea, iChar, 0 );
 	}
 
-	sprintf( buf, "[*****] FILE: %s LINE: %d", strArea, iLine );
+	snprintf(buf, sizeof(buf), "[*****] FILE: %s LINE: %d", strArea, iLine );
 	log_string( buf );
 /* RT removed because we don't want bugs shutting the mud 
 	if ( ( fp = fopen( "shutdown.txt", "a" ) ) != NULL )
@@ -3381,7 +3381,7 @@ void bug( const char *str, int param )
     }
 
     strcpy( buf, "[*****] BUG: " );
-    sprintf( buf + strlen(buf), str, param );
+    snprintf(buf + strlen(buf), sizeof(buf) + strlen(buf), str, param );
     log_string( buf );
 /* RT removed due to bug-file spamming 
     fclose( fpReserve );
@@ -3408,7 +3408,7 @@ void log_string( const char *str )
     strtime                    = ctime( &current_time );
     strtime[strlen(strtime)-1] = '\0';
     fprintf( stderr, "%s :: %s\n", strtime, str );
-    sprintf(strtime, "%s", str);
+    snprintf(strtime, sizeof(strtime), "%s", str);
     Wiznet::instance()->report( strtime, 0, 0, WIZ_LOG, WIZ_SECURE, 0);
     return;
 }

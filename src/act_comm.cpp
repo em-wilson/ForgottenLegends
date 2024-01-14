@@ -71,7 +71,7 @@ void do_delete( Character *ch, char *argument)
 	}
 	else
 	{
-    	    sprintf( strsave, "%s%s", PLAYER_DIR, capitalize( ch->getName() ) );
+        snprintf(strsave, sizeof(strsave), "%s%s", PLAYER_DIR, capitalize( ch->getName() ) );
 	    Wiznet::instance()->report("$N turns $Mself into line noise.",ch,NULL,0,0,0);
 	    stop_fighting(ch,TRUE);
 	    if (ch->pcdata->clan)
@@ -189,7 +189,7 @@ void do_channels( Character *ch, char *argument)
     {
 	if (ch->lines)
 	{
-	    sprintf(buf,"You display %d lines of scroll.\n\r",ch->lines+2);
+	    snprintf(buf, sizeof(buf),"You display %d lines of scroll.\n\r",ch->lines+2);
 	    send_to_char(buf,ch);
  	}
 	else
@@ -198,7 +198,7 @@ void do_channels( Character *ch, char *argument)
 
     if (ch->prompt != NULL)
     {
-	sprintf(buf,"Your current prompt is: %s\n\r",ch->prompt);
+	snprintf(buf, sizeof(buf),"Your current prompt is: %s\n\r",ch->prompt);
 	send_to_char(buf,ch);
     }
 
@@ -298,7 +298,7 @@ void talk_auction( char *argument )
 	     !IS_SET(victim->comm,COMM_NOAUCTION) &&
 	     !IS_SET(victim->comm,COMM_QUIET) )
 	{
-		sprintf(buf, "{BAUCTION: {c%s{x", argument);
+		snprintf(buf, sizeof(buf), "{BAUCTION: {c%s{x", argument);
 		send_to_char(buf,victim);
 		send_to_char("\n\r",victim);
  	}
@@ -341,7 +341,7 @@ void do_gossip( Character *ch, char *argument )
 
       REMOVE_BIT(ch->comm,COMM_NOGOSSIP);
  
-      sprintf( buf, "{cYou gossip '%s{c'{x\n\r", argument );
+      snprintf(buf, sizeof(buf), "{cYou gossip '%s{c'{x\n\r", argument );
       send_to_char( buf, ch );
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
@@ -396,7 +396,7 @@ void do_grats( Character *ch, char *argument )
  
       REMOVE_BIT(ch->comm,COMM_NOGRATS);
  
-      sprintf( buf, "{yYou grats '%s{y'{x\n\r", argument );
+      snprintf(buf, sizeof(buf), "{yYou grats '%s{y'{x\n\r", argument );
       send_to_char( buf, ch );
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
@@ -451,7 +451,7 @@ void do_quote( Character *ch, char *argument )
  
       REMOVE_BIT(ch->comm,COMM_NOQUOTE);
  
-      sprintf( buf, "You quote '%s'\n\r", argument );
+      snprintf(buf, sizeof(buf), "You quote '%s'\n\r", argument );
       send_to_char( buf, ch );
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
@@ -506,7 +506,7 @@ void do_question( Character *ch, char *argument )
  
         REMOVE_BIT(ch->comm,COMM_NOQUESTION);
  
-      sprintf( buf, "You question '%s'\n\r", argument );
+      snprintf(buf, sizeof(buf), "You question '%s'\n\r", argument );
       send_to_char( buf, ch );
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
@@ -561,7 +561,7 @@ void do_answer( Character *ch, char *argument )
  
         REMOVE_BIT(ch->comm,COMM_NOQUESTION);
  
-      sprintf( buf, "You answer '%s'\n\r", argument );
+      snprintf(buf, sizeof(buf), "You answer '%s'\n\r", argument );
       send_to_char( buf, ch );
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
@@ -616,9 +616,9 @@ void do_music( Character *ch, char *argument )
  
         REMOVE_BIT(ch->comm,COMM_NOMUSIC);
  
-      sprintf( buf, "You MUSIC: '%s'\n\r", argument );
+      snprintf(buf, sizeof(buf), "You MUSIC: '%s'\n\r", argument );
       send_to_char( buf, ch );
-      sprintf( buf, "$n MUSIC: '%s'", argument );
+      snprintf(buf, sizeof(buf), "$n MUSIC: '%s'", argument );
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
         Character *victim;
@@ -671,9 +671,9 @@ void do_clantalk( Character *ch, char *argument )
 
         REMOVE_BIT(ch->comm,COMM_NOCLAN);
 
-      sprintf( buf, "You clan '%s'\n\r", argument );
+      snprintf(buf, sizeof(buf), "You clan '%s'\n\r", argument );
       send_to_char( buf, ch );
-      sprintf( buf, "$n clans '%s'", argument );
+      snprintf(buf, sizeof(buf), "$n clans '%s'", argument );
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
         if ( d->connected == CON_PLAYING &&
@@ -711,7 +711,7 @@ void do_immtalk( Character *ch, char *argument )
 
     REMOVE_BIT(ch->comm,COMM_NOWIZ);
 
-    sprintf( buf, "$n: %s", argument );
+    snprintf(buf, sizeof(buf), "$n: %s", argument );
     act_new("$n: $t",ch,argument,NULL,TO_CHAR,POS_DEAD);
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
@@ -850,7 +850,7 @@ void do_tell( Character *ch, char *argument )
     {
 	act("$N seems to have misplaced $S link...try again later.",
 	    ch,NULL,victim,TO_CHAR);
-        sprintf(buf,"{B%s{C tried to tell you '%s' while you were {GLINKDEAD{C.{x\n\r",PERS(ch,victim),argument);
+        snprintf(buf, sizeof(buf),"{B%s{C tried to tell you '%s' while you were {GLINKDEAD{C.{x\n\r",PERS(ch,victim),argument);
         buf[0] = UPPER(buf[0]);
         add_buf(victim->pcdata->buffer,buf);
 	return;
@@ -885,7 +885,7 @@ void do_tell( Character *ch, char *argument )
 
 	act("$E is {RAFK{x, but your tell will go through when $E returns.",
 	    ch,NULL,victim,TO_CHAR);
-	sprintf(buf,"{B%s {Ctried to tell you '%s' while you were {RAFK{x.\n\r",PERS(ch,victim),argument);
+	snprintf(buf, sizeof(buf),"{B%s {Ctried to tell you '%s' while you were {RAFK{x.\n\r",PERS(ch,victim),argument);
 	buf[0] = UPPER(buf[0]);
 	add_buf(victim->pcdata->buffer,buf);
 	return;
@@ -921,7 +921,7 @@ void do_reply( Character *ch, char *argument )
 	return;
     }
 
-    sprintf(buf,"%s %s", ch->reply->getName(), argument );
+    snprintf(buf, sizeof(buf),"%s %s", ch->reply->getName(), argument );
     do_tell(ch,buf);
     return;
 }
@@ -983,7 +983,7 @@ void do_emote( Character *ch, char *argument )
 	argument++;
 
     MOBtrigger = FALSE;
-    sprintf(buf, "$n %s", argument);
+    snprintf(buf, sizeof(buf), "$n %s", argument);
     act( buf, ch, NULL, NULL, TO_ROOM );
     act( buf, ch, NULL, NULL, TO_CHAR );
     MOBtrigger = TRUE;
@@ -1403,7 +1403,7 @@ And there {Rw{ra{Rs{x {CIndustrial {WLight{x and {MMagic{x\n\r"
 
     send_to_char("'Good, bad, I'm the guy with the gun.' -Ash\n\r", ch);
     act("$n has left the game.", ch, NULL, NULL, TO_ROOM);
-    sprintf(log_buf, "%s has quit.", ch->getName());
+    snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s has quit.", ch->getName());
     log_string(log_buf);
     Wiznet::instance()->report("$N rejoins the real world.", ch, NULL, WIZ_LOGINS, 0, get_trust(ch));
 
@@ -1674,7 +1674,7 @@ void do_order( Character *ch, char *argument )
 	&& ( fAll || och == victim ) )
 	{
 	    found = TRUE;
-	    sprintf( buf, "$n orders you to '%s'.", argument );
+	    snprintf(buf, sizeof(buf), "$n orders you to '%s'.", argument );
 	    act( buf, ch, NULL, och, TO_VICT );
 	    interpret( och, argument );
 	}
@@ -1706,7 +1706,7 @@ void do_group( Character *ch, char *argument )
 	Character *leader;
 
 	leader = (ch->leader != NULL) ? ch->leader : ch;
-	sprintf( buf, "%s's group:\n\r", PERS(leader, ch) );
+	snprintf(buf, sizeof(buf), "%s's group:\n\r", PERS(leader, ch) );
 	send_to_char( buf, ch );
 
     for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
@@ -1714,7 +1714,7 @@ void do_group( Character *ch, char *argument )
    gch = *it;
 	    if ( is_same_group( gch, ch ) )
 	    {
-		sprintf( buf,
+		snprintf(buf, sizeof(buf),
 		"[%2d %s] %-16s %4d/%4d hp %4d/%4d mana %4d/%4d mv %5d xp\n\r",
 		    gch->level,
 		    IS_NPC(gch) ? "Mob" : class_table[gch->class_num].who_name,
@@ -1858,7 +1858,7 @@ void do_split( Character *ch, char *argument )
 
     if (share_silver > 0)
     {
-	sprintf(buf,
+	snprintf(buf, sizeof(buf),
 	    "You split %d silver coins. Your share is %d silver.\n\r",
  	    amount_silver,share_silver + extra_silver);
 	send_to_char(buf,ch);
@@ -1866,7 +1866,7 @@ void do_split( Character *ch, char *argument )
 
     if (share_gold > 0)
     {
-	sprintf(buf,
+	snprintf(buf, sizeof(buf),
 	    "You split %d gold coins. Your share is %d gold.\n\r",
 	     amount_gold,share_gold + extra_gold);
 	send_to_char(buf,ch);
@@ -1874,17 +1874,17 @@ void do_split( Character *ch, char *argument )
 
     if (share_gold == 0)
     {
-	sprintf(buf,"$n splits %d silver coins. Your share is %d silver.",
+	snprintf(buf, sizeof(buf),"$n splits %d silver coins. Your share is %d silver.",
 		amount_silver,share_silver);
     }
     else if (share_silver == 0)
     {
-	sprintf(buf,"$n splits %d gold coins. Your share is %d gold.",
+	snprintf(buf, sizeof(buf),"$n splits %d gold coins. Your share is %d gold.",
 		amount_gold,share_gold);
     }
     else
     {
-	sprintf(buf,
+	snprintf(buf, sizeof(buf),
 "$n splits %d silver and %d gold coins, giving you %d silver and %d gold.\n\r",
 	 amount_silver,amount_gold,share_silver,share_gold);
     }
@@ -2116,14 +2116,14 @@ void do_info( Character *ch, char *argument )
         REMOVE_BIT(ch->comm,COMM_NOINFO);
 
 /* Old format, re-integrated
-      sprintf( buf, "{YYou INFO: {C'%s{C'{x\n\r", argument );
+      snprintf(buf, sizeof(buf), "{YYou INFO: {C'%s{C'{x\n\r", argument );
       send_to_char( buf, ch );
-      sprintf( buf, "{Y$n INFO: {C'%s{C'{x", argument );
+      snprintf(buf, sizeof(buf), "{Y$n INFO: {C'%s{C'{x", argument );
 */
 
-      sprintf( buf, "{YINFO: {C'%s{C'{x\n\r", argument );
+      snprintf(buf, sizeof(buf), "{YINFO: {C'%s{C'{x\n\r", argument );
       send_to_char( buf, ch );
-      sprintf( buf, "{YINFO: {C'%s{C'{x", argument );
+      snprintf(buf, sizeof(buf), "{YINFO: {C'%s{C'{x", argument );
 
       for ( d = descriptor_list; d != NULL; d = d->next )
       {

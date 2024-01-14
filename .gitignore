@@ -1,9 +1,20 @@
+# CMake
+Makefile
+_deps/
+CMakeFiles
+cmake_install.cmake
+CMakeCache.txt
+
 .DS_Store
 *.swp
 *.o
 *.a
 test/tests
 src/rom
+Makefile
+build/
 .idea
 cmake-build-debug/
 data/misc/help.txt
+ForgottenLegends
+ForgottenLegendsTest

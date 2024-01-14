@@ -474,11 +474,11 @@ void init_descriptor( int control )
 	int addr;
 
 	addr = ntohl( sock.sin_addr.s_addr );
-	sprintf( buf, "%d.%d.%d.%d",
+	snprintf(buf, sizeof(buf), "%d.%d.%d.%d",
 	    ( addr >> 24 ) & 0xFF, ( addr >> 16 ) & 0xFF,
 	    ( addr >>  8 ) & 0xFF, ( addr       ) & 0xFF
 	    );
-	sprintf( log_buf, "Sock.sinaddr:  %s", buf );
+	snprintf(log_buf, 2*MAX_INPUT_LENGTH, "Sock.sinaddr:  %s", buf );
 	log_string( log_buf );
 	from = gethostbyaddr( (char *) &sock.sin_addr,
 	    sizeof(sock.sin_addr), AF_INET );
@@ -548,7 +548,7 @@ void close_socket( DESCRIPTOR_DATA *dclose )
 
     if ( ( ch = dclose->character ) != NULL )
     {
-	sprintf( log_buf, "Closing link to %s.", ch->getName() );
+	snprintf(log_buf, 2*MAX_INPUT_LENGTH, "Closing link to %s.", ch->getName() );
 	log_string( log_buf );
 	/* cut down on wiznet spam when rebooting */
        /* If ch is writing note or playing, just lose link otherwise clear char */
@@ -615,7 +615,7 @@ bool read_from_descriptor( DESCRIPTOR_DATA *d )
     iStart = strlen((const char*)d->inbuf);
     if ( iStart >= sizeof(d->inbuf) - 10 )
     {
-	sprintf( log_buf, "%s input overflow!", d->host );
+	snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s input overflow!", d->host );
 	log_string( log_buf );
 	write_to_descriptor( d->descriptor,
 	    (char*)"\n\r*** PUT A LID ON IT!!! ***\n\r", 0 );
@@ -725,7 +725,7 @@ void read_from_buffer( DESCRIPTOR_DATA *d )
 	    if (++d->repeat >= 25 && d->character
 	    &&  d->connected == CON_PLAYING)
 	    {
-		sprintf( log_buf, "%s input spamming!", d->host );
+		snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s input spamming!", d->host );
 		log_string( log_buf );
 		Wiznet::instance()->report((char*)"Spam spam spam $N spam spam spam spam spam!",
 		       d->character,NULL,WIZ_SPAM,0,get_trust(d->character));
@@ -814,38 +814,38 @@ bool process_output( DESCRIPTOR_DATA *d, bool fPrompt )
 
 		if (percent >= 100)
 		{
-		    sprintf(wound,"is in excellent condition.");
+		    snprintf(wound, sizeof(wound),"is in excellent condition.");
 		}
 		else if (percent >= 90)
 		{
-		    sprintf(wound,"has a few scratches.");
+		    snprintf(wound, sizeof(wound),"has a few scratches.");
 		}
 		else if (percent >= 75)
 		{
-		    sprintf(wound,"has some small wounds and bruises.");
+		    snprintf(wound, sizeof(wound),"has some small wounds and bruises.");
 		}
 		else if (percent >= 50)
 		{
-		    sprintf(wound,"has quite a few wounds.");
+		    snprintf(wound, sizeof(wound),"has quite a few wounds.");
 		}
 		else if (percent >= 30)
 		{
-		    sprintf(wound,"has some big nasty wounds and scratches.");
+		    snprintf(wound, sizeof(wound),"has some big nasty wounds and scratches.");
 		}
 		else if (percent >= 15)
 		{
-		    sprintf(wound,"looks pretty hurt.");
+		    snprintf(wound, sizeof(wound),"looks pretty hurt.");
 		}
 		else if (percent >= 0)
 		{
-		    sprintf(wound,"is in awful condition.");
+		    snprintf(wound, sizeof(wound),"is in awful condition.");
 		}
 		else
 		{
-		    sprintf(wound,"is bleeding to death.");
+		    snprintf(wound, sizeof(wound),"is bleeding to death.");
 		}
  
-		sprintf(buf,"%s %s \n\r", 
+		snprintf(buf, sizeof(buf),"%s %s \n\r", 
 	            IS_NPC(victim) ? victim->short_descr : victim->getName(),wound);
 		buf[0]      = UPPER( buf[0] );
 		pbuff       = buffer;
@@ -921,7 +921,7 @@ void bust_a_prompt( Character *ch )
     str = ch->prompt;
     if( !str || str[0] == '\0')
     {
-        sprintf( buf, "{c<%d to level>\n\r<%d/%dhp %d/%dm %d/%dmv>{x %s",
+        snprintf(buf, sizeof(buf), "{c<%d to level>\n\r<%d/%dhp %d/%dm %d/%dmv>{x %s",
 	   (ch->level + 1) * exp_per_level(ch,ch->pcdata->points) - ch->exp,
            ch->hit, ch->max_hit, ch->mana, ch->max_mana, ch->move,
 	   ch->max_move,  ch->prefix );
@@ -965,71 +965,71 @@ void bust_a_prompt( Character *ch )
 	    }
 	    if (!found)
 	 	strcat(buf,"none");
-	    sprintf(buf2,"%s",doors);
+	    snprintf(buf2, sizeof(buf2),"%s",doors);
 	    i = buf2; break;
  	 case 'c' :
-	    sprintf(buf2,"%s","\n\r");
+	    snprintf(buf2, sizeof(buf2),"%s","\n\r");
 	    i = buf2; break;
          case 'h' :
-            sprintf( buf2, "%d", ch->hit );
+            snprintf(buf2, sizeof(buf2), "%d", ch->hit );
             i = buf2; break;
          case 'H' :
-            sprintf( buf2, "%d", ch->max_hit );
+            snprintf(buf2, sizeof(buf2), "%d", ch->max_hit );
             i = buf2; break;
          case 'm' :
-            sprintf( buf2, "%d", ch->mana );
+            snprintf(buf2, sizeof(buf2), "%d", ch->mana );
             i = buf2; break;
          case 'M' :
-            sprintf( buf2, "%d", ch->max_mana );
+            snprintf(buf2, sizeof(buf2), "%d", ch->max_mana );
             i = buf2; break;
          case 'v' :
-            sprintf( buf2, "%d", ch->move );
+            snprintf(buf2, sizeof(buf2), "%d", ch->move );
             i = buf2; break;
          case 'V' :
-            sprintf( buf2, "%d", ch->max_move );
+            snprintf(buf2, sizeof(buf2), "%d", ch->max_move );
             i = buf2; break;
          case 'x' :
-            sprintf( buf2, "%d", ch->exp );
+            snprintf(buf2, sizeof(buf2), "%d", ch->exp );
             i = buf2; break;
 	 case 'X' :
-	    sprintf(buf2, "%d", IS_NPC(ch) ? 0 :
+	    snprintf(buf2, sizeof(buf2), "%d", IS_NPC(ch) ? 0 :
 	    (ch->level + 1) * exp_per_level(ch,ch->pcdata->points) - ch->exp);
 	    i = buf2; break;
          case 'g' :
-            sprintf( buf2, "%ld", ch->gold);
+            snprintf(buf2, sizeof(buf2), "%ld", ch->gold);
             i = buf2; break;
 	 case 's' :
-	    sprintf( buf2, "%ld", ch->silver);
+	    snprintf(buf2, sizeof(buf2), "%ld", ch->silver);
 	    i = buf2; break;
          case 'r' :
             if( ch->in_room != NULL )
-               sprintf( buf2, "%s", 
+               snprintf(buf2, sizeof(buf2), "%s", 
 		((!IS_NPC(ch) && IS_SET(ch->act,PLR_HOLYLIGHT)) ||
 		 (!IS_AFFECTED(ch,AFF_BLIND) && !room_is_dark( ch->in_room )))
 		? ch->in_room->name : "darkness");
             else
-               sprintf( buf2, " " );
+               snprintf(buf2, sizeof(buf2), " " );
             i = buf2; break;
          case 'R' :
             if( IS_IMMORTAL( ch ) && ch->in_room != NULL )
-               sprintf( buf2, "%d", ch->in_room->vnum );
+               snprintf(buf2, sizeof(buf2), "%d", ch->in_room->vnum );
             else
-               sprintf( buf2, " " );
+               snprintf(buf2, sizeof(buf2), " " );
             i = buf2; break;
          case 'z' :
             if( IS_IMMORTAL( ch ) && ch->in_room != NULL )
-               sprintf( buf2, "%s", ch->in_room->area->name );
+               snprintf(buf2, sizeof(buf2), "%s", ch->in_room->area->name );
             else
-               sprintf( buf2, " " );
+               snprintf(buf2, sizeof(buf2), " " );
             i = buf2; break;
          case '%' :
-            sprintf( buf2, "%%" );
+            snprintf(buf2, sizeof(buf2), "%%" );
             i = buf2; break;
          case 'o' :
-            sprintf( buf2, "%s", olc_ed_name(ch) );
+            snprintf(buf2, sizeof(buf2), "%s", olc_ed_name(ch) );
             i = buf2; break;
 	 case 'O' :
-	    sprintf( buf2, "%s", olc_ed_vnum(ch) );
+	    snprintf(buf2, sizeof(buf2), "%s", olc_ed_vnum(ch) );
 	    i = buf2; break;
       }
       ++str;
@@ -1185,7 +1185,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 
 	if (IS_SET(ch->act, PLR_DENY))
 	{
-	    sprintf( log_buf, "Denying access to %s@%s.", argument, d->host );
+	    snprintf(log_buf, 2*MAX_INPUT_LENGTH, "Denying access to %s@%s.", argument, d->host );
 	    log_string( log_buf );
 	    write_to_buffer( d, "You are denied access.\n\r", 0 );
 	    close_socket( d );
@@ -1239,7 +1239,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 		return;
 	    }
 	
-	    sprintf( buf, "Did I get that right, %s (Y/N)? ", argument );
+	    snprintf(buf, sizeof(buf), "Did I get that right, %s (Y/N)? ", argument );
 	    write_to_buffer( d, buf, 0 );
 	    d->connected = CON_CONFIRM_NEW_NAME;
 	    return;
@@ -1264,7 +1264,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	if ( check_reconnect( d, ch->getName(), TRUE ) )
 	    return;
 
-	sprintf( log_buf, "%s@%s has connected.", ch->getName(), d->host );
+	snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s@%s has connected.", ch->getName(), d->host );
 	log_string( log_buf );
 	Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
 
@@ -1330,7 +1330,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
 	switch ( *argument )
 	{
 	case 'y': case 'Y':
-	    sprintf( buf, "New character.\n\rGive me a password for %s: %s",
+	    snprintf(buf, sizeof(buf), "New character.\n\rGive me a password for %s: %s",
 		ch->getName(), echo_off_str );
 	    write_to_buffer( d, buf, 0 );
 	    d->connected = CON_GET_NEW_PASSWORD;
@@ -1619,7 +1619,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
         ch->class_num = iClass;
 	SET_BIT(ch->done, class_table[ch->class_num].flag);
 
-	sprintf( log_buf, "%s@%s new player.", ch->getName(), d->host );
+	snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s@%s new player.", ch->getName(), d->host );
 	log_string( log_buf );
 	Wiznet::instance()->report((char*)"Newbie alert!  $N sighted.",ch,NULL,WIZ_NEWBIE,0,0);
         Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
@@ -1657,7 +1657,7 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
         ch->class_num = iClass;
 	SET_BIT(ch->done, class_table[ch->class_num].flag);
 
-	sprintf( log_buf, "%s@%s reclasses as the %s class.", ch->getName(), d->host, class_table[ch->class_num].name );
+	snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s@%s reclasses as the %s class.", ch->getName(), d->host, class_table[ch->class_num].name );
 	log_string( log_buf );
 	Wiznet::instance()->report((char*)"Reclass alert!  $N sighted.",ch,NULL,WIZ_NEWBIE,0,0);
         Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_SITES,0,get_trust(ch));
@@ -1680,9 +1680,9 @@ case CON_RECLASS_CUST:
         {
 	    if (ch->pcdata->points < must_have)
 		ch->pcdata->points = must_have;
-            sprintf(buf,"Creation points: %d\n\r",ch->pcdata->points);
+            snprintf(buf, sizeof(buf),"Creation points: %d\n\r",ch->pcdata->points);
             send_to_char(buf,ch);
-            sprintf(buf,"Experience per level: %d\n\r",
+            snprintf(buf, sizeof(buf),"Experience per level: %d\n\r",
                     exp_per_level(ch,ch->gen_data->points_chosen));
 	    ch->exp = exp_per_level(ch,ch->gen_data->points_chosen) * ch->level;
             free_gen_data(ch->gen_data);
@@ -1766,9 +1766,9 @@ case CON_DEFAULT_CHOICE:
 	send_to_char("\n\r",ch);
        	if (!str_cmp(argument,"done"))
        	{
-	    sprintf(buf,"Creation points: %d\n\r",ch->pcdata->points);
+	    snprintf(buf, sizeof(buf),"Creation points: %d\n\r",ch->pcdata->points);
 	    send_to_char(buf,ch);
-	    sprintf(buf,"Experience per level: %d\n\r",
+	    snprintf(buf, sizeof(buf),"Experience per level: %d\n\r",
 	            exp_per_level(ch,ch->gen_data->points_chosen));
 	    if (ch->pcdata->points < 40)
 		ch->train = (40 - ch->pcdata->points + 1) / 2;
@@ -1855,7 +1855,7 @@ case CON_DEFAULT_CHOICE:
 	    ch->move	= ch->max_move;
 	    ch->train	 = 5;
 	    ch->practice = 5;
-	    sprintf( buf, "the %s", capitalize(class_table[ch->class_num].name) );
+	    snprintf(buf, sizeof(buf), "the %s", capitalize(class_table[ch->class_num].name) );
 	    set_title( ch, buf );
 
 	    do_outfit(ch,(char*)"");
@@ -2041,7 +2041,7 @@ bool check_reconnect( DESCRIPTOR_DATA *d, char *name, bool fConn )
 
 		act( "$n has reconnected.", ch, NULL, NULL, TO_ROOM );
 
-		sprintf( log_buf, "%s@%s reconnected.", ch->getName(), d->host );
+		snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s@%s reconnected.", ch->getName(), d->host );
 		log_string( log_buf );
 		Wiznet::instance()->report((char*)"$N groks the fullness of $S link.",
 		    ch,NULL,WIZ_LINKS,0,0);
@@ -2507,116 +2507,116 @@ int colour( char type, Character *ch, char *string )
     switch( type )
     {
        default:
-           sprintf( code, CLEAR );
+           snprintf(code, sizeof(code), CLEAR );
            break;
        case 'x':
-           sprintf( code, CLEAR );
+           snprintf(code, sizeof(code), CLEAR );
            break;
        case 'b':
-           sprintf( code, C_BLUE );
+           snprintf(code, sizeof(code), C_BLUE );
            break;
        case 'c':
-           sprintf( code, C_CYAN );
+           snprintf(code, sizeof(code), C_CYAN );
            break;
        case 'g':
-           sprintf( code, C_GREEN );
+           snprintf(code, sizeof(code), C_GREEN );
            break;
        case 'm':
-           sprintf( code, C_MAGENTA );
+           snprintf(code, sizeof(code), C_MAGENTA );
            break;
        case 'r':
-           sprintf( code, C_RED );
+           snprintf(code, sizeof(code), C_RED );
            break;
        case 'w':
-           sprintf( code, C_WHITE );
+           snprintf(code, sizeof(code), C_WHITE );
            break;
        case 'y':
-           sprintf( code, C_YELLOW );
+           snprintf(code, sizeof(code), C_YELLOW );
            break;
        case 'B':
-           sprintf( code, C_B_BLUE );
+           snprintf(code, sizeof(code), C_B_BLUE );
            break;
        case 'C':
-           sprintf( code, C_B_CYAN );
+           snprintf(code, sizeof(code), C_B_CYAN );
            break;
        case 'G':
-           sprintf( code, C_B_GREEN );
+           snprintf(code, sizeof(code), C_B_GREEN );
            break;
        case 'M':
-           sprintf( code, C_B_MAGENTA );
+           snprintf(code, sizeof(code), C_B_MAGENTA );
            break;
        case 'R':
-           sprintf( code, C_B_RED );
+           snprintf(code, sizeof(code), C_B_RED );
            break;
        case 'W':
-           sprintf( code, C_B_WHITE );
+           snprintf(code, sizeof(code), C_B_WHITE );
            break;
        case 'Y':
-           sprintf( code, C_B_YELLOW );
+           snprintf(code, sizeof(code), C_B_YELLOW );
            break;
        case 'D':
-           sprintf( code, C_D_GREY );
+           snprintf(code, sizeof(code), C_D_GREY );
            break;
 	/* Blizzy's random colour code */
 	case 'e':
 	switch (number_range(1,14))
 	{ 
      case 1:
-           sprintf( code, C_BLUE );
+           snprintf(code, sizeof(code), C_BLUE );
            break;
        case 2:
-           sprintf( code, C_CYAN );
+           snprintf(code, sizeof(code), C_CYAN );
            break;
        default:
-           sprintf( code, C_GREEN );
+           snprintf(code, sizeof(code), C_GREEN );
            break;
        case 3:
-           sprintf( code, C_MAGENTA );
+           snprintf(code, sizeof(code), C_MAGENTA );
            break;
        case 4:
-           sprintf( code, C_RED );
+           snprintf(code, sizeof(code), C_RED );
            break;
        case 5:
-           sprintf( code, C_WHITE );
+           snprintf(code, sizeof(code), C_WHITE );
            break;
        case 6:
-           sprintf( code, C_YELLOW );
+           snprintf(code, sizeof(code), C_YELLOW );
            break;
        case 7:
-           sprintf( code, C_B_BLUE );
+           snprintf(code, sizeof(code), C_B_BLUE );
            break;
        case 8:
-           sprintf( code, C_B_CYAN );
+           snprintf(code, sizeof(code), C_B_CYAN );
            break;
        case 9:
-           sprintf( code, C_B_GREEN );
+           snprintf(code, sizeof(code), C_B_GREEN );
            break;
        case 10:
-           sprintf( code, C_B_MAGENTA );
+           snprintf(code, sizeof(code), C_B_MAGENTA );
            break;
        case 11:
-           sprintf( code, C_B_RED );
+           snprintf(code, sizeof(code), C_B_RED );
            break;
        case 12:
-           sprintf( code, C_B_WHITE );
+           snprintf(code, sizeof(code), C_B_WHITE );
            break;
        case 13:
-           sprintf( code, C_B_YELLOW );
+           snprintf(code, sizeof(code), C_B_YELLOW );
            break;
        case 14:
-           sprintf( code, C_D_GREY );
+           snprintf(code, sizeof(code), C_D_GREY );
            break;
        }
 	    break;
 
        case '*':
-           sprintf( code, "%c", 007 );
+           snprintf(code, sizeof(code), "%c", 007 );
            break;
        case '/':
-           sprintf( code, "%c", 012 );
+           snprintf(code, sizeof(code), "%c", 012 );
            break;
        case '{':
-           sprintf( code, "%c", '{' );
+           snprintf(code, sizeof(code), "%c", '{' );
            break;
     }
 
@@ -2677,7 +2677,7 @@ void log_stringf (const char * fmt, ...)
        char buf [2*MSL];
        va_list args;
        va_start (args, fmt);
-       vsprintf (buf, fmt, args);
+       vsnprintf(buf, sizeof(buf), fmt, args);
        va_end (args);
  
        log_string (buf);

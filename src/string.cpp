@@ -165,7 +165,7 @@ void string_add( Character *ch, char *argument )
 
             *ch->desc->pString =
                 string_replace( *ch->desc->pString, arg2, arg3 );
-            sprintf( buf, "'%s' replaced with '%s'.\n\r", arg2, arg3 );
+            snprintf(buf, sizeof(buf), "'%s' replaced with '%s'.\n\r", arg2, arg3 );
             send_to_char( buf, ch );
             return;
         }
@@ -236,7 +236,7 @@ void string_add( Character *ch, char *argument )
 					for ( mpl = mob->mprogs; mpl; mpl = mpl->next )
 						if ( mpl->vnum == mpc->vnum )
 						{
-							sprintf( buf, "Arreglando mob %d.\n\r", mob->vnum );
+							snprintf(buf, sizeof(buf), "Arreglando mob %d.\n\r", mob->vnum );
 							send_to_char( buf, ch );
 							mpl->code = mpc->code;
 						}
@@ -665,7 +665,7 @@ char *numlineas( char *string )
 	while ( *string )
 	{
 		string = getline( string, tmpb );
-		sprintf( buf2, "%2d. %s\n\r", cnt++, tmpb );
+		snprintf(buf2, sizeof(buf2), "%2d. %s\n\r", cnt++, tmpb );
 		strcat( buf, buf2 );
 	}
 
