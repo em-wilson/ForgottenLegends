@@ -228,7 +228,6 @@ void    init_mm         args( ( void ) );
 void	load_area	args( ( FILE *fp ) );
 void    new_load_area   args( ( FILE *fp ) );   /* OLC */
 void	load_helps	args( ( FILE *fp, char *fname ) );
-void	load_old_mob	args( ( FILE *fp ) );
 void 	load_mobiles	args( ( FILE *fp ) );
 void	load_old_obj	args( ( FILE *fp ) );
 void 	load_objects	args( ( FILE *fp ) );
@@ -369,7 +368,6 @@ void boot_db()
 		else if ( !str_cmp( word, "AREA"     ) ) load_area    (fpArea);
   /* OLC */     else if ( !str_cmp( word, "AREADATA" ) ) new_load_area(fpArea);
 		else if ( !str_cmp( word, "HELPS"    ) ) load_helps   (fpArea, strArea);
-		else if ( !str_cmp( word, "MOBOLD"   ) ) load_old_mob (fpArea);
 		else if ( !str_cmp( word, "MOBILES"  ) ) load_mobiles (fpArea);
 		else if ( !str_cmp( word, "MOBPROGS" ) ) load_mobprogs(fpArea);
 		else if ( !str_cmp( word, "OBJOLD"   ) ) load_old_obj (fpArea);
@@ -649,146 +647,6 @@ void load_helps( FILE *fp, char *fname )
 	pHelp->next_area	= NULL;
 
 	top_help++;
-    }
-
-    return;
-}
-
-
-
-/*
- * Snarf a mob section.  old style 
- */
-void load_old_mob( FILE *fp )
-{
-    MOB_INDEX_DATA *pMobIndex;
-    /* for race updating */
-    int race;
-    char name[MAX_STRING_LENGTH];
-
-    if ( !area_last )   /* OLC */
-    {
-        bug( "Load_mobiles: no #AREA seen yet.", 0 );
-        exit( 1 );
-    }
-
-    for ( ; ; )
-    {
-	sh_int vnum;
-	char letter;
-	int iHash;
-
-	letter				= fread_letter( fp );
-	if ( letter != '#' )
-	{
-	    bug( "Load_mobiles: # not found.", 0 );
-	    exit( 1 );
-	}
-
-	vnum				= fread_number( fp );
-	if ( vnum == 0 )
-	    break;
-
-	fBootDb = FALSE;
-	if ( get_mob_index( vnum ) != NULL )
-	{
-	    bug( "Load_mobiles: vnum %d duplicated.", vnum );
-	    exit( 1 );
-	}
-	fBootDb = TRUE;
-
-	pMobIndex			= (MOB_INDEX_DATA*)alloc_perm( sizeof(*pMobIndex) );
-	pMobIndex->vnum			= vnum;
-        pMobIndex->area                 = area_last;               /* OLC */
-	pMobIndex->new_format		= FALSE;
-	pMobIndex->player_name		= fread_string( fp );
-	pMobIndex->short_descr		= fread_string( fp );
-	pMobIndex->long_descr		= fread_string( fp );
-	pMobIndex->description		= fread_string( fp );
-
-	pMobIndex->long_descr[0]	= UPPER(pMobIndex->long_descr[0]);
-	pMobIndex->description[0]	= UPPER(pMobIndex->description[0]);
-
-	pMobIndex->act			= fread_flag( fp ) | ACT_IS_NPC;
-	pMobIndex->affected_by		= fread_flag( fp );
-	pMobIndex->pShop		= NULL;
-	pMobIndex->alignment		= fread_number( fp );
-	letter				= fread_letter( fp );
-	pMobIndex->level		= fread_number( fp );
-
-	/*
-	 * The unused stuff is for imps who want to use the old-style
-	 * stats-in-files method.
-	 */
-					  fread_number( fp );	/* Unused */
-					  fread_number( fp );	/* Unused */
-					  fread_number( fp );	/* Unused */
-	/* 'd'		*/		  fread_letter( fp );	/* Unused */
-					  fread_number( fp );	/* Unused */
-	/* '+'		*/		  fread_letter( fp );	/* Unused */
-					  fread_number( fp );	/* Unused */
-					  fread_number( fp );	/* Unused */
-	/* 'd'		*/		  fread_letter( fp );	/* Unused */
-					  fread_number( fp );	/* Unused */
-	/* '+'		*/		  fread_letter( fp );	/* Unused */
-					  fread_number( fp );	/* Unused */
-        pMobIndex->wealth               = fread_number( fp )/20;	
-	/* xp can't be used! */		  fread_number( fp );	/* Unused */
-	pMobIndex->start_pos		= fread_number( fp );	/* Unused */
-	pMobIndex->default_pos		= fread_number( fp );	/* Unused */
-
-  	if (pMobIndex->start_pos < POS_SLEEPING)
-	    pMobIndex->start_pos = POS_STANDING;
-	if (pMobIndex->default_pos < POS_SLEEPING)
-	    pMobIndex->default_pos = POS_STANDING;
-
-	/*
-	 * Back to meaningful values.
-	 */
-	pMobIndex->sex			= fread_number( fp );
-
-    	/* compute the race BS */
-   	one_argument(pMobIndex->player_name,name);
- 
-   	if (name[0] == '\0' || (race =  race_lookup(name)) == 0)
-   	{
-            /* fill in with blanks */
-            pMobIndex->race = race_lookup("human");
-            pMobIndex->off_flags = OFF_DODGE|OFF_DISARM|OFF_TRIP|ASSIST_VNUM;
-            pMobIndex->imm_flags = 0;
-            pMobIndex->res_flags = 0;
-            pMobIndex->vuln_flags = 0;
-            pMobIndex->form = FORM_EDIBLE|FORM_SENTIENT|FORM_BIPED|FORM_MAMMAL;
-            pMobIndex->parts = PART_HEAD|PART_ARMS|PART_LEGS|PART_HEART|
-                               PART_BRAINS|PART_GUTS;
-    	}
-    	else
-    	{
-            pMobIndex->race = race;
-            pMobIndex->off_flags = OFF_DODGE|OFF_DISARM|OFF_TRIP|ASSIST_RACE|
-                                   race_table[race].off;
-            pMobIndex->imm_flags = race_table[race].imm;
-            pMobIndex->res_flags = race_table[race].res;
-            pMobIndex->vuln_flags = race_table[race].vuln;
-            pMobIndex->form = race_table[race].form;
-            pMobIndex->parts = race_table[race].parts;
-    	}
-
-	if ( letter != 'S' )
-	{
-	    bug( "Load_mobiles: vnum %d non-S.", vnum );
-	    exit( 1 );
-	}
-
-	convert_mobile( pMobIndex );                           /* ROM OLC */
-
-	iHash			= vnum % MAX_KEY_HASH;
-	pMobIndex->next		= mob_index_hash[iHash];
-	mob_index_hash[iHash]	= pMobIndex;
-	top_mob_index++;
-        top_vnum_mob = top_vnum_mob < vnum ? vnum : top_vnum_mob;  /* OLC */
-        assign_area_vnum( vnum );                                  /* OLC */
-	kill_table[URANGE(0, pMobIndex->level, MAX_LEVEL-1)].number++;
     }
 
     return;
