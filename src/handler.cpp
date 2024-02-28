@@ -1996,11 +1996,11 @@ Character *get_char_world( Character *ch, char *argument )
     for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
         wch = *it;
-	if ( wch->in_room == NULL || !can_see( ch, wch ) 
-	||   !is_name( arg, wch->getName() ) )
-	    continue;
-	if ( ++count == number )
-	    return wch;
+        if ( wch->in_room == NULL || !can_see( ch, wch ) 
+        ||   !is_name( arg, wch->getName() ) )
+            continue;
+        if ( ++count == number )
+            return wch;
     }
 
     return NULL;

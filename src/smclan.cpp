@@ -21,6 +21,7 @@
 #include "merc.h"
 #include "interp.h"
 #include "tables.h"
+#include "ClanManager.h"
 #include "PlayerCharacter.h"
 
 #define MAX_NEST	100
@@ -28,6 +29,7 @@
 void show_flag_cmds( Character *ch, const struct flag_type *flag_table );
 CLAN_DATA * first_clan;
 CLAN_DATA * last_clan;
+extern ClanManager * clan_manager;
 
 /* local routines */
 void	fread_clan	args( ( CLAN_DATA *clan, FILE *fp ) );
@@ -37,20 +39,6 @@ int flag_value                  args ( ( const struct flag_type *flag_table,
                                          char *argument) );
 char *flag_string               args ( ( const struct flag_type *flag_table,
                                          int bits ) );
-
-/*
- * Get pointer to clan structure from clan name.
- */
-CLAN_DATA *get_clan( char *name )
-{
-    CLAN_DATA *clan;
-    
-    for ( clan = first_clan; clan; clan = clan->next )
-       if ( !str_prefix( name, clan->name ) )
-         return clan;
-
-    return NULL;
-}
 
 void write_clan_list( )
 {
@@ -326,7 +314,7 @@ void do_delclan( Character *ch, char *argument )
     CLAN_DATA *clan;
     char strsave[MAX_STRING_LENGTH];
 
-    if ((clan = get_clan(argument)) == NULL)
+    if ((clan = clan_manager->get_clan(argument)) == NULL)
     {
 	send_to_char("That clan does not exist.\n\r",ch);
 	return;
@@ -387,8 +375,8 @@ void do_induct( Character *ch, char *argument )
 
     if ( IS_NPC( ch ) || !ch->pcdata->clan )
     {
-	send_to_char( "Huh?\n\r", ch );
-	return;
+		send_to_char( "Huh?\n\r", ch );
+		return;
     }
 
     clan = ch->pcdata->clan;
@@ -399,16 +387,16 @@ void do_induct( Character *ch, char *argument )
 	;
     else
     {
-	send_to_char( "Huh?\n\r", ch );
-	return;
+		send_to_char( "Huh?\n\r", ch );
+		return;
     }
 
     argument = one_argument( argument, arg );
 
     if ( arg[0] == '\0' )
     {
-	send_to_char( "Induct whom?\n\r", ch );
-	return;
+		send_to_char( "Induct whom?\n\r", ch );
+		return;
     }
 
 	Character *victim;
@@ -420,8 +408,8 @@ void do_induct( Character *ch, char *argument )
 
     if ( victim->isNPC() )
     {
-	send_to_char( "Not on NPC's.\n\r", ch );
-	return;
+		send_to_char( "Not on NPC's.\n\r", ch );
+		return;
     }
 
 	if ( victim->level < 10 )
@@ -442,8 +430,8 @@ void do_induct( Character *ch, char *argument )
 			send_to_char("They do not wish to join your clan.\n\r",ch);
 			return;
 		}
-	--victim->pcdata->clan->members;
-	save_clan( victim->pcdata->clan );
+		--victim->pcdata->clan->members;
+		save_clan( victim->pcdata->clan );
     }
     clan->members++;
 
@@ -475,8 +463,8 @@ void do_outcast( Character *ch, char *argument )
 	;
     else
     {
-	send_to_char( "Huh?\n\r", ch );
-	return;
+		send_to_char( "Huh?\n\r", ch );
+		return;
     }
 
 
@@ -484,20 +472,20 @@ void do_outcast( Character *ch, char *argument )
 
     if ( arg[0] == '\0' )
     {
-	send_to_char( "Outcast whom?\n\r", ch );
-	return;
+		send_to_char( "Outcast whom?\n\r", ch );
+		return;
     }
 
     if ( ( victim = get_char_world( ch, arg ) ) == NULL )
     {
-	send_to_char( "That player is not here.\n\r", ch);
-	return;
+		send_to_char( "That player is not here.\n\r", ch);
+		return;
     }
 
     if ( IS_NPC(victim) )
     {
-	send_to_char( "Not on NPC's.\n\r", ch );
-	return;
+		send_to_char( "Not on NPC's.\n\r", ch );
+		return;
     }
 
     if ( victim == ch )
@@ -513,21 +501,21 @@ void do_outcast( Character *ch, char *argument )
     }
     if ( !str_cmp(victim->getName(), ch->pcdata->clan->leader ) )
     {
-	send_to_char("You cannot loner your own leader!\n\r",ch);
-	return;
+		send_to_char("You cannot loner your own leader!\n\r",ch);
+		return;
     }
     --clan->members;
     if ( !str_cmp( victim->getName(), ch->pcdata->clan->number1 ) )
     {
-	free_string( ch->pcdata->clan->number1 );
-	ch->pcdata->clan->number1 = str_dup( "" );
+		free_string( ch->pcdata->clan->number1 );
+		ch->pcdata->clan->number1 = str_dup( "" );
     }
     if ( !str_cmp( victim->getName(), ch->pcdata->clan->number2 ) )
     {
-	free_string( ch->pcdata->clan->number2 );
-	ch->pcdata->clan->number2 = str_dup( "" );
+		free_string( ch->pcdata->clan->number2 );
+		ch->pcdata->clan->number2 = str_dup( "" );
     }
-    victim->pcdata->clan = get_clan((char*)"outcast");
+    victim->pcdata->clan = clan_manager->get_clan((char*)"outcast");
     act( "You outcast $N from $t", ch, clan->name, victim, TO_CHAR );
     act( "$n outcasts you from $t", ch, clan->name, victim, TO_VICT );
     save_char_obj( victim );	/* clan gets saved when pfile is saved */
@@ -545,149 +533,149 @@ void do_setclan( Character *ch, char *argument )
 
     if ( IS_NPC( ch ) )
     {
-	send_to_char( "Huh?\n\r", ch );
-	return;
+		send_to_char( "Huh?\n\r", ch );
+		return;
     }
 
     argument = one_argument( argument, arg1 );
     argument = one_argument( argument, arg2 );
     if ( arg1[0] == '\0' )
     {
-	send_to_char( "Usage: set clan <clan> <field> <argument>\n\r", ch);
-	send_to_char( "\n\rField being one of:\n\r", ch );
-	send_to_char( " leader recruiter1 recruiter2\n\r", ch ); 
-	send_to_char( " members deathroom flags\n\r", ch );
-	send_to_char( " name filename motto desc\n\r", ch );
-	send_to_char( " strikes pkill pdeath money\n\r", ch );
-	return;
+		send_to_char( "Usage: set clan <clan> <field> <argument>\n\r", ch);
+		send_to_char( "\n\rField being one of:\n\r", ch );
+		send_to_char( " leader recruiter1 recruiter2\n\r", ch ); 
+		send_to_char( " members deathroom flags\n\r", ch );
+		send_to_char( " name filename motto desc\n\r", ch );
+		send_to_char( " strikes pkill pdeath money\n\r", ch );
+		return;
     }
 
-    clan = get_clan( arg1 );
+    clan = clan_manager->get_clan( arg1 );
     if ( !clan )
     {
-	send_to_char( "No such clan.\n\r", ch );
-	return;
+		send_to_char( "No such clan.\n\r", ch );
+		return;
     }
     if ( !str_prefix( arg2, "leader" ) )
     {
-	free_string( clan->leader );
-	clan->leader = str_dup( argument );
-	send_to_char( "Done.\n\r", ch );
-	save_clan( clan );
-	return;
+		free_string( clan->leader );
+		clan->leader = str_dup( argument );
+		send_to_char( "Done.\n\r", ch );
+		save_clan( clan );
+		return;
     }
     if ( !str_prefix( arg2, "recruiter1" ) )
     {
-	free_string( clan->number1 );
-	clan->number1 = str_dup( argument );
-	send_to_char( "Done.\n\r", ch );
-	save_clan( clan );
-	return;
+		free_string( clan->number1 );
+		clan->number1 = str_dup( argument );
+		send_to_char( "Done.\n\r", ch );
+		save_clan( clan );
+		return;
     }
     if ( !str_prefix( arg2, "recruiter2" ) )
     {
-	free_string( clan->number2 );
-	clan->number2 = str_dup( argument );
-	send_to_char( "Done.\n\r", ch );
-	save_clan( clan );
-	return;
+		free_string( clan->number2 );
+		clan->number2 = str_dup( argument );
+		send_to_char( "Done.\n\r", ch );
+		save_clan( clan );
+		return;
     }
     if ( !str_prefix( arg2, "members" ) )
     {
-	clan->members = atoi( argument );
-	send_to_char( "Done.\n\r", ch );
-	save_clan( clan );
-	return;
+		clan->members = atoi( argument );
+		send_to_char( "Done.\n\r", ch );
+		save_clan( clan );
+		return;
     }
     if ( !str_prefix( arg2, "deathroom" ) )
     {
-	clan->death = atoi( argument );
-	send_to_char( "Death room set.\n\r", ch);
-	save_clan( clan );
-	return;
+		clan->death = atoi( argument );
+		send_to_char( "Death room set.\n\r", ch);
+		save_clan( clan );
+		return;
     }
     if ( !str_prefix( arg2, "flags" ) )
     {
-	int value;
+		int value;
 
-	if (argument[0] == '\0')
-	{
-	    show_flag_cmds( ch, clan_flags );
-	    return;
-	}
+		if (argument[0] == '\0')
+		{
+			show_flag_cmds( ch, clan_flags );
+			return;
+		}
 
-	if ( ( value = flag_value( clan_flags, argument ) ) != NO_FLAG )
-	{
-	    TOGGLE_BIT(clan->flags, value);
-	    send_to_char("Clan flags toggled.\n\r",ch);
-	    save_clan(clan);
-	    return;
-	}
+		if ( ( value = flag_value( clan_flags, argument ) ) != NO_FLAG )
+		{
+			TOGGLE_BIT(clan->flags, value);
+			send_to_char("Clan flags toggled.\n\r",ch);
+			save_clan(clan);
+			return;
+		}
 
-	send_to_char("That flag does not exist.\n\rList of flags:\n\r", ch);
-	do_setclan(ch,(char*)"flags");
-	return;
+		send_to_char("That flag does not exist.\n\rList of flags:\n\r", ch);
+		do_setclan(ch,(char*)"flags");
+		return;
     }
     if ( !str_prefix( arg2, "whoname" ) )
     {
-	free_string( clan->whoname );
-	clan->whoname = str_dup( argument );
-	send_to_char("Whoname set.\n\r",ch);
-	save_clan( clan );
-	return;
+		free_string( clan->whoname );
+		clan->whoname = str_dup( argument );
+		send_to_char("Whoname set.\n\r",ch);
+		save_clan( clan );
+		return;
     }
     if ( !str_prefix( arg2, "name" ) )
     {
-	free_string( clan->name );
-	clan->name = str_dup( argument );
-	send_to_char( "Done.\n\r", ch );
-	save_clan( clan );
-	return;
+		free_string( clan->name );
+		clan->name = str_dup( argument );
+		send_to_char( "Done.\n\r", ch );
+		save_clan( clan );
+		return;
     }
     if ( !str_prefix( arg2, "filename" ) )
     {
-	free_string( clan->filename );
-	clan->filename = str_dup( argument );
-	send_to_char( "Done.\n\r", ch );
-	save_clan( clan );
-	write_clan_list( );
-	return;
+		free_string( clan->filename );
+		clan->filename = str_dup( argument );
+		send_to_char( "Done.\n\r", ch );
+		save_clan( clan );
+		write_clan_list( );
+		return;
     }
     if ( !str_prefix( arg2, "motto" ) )
     {
-	free_string( clan->motto );
-	clan->motto = str_dup( argument );
-	send_to_char( "Done.\n\r", ch );
-	save_clan( clan );
-	return;
+		free_string( clan->motto );
+		clan->motto = str_dup( argument );
+		send_to_char( "Done.\n\r", ch );
+		save_clan( clan );
+		return;
     }
     if ( !str_prefix( "played", arg2) )
     {
-	clan->played = atoi( argument );
-	send_to_char ("Ok.\n\r", ch );
-	save_clan( clan );
-	return;
+		clan->played = atoi( argument );
+		send_to_char ("Ok.\n\r", ch );
+		save_clan( clan );
+		return;
     }
     if ( !str_prefix( "pkill", arg2) )
     {
-	clan->pkills = atoi( argument );
-	send_to_char ("Ok.\n\r", ch );
-	save_clan( clan );
-	return;
+		clan->pkills = atoi( argument );
+		send_to_char ("Ok.\n\r", ch );
+		save_clan( clan );
+		return;
     }
     if ( !str_prefix( "pdeath", arg2) )
     {
-	clan->pdeaths = atoi( argument );
-	send_to_char ("Ok.\n\r", ch );
-	save_clan( clan );
-	return;
+		clan->pdeaths = atoi( argument );
+		send_to_char ("Ok.\n\r", ch );
+		save_clan( clan );
+		return;
     }
     if ( !str_prefix( "money", arg2) )
     {
-	clan->money = atoi( argument );
-	send_to_char( "Money set.\n\r",ch);
-	save_clan( clan );
-	return;
+		clan->money = atoi( argument );
+		send_to_char( "Money set.\n\r",ch);
+		save_clan( clan );
+		return;
     }
     do_setclan( ch, (char*)"" );
     return;
@@ -784,7 +772,7 @@ void do_clist( Character *ch, char *argument )
         return;
     }
 
-    clan = get_clan( argument );
+    clan = clan_manager->get_clan( argument );
     if (!clan || (IS_SET(clan->flags, CLAN_NOSHOW) && !IS_IMMORTAL(ch)))
     {
         send_to_char( "No such clan.\n\r", ch );

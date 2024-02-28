@@ -37,9 +37,12 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "tables.h"
+#include "ClanManager.h"
 #include "PlayerCharacter.h"
 
 DECLARE_DO_FUN( do_clist	);
+
+extern ClanManager *clan_manager;
 
 void do_join( Character *caller, char *argument )
 {
@@ -62,15 +65,7 @@ void do_join( Character *caller, char *argument )
 	return;
     }
 
-/* Outcasts can join clans too :D
-    if (ch->pcdata->clan == get_clan("outcast"))
-    {
-	send_to_char("You are outcasted from any clans and must bow your head in shame.\n\r",ch);
-	return;
-    }
-*/
-
-	CLAN_DATA *join = get_clan(argument);
+	CLAN_DATA *join = clan_manager->get_clan(argument);
     if (!join)
     {
 	snprintf(buf, sizeof(buf), "%s: that clan does not exist.\n\r",argument);

@@ -25,9 +25,12 @@
 #include "recycle.h"
 /* #include "do.h" */ /* My do_XXX functions are declared in this file */
 #include "colordef.h"
+#include "ClanManager.h"
 #include "PlayerCharacter.h"
 
 DECLARE_DO_FUN( do_help                );
+
+extern ClanManager * clan_manager;
 
 /*
  
@@ -405,7 +408,7 @@ bool is_note_to (Character *ch, Note *note)
 		return TRUE;
 		
 	/* Allow clan notes */
-	if ( (IS_IMMORTAL(ch) && get_clan(note->to_list) )
+	if ( (IS_IMMORTAL(ch) && clan_manager->get_clan(note->to_list) )
 		|| (IS_CLANNED(ch) && is_full_name(ch->pcdata->clan->name, note->to_list)))
 		return TRUE;
 

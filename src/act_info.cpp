@@ -40,6 +40,7 @@
 #include "recycle.h"
 #include "tables.h"
 #include "lookup.h"
+#include "ClanManager.h"
 #include "PlayerCharacter.h"
 
 /* command procedures needed */
@@ -68,6 +69,7 @@ void	show_char_to_char_1	args( ( Character *victim, Character *ch ) );
 void	show_char_to_char	args( ( Character *list, Character *ch ) );
 bool	check_blind		args( ( Character *ch ) );
 
+extern ClanManager * clan_manager;
 
 
 char *format_obj_to_char( OBJ_DATA *obj, Character *ch, bool fShort )
@@ -1932,7 +1934,7 @@ void do_who( Character *ch, char *argument )
 			    fClan = TRUE;
 			else
 		        {
-			    iClan = get_clan(arg);
+			    iClan = clan_manager->get_clan(arg);
 			    if (iClan)
 			    {
 				fClanRestrict = TRUE;
@@ -2738,11 +2740,11 @@ void do_nw( Character *ch, char *argument )
 
     for (clan = first_clan; clan != NULL; clan = clan->next)
     {
-	if (!IS_SET(clan->flags, CLAN_NOSHOW))
-	{
-	    snprintf(buf, sizeof(buf), "%-15s %-15ld\n\r", capitalize(clan->name), clan_nw_lookup(clan));
-	    send_to_char(buf,ch);
-	}
+        if (!IS_SET(clan->flags, CLAN_NOSHOW))
+        {
+            snprintf(buf, sizeof(buf), "%-15s %-15ld\n\r", capitalize(clan->name), clan_nw_lookup(clan));
+            send_to_char(buf,ch);
+        }
     }
 
     send_to_char("\n\r",ch);

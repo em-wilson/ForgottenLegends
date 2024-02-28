@@ -59,6 +59,7 @@
 #include "recycle.h"
 #include "clan.h"
 #include "Wiznet.h"
+#include "ClanManager.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_help		);
@@ -157,6 +158,8 @@ bool	process_output		args( ( DESCRIPTOR_DATA *d, bool fPrompt ) );
 void	read_from_buffer	args( ( DESCRIPTOR_DATA *d ) );
 void	stop_idling		args( ( Character *ch ) );
 void    bust_a_prompt           args( ( Character *ch ) );
+
+extern ClanManager * clan_manager;
 
 /* Needs to be global because of do_copyover */
 extern int port, control;
@@ -362,13 +365,13 @@ void game_loop_unix( int control )
 		    if ( ( d->fcommand || d->outtop > 0 )
 		    &&   FD_ISSET(d->descriptor, &out_set) )
 		    {
-			if ( !process_output( d, TRUE ) )
-			{
-			    if ( d->character != NULL && d->connected == CON_PLAYING)
-				save_char_obj( d->character );
-			    d->outtop	= 0;
-			    close_socket( d );
-			}
+				if ( !process_output( d, TRUE ) )
+				{
+					if ( d->character != NULL && d->connected == CON_PLAYING)
+					save_char_obj( d->character );
+					d->outtop	= 0;
+					close_socket( d );
+				}
 		    }
 		}
 
@@ -1913,7 +1916,7 @@ bool check_parse_name( char *name )
 	(char*)"all auto immortal self someone something the you demise balance circle loner honor none") )
 	return FALSE;
 	
-    if (get_clan( name ) )
+    if (clan_manager->get_clan( name ) )
 	return FALSE;
 
     if (str_cmp(capitalize(name),"Alander") && (!str_prefix("Alan",name)

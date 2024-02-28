@@ -36,6 +36,7 @@
 #include <sys/resource.h>
 
 #include "merc.h"
+#include "ClanManager.h"
 #include "db.h"
 #include "EquipmentListGenerator.h"
 #include "recycle.h"
@@ -47,6 +48,7 @@
 
 
 extern	int	_filbuf		args( (FILE *) );
+ClanManager * clan_manager;
 
 #if !defined(OLD_RAND)
 /* RedHat 5.x already contains this, so I'm commenting it out.
@@ -315,6 +317,7 @@ void boot_db()
 	}
     }
 
+    clan_manager = new ClanManager();
     load_clans();
     /*
      * Read in all the area files.
@@ -892,7 +895,7 @@ void load_rooms( FILE *fp )
                     bug("Load_rooms: duplicate clan fields.",0);
                     exit(1);
                 }
-                pRoomIndex->clan = get_clan(fread_string(fp));
+                pRoomIndex->clan = clan_manager->get_clan(fread_string(fp));
             }
 
 	    else if ( letter == 'D' )

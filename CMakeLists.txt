@@ -26,6 +26,8 @@ set(SOURCE_FILES
     src/bow.cpp
     src/Character.cpp
     src/Character.h
+    src/ClanManager.cpp
+    src/ClanManager.h
     src/clan.h
     src/colordef.h
     src/comm.cpp
@@ -84,6 +86,7 @@ set(SOURCE_FILES
 
 set(TEST_FILES
     test/main.cpp
+    test/ClanManager.cpp
     test/NonPlayerCharacter.cpp test/PlayerCharacter.cpp)
 
 include_directories(src)

@@ -42,9 +42,11 @@
 #include <sys/types.h>
 #include <ctype.h>
 #include "merc.h"
+#include "ClanManager.h"
 #include "tables.h"
 #include "lookup.h"
 
+extern ClanManager * clan_manager;
 extern int flag_lookup( const char *word, const struct flag_type *flag_table );
 
 /*
@@ -575,7 +577,7 @@ int cmd_eval( sh_int vnum, char *line, int check,
 	case CHK_POS:
 	    return( lval_char != NULL && lval_char->position == position_lookup( buf ) );
 	case CHK_CLAN:
-	    return( lval_char != NULL && lval_char->pcdata->clan == get_clan( buf ) );
+	    return( lval_char != NULL && lval_char->pcdata->clan == clan_manager->get_clan( buf ) );
 	case CHK_RACE:
 	    return( lval_char != NULL && lval_char->race == race_lookup( buf ) );
 	case CHK_OBJTYPE:

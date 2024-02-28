@@ -18,6 +18,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "ClanManager.h"
 #include "tables.h"
 #include "olc.h"
 #include "recycle.h"
@@ -31,7 +32,7 @@
 #define AEDIT( fun )		bool fun( Character *ch, char *argument )
 
 
-
+extern ClanManager * clan_manager;
 struct olc_help_type
 {
     const char *command;
@@ -1868,7 +1869,7 @@ REDIT( redit_clan )
 
     EDIT_ROOM(ch, pRoom);
     
-    pRoom->clan = get_clan(argument);
+    pRoom->clan = clan_manager->get_clan(argument);
     
     send_to_char ( "Clan set.\n\r", ch);
     return TRUE;

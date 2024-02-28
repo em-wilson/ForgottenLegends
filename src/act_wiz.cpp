@@ -37,6 +37,7 @@
 #include "tables.h"
 #include "lookup.h"
 #include "Wiznet.h"
+#include "ClanManager.h"
 #include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
 
@@ -65,6 +66,8 @@ DECLARE_DO_FUN(do_stand		);
  */
 int     close           args( ( int fd ) );
 bool    write_to_descriptor     args( ( int desc, const char *txt, int length ) );
+
+extern ClanManager * clan_manager;
 
 void do_wiznet( Character *ch, char *argument )
 {
@@ -197,13 +200,13 @@ void do_guild( Character *ch, char *argument )
         send_to_char("You are now a member of no clan!\n\r",victim);
         if (victim->pcdata->clan)
         --victim->pcdata->clan->members;
-	save_clan(victim->pcdata->clan);
+	    save_clan(victim->pcdata->clan);
         victim->pcdata->clan = NULL;
         save_char_obj(victim);
         return;
     }
 
-    clan = get_clan(arg2);
+    clan = clan_manager->get_clan(arg2);
     if (!clan)
     {
         send_to_char("No such clan exists.\n\r",ch);

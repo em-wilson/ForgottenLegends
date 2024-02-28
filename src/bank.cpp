@@ -6,9 +6,12 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "interp.h"
+#include "ClanManager.h"
 
 DECLARE_DO_FUN( do_bank_change	);
 DECLARE_DO_FUN( do_bank_clan	);
+
+extern ClanManager * clan_manager;
 
 void do_bank( Character *ch, char *argument)
 {
@@ -349,7 +352,7 @@ void do_bank_clan(Character *ch, char *argument)
 	CLAN_DATA *clan;
 	int debit;
 
-	if ((clan = get_clan(arg1)) == NULL)
+	if ((clan = clan_manager->get_clan(arg1)) == NULL)
 	{
 	    send_to_char("Syntax: bank clan <clan name> <amount to withdraw (in k)>\n\r",ch);
 	    return;

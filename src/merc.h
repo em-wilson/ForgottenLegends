@@ -2243,7 +2243,6 @@ void 	substitute_alias args( (DESCRIPTOR_DATA *d, char *input) );
 bool	check_ban	args( ( char *site, int type) );
 
 /* clans.c */
-CL *    get_clan        args( ( char *name ) );
 void    load_clans      args( ( void ) );
 void    save_clan       args( ( CLAN_DATA *clan ) );
 

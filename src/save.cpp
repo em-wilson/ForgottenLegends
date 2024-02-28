@@ -30,9 +30,11 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "recycle.h"
+#include "ClanManager.h"
 #include "PlayerCharacter.h"
 #include "NonPlayerCharacter.h"
 
+extern ClanManager * clan_manager;
 extern  int     _filbuf         args( (FILE *) );
 int rename(const char *oldfname, const char *newfname);
 
@@ -718,7 +720,7 @@ void fread_char( Character *ch, FILE *fp )
 	case 'C':
 	    KEY( "Class",	ch->class_num,		fread_number( fp ) );
 	    KEY( "Cla",		ch->class_num,		fread_number( fp ) );
-	    KEY( "Clan",	ch->pcdata->clan,	get_clan(fread_string(fp)));
+	    KEY( "Clan",	ch->pcdata->clan,	clan_manager->get_clan(fread_string(fp)));
 
 	    if ( !str_cmp( word, "Condition" ) || !str_cmp(word,"Cond"))
 	    {
