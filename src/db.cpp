@@ -46,9 +46,7 @@
 #include "NonPlayerCharacter.h"
 
 
-#if !defined(macintosh)
 extern	int	_filbuf		args( (FILE *) );
-#endif
 
 #if !defined(OLD_RAND)
 /* RedHat 5.x already contains this, so I'm commenting it out.
@@ -467,7 +465,6 @@ void load_area( FILE *fp )
                 if ( !str_cmp( word, literal ) )    \
                 {                                   \
                     field  = value;                 \
-                    fMatch = TRUE;                  \
                     break;                          \
                                 }
 
@@ -476,7 +473,6 @@ void load_area( FILE *fp )
                 {                                   \
                     free_string( field );           \
                     field = fread_string( fp );     \
-                    fMatch = TRUE;                  \
                     break;                          \
                                 }
 
@@ -496,7 +492,6 @@ void new_load_area( FILE *fp )
 {
     AREA_DATA *pArea;
     char      *word;
-    bool      fMatch;
 
     pArea               = (AREA_DATA*)alloc_perm( sizeof(*pArea) );
     pArea->age          = 15;
@@ -514,7 +509,6 @@ void new_load_area( FILE *fp )
     for ( ; ; )
     {
        word   = feof( fp ) ? (char*)"End" : fread_word( fp );
-       fMatch = FALSE;
 
        switch ( UPPER(word[0]) )
        {
@@ -537,7 +531,6 @@ void new_load_area( FILE *fp )
            case 'E':
              if ( !str_cmp( word, "End" ) )
              {
-                 fMatch = TRUE;
                  if ( area_first == NULL )
                     area_first = pArea;
                  if ( area_last  != NULL )
@@ -2558,7 +2551,7 @@ void do_memory( Character *ch, char *argument )
 
 void do_dump( Character *ch, char *argument )
 {
-    int count,count2,num_pcs,aff_count;
+    int count,count2,aff_count;
     Character *fch;
     MOB_INDEX_DATA *pMobIndex;
     OBJ_DATA *obj;
@@ -2575,8 +2568,6 @@ void do_dump( Character *ch, char *argument )
     fp = fopen("mem.dmp","w");
 
     /* report use of data structures */
-    
-    num_pcs = 0;
     aff_count = 0;
 
     /* mobile prototypes */
@@ -2589,8 +2580,6 @@ void do_dump( Character *ch, char *argument )
     {
     	fch = *it;
 	count++;
-	if (fch->pcdata != NULL)
-	    num_pcs++;
 	for (af = fch->affected; af != NULL; af = af->next)
 	    aff_count++;
     }

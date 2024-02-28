@@ -1,11 +1,7 @@
 /* The following code is based on ILAB OLC by Jason Dinkel */
 /* Mobprogram code by Lordrom for Nevermore Mud */
 
-#if defined(macintosh)
-#include <types.h>
-#else
 #include <sys/types.h>
-#endif
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>

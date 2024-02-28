@@ -25,12 +25,8 @@
 *	ROM license, in the file Rom24/doc/rom.license			   *
 ***************************************************************************/
 
-#if defined(macintosh)
-#include <types.h>
-#else
 #include <sys/types.h>
 #include <sys/time.h>
-#endif
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
@@ -5078,9 +5074,9 @@ void do_laston ( Character *ch, char *argument )
    char buf[MAX_STRING_LENGTH];
    char arg1[MAX_STRING_LENGTH];
    long laston = 0;
+   int level = 0;
    bool finished = FALSE;
-   int d, h, m, s, kills = 0, deaths = 0, PCkills = 0, PCdeaths = 0, level = 0, classnum = 0;
-   char *race = (char*)"";
+   int d, h, m, s;
 
    argument = one_argument( argument, arg1 );
 
@@ -5111,29 +5107,11 @@ void do_laston ( Character *ch, char *argument )
 	word = feof(fp) ? (char*)"End" : fread_word(fp);
 	switch(UPPER(word[0]))
 	{
-	  case 'C':
-	    if(!str_cmp(word, "Cla "))
-	    {
-	      classnum = fread_number(fp);
-	    }
-	    break;
-
 	  case 'E':	
 	    if(!str_cmp(word, "End"))
 	    {
 	      finished = TRUE;
 	      break;
-	    }
-	    break;
-	  case 'M':
-	    if(!str_cmp(word, "Mkills"))
-	    {
-		kills = fread_number(fp);
-	    }
-	    break;	 
-	    if(!str_cmp(word, "MKiled"))
-	    {
-		deaths = fread_number(fp);
 	    }
 	    break;
 	  case 'L':
@@ -5144,22 +5122,6 @@ void do_laston ( Character *ch, char *argument )
 	    if(!str_cmp(word, "LogO"))
 	    {
 	      laston = fread_number(fp);
-	    }
-	    break;
-	  case 'P':
-	    if(!str_cmp(word, "Pkills"))
-	    {
-		PCkills = fread_number(fp);
-	    }
-	    if(!str_cmp(word, "Pkiled"))
-	    {
-		PCdeaths = fread_number(fp);
-	    }
-	    break;		
-	  case 'R':
-	    if(!str_cmp(word, "Race"))
-	    {
-	      race = fread_string(fp);
 	    }
 	    break;
 	  case '#':

@@ -19,11 +19,7 @@
  *  mob etc is part of that area.
  */
 
-#if defined(macintosh)
-#include <types.h>
-#else
 #include <sys/types.h>
-#endif
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -669,7 +665,6 @@ void save_resets( FILE *fp, AREA_DATA *pArea )
 {
     RESET_DATA *pReset;
     MOB_INDEX_DATA *pLastMob = NULL;
-    OBJ_INDEX_DATA *pLastObj;
     ROOM_INDEX_DATA *pRoom;
     char buf[MAX_STRING_LENGTH];
     int iHash;
@@ -692,77 +687,6 @@ void save_resets( FILE *fp, AREA_DATA *pArea )
 	    bug( "Save_resets: bad command %c.", pReset->command );
 	    break;
 
-#if defined( VERBOSE )
-	case 'M':
-            pLastMob = get_mob_index( pReset->arg1 );
-	    fprintf( fp, "M 0 %d %d %d %d Load %s\n", 
-	        pReset->arg1,
-                pReset->arg2,
-                pReset->arg3,
-		pReset->arg4,
-                pLastMob->short_descr );
-            break;
-
-	case 'O':
-            pLastObj = get_obj_index( pReset->arg1 );
-            pRoom = get_room_index( pReset->arg3 );
-	    fprintf( fp, "O 0 %d 0 %d %s loaded to %s\n", 
-	        pReset->arg1,
-                pReset->arg3,
-                capitalize(pLastObj->short_descr),
-                pRoom->name );
-            break;
-
-	case 'P':
-            pLastObj = get_obj_index( pReset->arg1 );
-	    fprintf( fp, "P 0 %d %d %d %d %s put inside %s\n", 
-	        pReset->arg1,
-	        pReset->arg2,
-                pReset->arg3,
-                pReset->arg4,
-                capitalize(get_obj_index( pReset->arg1 )->short_descr),
-                pLastObj->short_descr );
-            break;
-
-	case 'G':
-	    fprintf( fp, "G 0 %d 0 %s is given to %s\n",
-	        pReset->arg1,
-	        capitalize(get_obj_index( pReset->arg1 )->short_descr),
-                pLastMob ? pLastMob->short_descr : "!NO_MOB!" );
-            if ( !pLastMob )
-            {
-                snprintf(buf, sizeof(buf), "Save_resets: !NO_MOB! in [%s]", pArea->file_name );
-                bug( buf, 0 );
-            }
-            break;
-
-	case 'E':
-	    fprintf( fp, "E 0 %d 0 %d %s is loaded %s of %s\n",
-	        pReset->arg1,
-                pReset->arg3,
-                capitalize(get_obj_index( pReset->arg1 )->short_descr),
-                flag_string( wear_loc_strings, pReset->arg3 ),
-                pLastMob ? pLastMob->short_descr : "!NO_MOB!" );
-            if ( !pLastMob )
-            {
-                snprintf(buf, sizeof(buf), "Save_resets: !NO_MOB! in [%s]", pArea->file_name );
-                bug( buf, 0 );
-            }
-            break;
-
-	case 'D':
-            break;
-
-	case 'R':
-            pRoom = get_room_index( pReset->arg1 );
-	    fprintf( fp, "R 0 %d %d Randomize %s\n", 
-	        pReset->arg1,
-                pReset->arg2,
-                pRoom->name );
-            break;
-            }
-#endif
-#if !defined( VERBOSE )
 	case 'M':
             pLastMob = get_mob_index( pReset->arg1 );
 	    fprintf( fp, "M 0 %d %d %d %d\n", 
@@ -773,7 +697,6 @@ void save_resets( FILE *fp, AREA_DATA *pArea )
             break;
 
 	case 'O':
-            pLastObj = get_obj_index( pReset->arg1 );
             pRoom = get_room_index( pReset->arg3 );
 	    fprintf( fp, "O 0 %d 0 %d\n", 
 	        pReset->arg1,
@@ -781,7 +704,6 @@ void save_resets( FILE *fp, AREA_DATA *pArea )
             break;
 
 	case 'P':
-            pLastObj = get_obj_index( pReset->arg1 );
 	    fprintf( fp, "P 0 %d %d %d %d\n", 
 	        pReset->arg1,
 	        pReset->arg2,
@@ -821,7 +743,6 @@ void save_resets( FILE *fp, AREA_DATA *pArea )
                 pReset->arg2 );
             break;
             }
-#endif
         }
 	    }	/* End if correct area */
 	}	/* End for pRoom */
@@ -970,10 +891,7 @@ void do_asave( Character *ch, char *argument )
 {
     char arg1 [MAX_INPUT_LENGTH];
     AREA_DATA *pArea;
-    FILE *fp;
     int value, sec;
-
-    fp = NULL;
 
     if ( !ch )       /* Do an autosave */
 	sec = 9;

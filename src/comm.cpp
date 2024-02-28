@@ -43,13 +43,8 @@
  * -- Furey  26 Jan 1993
  */
 
-#if defined(macintosh)
-#include <types.h>
-#else
 #include <sys/types.h>
 #include <sys/time.h>
-#endif
-
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
@@ -595,9 +590,6 @@ void close_socket( DESCRIPTOR_DATA *dclose )
 
     close( dclose->descriptor );
     free_descriptor(dclose);
-#if defined(MSDOS) || defined(macintosh)
-    exit(1);
-#endif
     return;
 }
 
@@ -1111,11 +1103,6 @@ bool write_to_descriptor( int desc, const char *txt, int length )
     int iStart;
     int nWrite;
     int nBlock;
-
-#if defined(macintosh) || defined(MSDOS)
-    if ( desc == 0 )
-	desc = 1;
-#endif
 
     if ( length <= 0 )
 	length = strlen(txt);
@@ -2183,14 +2170,10 @@ void page_to_char_bw( const char *txt, Character *ch )
 	return;
     }
 	
-#if defined(macintosh)
-	send_to_char(txt,ch);
-#else
     ch->desc->showstr_head = new char[strlen(txt) + 1];
     strcpy(ch->desc->showstr_head,txt);
     ch->desc->showstr_point = ch->desc->showstr_head;
     show_string(ch->desc,(char*)"");
-#endif
 }
 
 /*
@@ -2321,7 +2304,6 @@ void act_string( const char * format, Character *to, Character *ch, Character *v
     const 		char    *i = NULL;
     char               	*point;
     char               	buf[ MAX_STRING_LENGTH   ];
-    bool               	fColour = FALSE;
     char               	fname[ MAX_INPUT_LENGTH  ];
     char	      		*pbuff;
     char               	buffer[ MAX_STRING_LENGTH*2 ];
@@ -2335,7 +2317,6 @@ void act_string( const char * format, Character *to, Character *ch, Character *v
     		*point++ = *str++;
     		continue;
     	}
-    	fColour = TRUE;
     	++str;
     	i = " <@@@> ";
     	if( !arg2 && *str >= 'A' && *str <= 'Z' )
@@ -2483,19 +2464,6 @@ void act_new( const char *format, Character *ch, const void *arg1,
   	}
     return;
 }
-
-
-
-/*
- * Macintosh support functions.
- */
-#if defined(macintosh)
-int gettimeofday( struct timeval *tp, void *tzp )
-{
-    tp->tv_sec  = time( NULL );
-    tp->tv_usec = 0;
-}
-#endif
 
 int colour( char type, Character *ch, char *string )
 {

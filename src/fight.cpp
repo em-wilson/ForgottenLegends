@@ -25,11 +25,7 @@
 *	ROM license, in the file Rom24/doc/rom.license			   *
 ***************************************************************************/
 
-#if defined(macintosh)
-#include <types.h>
-#else
 #include <sys/types.h>
-#endif
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -210,8 +206,6 @@ void check_assist(Character *ch,Character *victim)
  * Do one group of attacks.
  */
 void multi_hit( Character *ch, Character *victim, int dt ) {
-    int chance;
-
     /* decrement the wait */
     if (ch->desc == NULL)
         ch->wait = UMAX(0, ch->wait - PULSE_VIOLENCE);
@@ -719,10 +713,12 @@ void one_hit( Character *ch, Character *victim, int dt, bool secondary )
 }
 
 
-void perform_autoloot(Character *ch, OBJ_DATA *corpse) {
+void perform_autoloot(Character *ch) {
+	OBJ_DATA *corpse = NULL;
+
     if (IS_NPC(ch) && IS_SET(ch->act,ACT_PET) && ch->master != NULL) {
         // The master should be doing this
-        perform_autoloot(ch->master, corpse);
+        perform_autoloot(ch->master);
     } else if (!IS_NPC(ch)
         &&  (corpse = get_obj_list(ch,(char*)"corpse",ch->in_room->contents)) != NULL
         &&  corpse->item_type == ITEM_CORPSE_NPC && can_see_obj(ch,corpse))
@@ -760,8 +756,6 @@ void perform_autoloot(Character *ch, OBJ_DATA *corpse) {
 bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
 	    bool show ) 
 {
-
-    OBJ_DATA *corpse;
     bool immune;
 
     if ( victim->position == POS_DEAD )
@@ -1042,7 +1036,7 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
         }
 
         /* RT new auto commands */
-        perform_autoloot(ch, corpse);
+        perform_autoloot(ch);
 
 	return TRUE;
     }
@@ -1094,8 +1088,6 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
  */
 bool damage_old( Character *ch, Character *victim, int dam, int dt, int 
 dam_type, bool show ) {
-
-    OBJ_DATA *corpse;
     bool immune;
 
     if ( victim->position == POS_DEAD )
@@ -1338,7 +1330,7 @@ dam_type, bool show ) {
         }
 
         /* RT new auto commands */
-        perform_autoloot(ch, corpse);
+        perform_autoloot(ch);
 
         return TRUE;
     }
@@ -2160,7 +2152,6 @@ void group_gain( Character *ch, Character *victim )
 	if ( !is_same_group( gch, ch ) || IS_NPC(gch))
 	    continue;
 
-/*	Taken out, add it back if you want it
 	if ( gch->level - lch->level >= 5 )
 	{
 	    send_to_char( "You are too high for this group.\n\r", gch );
@@ -2172,7 +2163,6 @@ void group_gain( Character *ch, Character *victim )
 	    send_to_char( "You are too low for this group.\n\r", gch );
 	    continue;
 	}
-*/
 
 	xp = xp_compute( gch, victim, group_levels );  
 	snprintf(buf, sizeof(buf), "You receive %d experience points.\n\r", xp );

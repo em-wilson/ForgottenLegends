@@ -16,22 +16,17 @@
  ***************************************************************************/
  
 /***************************************************************************
-*	ROM 2.4 is copyright 1993-1996 Russ Taylor			   *
-*	ROM has been brought to you by the ROM consortium		   *
-*	    Russ Taylor (rtaylor@efn.org)				   *
-*	    Gabrielle Taylor						   *
-*	    Brian Moore (zump@rom.org)					   *
-*	By using this code, you have agreed to follow the terms of the	   *
-*	ROM license, in the file Rom24/doc/rom.license			   *
+*	ROM 2.4 is copyright 1993-1996 Russ Taylor                             *
+*	ROM has been brought to you by the ROM consortium                      *
+*	    Russ Taylor (rtaylor@efn.org)				   					   *
+*	    Gabrielle Taylor						   						   *
+*	    Brian Moore (zump@rom.org)					   					   *
+*	By using this code, you have agreed to follow the terms of the	       *
+*	ROM license, in the file Rom24/doc/rom.license			   			   *
 ***************************************************************************/
 
-#if defined(macintosh)
-#include <types.h>
-#include <time.h>
-#else
 #include <sys/types.h>
 #include <sys/time.h>
-#endif
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

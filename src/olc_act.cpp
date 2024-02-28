@@ -11,13 +11,7 @@
  *                                                                         *
  ***************************************************************************/
 
-
-
-#if defined(macintosh)
-#include <types.h>
-#else
 #include <sys/types.h>
-#endif
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -3492,8 +3486,6 @@ OEDIT( oedit_ed )
 
     if ( !str_cmp( command, "format" ) )
     {
-	EXTRA_DESCR_DATA *ped = NULL;
-
 	if ( keyword[0] == '\0' )
 	{
 	    send_to_char( "Syntax:  ed format [keyword]\n\r", ch );
@@ -3504,7 +3496,6 @@ OEDIT( oedit_ed )
 	{
 	    if ( is_name( keyword, ed->keyword ) )
 		break;
-	    ped = ed;
 	}
 
 	if ( !ed )

@@ -696,7 +696,6 @@ void do_setclan( Character *ch, char *argument )
 void do_makeclan( Character *ch, char *argument )
 {
     CLAN_DATA *clan;
-    bool found;
 
 	if (get_trust(ch) < MAX_LEVEL ) {
 		send_to_char("Only implementors can run this command.", ch);
@@ -709,7 +708,6 @@ void do_makeclan( Character *ch, char *argument )
 	return;
     }
 
-    found = FALSE;
     argument[0] = LOWER(argument[0]);
 
     CREATE( clan, CLAN_DATA, 1 );

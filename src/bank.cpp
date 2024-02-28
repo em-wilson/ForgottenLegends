@@ -1,10 +1,6 @@
 /* Blizzard's banking code begins.  Hehe :) */
 
-#if defined(macintosh)
-#include <types.h>
-#else
 #include <sys/types.h>
-#endif
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
