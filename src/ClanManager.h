@@ -4,7 +4,7 @@
 class ClanManager
 {
     public:
-        CLAN_DATA *get_clan( char *name );
+        CLAN_DATA *get_clan( const char *name );
     // private:
     //     CLAN_DATA * first_clan;
     //     CLAN_DATA * last_clan;

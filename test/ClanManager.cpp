@@ -9,25 +9,19 @@ SCENARIO( "Clan Management" ) {
         first_clan->name = str_dup("bar");
 
         WHEN("Looking for a non-existing clan") {
-            char * argument = str_dup("foo");
-            CLAN_DATA *result = target->get_clan(argument);
+            CLAN_DATA *result = target->get_clan("foo");
 
             THEN("The result should be NULL") {
                 REQUIRE( result == NULL );
             }
-
-            free_string(argument);
         }
 
         WHEN("Looking for an existing clan") {
-            char * argument = str_dup("bar");
-            CLAN_DATA *result = target->get_clan(argument);
+            CLAN_DATA *result = target->get_clan("bar");
 
             THEN("The result should not be NULL") {
                 REQUIRE( result != NULL );
             }
-
-            free_string(argument);
         }
 
         // Clean up

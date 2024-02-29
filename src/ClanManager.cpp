@@ -7,7 +7,7 @@ extern  CLAN_DATA * first_clan;
 /*
  * Get pointer to clan structure from clan name.
  */
-CLAN_DATA * ClanManager::get_clan( char *name )
+CLAN_DATA * ClanManager::get_clan( const char *name )
 {
     CLAN_DATA *clan;
     
