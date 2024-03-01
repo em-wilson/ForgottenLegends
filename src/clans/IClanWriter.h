@@ -10,5 +10,6 @@ class IClanWriter {
         virtual ~IClanWriter() { }
         virtual void write_clan_list(vector<Clan *> clans) = 0;
         virtual void save_clan( Clan *clan ) = 0;
+        virtual void delete_clan( Clan *clan ) = 0;
 };
 #endif

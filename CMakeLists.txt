@@ -110,3 +110,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Catch2)
 add_executable(ForgottenLegendsTest ${TEST_FILES})
 target_link_libraries(ForgottenLegendsTest PRIVATE Catch2::Catch2WithMain librom)
+list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
+enable_testing()
+add_test(fl_tests ForgottenLegendsTest)

@@ -12,13 +12,13 @@
 class Note
 {
 public:
-    Note *next;
-    bool 	valid;
-    sh_int	type;
-    char *	sender;
-    char *	date;
-    char *	to_list;
-    char *	subject;
+    Note        *next;
+    bool 	    valid;
+    short int	type;
+    char *	    sender;
+    char *	    date;
+    char *	    to_list;
+    char *	    subject;
     time_t  	date_stamp;
     time_t      expire;
 

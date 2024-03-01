@@ -8,8 +8,13 @@ using std::vector;
 class FakeClanWriter : public IClanWriter {
     public:
         FakeClanWriter() {
+            this->clear();
+        }
+
+        void clear() {
             written = false;
             clans_saved = 0;
+            clans_deleted = 0;
         }
 
         void write_clan_list(vector<Clan *> clan_list) {
@@ -20,8 +25,13 @@ class FakeClanWriter : public IClanWriter {
             clans_saved++;
         }
 
+        void delete_clan(Clan *clan) {
+            clans_deleted++;
+        }
+
         bool written;
         int clans_saved;
+        int clans_deleted;
 };
 
 SCENARIO( "Clan Management" ) {
@@ -91,6 +101,27 @@ SCENARIO( "Clan Management" ) {
                 REQUIRE(list.at("bar") == 1250);
             }
             clan->setMemberCount(0);
+        }
+
+        WHEN("A clan is added") {
+            Clan *demo_clan = new Clan();
+            target->add_clan(demo_clan);
+
+            THEN("There will be two clans") {
+                REQUIRE(target->get_all_clans().size() == 2);
+                REQUIRE(writer->clans_deleted == 0);
+                REQUIRE(writer->clans_saved == 0);
+            }
+
+            THEN("One of the clans may be deleted") {
+                demo_clan = target->delete_clan(demo_clan);
+                REQUIRE(target->get_all_clans().size() == 1);
+                REQUIRE(writer->clans_deleted == 1);
+            }
+
+            delete demo_clan;
+            demo_clan = NULL;
+            writer->clear();
         }
 
         delete first_clan;

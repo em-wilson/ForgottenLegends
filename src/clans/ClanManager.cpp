@@ -107,14 +107,13 @@ void ClanManager::save_clan(Clan *clan) {
     _writer->save_clan(clan);
 }
 
-void ClanManager::delete_clan(Clan *clan) {
-    char strsave[MAX_STRING_LENGTH];
-
+Clan * ClanManager::delete_clan(Clan *clan) {
     _clan_list.remove(clan);
-    snprintf(strsave, sizeof(strsave), "%s%s%s", DATA_DIR, CLAN_DIR, clan->getFilename().c_str() );
-    // TODO: Should be done by clan writer
-    DISPOSE( clan );
+    _writer->delete_clan(clan);
+    this->write_clan_list();
     delete clan;
+    clan = NULL;
+    return clan;
 }
 
 vector<Clan *> ClanManager::get_all_clans() {

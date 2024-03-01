@@ -4,6 +4,7 @@ _deps/
 CMakeFiles
 cmake_install.cmake
 CMakeCache.txt
+CTestTestfile.cmake
 
 .vscode
 .DS_Store
@@ -14,6 +15,7 @@ test/tests
 src/rom
 Makefile
 build/
+Testing/
 .idea
 cmake-build-debug/
 data/misc/help.txt

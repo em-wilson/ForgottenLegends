@@ -16,7 +16,7 @@ class ClanManager
         Clan *get_clan( const char *name );
         void write_clan_list( );
         void save_clan(Clan *clan);
-        void delete_clan(Clan *clan);
+        Clan * delete_clan(Clan *clan);
         void handle_player_delete(Character *ch);
         void handle_kill(Character *killer, Character *victim);
         void handle_death(Character *killer, Character *victim);
