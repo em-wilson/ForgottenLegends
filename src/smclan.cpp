@@ -43,18 +43,6 @@ char *flag_string               args ( ( const struct flag_type *flag_table,
  * Read in actual clan data.
  */
 
-#if defined(KEY)
-#undef KEY
-#endif
-
-#define KEY( literal, field, value )					\
-				if ( !str_cmp( word, literal ) )	\
-				{					\
-				    field  = value;			\
-				    fMatch = TRUE;			\
-				    break;				\
-				}
-
 #define KEYFN( literal, fn, value )					\
 				if ( !str_cmp( word, literal ) )	\
 				{					\
@@ -89,15 +77,21 @@ void fread_clan( Clan *clan, FILE *fp )
 				fread_to_eol( fp );
 				break;
 
+			case '#':
+				if ( !str_cmp( word, "#END" ) )
+				{
+					return;
+				}
+
 			case 'D':
 				KEYFN( "Death",		clan->setDeathRoomVnum,		fread_number( fp ) 			);
 				break;
 
-			case 'E':
-				if ( !str_cmp( word, "End" ) )
-				{
-					return;
-				}
+			// case 'E':
+			// 	if ( !str_cmp( word, "End" ) )
+			// 	{
+			// 		return;
+			// 	}
 
 			case 'F':
 				KEYFN( "Filename",	clan->setFilename,			fread_string_nohash( fp ) 	);

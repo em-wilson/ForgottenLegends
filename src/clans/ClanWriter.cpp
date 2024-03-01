@@ -65,25 +65,25 @@ void ClanWriter::save_clan( Clan *clan )
     }
     else
     {
-	fprintf( fp, "#CLAN\n" );
-	fprintf( fp, "Name         %s~\n",	clan->getName().c_str()				);
-	fprintf( fp, "Whoname      %s~\n",	clan->getWhoname().c_str()			);
-	fprintf( fp, "Filename     %s~\n",	clan->getFilename().c_str()			);
-	fprintf( fp, "Motto        %s~\n",	clan->getMotto().c_str()			);
-	fprintf( fp, "Leader       %s~\n",	clan->getLeader().c_str()			);
-	fprintf( fp, "NumberOne    %s~\n",	clan->getFirstOfficer().c_str()		);
-	fprintf( fp, "NumberTwo    %s~\n",	clan->getSecondOfficer().c_str()	);
-	fprintf( fp, "Flags        %s\n",	print_flags(clan->getFlags())		);
-	fprintf( fp, "PKills       %d\n",	clan->getPkills()					);
-	fprintf( fp, "PDeaths      %d\n",	clan->getPdeaths()					);
-	fprintf( fp, "MKills       %d\n",	clan->getMkills()					);
-	fprintf( fp, "MDeaths      %d\n",	clan->getMdeaths()					);
-	fprintf( fp, "Played       %d\n",	clan->getPlayTime()					);
-	fprintf( fp, "Members      %d\n",	clan->countMembers()				);
-	fprintf( fp, "Death        %d\n",	clan->getDeathRoomVnum()			);
-	fprintf( fp, "Money        %ld\n",	clan->getMoney()					);
-	fprintf( fp, "End\n\n"													);
-	fprintf( fp, "#END\n"													);
+        fprintf( fp, "#CLAN\n" );
+        fprintf( fp, "Name         %s~\n",	clan->getName().c_str()				);
+        fprintf( fp, "Whoname      %s~\n",	clan->getWhoname().c_str()			);
+        fprintf( fp, "Filename     %s~\n",	clan->getFilename().c_str()			);
+        fprintf( fp, "Motto        %s~\n",	clan->getMotto().c_str()			);
+        fprintf( fp, "Leader       %s~\n",	clan->getLeader().c_str()			);
+        fprintf( fp, "NumberOne    %s~\n",	clan->getFirstOfficer().c_str()		);
+        fprintf( fp, "NumberTwo    %s~\n",	clan->getSecondOfficer().c_str()	);
+        fprintf( fp, "Flags        %s\n",	print_flags(clan->getFlags())		);
+        fprintf( fp, "PKills       %d\n",	clan->getPkills()					);
+        fprintf( fp, "PDeaths      %d\n",	clan->getPdeaths()					);
+        fprintf( fp, "MKills       %d\n",	clan->getMkills()					);
+        fprintf( fp, "MDeaths      %d\n",	clan->getMdeaths()					);
+        fprintf( fp, "Played       %d\n",	clan->getPlayTime()					);
+        fprintf( fp, "Members      %d\n",	clan->countMembers()				);
+        fprintf( fp, "Death        %d\n",	clan->getDeathRoomVnum()			);
+        fprintf( fp, "Money        %ld\n",	clan->getMoney()					);
+        fprintf( fp, "\n"													    );
+        fprintf( fp, "#END\n"													);
     }
     fclose( fp );
     fpReserve = fopen( NULL_FILE, "r" );
