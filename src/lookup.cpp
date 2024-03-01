@@ -175,25 +175,3 @@ int nw_lookup( PlayerCharacter *ch )
 
     return nw /= 100;
 }
-
-long clan_nw_lookup( CLAN_DATA * clan)
-{
-    long nw;
-
-    nw = 0;
-
-    /* First, monetary value */
-    nw += clan->money * 10;
-
-    // Pkills are worth +/- 1000 gold, mkills are worth +/- 50 gold
-    nw += 10000 * (clan->pkills * 10);
-    nw -= 100 * (clan->pdeaths * 10);
-    nw += 5000 * (clan->mkills * 5);
-    nw -= 50 * (clan->mdeaths * 5);
-
-    /* Members are worth 250 each */
-    nw += clan->members * 25000;
-
-    return nw /= 100;
-}
-

@@ -2,6 +2,7 @@
 #define PCDATA_H
 
 #include <list>
+#include "clans/Clan.h"
 
 /*
  * Data which only PC's have.
@@ -11,7 +12,7 @@ class PC_DATA
 public:
 	static std::list<PC_DATA *> active;
     PC_DATA *		next;
-    CLAN_DATA *		clan;
+    Clan *		clan;
     BUFFER * 		buffer;
     bool		valid;
     char *		pwd;

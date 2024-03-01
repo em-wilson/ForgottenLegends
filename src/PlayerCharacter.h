@@ -1,4 +1,5 @@
 #include "Character.h"
+#include "clans/Clan.h"
 
 class PlayerCharacter : public Character {
 public:
@@ -15,7 +16,7 @@ public:
 
     void setClanCust(int i);
 
-    void setJoin(CLAN_DATA * clan);
+    void setJoin(Clan * clan);
 
     void incrementPlayerKills( int amount );
 
@@ -43,11 +44,11 @@ public:
 
     void writeToFile(FILE *fp);
 
-    bool wantsToJoinClan( CLAN_DATA *clan );
+    bool wantsToJoinClan( Clan *clan );
 
 private:
     /* clan stuff */
-    CLAN_DATA *		join;
+    Clan *		join;
     int			    pkills;
     int			    pkilled;
     int			    mkills;

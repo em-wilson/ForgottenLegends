@@ -37,7 +37,7 @@
 #include "tables.h"
 #include "lookup.h"
 #include "Wiznet.h"
-#include "ClanManager.h"
+#include "clans/ClanManager.h"
 #include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
 
@@ -178,7 +178,6 @@ void do_guild( Character *ch, char *argument )
     char arg1[MAX_INPUT_LENGTH],arg2[MAX_INPUT_LENGTH];
     char buf[MAX_STRING_LENGTH];
     Character *victim;
-    CLAN_DATA *clan;
 
     argument = one_argument( argument, arg1 );
     argument = one_argument( argument, arg2 );
@@ -198,33 +197,25 @@ void do_guild( Character *ch, char *argument )
     {
         send_to_char("They are now clanless.\n\r",ch);
         send_to_char("You are now a member of no clan!\n\r",victim);
-        if (victim->pcdata->clan)
-        --victim->pcdata->clan->members;
-	    save_clan(victim->pcdata->clan);
-        victim->pcdata->clan = NULL;
+        clan_manager->remove_player(victim);
         save_char_obj(victim);
         return;
     }
 
-    clan = clan_manager->get_clan(arg2);
+    Clan * clan = clan_manager->get_clan(arg2);
     if (!clan)
     {
         send_to_char("No such clan exists.\n\r",ch);
         return;
     }
 
-        snprintf(buf, sizeof(buf),"They are now a member of clan %s.\n\r", clan->name);
-        send_to_char(buf,ch);
-        snprintf(buf, sizeof(buf),"You are now a member of clan %s.\n\r", clan->name);
-        send_to_char(buf,victim);
-
-    if (victim->pcdata->clan)
-    --victim->pcdata->clan->members;
-    save_clan(victim->pcdata->clan);
-    victim->pcdata->clan = clan;
-    clan->members++;
-    save_clan(clan);
+    clan_manager->add_player(victim, clan);
     save_char_obj(victim);
+
+    snprintf(buf, sizeof(buf),"They are now a member of clan %s.\n\r", clan->getName().c_str());
+    send_to_char(buf,ch);
+    snprintf(buf, sizeof(buf),"You are now a member of clan %s.\n\r", clan->getName().c_str());
+    send_to_char(buf,victim);
 }
 
 /* equips a character */
@@ -4746,8 +4737,7 @@ void do_copyover (Character *ch, char * argument)
 
 		       if (IS_CLANNED(och))
 		       {
-				och->pcdata->clan->played += current_time - och->logon;
-				save_clan(och->pcdata->clan);
+                clan_manager->add_playtime(och->pcdata->clan, current_time - och->logon);
 		       }
                        save_char_obj (och);
                 

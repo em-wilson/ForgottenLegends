@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "interp.h"
-#include "ClanManager.h"
+#include "clans/ClanManager.h"
 
 DECLARE_DO_FUN( do_bank_change	);
 DECLARE_DO_FUN( do_bank_clan	);
@@ -349,99 +349,99 @@ void do_bank_clan(Character *ch, char *argument)
 
     if (IS_IMMORTAL(ch))
     {
-	CLAN_DATA *clan;
-	int debit;
+        Clan *clan;
+        int debit;
 
-	if ((clan = clan_manager->get_clan(arg1)) == NULL)
-	{
-	    send_to_char("Syntax: bank clan <clan name> <amount to withdraw (in k)>\n\r",ch);
-	    return;
-	}
+        if ((clan = clan_manager->get_clan(arg1)) == NULL)
+        {
+            send_to_char("Syntax: bank clan <clan name> <amount to withdraw (in k)>\n\r",ch);
+            return;
+        }
 
-	if ((debit = atoi(arg2)) <= 0)
-	{
-	    send_to_char("Syntax: bank clan <clan name> <amount to withdraw (in k)>\n\r",ch);
-	    return;
-	}
+        if ((debit = atoi(arg2)) <= 0)
+        {
+            send_to_char("Syntax: bank clan <clan name> <amount to withdraw (in k)>\n\r",ch);
+            return;
+        }
 
-	if (clan->money < debit * 100000)
-	{
-	    send_to_char("The clan doesn't have that much money!\n\r",ch);
-	    return;
-	}
+        if (clan->getMoney() < debit * 100000)
+        {
+            send_to_char("The clan doesn't have that much money!\n\r",ch);
+            return;
+        }
 
-	clan->money -= debit * 100000;
-	ch->gold += debit * 1000;
-	append_file( ch, UPGRADE_FILE, argument ); 
-	save_clan(clan);
-	return;
+        clan->debitMoney(debit * 100000);
+        ch->gold += debit * 1000;
+        append_file( ch, UPGRADE_FILE, argument ); 
+        clan_manager->save_clan(clan);
+        return;
     }
     else
     {
-	if (str_cmp(ch->pcdata->clan->leader, ch->getName() ))
-	{
-	    send_to_char("Only your clan leader may access the clan account.\n\r", ch);
-	    return;
-	}
+        if (str_cmp(ch->pcdata->clan->getLeader().c_str(), ch->getName() ))
+        {
+            send_to_char("Only your clan leader may access the clan account.\n\r", ch);
+            return;
+        }
 
-	if (arg2[0] == '\0' || (str_cmp(arg2, "gold") && str_cmp(arg2, "silver")))
-	{
-	    send_to_char("Syntax: bank clan (+/- amount) (gold/silver)\n\r",ch);
-	    return;
-	}
+        if (arg2[0] == '\0' || (str_cmp(arg2, "gold") && str_cmp(arg2, "silver")))
+        {
+            send_to_char("Syntax: bank clan (+/- amount) (gold/silver)\n\r",ch);
+            return;
+        }
 
-	if (!str_cmp(arg2, "gold"))
-	    amount = atoi(arg1) * 100;
-	else
-	    amount = atoi(arg1);
+        if (!str_cmp(arg2, "gold"))
+            amount = atoi(arg1) * 100;
+        else
+            amount = atoi(arg1);
 
-	if ( amount == 0 )
-	{
-	    send_to_char("Nothing much happens.\n\r", ch);
-	    return;
-	}
+        if ( amount == 0 )
+        {
+            send_to_char("Nothing much happens.\n\r", ch);
+            return;
+        }
 
-	if ( amount < 0 && amount * -1 > ch->pcdata->clan->money )
-	{
-	    send_to_char("You cannot withdraw more than your clan has.\n\r", ch);
-	    return;
-	}
+        if ( amount < 0 && amount * -1 > ch->pcdata->clan->getMoney() )
+        {
+            send_to_char("You cannot withdraw more than your clan has.\n\r", ch);
+            return;
+        }
 
-	if ((ch->gold * 100) + ch->silver < amount && amount > 0)
-	{
-	    send_to_char("You cannot afford to deposit that much.\n\r",ch);
-	    return;
-	}
+        if ((ch->gold * 100) + ch->silver < amount && amount > 0)
+        {
+            send_to_char("You cannot afford to deposit that much.\n\r",ch);
+            return;
+        }
 
-	if (amount > 0)
-	{
-	    if (ch->silver < amount)
-	    {
-	        ch->gold -= ((amount - ch->silver + 99) / 100);
-	        ch->silver -= amount - (100 * ((amount - ch->silver + 99) / 100));
-	    }
-	    else
-		ch->silver -= amount;
+        if (amount > 0)
+        {
+            if (ch->silver < amount)
+            {
+                ch->gold -= ((amount - ch->silver + 99) / 100);
+                ch->silver -= amount - (100 * ((amount - ch->silver + 99) / 100));
+            }
+            else
+            ch->silver -= amount;
 
-	}
-	
-	ch->pcdata->clan->money += amount;
-	save_clan(ch->pcdata->clan);
+        }
+        
+        ch->pcdata->clan->creditMoney(amount);
+        clan_manager->save_clan(ch->pcdata->clan);
 
-	if ( amount < 0 )
-	{
-	    amount = amount * -1;
+        if ( amount < 0 )
+        {
+            amount = amount * -1;
 
-	    ch->gold += amount / 100;
-	    ch->silver += amount - (amount / 100);
+            ch->gold += amount / 100;
+            ch->silver += amount - (amount / 100);
 
-	    send_to_char("You withdraw from your clan fund.\n\r",ch);
-	    return;
-	}
-	else
-	{
-	    send_to_char("You add to your clan fund.\n\r",ch);
-	    return;
-	}
+            send_to_char("You withdraw from your clan fund.\n\r",ch);
+            return;
+        }
+        else
+        {
+            send_to_char("You add to your clan fund.\n\r",ch);
+            return;
+        }
     }
 }

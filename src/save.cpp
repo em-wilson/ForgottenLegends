@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "recycle.h"
-#include "ClanManager.h"
+#include "clans/ClanManager.h"
 #include "PlayerCharacter.h"
 #include "NonPlayerCharacter.h"
 

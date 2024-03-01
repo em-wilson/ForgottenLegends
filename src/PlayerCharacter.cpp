@@ -83,7 +83,7 @@ void PlayerCharacter::setClanCust(int value) {
         this->clan_cust = value;
 }
 
-void PlayerCharacter::setJoin(CLAN_DATA *clan) {
+void PlayerCharacter::setJoin(Clan *clan) {
         this->join = clan;
 }
 
@@ -175,7 +175,7 @@ void PlayerCharacter::writeToFile(FILE *fp) {
         fprintf( fp, "Kills %d %d %d %d\n", this->pkills, this->pkilled,
                 this->mkills, this->mkilled);
         if (this->pcdata->clan)
-                fprintf( fp, "Clan %s~\n", this->pcdata->clan->name);
+                fprintf( fp, "Clan %s~\n", this->pcdata->clan->getName().c_str());
         fprintf( fp, "Sex  %d\n",	this->sex			);
         fprintf( fp, "Cla  %d\n",	this->class_num		);
         fprintf( fp, "Levl %d\n",	this->level		);
@@ -337,7 +337,7 @@ void PlayerCharacter::setAdrenaline(int value) {
         this->adrenaline = value;
 }
 
-bool PlayerCharacter::wantsToJoinClan( CLAN_DATA *clan ) {
+bool PlayerCharacter::wantsToJoinClan( Clan *clan ) {
         return this->join == clan;
 }
 

@@ -554,7 +554,7 @@ void save_rooms( FILE *fp, AREA_DATA *pArea )
 		 fprintf ( fp, "M %d H %d\n",pRoomIndex->mana_rate,
 		                             pRoomIndex->heal_rate);
 		if (pRoomIndex->clan )
-		 fprintf ( fp, "C %s~\n" , pRoomIndex->clan->name );
+		 fprintf ( fp, "C %s~\n" , pRoomIndex->clan->getName().c_str() );
 		 			     
 		if (!IS_NULLSTR(pRoomIndex->owner))
 		 fprintf ( fp, "O %s~\n" , pRoomIndex->owner );

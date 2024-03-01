@@ -1910,10 +1910,12 @@ void extract_char( Character *ch, bool fPull )
     /* Death room is set in the clan tabe now */
     if ( !fPull && IS_CLANNED(ch))
     {
-	if (get_room_index(ch->pcdata->clan->death))
-        char_to_room(ch,get_room_index(ch->pcdata->clan->death));
-	else char_to_room(ch,get_room_index(ROOM_VNUM_ALTAR));
-	return;
+        if (get_room_index(ch->pcdata->clan->getDeathRoomVnum())) {
+            char_to_room(ch,get_room_index(ch->pcdata->clan->getDeathRoomVnum()));
+        } else {
+            char_to_room(ch,get_room_index(ROOM_VNUM_ALTAR));
+        }
+        return;
     }
     else if ( !fPull && !IS_CLANNED(ch))
     {

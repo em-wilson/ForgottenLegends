@@ -36,7 +36,8 @@
 #include <sys/resource.h>
 
 #include "merc.h"
-#include "ClanManager.h"
+#include "clans/ClanManager.h"
+#include "clans/ClanWriter.h"
 #include "db.h"
 #include "EquipmentListGenerator.h"
 #include "recycle.h"
@@ -317,7 +318,7 @@ void boot_db()
 	}
     }
 
-    clan_manager = new ClanManager();
+    clan_manager = new ClanManager(new ClanWriter(CLAN_DIR, CLAN_LIST));
     load_clans();
     /*
      * Read in all the area files.

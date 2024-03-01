@@ -59,7 +59,7 @@
 #include "recycle.h"
 #include "clan.h"
 #include "Wiznet.h"
-#include "ClanManager.h"
+#include "clans/ClanManager.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_help		);

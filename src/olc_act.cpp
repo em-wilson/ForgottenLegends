@@ -18,7 +18,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
-#include "ClanManager.h"
+#include "clans/ClanManager.h"
 #include "tables.h"
 #include "olc.h"
 #include "recycle.h"
@@ -1116,7 +1116,7 @@ REDIT( redit_show )
     if ( pRoom->clan )
     {
 	snprintf(buf, sizeof(buf), "Clan      : [%s]\n\r",
-		pRoom->clan->name );
+		pRoom->clan->getName().c_str() );
 	strcat( buf1, buf );
     }
 

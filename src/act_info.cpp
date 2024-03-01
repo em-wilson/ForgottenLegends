@@ -40,7 +40,7 @@
 #include "recycle.h"
 #include "tables.h"
 #include "lookup.h"
-#include "ClanManager.h"
+#include "clans/ClanManager.h"
 #include "PlayerCharacter.h"
 
 /* command procedures needed */
@@ -224,7 +224,7 @@ void show_char_to_char_0( Character *victim, Character *ch )
     if ( !IS_NPC(victim) && IS_SET(victim->act, PLR_THIEF  ) )
 						strcat( buf, "{B({YTHIEF{B){x " );
 
-    if ( IS_CLANNED(victim)	)		strcat( buf, victim->pcdata->clan->whoname );
+    if ( IS_CLANNED(victim)	)		strcat( buf, victim->pcdata->clan->getWhoname().c_str() );
     if ( victim->position == victim->start_pos && victim->long_descr[0] != '\0' )
     {
 	strcat( buf, victim->long_descr );
@@ -1834,9 +1834,9 @@ void do_whois (Character *ch, char *argument)
 		wch->level, race, class_name,
 	     wch->incog_level >= LEVEL_HERO ? "(Incog) ": "",
  	     wch->invis_level >= LEVEL_HERO ? "(Wizi) " : "",
-	     IS_CLANNED(wch) && (IS_IMMORTAL(ch) || wch->pcdata->clan == ch->pcdata->clan || wch->in_room == ch->in_room) ? wch->pcdata->clan->whoname : "",
+	     IS_CLANNED(wch) && (IS_IMMORTAL(ch) || wch->pcdata->clan == ch->pcdata->clan || wch->in_room == ch->in_room) ? wch->pcdata->clan->getWhoname().c_str() : "",
 	     IS_SET(wch->comm, COMM_AFK) ? "[AFK] " : "",
-             (IS_CLANNED(ch) && IS_CLANNED(wch) && IS_SET(wch->pcdata->clan->flags, CLAN_PK) && IS_SET(ch->pcdata->clan->flags, CLAN_PK) && wch->level + wch->getRange() >= ch->level ) ? "{R({rPK{R){x " : "",
+             (IS_CLANNED(ch) && IS_CLANNED(wch) && wch->pcdata->clan->hasFlag(CLAN_PK) && ch->pcdata->clan->hasFlag(CLAN_PK) && wch->level + wch->getRange() >= ch->level ) ? "{R({rPK{R){x " : "",
              IS_SET(wch->act,PLR_THIEF) ? "{B({YTHIEF{B){x " : "",
 		wch->getName(), IS_NPC(wch) ? "" : wch->pcdata->title);
 	    add_buf(output,buf);
@@ -1865,7 +1865,6 @@ void do_who( Character *ch, char *argument )
     DESCRIPTOR_DATA *d;
     int iClass;
     int iRace;
-    CLAN_DATA *iClan;
     int iLevelLower;
     int iLevelUpper;
     int nNumber;
@@ -1934,8 +1933,7 @@ void do_who( Character *ch, char *argument )
 			    fClan = TRUE;
 			else
 		        {
-			    iClan = clan_manager->get_clan(arg);
-			    if (iClan)
+			    if (NULL != clan_manager->get_clan(arg))
 			    {
 				fClanRestrict = TRUE;
 			    }
@@ -2039,9 +2037,9 @@ void do_who( Character *ch, char *argument )
 	    wch->level, race, class_name,
 	    wch->incog_level >= LEVEL_HERO ? "(Incog) " : "",
 	    wch->invis_level >= LEVEL_HERO ? "(Wizi) " : "",
-	    IS_CLANNED(wch) && (IS_IMMORTAL(ch) || wch->pcdata->clan == ch->pcdata->clan || wch->in_room == ch->in_room) ? wch->pcdata->clan->whoname : "",
+	    IS_CLANNED(wch) && (IS_IMMORTAL(ch) || wch->pcdata->clan == ch->pcdata->clan || wch->in_room == ch->in_room) ? wch->pcdata->clan->getWhoname().c_str() : "",
 	    IS_SET(wch->comm, COMM_AFK) ? "[AFK] " : "",
-             (IS_CLANNED(ch) && IS_CLANNED(wch) && IS_SET(wch->pcdata->clan->flags, CLAN_PK) && IS_SET(ch->pcdata->clan->flags, CLAN_PK) && wch->level + wch->getRange() >= ch->level ) ? "{R({rPK{R){x " : "",
+             (IS_CLANNED(ch) && IS_CLANNED(wch) && wch->pcdata->clan->hasFlag(CLAN_PK) && ch->pcdata->clan->hasFlag(CLAN_PK) && wch->level + wch->getRange() >= ch->level ) ? "{R({rPK{R){x " : "",
             IS_SET(wch->act, PLR_THIEF)  ? "{B({YTHIEF{B){x "  : "",
 	    wch->getName(),
 	    IS_NPC(wch) ? "" : wch->pcdata->title );
@@ -2729,7 +2727,6 @@ void look_window( Character *ch, OBJ_DATA *obj )    /* Voltecs Window code 1998 
 void do_nw( Character *ch, char *argument )
 {
     DESCRIPTOR_DATA *d;
-    CLAN_DATA *clan;
     char buf[MAX_STRING_LENGTH];
 
     if (IS_NPC(ch))
@@ -2738,13 +2735,10 @@ void do_nw( Character *ch, char *argument )
     snprintf(buf, sizeof(buf), "%-15s %15s\n\r", "Clan Name", "Net Worth (gold)");
     send_to_char(buf,ch);
 
-    for (clan = first_clan; clan != NULL; clan = clan->next)
-    {
-        if (!IS_SET(clan->flags, CLAN_NOSHOW))
-        {
-            snprintf(buf, sizeof(buf), "%-15s %-15ld\n\r", capitalize(clan->name), clan_nw_lookup(clan));
-            send_to_char(buf,ch);
-        }
+    auto clan_nw = clan_manager->list_clan_nw();
+    for ( auto nw : clan_nw )  {
+        snprintf(buf, sizeof(buf), "%-15s %-15ld\n\r", capitalize(nw.first.c_str()), nw.second);
+        send_to_char(buf,ch);
     }
 
     send_to_char("\n\r",ch);

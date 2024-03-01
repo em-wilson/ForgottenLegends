@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "tables.h"
-#include "ClanManager.h"
+#include "clans/ClanManager.h"
 #include "PlayerCharacter.h"
 
 DECLARE_DO_FUN( do_clist	);
@@ -65,7 +65,7 @@ void do_join( Character *caller, char *argument )
 	return;
     }
 
-	CLAN_DATA *join = clan_manager->get_clan(argument);
+	Clan *join = clan_manager->get_clan(argument);
     if (!join)
     {
 	snprintf(buf, sizeof(buf), "%s: that clan does not exist.\n\r",argument);
@@ -74,7 +74,7 @@ void do_join( Character *caller, char *argument )
     }
 
     ch->setJoin(join);
-    snprintf(buf, sizeof(buf), "You are now eligable to join %s.\n\r",join->name);
+    snprintf(buf, sizeof(buf), "You are now eligable to join %s.\n\r",join->getName().c_str());
     send_to_char(buf,ch);
     return;
 }
@@ -87,7 +87,7 @@ void do_cedit( Character *caller, char *argument )
 	}
 
 	PlayerCharacter *ch = (PlayerCharacter*)caller;
-    if (!IS_CLANNED(ch) || str_cmp(ch->getName(),ch->pcdata->clan->leader))
+    if (!IS_CLANNED(ch) || str_cmp(ch->getName(),ch->pcdata->clan->getLeader().c_str()))
     {
 	send_to_char("Only clan leaders may use this command.",ch);
 	return;

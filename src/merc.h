@@ -25,6 +25,8 @@
 *	ROM license, in the file Rom24/doc/rom.license			               *
 ***************************************************************************/
 
+#ifndef __MERC_H__
+#define __MERC_H__
 
 /*
  * Accommodate old non-Ansi compilers.
@@ -95,7 +97,6 @@ typedef struct	time_info_data		TIME_INFO_DATA;
 typedef struct	weather_data		WEATHER_DATA;
 typedef struct  mprog_list		MPROG_LIST;
 typedef struct  mprog_code		MPROG_CODE;
-typedef struct  clan_data		CLAN_DATA;
 
 class Character;
 class PlayerCharacter;
@@ -477,31 +478,6 @@ struct race_type
     long	parts;			/* default parts for the race */
 };
 
-struct  clan_data
-{
-    CLAN_DATA * next;           /* next clan in list                    */
-    CLAN_DATA * prev;           /* previous clan in list                */
-    char *      filename;       /* Clan filename                        */
-    char *      name;           /* Clan name                            */
-    char *      motto;          /* Clan motto                           */
-    char *      description;    /* A brief description of the clan      */
-    char *      whoname;        /* How the clan appears in the wholist  */
-    char *      leader;         /* Head clan leader                     */
-    char *      number1;        /* First officer                        */
-    char *      number2;        /* Second officer                       */
-    int         pkills;         /* Number of pkills on behalf of clan   */
-    int         pdeaths;        /* Number of pkills against clan        */
-    int         mkills;         /* Number of mkills on behalf of clan   */
-    int         mdeaths;        /* Number of clan deaths due to mobs    */
-    int         score;          /* Overall score                        */
-    long	money;		/* How much money do they have?		*/
-    sh_int      strikes;        /* Number of strikes against the clan   */
-    sh_int      members;        /* Number of clan members               */
-    int         death;          /* Where players end up when they die   */
-    long	flags;		/* Clan flags				*/
-    int		played;		/* How long has the clan been in?	*/
-};
-
 struct pc_race_type  /* additional data for pc races */
 {
     const char *	name;			/* MUST be in race_type */
@@ -839,8 +815,6 @@ struct	kill_data
 
 /*
  * Bits for 'clan flags'.
- * Used by CLAN_DATA
- * -Blizzard
  */
 #define CLAN_NOSHOW		(A)
 #define CLAN_PK			(B)
@@ -1690,7 +1664,7 @@ struct	room_index_data
     sh_int		sector_type;
     sh_int		heal_rate;
     sh_int 		mana_rate;
-    CLAN_DATA *		clan;
+    Clan *		clan;
 };
 
 
@@ -2204,7 +2178,6 @@ char *	crypt		args( ( const char *key, const char *salt ) );
 #define SF	SPEC_FUN
 #define AD	AFFECT_DATA
 #define MPC	MPROG_CODE
-#define CL      CLAN_DATA
 
 /* act_comm.c */
 void	talk_auction	args( ( char *argument ) );
@@ -2244,7 +2217,6 @@ bool	check_ban	args( ( char *site, int type) );
 
 /* clans.c */
 void    load_clans      args( ( void ) );
-void    save_clan       args( ( CLAN_DATA *clan ) );
 
 /* comm.c */
 int     strlen_color    args( (char *argument)  );
@@ -2514,7 +2486,6 @@ int	race_lookup	args( ( const char *name) );
 int	item_lookup	args( ( const char *name) );
 int	liq_lookup	args( ( const char *name) );
 int	nw_lookup	args( ( PlayerCharacter *ch ) );
-long	clan_nw_lookup	args( ( CLAN_DATA *clan ) );
 
 #undef	CD
 #undef	MID
@@ -2584,6 +2555,4 @@ extern          WEB_INDEX_DATA *        web_index_hash  [MAX_KEY_HASH];
 extern		OBJ_INDEX_DATA *	obj_index_hash  [MAX_KEY_HASH];
 extern		ROOM_INDEX_DATA *	room_index_hash [MAX_KEY_HASH];
 
-// Clan schtuff -Blizzard
-extern          CLAN_DATA         *     first_clan;
-extern          CLAN_DATA         *     last_clan;
+#endif

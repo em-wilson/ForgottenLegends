@@ -26,8 +26,13 @@ set(SOURCE_FILES
     src/bow.cpp
     src/Character.cpp
     src/Character.h
-    src/ClanManager.cpp
-    src/ClanManager.h
+    src/clans/Clan.cpp
+    src/clans/Clan.h
+    src/clans/ClanManager.cpp
+    src/clans/ClanManager.h
+    src/clans/ClanWriter.cpp
+    src/clans/ClanWriter.h
+    src/clans/IClanWriter.h
     src/clan.h
     src/colordef.h
     src/comm.cpp

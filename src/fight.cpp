@@ -32,6 +32,7 @@
 #include "merc.h"
 #include "Wiznet.h"
 #include "PlayerCharacter.h"
+#include "clans/ClanManager.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_backstab	);
@@ -72,7 +73,7 @@ void	raw_kill	args( ( Character *victim ) );
 void	set_fighting	args( ( Character *ch, Character *victim ) );
 void	disarm		args( ( Character *ch, Character *victim ) );
 
-
+extern ClanManager * clan_manager;
 
 /*
  * Control the fights going on.
@@ -984,38 +985,33 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
             (IS_NPC(ch) ? ch->short_descr : ch->getName()),
             ch->in_room->name, ch->in_room->vnum);
  
-        if (IS_NPC(victim))
+	clan_manager->handle_kill(ch, victim);
+	clan_manager->handle_death(ch, victim);
+
+	if (IS_NPC(victim))
 	{
 	    if (!IS_NPC(ch))
 			((PlayerCharacter*)ch)->incrementMobKills(1);
 
             Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_MOBDEATHS,0,0);
 	}
-        else
+	else
 	{
 	    if (!IS_NPC(ch))
 	    {
 			((PlayerCharacter*)ch)->incrementPlayerKills(1);
 			((PlayerCharacter*)ch)->incrementRange(1);
-		if (IS_CLANNED(ch))
-		{
-		    ch->pcdata->clan->pkills++;
-		    save_clan(ch->pcdata->clan);
-		}
 			((PlayerCharacter*)victim)->incrementKilledByPlayerCount(1);
 			((PlayerCharacter*)victim)->setJustKilled(5);
 			((PlayerCharacter*)victim)->incrementRange(-1);
-		if (IS_CLANNED(victim))
-		{
-		    victim->pcdata->clan->pdeaths++;
-		    save_clan(victim->pcdata->clan);
-		}
 	    }
 	    else
+		{
 			((PlayerCharacter*)ch)->incrementKilledByMobCount(1);
 			((PlayerCharacter*)ch)->setJustKilled(5);
 
             Wiznet::instance()->report(log_buf,NULL,NULL,WIZ_DEATHS,0,0);
+		}
 	}
 
 	/*
@@ -1470,13 +1466,13 @@ bool is_safe(Character *ch, Character *victim)
 		return TRUE;
 	    }
 
-	    if (IS_CLANNED(ch) && !IS_SET(ch->pcdata->clan->flags, CLAN_PK))
+	    if (IS_CLANNED(ch) && !ch->pcdata->clan->hasFlag(CLAN_PK))
 	    {
 		send_to_char("You must be in a pkilling clan to kill other players.\n\r",ch);
 		return TRUE;
 	    }
 
-	    if (IS_CLANNED(victim) && !IS_SET(victim->pcdata->clan->flags, CLAN_PK))
+	    if (IS_CLANNED(victim) && !victim->pcdata->clan->hasFlag(CLAN_PK))
 	    {
 		send_to_char("They are in a non pkilling clan.  Leave them alone.\n\r",ch);
 		return TRUE;
@@ -2218,7 +2214,7 @@ int xp_compute( Character *gch, Character *victim, int total_levels )
 
     if (IS_CLANNED(gch))
     {
-	if (IS_SET(gch->pcdata->clan->flags, CLAN_PK))
+	if (gch->pcdata->clan->hasFlag(CLAN_PK))
 	    xp *= 1.5;
 	else
 	    xp *= 1.25;

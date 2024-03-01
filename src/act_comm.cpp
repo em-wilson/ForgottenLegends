@@ -38,10 +38,13 @@
 #include "tables.h"
 #include "Wiznet.h"
 #include "PlayerCharacter.h"
+#include "clans/ClanManager.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_quit	);
 void chatperform(Character *ch,Character *victim,char* msg);
+
+extern ClanManager * clan_manager;
 
 /* RT code to delete yourself */
 
@@ -70,11 +73,7 @@ void do_delete( Character *ch, char *argument)
         snprintf(strsave, sizeof(strsave), "%s%s", PLAYER_DIR, capitalize( ch->getName() ) );
 	    Wiznet::instance()->report("$N turns $Mself into line noise.",ch,NULL,0,0,0);
 	    stop_fighting(ch,TRUE);
-	    if (ch->pcdata->clan)
-	    {
-		ch->pcdata->clan->members--;
-		save_clan(ch->pcdata->clan);
-	    }
+        clan_manager->handle_player_delete(ch);
 	    do_quit(ch,(char*)"");
 	    unlink(strsave);
 	    return;
@@ -1384,8 +1383,7 @@ void do_quit( Character *caller, char *argument ) {
     }
 
     if (IS_CLANNED(ch)) {
-        ch->pcdata->clan->played += current_time - ch->logon;
-        save_clan(ch->pcdata->clan);
+        clan_manager->add_playtime(ch->pcdata->clan, current_time - ch->logon);
     }
 
 /*

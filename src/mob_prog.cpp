@@ -42,7 +42,7 @@
 #include <sys/types.h>
 #include <ctype.h>
 #include "merc.h"
-#include "ClanManager.h"
+#include "clans/ClanManager.h"
 #include "tables.h"
 #include "lookup.h"
 

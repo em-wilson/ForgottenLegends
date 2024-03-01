@@ -3,7 +3,6 @@
 
 #include <list>
 #include <string>
-#include <ForceFeedback/ForceFeedback.h>
 #include "pc_data.h"
 
 /*

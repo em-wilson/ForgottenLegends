@@ -1,5 +1,6 @@
 #include <sys/types.h>
 #include <sys/time.h>
+#include <unistd.h>
 #include "merc.h"
 
 /* Needs to be global because of do_copyover */
