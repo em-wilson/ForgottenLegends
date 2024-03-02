@@ -1,6 +1,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include "merc.h"
+#include "board.h"
 #include "PlayerCharacter.h"
 #include "Wiznet.h"
 
@@ -291,7 +292,7 @@ void PlayerCharacter::writeToFile(FILE *fp) {
                 /* Save number of boards in case that number changes */
                 fprintf (fp, "Boards       %d ", MAX_BOARD);
                 for (i = 0; i < MAX_BOARD; i++)
-                        fprintf (fp, "%s %ld ", boards[i].short_name, this->pcdata->last_note[i]);
+                        fprintf (fp, "%s %ld ", boards[i].short_name, this->pcdata->last_note_read.at(i));
                 fprintf (fp, "\n");
 
                 for ( sn = 0; sn < MAX_SKILL; sn++ )

@@ -1,5 +1,6 @@
 #include <sys/types.h>
 #include "merc.h"
+#include "board.h"
 #include "recycle.h"
 #include "pc_data.h"
 
@@ -41,7 +42,7 @@ PC_DATA::PC_DATA()
     this->board = NULL;
     this->in_progress = NULL;
     for ( int board = 0; board < MAX_BOARD; board++ ) {
-    	this->last_note[board] = 0;
+    	this->last_note_read.emplace(board, 0);
     }
 
     for ( int group = 0; group < MAX_GROUP; group++ ) {

@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "merc.h"
+#include "board.h"
 #include "recycle.h"
 #include "clans/ClanManager.h"
 #include "PlayerCharacter.h"
@@ -710,7 +711,7 @@ void fread_char( Character *ch, FILE *fp )
                         fread_number (fp); /* read last_note and skip info */
                     }
                     else /* Save it */
-                        ch->pcdata->last_note[i] = fread_number (fp);
+                        ch->pcdata->last_note_read.emplace(i, fread_number (fp) );
                 } /* for */
     
                  fMatch = TRUE;

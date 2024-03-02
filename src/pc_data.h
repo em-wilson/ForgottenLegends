@@ -2,7 +2,11 @@
 #define PCDATA_H
 
 #include <list>
+#include <unordered_map>
 #include "clans/Clan.h"
+
+typedef struct board_data BOARD_DATA;
+class Note;
 
 /*
  * Data which only PC's have.
@@ -35,7 +39,7 @@ public:
     char * 		alias_sub[MAX_ALIAS];
     int 		security;	/* OLC */ /* Builder security */
     BOARD_DATA *        board;                  /* The current board        */
-    time_t              last_note[MAX_BOARD];   /* last note for the boards */
+    std::unordered_map<int, time_t> last_note_read;   /* last note for the boards */
     Note *         in_progress;
 
     PC_DATA();

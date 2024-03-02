@@ -32,6 +32,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "board.h"
 #include "interp.h"
 #include "recycle.h"
 #include "Wiznet.h"

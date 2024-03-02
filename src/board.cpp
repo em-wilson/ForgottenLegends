@@ -22,6 +22,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "board.h"
 #include "recycle.h"
 /* #include "do.h" */ /* My do_XXX functions are declared in this file */
 #include "colordef.h"
@@ -426,7 +427,7 @@ int unread_notes (Character *ch, BOARD_DATA *board)
 	if (board->read_level > get_trust(ch))
 		return BOARD_NOACCESS;
 		
-	last_read = ch->pcdata->last_note[board_number(board)];
+	last_read = ch->pcdata->last_note_read.at(board_number(board));
 	
 	for (note = board->note_first; note; note = note->next)
 		if (is_note_to(ch, note) && ((long)last_read < (long)note->date_stamp))
@@ -560,7 +561,7 @@ static void do_nread (Character *ch, char *argument)
 {
 	Note *p;
 	int count = 0, number;
-	time_t *last_note = &ch->pcdata->last_note[board_number(ch->pcdata->board)];
+	time_t *last_note = &ch->pcdata->last_note_read.at(board_number(ch->pcdata->board));
 	
 	if (!str_cmp(argument, "again"))
 	{ /* read last note again */
@@ -671,7 +672,7 @@ static void do_nlist (Character *ch, char *argument)
 	send_to_char (BOLD "Notes on this board:" NO_COLOR "\n\r"
 	              RED "Num> Author        Subject" NO_COLOR "\n\r",ch);
 	              
-	last_note = ch->pcdata->last_note[board_number (ch->pcdata->board)];
+	last_note = ch->pcdata->last_note_read.at(board_number (ch->pcdata->board) );
 	
 	for (p = ch->pcdata->board->note_first; p; p = p->next)
 	{
@@ -704,7 +705,7 @@ static void do_ncatchup (Character *ch, char *argument)
 		send_to_char ("Alas, there are no notes in that board.\n\r",ch);
 	else
 	{
-		ch->pcdata->last_note[board_number(ch->pcdata->board)] = p->date_stamp;
+		ch->pcdata->last_note_read.emplace(board_number(ch->pcdata->board), p->date_stamp);
 		send_to_char ("All mesages skipped.\n\r",ch);
 	}
 }

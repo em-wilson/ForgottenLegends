@@ -36,6 +36,7 @@
 #include <sys/resource.h>
 
 #include "merc.h"
+#include "board.h"
 #include "clans/ClanManager.h"
 #include "clans/ClanWriter.h"
 #include "db.h"

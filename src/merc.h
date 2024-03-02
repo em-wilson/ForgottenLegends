@@ -1455,7 +1455,6 @@ struct mem_data
     time_t 	when;
 };
 
-#include "board.h"
 #include "Character.h"
 
 /* Data for generating characters -- only used during generation */
@@ -2047,7 +2046,6 @@ extern		KILL_DATA		kill_table	[];
 extern		char			log_buf		[];
 extern		TIME_INFO_DATA		time_info;
 extern		WEATHER_DATA		weather_info;
-extern          Note         *     note_free;
 extern          OBJ_DATA          *     obj_free;
 extern		bool			MOBtrigger;
 

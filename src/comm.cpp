@@ -56,6 +56,7 @@
 #include <unistd.h>
 
 #include "merc.h"
+#include "board.h"
 #include "Game.h"
 #include "recycle.h"
 #include "clan.h"
