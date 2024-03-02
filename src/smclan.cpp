@@ -561,7 +561,7 @@ void do_setclan( Character *ch, char *argument )
 
 void do_makeclan( Character *ch, char *argument )
 {
-	if (get_trust(ch) < MAX_LEVEL ) {
+	if (ch->getTrust() < MAX_LEVEL ) {
 		send_to_char("Only implementors can run this command.", ch);
 		return;
 	}

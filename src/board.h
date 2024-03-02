@@ -58,6 +58,7 @@ bool is_note_to (Character *ch, Note *note); /* is tha note to ch? */
 void personal_message (const char *sender, const char *to, const char *subject, const int expire_days, const char *text);
 void make_note (const char* board_name, const char *sender, const char *to, const char *subject, const int expire_days, const char *text);
 void save_notes ();
+bool is_note_room (ROOM_INDEX_DATA *room);
 
 /* for nanny */
 void handle_con_note_to 		(DESCRIPTOR_DATA *d, char * argument);

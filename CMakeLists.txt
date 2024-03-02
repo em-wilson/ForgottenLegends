@@ -20,23 +20,20 @@ set(SOURCE_FILES
     src/alias.cpp
     src/ban.cpp
     src/bank.cpp
+    src/BanManager.cpp src/BanManager.h
     src/bit.cpp
-    src/board.cpp
-    src/board.h
+    src/board.cpp src/board.h
     src/bow.cpp
-    src/Character.cpp
-    src/Character.h
+    src/Character.cpp src/Character.h
     src/ConnectedStateManager.cpp src/ConnectedStateManager.h
-    src/clans/Clan.cpp
-    src/clans/Clan.h
-    src/clans/ClanManager.cpp
-    src/clans/ClanManager.h
-    src/clans/ClanWriter.cpp
-    src/clans/ClanWriter.h
+    src/clans/Clan.cpp src/clans/Clan.h
+    src/clans/ClanManager.cpp src/clans/ClanManager.h
+    src/clans/ClanWriter.cpp src/clans/ClanWriter.h
     src/clans/IClanWriter.h
     src/clan.h
     src/connected_state_handlers/AbstractStateHandler.cpp src/connected_state_handlers/AbstractStateHandler.h
-    src/connected_state_handlers/GetOldPasswordStateHandler.cpp
+    src/connected_state_handlers/BreakConnectStateHandler.cpp src/connected_state_handlers/BreakConnectStateHandler.h
+    src/connected_state_handlers/GetOldPasswordStateHandler.cpp src/connected_state_handlers/GetOldPasswordStateHandler.h
     src/connected_state_handlers/ConfirmNewNameStateHandler.cpp src/connected_state_handlers/ConfirmNewNameStateHandler.h
     src/connected_state_handlers/GetNameStateHandler.cpp src/connected_state_handlers/GetNameStateHandler.h
     src/colordef.h
@@ -45,6 +42,7 @@ set(SOURCE_FILES
     src/db.cpp
     src/db.h
     src/db2.cpp
+    src/Descriptor.h
     src/effects.cpp
     src/fight.cpp
     src/flags.cpp

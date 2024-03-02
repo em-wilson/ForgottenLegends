@@ -86,7 +86,7 @@ void do_mob( Character *ch, char *argument )
     /*
      * Security check!
      */
-    if ( ch->desc != NULL && get_trust(ch) < MAX_LEVEL )
+    if ( ch->desc != NULL && ch->getTrust() < MAX_LEVEL )
 	return;
     mob_interpret( ch, argument );
 }
@@ -545,7 +545,7 @@ void do_mpoload( Character *ch, char *argument )
  
     if ( arg2[0] == '\0' )
     {
-	level = get_trust( ch );
+	level = ch->getTrust();
     }
     else
     {
@@ -559,7 +559,7 @@ void do_mpoload( Character *ch, char *argument )
 	    return;
         }
 	level = atoi( arg2 );
-	if ( level < 0 || level > get_trust( ch ) )
+	if ( level < 0 || level > ch->getTrust() )
 	{
 	    bug( "Mpoload - Bad level from vnum %d.", 
 		IS_NPC(ch) ? ch->pIndexData->vnum : 0 );
@@ -892,7 +892,7 @@ void do_mpforce( Character *ch, char *argument )
        vch = *it;
 
 	    if ( vch->in_room == ch->in_room
-		&& get_trust( vch ) < get_trust( ch ) 
+		&& vch->getTrust() < ch->getTrust() 
 		&& can_see( ch, vch ) )
 	    {
 		interpret( vch, argument );

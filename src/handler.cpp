@@ -33,6 +33,7 @@
 #include <time.h>
 #include "merc.h"
 #include "magic.h"
+#include "NonPlayerCharacter.h"
 #include "recycle.h"
 #include "tables.h"
 
@@ -649,24 +650,6 @@ void reset_char(Character *ch)
     /* make sure sex is RIGHT!!!! */
     if (ch->sex < 0 || ch->sex > 2)
 	ch->sex = ch->pcdata->true_sex;
-}
-
-
-/*
- * Retrieve a character's trusted level for permission checking.
- */
-int get_trust( Character *ch )
-{
-    if ( ch->desc != NULL && ch->desc->original != NULL )
-	ch = ch->desc->original;
-
-    if (ch->trust)
-	return ch->trust;
-
-    if ( IS_NPC(ch) && ch->level >= LEVEL_HERO )
-	return LEVEL_HERO - 1;
-    else
-	return ch->level;
 }
 
 
@@ -2376,7 +2359,7 @@ bool room_is_private( ROOM_INDEX_DATA *pRoomIndex )
 bool can_see_room( Character *ch, ROOM_INDEX_DATA *pRoomIndex )
 {
     if (IS_SET(pRoomIndex->room_flags, ROOM_IMP_ONLY) 
-    &&  get_trust(ch) < MAX_LEVEL)
+    &&  ch->getTrust() < MAX_LEVEL)
 	return FALSE;
 
     if (IS_SET(pRoomIndex->room_flags, ROOM_GODS_ONLY)
@@ -2410,11 +2393,11 @@ bool can_see( Character *ch, Character *victim )
     if ( ch == victim )
 	return TRUE;
     
-    if ( victim == NULL || get_trust(ch) < victim->invis_level)
+    if ( victim == NULL || ch->getTrust() < victim->invis_level)
 	return FALSE;
 
 
-    if (get_trust(ch) < victim->incog_level && ch->in_room != victim->in_room)
+    if (ch->getTrust() < victim->incog_level && ch->in_room != victim->in_room)
 	return FALSE;
 
     if ( (!IS_NPC(ch) && IS_SET(ch->act, PLR_HOLYLIGHT)) 

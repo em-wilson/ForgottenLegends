@@ -5,7 +5,10 @@
 #include <unordered_map>
 #include "clans/Clan.h"
 
+#define MAX_ALIAS		    5           // Temporary - if updating this, also update merc.h
+
 typedef struct board_data BOARD_DATA;
+typedef struct 	buf_type	 	BUFFER;
 class Note;
 
 /*
@@ -23,17 +26,17 @@ public:
     char *		bamfin;
     char *		bamfout;
     char *		title;
-    sh_int		perm_hit;
-    sh_int		perm_mana;
-    sh_int		perm_move;
-    sh_int		true_sex;
+    short int		perm_hit;
+    short int		perm_mana;
+    short int		perm_move;
+    short int		true_sex;
     int			last_level;
-    sh_int		condition	[4];
-    sh_int		learned		[MAX_SKILL];
-    sh_int		sk_level	[MAX_SKILL];
-    sh_int		sk_rating	[MAX_SKILL];
-    bool		group_known	[MAX_GROUP];
-    sh_int		points;
+    short int		condition	[4];
+    std::unordered_map<int, short int> learned;
+    std::unordered_map<int, short int> sk_level;
+    std::unordered_map<int, short int> sk_rating;
+    std::unordered_map<int, bool> group_known;
+    short int		points;
     bool              	confirm_delete;
     char *		alias[MAX_ALIAS];
     char * 		alias_sub[MAX_ALIAS];

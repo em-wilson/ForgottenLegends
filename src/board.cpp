@@ -103,6 +103,10 @@ static void append_note (FILE *fp, Note *note)
 	fprintf (fp, "Text\n%s~\n\n", note->getText().c_str());
 }
 
+bool is_note_room( ROOM_INDEX_DATA *room ) {
+    return room == get_room_index(ROOM_VNUM_NOTE);
+}
+
 /* Save a note in a given board */
 void finish_note (BOARD_DATA *board, Note *note)
 {
@@ -394,7 +398,7 @@ bool is_note_to (Character *ch, Note *note)
 		is_full_name ("immortals", note->to_list)))
 		return TRUE;
 
-	if ((get_trust(ch) == MAX_LEVEL) && (
+	if ((ch->getTrust() == MAX_LEVEL) && (
 		is_full_name ("imp", note->to_list) ||
 		is_full_name ("imps", note->to_list) ||
 		is_full_name ("implementor", note->to_list) ||
@@ -405,7 +409,7 @@ bool is_note_to (Character *ch, Note *note)
 		return TRUE;
 
 	/* Allow a note to e.g. 40 to send to characters level 40 and above */		
-	if (is_number(note->to_list) && get_trust(ch) >= atoi(note->to_list))
+	if (is_number(note->to_list) && ch->getTrust() >= atoi(note->to_list))
 		return TRUE;
 		
 	/* Allow clan notes */
@@ -424,7 +428,7 @@ int unread_notes (Character *ch, BOARD_DATA *board)
 	time_t last_read;
 	int count = 0;
 	
-	if (board->read_level > get_trust(ch))
+	if (board->read_level > ch->getTrust())
 		return BOARD_NOACCESS;
 		
 	last_read = ch->pcdata->last_note_read.at(board_number(board));
@@ -457,7 +461,7 @@ static void do_nwrite (Character *caller, char *argument)
 	    return;
 	}
 
-	if (get_trust(ch) < ch->pcdata->board->write_level)
+	if (ch->getTrust() < ch->pcdata->board->write_level)
 	{
 		send_to_char ("You cannot post notes on this board.\n\r",ch);
 		return;
@@ -636,7 +640,7 @@ static void do_nremove (Character *ch, char *argument)
 		return;
 	}
 	
-	if (str_cmp(ch->getName(),p->sender) && (get_trust(ch) < MAX_LEVEL))
+	if (str_cmp(ch->getName(),p->sender) && (ch->getTrust() < MAX_LEVEL))
 	{
 		send_to_char ("You are not authorized to remove this note.\n\r",ch);
 		return;
@@ -780,9 +784,9 @@ void do_board (Character *ch, char *argument)
 		send_to_char (buf,ch);
 
 		/* Inform of rights */		
-		if (ch->pcdata->board->read_level > get_trust(ch))
+		if (ch->pcdata->board->read_level > ch->getTrust())
 			send_to_char ("You cannot read nor write notes on this board.\n\r",ch);
-		else if (ch->pcdata->board->write_level > get_trust(ch))
+		else if (ch->pcdata->board->write_level > ch->getTrust())
 			send_to_char ("You can only read notes from this board.\n\r",ch);
 		else
 			send_to_char ("You can both read and write on this board.\n\r",ch);
@@ -810,7 +814,7 @@ void do_board (Character *ch, char *argument)
 		{
 			ch->pcdata->board = &boards[i];
 			snprintf(buf, sizeof(buf), "Current board changed to " BOLD "%s" NO_COLOR ". %s.\n\r",boards[i].short_name,
-			              (get_trust(ch) < boards[i].write_level) 
+			              (ch->getTrust() < boards[i].write_level) 
 			              ? "You can only read here" 
 			              : "You can both read and write here");
 			send_to_char (buf,ch);
@@ -842,7 +846,7 @@ void do_board (Character *ch, char *argument)
 	
 	ch->pcdata->board = &boards[i];
 	snprintf(buf, sizeof(buf), "Current board changed to " BOLD "%s" NO_COLOR ". %s.\n\r",boards[i].short_name,
-	              (get_trust(ch) < boards[i].write_level) 
+	              (ch->getTrust() < boards[i].write_level) 
 	              ? "You can only read here" 
 	              : "You can both read and write here");
 	send_to_char (buf,ch);

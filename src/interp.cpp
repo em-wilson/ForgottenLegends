@@ -494,7 +494,7 @@ void interpret( Character *ch, char *argument )
      * Look for command in command table.
      */
     found = FALSE;
-    trust = get_trust( ch );
+    trust = ch->getTrust();
     for ( cmd = 0; cmd_table[cmd].name[0] != '\0'; cmd++ )
     {
 	if ( command[0] == cmd_table[cmd].name[0]
@@ -517,7 +517,7 @@ void interpret( Character *ch, char *argument )
     ||   cmd_table[cmd].log == LOG_ALWAYS )
     {
 	snprintf(log_buf, 2*MAX_INPUT_LENGTH, "Log %s: %s", ch->getName(), logline );
-	Wiznet::instance()->report(log_buf,ch,NULL,WIZ_SECURE,0,get_trust(ch));
+	Wiznet::instance()->report(log_buf,ch,NULL,WIZ_SECURE,0,ch->getTrust());
 	log_string( log_buf );
     }
 
@@ -818,7 +818,7 @@ void do_commands( Character *ch, char *argument )
     for ( cmd = 0; cmd_table[cmd].name[0] != '\0'; cmd++ )
     {
         if ( cmd_table[cmd].level <  LEVEL_HERO
-        &&   cmd_table[cmd].level <= get_trust( ch ) 
+        &&   cmd_table[cmd].level <= ch->getTrust() 
 	&&   cmd_table[cmd].show)
 	{
 	    snprintf(buf, sizeof(buf), "%-12s", cmd_table[cmd].name );
@@ -839,55 +839,55 @@ void do_wizhelp( Character *ch, char *argument )
 
     output = new_buf();
 
-    if (get_trust(ch) >= 52)
+    if (ch->getTrust() >= 52)
     {
 	add_buf(output, "{y[{cAvatars (52){y]{x\n\r");
 	add_buf(output, return_wizhelp(52));
     }
 
-    if (get_trust(ch) >= 53)
+    if (ch->getTrust() >= 53)
     {
 	add_buf(output, "\n\r{y[{cAngels (53){y]{x\n\r");
 	add_buf(output, return_wizhelp(53));
     }
 
-    if (get_trust(ch) >= 54)
+    if (ch->getTrust() >= 54)
     {
 	add_buf(output,"\n\r{y[{cDemiGods (54){y]{x\n\r");
 	add_buf(output,return_wizhelp(54));
     }
 
-    if (get_trust(ch) >= 55)
+    if (ch->getTrust() >= 55)
     {
 	add_buf(output, "\n\r{y[{cImmortals (55){y]{x\n\r");
 	add_buf(output, return_wizhelp(55));
     }
 
-    if (get_trust(ch) >= 56)
+    if (ch->getTrust() >= 56)
     {
 	add_buf(output, "\n\r{y[{cGods (56){y]{x\n\r");
 	add_buf(output, return_wizhelp(56));
     }
 
-    if (get_trust(ch) >= 57)
+    if (ch->getTrust() >= 57)
     {
 	add_buf(output, "\n\r{y[{cDeities (57){y]{x\n\r");
 	add_buf(output, return_wizhelp(57));
     }
 
-    if (get_trust(ch) >= 58)
+    if (ch->getTrust() >= 58)
     {
 	add_buf(output, "\n\r{y[{cSupremacies (58){y]{x\n\r");
 	add_buf(output, return_wizhelp(58));
     }
 
-    if (get_trust(ch) >= 59)
+    if (ch->getTrust() >= 59)
     {
 	add_buf(output, "\n\r{y[{cCreators (59){y]{x\n\r");
 	add_buf(output, return_wizhelp(59));
     }
 
-    if (get_trust(ch) >= 60)
+    if (ch->getTrust() >= 60)
     {
 	add_buf(output, "\n\r{y[{cImplementors (60){y]{x\n\r");
 	add_buf(output, return_wizhelp(60));

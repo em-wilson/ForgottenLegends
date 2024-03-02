@@ -117,7 +117,7 @@ void save_char_obj( Character *ch )
  	}
 
 	fprintf(fp,"Lev %2d Trust %2d  %s%s\n",
-	    ch->level, get_trust(ch), ch->getName(), ch->pcdata->title);
+	    ch->level, ch->getTrust(), ch->getName(), ch->pcdata->title);
 	fclose( fp );
 	fpReserve = fopen( NULL_FILE, "r" );
     }

@@ -1951,7 +1951,10 @@ OBJ_INDEX_DATA *get_obj_index( int vnum )
     return NULL;
 }
 
-
+ROOM_INDEX_DATA *get_limbo_room()
+{
+    return get_room_index(ROOM_VNUM_LIMBO);
+}
 
 /*
  * Translates mob virtual number to its room index struct.

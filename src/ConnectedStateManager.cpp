@@ -1,6 +1,7 @@
 #include "ConnectedState.h"
 #include "ConnectedStateManager.h"
 #include "connected_state_handlers/GetNameStateHandler.h"
+#include "Descriptor.h"
 
 ConnectedStateManager::ConnectedStateManager(Game *game) {
     _game = game;

@@ -30,9 +30,10 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
-#include "Wiznet.h"
+#include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
 #include "clans/ClanManager.h"
+#include "Wiznet.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_backstab	);
@@ -3430,7 +3431,7 @@ void do_slay( Character *ch, char *argument )
 	return;
     }
 
-    if ( !IS_NPC(victim) && (victim->level >= get_trust(ch) || ch->level < MAX_LEVEL - 3))
+    if ( !IS_NPC(victim) && (victim->level >= ch->getTrust() || ch->level < MAX_LEVEL - 3))
     {
 	send_to_char( "You failed.\n\r", ch );
 	return;

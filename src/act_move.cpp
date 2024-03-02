@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "merc.h"
+#include "NonPlayerCharacter.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_look		);

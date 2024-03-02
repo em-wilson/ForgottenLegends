@@ -2,12 +2,15 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "merc.h"
+#include "BanManager.h"
 #include "Game.h"
 
 // Connected State Handlers
+#include "connected_state_handlers/BreakConnectStateHandler.h"
+#include "connected_state_handlers/ConfirmNewNameStateHandler.h"
 #include "connected_state_handlers/GetNameStateHandler.h"
 #include "connected_state_handlers/GetOldPasswordStateHandler.h"
-#include "connected_state_handlers/ConfirmNewNameStateHandler.h"
+
 
 /* Needs to be global because of do_copyover */
 int port, control;
@@ -83,12 +86,14 @@ int main( int argc, char **argv )
     if (!fCopyOver)
          control = init_socket( port );
 
+    BanManager *ban_manager = new BanManager();
     clan_manager = new ClanManager(new ClanWriter(CLAN_DIR, CLAN_LIST));
     
     ConnectedStateManager csm = ConnectedStateManager(&game);
-    csm.addHandler(new GetNameStateHandler(clan_manager));
+    csm.addHandler(new GetNameStateHandler(ban_manager, clan_manager));
     csm.addHandler(new GetOldPasswordStateHandler());
     csm.addHandler(new ConfirmNewNameStateHandler());
+    csm.addHandler(new BreakConnectStateHandler());
     game.setConnectedStateManager(&csm);
 
     boot_db();

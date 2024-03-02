@@ -24,7 +24,7 @@ void Wiznet::report(const char *string, Character *ch, OBJ_DATA *obj,
 		&&  IS_SET(d->character->wiznet,WIZ_ON) 
 		&&  (!flag || IS_SET(d->character->wiznet,flag))
 		&&  (!flag_skip || !IS_SET(d->character->wiznet,flag_skip))
-		&&  get_trust(d->character) >= min_level
+		&&  d->character->getTrust() >= min_level
 		&&  d->character != ch)
 	        {
 			    if (IS_SET(d->character->wiznet,WIZ_PREFIX))

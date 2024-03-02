@@ -31,6 +31,7 @@
 #include "merc.h"
 #include "magic.h"
 #include "interp.h"
+#include "Wiznet.h"
 
 
 /* item type list */

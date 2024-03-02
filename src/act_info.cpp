@@ -444,7 +444,7 @@ void show_char_to_char( Character *list, Character *ch )
 	if ( rch == ch )
 	    continue;
 
-	if ( get_trust(ch) < rch->invis_level)
+	if ( ch->getTrust() < rch->invis_level)
 	    continue;
 
 	if ( can_see( ch, rch ) )
@@ -1366,10 +1366,10 @@ void do_score( Character *ch, char *argument )
         ( ch->played + (int) (current_time - ch->logon) ) / 3600);
     send_to_char( buf, ch );
 
-    if ( get_trust( ch ) != ch->level )
+    if ( ch->getTrust() != ch->level )
     {
 	snprintf(buf, sizeof(buf), "You are trusted at level %d.\n\r",
-	    get_trust( ch ) );
+	    ch->getTrust() );
 	send_to_char( buf, ch );
     }
 
@@ -1727,7 +1727,7 @@ void do_help( Character *ch, char *argument )
     {
     	level = (pHelp->level < 0) ? -1 * pHelp->level - 1 : pHelp->level;
 
-	if (level > get_trust( ch ) )
+	if (level > ch->getTrust() )
 	    continue;
 
 	if ( is_name( argall, pHelp->keyword ) )

@@ -3,9 +3,22 @@
 
 #include <list>
 #include <string>
+#include <unordered_map>
 #include "clans/Clan.h"
-#include "merc.h"
 #include "pc_data.h"
+
+class Character;
+
+#define args( list )			    list
+typedef bool    SPEC_FUN	        args( ( Character *ch ) );
+typedef struct	affect_data		    AFFECT_DATA;
+typedef struct	area_data		    AREA_DATA;
+typedef struct  descriptor_data     DESCRIPTOR_DATA;
+typedef struct  gen_data		    GEN_DATA;
+typedef struct  mem_data            MEM_DATA;
+typedef struct	mob_index_data		MOB_INDEX_DATA;
+typedef struct	obj_data		    OBJ_DATA;
+typedef struct	room_index_data		ROOM_INDEX_DATA;
 
 /*
  * One character (PC or NPC).
@@ -37,76 +50,76 @@ public:
     bool		valid;
     bool		confirm_reclass;
     long		id;
-    sh_int		version;
+    short int		version;
     char *		short_descr;
     char *		long_descr;
     char *		prompt;
     char *		prefix;
-    sh_int		group;
-    sh_int		sex;
-    sh_int		class_num;
-    sh_int		race;
-    sh_int		level;
-    sh_int		trust;
-    sh_int		drac;
-    sh_int		breathe;
+    short int		group;
+    short int		sex;
+    short int		class_num;
+    short int		race;
+    short int		level;
+    short int		trust;
+    short int		drac;
+    short int		breathe;
     int			played;
     int			lines;  /* for the pager */
     time_t		logon;
-    sh_int		timer;
-    sh_int		wait;
-    sh_int		daze;
-    sh_int		hit;
-    sh_int		max_hit;
-    sh_int		mana;
-    sh_int		max_mana;
-    sh_int		move;
-    sh_int		max_move;
+    short int		timer;
+    short int		wait;
+    short int		daze;
+    short int		hit;
+    short int		max_hit;
+    short int		mana;
+    short int		max_mana;
+    short int		move;
+    short int		max_move;
     long		gold;
     long		silver;
     int			exp;
     long		act;
     long		comm;   /* RT added to pad the vector */
     long		done;   /* What classes have they completed? */
-    sh_int		reclass_num; /* How many times have the reclassed? */
+    short int		reclass_num; /* How many times have the reclassed? */
     long		wiznet; /* wiz stuff */
     long		imm_flags;
     long		res_flags;
     long		vuln_flags;
-    sh_int		invis_level;
-    sh_int		incog_level;
+    short int		invis_level;
+    short int		incog_level;
     long			affected_by;
-    sh_int		position;
-    sh_int		practice;
-    sh_int		train;
-    sh_int		carry_weight;
-    sh_int		carry_number;
-    sh_int		saving_throw;
-    sh_int		alignment;
-    sh_int		hitroll;
-    sh_int		damroll;
-    sh_int		armor[4];
-    sh_int		wimpy;
+    short int		position;
+    short int		practice;
+    short int		train;
+    short int		carry_weight;
+    short int		carry_number;
+    short int		saving_throw;
+    short int		alignment;
+    short int		hitroll;
+    short int		damroll;
+    short int		armor[4];
+    short int		wimpy;
     /* stats */
-    sh_int		perm_stat[MAX_STATS];
-    sh_int		mod_stat[MAX_STATS];
+    std::unordered_map<int, short int> perm_stat;
+    std::unordered_map<int, short int> mod_stat;
     /* parts stuff */
     long		form;
     long		parts;
-    sh_int		size;
+    short int		size;
     char*		material;
     /* mobile stuff */
     long		off_flags;
-    sh_int		damage[3];
-    sh_int		dam_type;
-    sh_int		start_pos;
-    sh_int		default_pos;
+    short int		damage[3];
+    short int		dam_type;
+    short int		start_pos;
+    short int		default_pos;
 
-    sh_int		mprog_delay;
+    short int		mprog_delay;
 
     /* werefolk stuff */
-    sh_int		morph_form;
-    sh_int		orig_form;
+    short int		morph_form;
+    short int		orig_form;
     int			xp;
 
     Character();
@@ -126,8 +139,12 @@ public:
     void setDescription( const char * description );
     char * getDescription();
 
+    virtual bool isDenied();
+    virtual bool isImmortal();
     virtual bool isNPC() = 0;
+
     virtual int getRange();
+    virtual int getTrust();
 
     virtual bool didJustDie();
 

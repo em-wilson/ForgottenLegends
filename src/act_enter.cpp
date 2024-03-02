@@ -31,6 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "merc.h"
+#include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
 
 void    raw_kill        args( ( Character *victim ) );

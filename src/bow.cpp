@@ -184,7 +184,7 @@ Character * find_char( Character *ch, char *search, ROOM_INDEX_DATA *scan_room )
     for (rch=scan_room->people; rch != NULL; rch=rch->next_in_room)
     {
 	if (rch == ch) continue;
-	if (!IS_NPC(rch) && rch->invis_level > get_trust(ch)) continue;
+	if (!IS_NPC(rch) && rch->invis_level > ch->getTrust()) continue;
 
 	/*
 	* Are we looking for someone in particular?

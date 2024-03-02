@@ -98,7 +98,7 @@ void scan_list(ROOM_INDEX_DATA *scan_room, Character *ch, sh_int depth,
    for (rch=scan_room->people; rch != NULL; rch=rch->next_in_room)
    {
       if (rch == ch) continue;
-      if (!IS_NPC(rch) && rch->invis_level > get_trust(ch)) continue;
+      if (!IS_NPC(rch) && rch->invis_level > ch->getTrust()) continue;
       if (can_see(ch, rch)) scan_char(rch, ch, depth, door);
    }
    return;

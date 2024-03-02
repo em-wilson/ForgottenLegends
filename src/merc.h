@@ -78,7 +78,6 @@ typedef struct	affect_data		AFFECT_DATA;
 typedef struct	area_data		AREA_DATA;
 typedef struct	ban_data		BAN_DATA;
 typedef struct 	buf_type	 	BUFFER;
-typedef struct	descriptor_data		DESCRIPTOR_DATA;
 typedef struct	exit_data		EXIT_DATA;
 typedef struct	extra_descr_data	EXTRA_DESCR_DATA;
 typedef struct	help_data		HELP_DATA;
@@ -134,7 +133,7 @@ typedef void SPELL_FUN	args( ( int sn, int level, bool succesful_cast, Character
 #define MAX_DRACONIAN		   15
 #define MAX_GROUP		   35
 #define MAX_IN_GROUP		   15
-#define MAX_ALIAS		    5
+#define MAX_ALIAS		    5           // Temporary - if updating this, also update pc_data.h
 #define MAX_CLASS		   12
 #define MAX_PC_RACE		    4
 #define MAX_DAMAGE_MESSAGE	   42
@@ -278,33 +277,7 @@ struct	weather_data
 #define CON_CLAN_CREATE			26
 
 
-/*
- * Descriptor (channel) structure.
- */
-struct	descriptor_data
-{
-    DESCRIPTOR_DATA *	next;
-    DESCRIPTOR_DATA *	snoop_by;
-    Character *		character;
-    Character *		original;
-    bool		valid;
-    char *		host;
-    sh_int		descriptor;
-    sh_int		connected;
-    bool		fcommand;
-    unsigned char		inbuf		[4 * MAX_INPUT_LENGTH];
-    char		incomm		[MAX_INPUT_LENGTH];
-    char		inlast		[MAX_INPUT_LENGTH];
-    int			repeat;
-    char *		outbuf;
-    int			outsize;
-    int			outtop;
-    char *		showstr_head;
-    char *		showstr_point;
-    void *              pEdit;		/* OLC */
-    char **             pString;	/* OLC */
-    int			editor;		/* OLC */
-};
+#include "Descriptor.h"
 
 
 
@@ -565,6 +538,8 @@ struct	kill_data
 
 
 /* RT ASCII conversions -- used so we can have letters in this file */
+#ifndef ASCII_FLAG_CONVERSIONS
+#define ASCII_FLAG_CONVERSIONS
 
 #define A		  	1
 #define B			2
@@ -600,6 +575,8 @@ struct	kill_data
 #define cc			268435456    
 #define dd			536870912
 #define ee			1073741824
+
+#endif
 
 /*
  * ACT bits for mobs.
@@ -1341,30 +1318,6 @@ struct	kill_data
 #define COMM_SNOOP_PROOF	(Y)
 #define COMM_AFK		(Z)
 
-/* WIZnet flags */
-#define WIZ_ON			(A)
-#define WIZ_TICKS		(B)
-#define WIZ_LOGINS		(C)
-#define WIZ_SITES		(D)
-#define WIZ_LINKS		(E)
-#define WIZ_DEATHS		(F)
-#define WIZ_RESETS		(G)
-#define WIZ_MOBDEATHS		(H)
-#define WIZ_FLAGS		(I)
-#define WIZ_PENALTIES		(J)
-#define WIZ_SACCING		(K)
-#define WIZ_LEVELS		(L)
-#define WIZ_SECURE		(M)
-#define WIZ_SWITCHES		(N)
-#define WIZ_SNOOPS		(O)
-#define WIZ_RESTORE		(P)
-#define WIZ_LOAD		(Q)
-#define WIZ_NEWBIE		(R)
-#define WIZ_PREFIX		(S)
-#define WIZ_SPAM		(FLAG_T)
-#define WIZ_LOG			(U)
-#define WIZ_CLANS		(FLAG_V)
-
 /*
  * Class flags.
  * This remembers what classes a player has been.
@@ -1381,52 +1334,6 @@ struct	kill_data
 #define DONE_PSIONISCIST	(J)
 #define DONE_ROGUE		(K)
 #define DONE_ILLUSIONIST	(L)
-
-/*
- * Prototype for a mob.
- * This is the in-memory version of #MOBILES.
- */
-struct	mob_index_data
-{
-    MOB_INDEX_DATA *	next;
-    SPEC_FUN *		spec_fun;
-    SHOP_DATA *		pShop;
-    MPROG_LIST *        mprogs;
-    AREA_DATA *		area;		/* OLC */
-    sh_int		vnum;
-    sh_int		group;
-    bool		new_format;
-    sh_int		count;
-    sh_int		killed;
-    char *		player_name;
-    char *		short_descr;
-    char *		long_descr;
-    char *		description;
-    long		act;
-    long		affected_by;
-    sh_int		alignment;
-    sh_int		level;
-    sh_int		hitroll;
-    sh_int		hit[3];
-    sh_int		mana[3];
-    sh_int		damage[3];
-    sh_int		ac[4];
-    sh_int 		dam_type;
-    long		off_flags;
-    long		imm_flags;
-    long		res_flags;
-    long		vuln_flags;
-    sh_int		start_pos;
-    sh_int		default_pos;
-    sh_int		sex;
-    sh_int		race;
-    long		wealth;
-    long		form;
-    long		parts;
-    sh_int		size;
-    char *		material;
-    long		mprog_flags;
-};
 
 /*
  * Web Page Data
@@ -1913,8 +1820,8 @@ do                                                              \
  * Character macros.
  */
 #define IS_NPC(ch)		(IS_SET((ch)->act, ACT_IS_NPC) && (ch)->desc == NULL)
-#define IS_IMMORTAL(ch)		(get_trust(ch) >= LEVEL_IMMORTAL)
-#define IS_TRUSTED(ch,level)	(get_trust((ch)) >= (level))
+#define IS_IMMORTAL(ch)		(ch->getTrust() >= LEVEL_IMMORTAL)
+#define IS_TRUSTED(ch,level)	(ch->getTrust() >= (level))
 #define IS_AFFECTED(ch, sn)	(IS_SET((ch)->affected_by, (sn)))
 
 #define IS_GOOD(ch)		(ch->alignment >= 350)
@@ -2327,7 +2234,6 @@ int	get_weapon_sn	args( ( Character *ch ) );
 int	get_weapon_skill args(( Character *ch, int sn ) );
 int     get_age         args( ( Character *ch ) );
 void	reset_char	args( ( Character *ch )  );
-int	get_trust	args( ( Character *ch ) );
 int	get_curr_stat	args( ( Character *ch, int stat ) );
 int 	get_max_train	args( ( Character *ch, int stat ) );
 int	can_carry_n	args( ( Character *ch ) );

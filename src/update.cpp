@@ -35,6 +35,7 @@
 #include "music.h"
 #include "tables.h"
 #include "recycle.h"
+#include "NonPlayerCharacter.h"
 #include "Wiznet.h"
 
 /* command procedures needed */

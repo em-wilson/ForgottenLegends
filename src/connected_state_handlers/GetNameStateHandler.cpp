@@ -1,21 +1,54 @@
 #include <sys/time.h>
-#include "../merc.h"
-#include "../telnet.h"
-#include "../ConnectedState.h"
+#include "telnet.h"
+#include "BanManager.h"
+#include "clans/ClanManager.h"
+#include "ConnectedState.h"
+#include "Descriptor.h"
 #include "AbstractStateHandler.h"
 #include "GetNameStateHandler.h"
+#include "NonPlayerCharacter.h" // for MOB_INDEX_DATA
 
 extern bool newlock;
 extern bool wizlock;
 
+#ifndef MAX_STRING_LENGTH
+#define MAX_STRING_LENGTH	 4608
+#endif
+
+#ifndef MAX_KEY_HASH
+#define	MAX_KEY_HASH		 1024
+#endif
+
+#ifndef LOWER
+#define LOWER(c)		((c) >= 'A' && (c) <= 'Z' ? (c)+'a'-'A' : (c))
+#endif
+
+#ifndef UPPER
+#define UPPER(c)		((c) >= 'a' && (c) <= 'z' ? (c)+'A'-'a' : (c))
+#endif
+
+
 const unsigned char echo_off_str[] = {IAC, WILL, TELOPT_ECHO, '\0'};
 
+bool is_name ( char *str, char *namelist );
+char *capitalize( const char *str );
+bool load_char_obj( DESCRIPTOR_DATA *d, char *name );
+void log_string( const char *str );
+bool str_cmp( const char *astr, const char *bstr );
+bool str_prefix( const char *astr, const char *bstr );
+bool str_suffix( const char *astr, const char *bstr );
 
-GetNameStateHandler::GetNameStateHandler(ClanManager *clan_manager) : AbstractStateHandler(ConnectedState::GetName) {
+// Socket helpers
+void close_socket(DESCRIPTOR_DATA *dclose);
+void write_to_buffer(DESCRIPTOR_DATA *d, const char *txt, int length);
+
+GetNameStateHandler::GetNameStateHandler(BanManager *ban_manager, ClanManager *clan_manager) : AbstractStateHandler(ConnectedState::GetName) {
+	this->ban_manager = ban_manager;
     this->clan_manager = clan_manager;
 }
 
 GetNameStateHandler::~GetNameStateHandler() {
+	this->ban_manager = nullptr;
     this->clan_manager = nullptr;
 }
 
@@ -29,23 +62,23 @@ bool GetNameStateHandler::check_parse_name(char *name)
 	 */
 	if (is_name(name,
 				(char *)"all auto immortal self someone something the you demise balance circle loner honor none"))
-		return FALSE;
+		return false;
 
 	if (clan_manager->get_clan(name))
-		return FALSE;
+		return false;
 
 	if (str_cmp(capitalize(name), "Alander") && (!str_prefix("Alan", name) || !str_suffix("Alander", name)))
-		return FALSE;
+		return false;
 
 	/*
 	 * Length restrictions.
 	 */
 
 	if (strlen(name) < 2)
-		return FALSE;
+		return false;
 
 	if (strlen(name) > 12)
-		return FALSE;
+		return false;
 
 	/*
 	 * Alphanumerics only.
@@ -53,34 +86,34 @@ bool GetNameStateHandler::check_parse_name(char *name)
 	 */
 	{
 		char *pc;
-		bool fIll, adjcaps = FALSE, cleancaps = FALSE;
+		bool fIll, adjcaps = false, cleancaps = false;
 		unsigned int total_caps = 0;
 
-		fIll = TRUE;
+		fIll = true;
 		for (pc = name; *pc != '\0'; pc++)
 		{
 			if (!isalpha(*pc))
-				return FALSE;
+				return false;
 
 			if (isupper(*pc)) /* ugly anti-caps hack */
 			{
 				if (adjcaps)
-					cleancaps = TRUE;
+					cleancaps = true;
 				total_caps++;
-				adjcaps = TRUE;
+				adjcaps = true;
 			}
 			else
-				adjcaps = FALSE;
+				adjcaps = false;
 
 			if (LOWER(*pc) != 'i' && LOWER(*pc) != 'l')
-				fIll = FALSE;
+				fIll = false;
 		}
 
 		if (fIll)
-			return FALSE;
+			return false;
 
 		if (cleancaps || (total_caps > (strlen(name)) / 2 && strlen(name) < 3))
-			return FALSE;
+			return false;
 	}
 
 	/*
@@ -98,16 +131,17 @@ bool GetNameStateHandler::check_parse_name(char *name)
 				 pMobIndex = pMobIndex->next)
 			{
 				if (is_name(name, pMobIndex->player_name))
-					return FALSE;
+					return false;
 			}
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 void GetNameStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 	char buf[MAX_STRING_LENGTH];
+	char log_buf[2*MAX_INPUT_LENGTH];
 
 	Character *ch = d->character;
 
@@ -127,7 +161,7 @@ void GetNameStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 		bool fOld = load_char_obj(d, argument);
 		ch = d->character;
 
-		if (IS_SET(ch->act, PLR_DENY))
+		if (ch->isDenied())
 		{
 			snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "Denying access to %s@%s.", argument, d->host);
 			log_string(log_buf);
@@ -136,20 +170,20 @@ void GetNameStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 			return;
 		}
 
-		if (check_ban(d->host, BAN_PERMIT) && !IS_SET(ch->act, PLR_PERMIT))
+		if (ban_manager->isSiteBanned(d))
 		{
 			write_to_buffer(d, "Your site has been banned from this mud.\n\r", 0);
 			close_socket(d);
 			return;
 		}
 
-		if (check_reconnect(d, argument, FALSE))
+		if (check_reconnect(d, argument, false))
 		{
-			fOld = TRUE;
+			fOld = true;
 		}
 		else
 		{
-			if (wizlock && !IS_IMMORTAL(ch))
+			if (wizlock && !ch->isImmortal())
 			{
 				write_to_buffer(d, "The game is wizlocked.\n\r", 0);
 				close_socket(d);
@@ -162,7 +196,7 @@ void GetNameStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 			/* Old player */
 			write_to_buffer(d, "Password: ", 0);
 			write_to_buffer(d, (const char *)echo_off_str, 0);
-			d->connected = CON_GET_OLD_PASSWORD;
+			d->connected = ConnectedState::GetOldPassword;
 			return;
 		}
 		else
@@ -175,7 +209,7 @@ void GetNameStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 				return;
 			}
 
-			if (check_ban(d->host, BAN_NEWBIES))
+			if (!ban_manager->areNewPlayersAllowed(d))
 			{
 				write_to_buffer(d,
 								"New players are not allowed from your site.\n\r", 0);
@@ -185,7 +219,7 @@ void GetNameStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 
 			snprintf(buf, sizeof(buf), "Did I get that right, %s (Y/N)? ", argument);
 			write_to_buffer(d, buf, 0);
-			d->connected = CON_CONFIRM_NEW_NAME;
+			d->connected = ConnectedState::ConfirmNewName;
 			return;
 		}
 }

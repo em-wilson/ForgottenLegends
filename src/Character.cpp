@@ -451,3 +451,28 @@ void Character::update() {
         ::damage( this, this, 1, TYPE_UNDEFINED, DAM_NONE,FALSE);
     }
 }
+
+/*
+ * Retrieve a character's trusted level for permission checking.
+ */
+int Character::getTrust( )
+{
+    if ( this->desc != NULL && this->desc->original != NULL ) {
+        return this->desc->original->getTrust();
+    }
+
+    if (this->trust) {
+	    return this->trust;
+    }
+
+    return this->level;
+}
+
+
+bool Character::isDenied() {
+    return IS_SET(this->act, PLR_DENY);
+}
+
+bool Character::isImmortal() {
+    return IS_IMMORTAL(this);
+}

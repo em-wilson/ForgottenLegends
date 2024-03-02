@@ -237,7 +237,6 @@ NonPlayerCharacter::~NonPlayerCharacter() {
         mobile_count--;
 }
 
-
 bool NonPlayerCharacter::isNPC() {
         return true;
 }
@@ -359,4 +358,19 @@ int NonPlayerCharacter::move_gain( )
                 gain /=2 ;
 
         return UMIN(gain, this->max_move - this->move);
+}
+
+/*
+ * Retrieve a character's trusted level for permission checking.
+ */
+int NonPlayerCharacter::getTrust( )
+{
+    if ( this->desc != NULL && this->desc->original != NULL ) {
+        return this->desc->original->getTrust();
+    }
+
+    if (this->level >= LEVEL_HERO) {
+        return LEVEL_HERO;
+    }
+    return this->level;
 }

@@ -19,6 +19,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "NonPlayerCharacter.h"
 #include "tables.h"
 #include "olc.h"
 

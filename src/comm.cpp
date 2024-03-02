@@ -62,7 +62,7 @@
 #include "clan.h"
 #include "Wiznet.h"
 #include "clans/ClanManager.h"
-#include "connected_state_handlers/IConnectedStateHandler.h"
+#include "IConnectedStateHandler.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_help);
@@ -702,13 +702,13 @@ void read_from_buffer(DESCRIPTOR_DATA *d)
 				snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s input spamming!", d->host);
 				log_string(log_buf);
 				Wiznet::instance()->report((char *)"Spam spam spam $N spam spam spam spam spam!",
-										   d->character, NULL, WIZ_SPAM, 0, get_trust(d->character));
+										   d->character, NULL, WIZ_SPAM, 0, d->character->getTrust());
 				if (d->incomm[0] == '!')
 					Wiznet::instance()->report(d->inlast, d->character, NULL, WIZ_SPAM, 0,
-											   get_trust(d->character));
+											   d->character->getTrust());
 				else
 					Wiznet::instance()->report(d->incomm, d->character, NULL, WIZ_SPAM, 0,
-											   get_trust(d->character));
+											   d->character->getTrust());
 
 				d->repeat = 0;
 				/*
@@ -1151,53 +1151,6 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		close_socket(d);
 		return;
 
-		/* RT code for breaking link */
-
-	case CON_BREAK_CONNECT:
-		switch (*argument)
-		{
-		case 'y':
-		case 'Y':
-			for (d_old = descriptor_list; d_old != NULL; d_old = d_next)
-			{
-				d_next = d_old->next;
-				if (d_old == d || d_old->character == NULL)
-					continue;
-
-				if (str_cmp(ch->getName(), d_old->original ? d_old->original->getName() : d_old->character->getName()))
-					continue;
-
-				close_socket(d_old);
-			}
-			if (check_reconnect(d, ch->getName(), TRUE))
-				return;
-			write_to_buffer(d, "Reconnect attempt failed.\n\rName: ", 0);
-			if (d->character != NULL)
-			{
-				char_list.remove(d->character);
-				delete d->character;
-				d->character = NULL;
-			}
-			d->connected = CON_GET_NAME;
-			break;
-
-		case 'n':
-		case 'N':
-			write_to_buffer(d, "Name: ", 0);
-			if (d->character != NULL)
-			{
-				delete d->character;
-				d->character = NULL;
-			}
-			d->connected = CON_GET_NAME;
-			break;
-
-		default:
-			write_to_buffer(d, "Please type Y or N? ", 0);
-			break;
-		}
-		break;
-
 	case CON_GET_NEW_PASSWORD:
 		write_to_buffer(d, "\n\r", 2);
 
@@ -1473,7 +1426,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s new player.", ch->getName(), d->host);
 		log_string(log_buf);
 		Wiznet::instance()->report((char *)"Newbie alert!  $N sighted.", ch, NULL, WIZ_NEWBIE, 0, 0);
-		Wiznet::instance()->report(log_buf, NULL, NULL, WIZ_SITES, 0, get_trust(ch));
+		Wiznet::instance()->report(log_buf, NULL, NULL, WIZ_SITES, 0, ch->getTrust());
 
 		write_to_buffer(d, "\n\r", 0);
 
@@ -1511,7 +1464,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s reclasses as the %s class.", ch->getName(), d->host, class_table[ch->class_num].name);
 		log_string(log_buf);
 		Wiznet::instance()->report((char *)"Reclass alert!  $N sighted.", ch, NULL, WIZ_NEWBIE, 0, 0);
-		Wiznet::instance()->report(log_buf, NULL, NULL, WIZ_SITES, 0, get_trust(ch));
+		Wiznet::instance()->report(log_buf, NULL, NULL, WIZ_SITES, 0, ch->getTrust());
 
 		group_add(ch, class_table[ch->class_num].base_group, FALSE);
 		ch->gen_data = new_gen_data();
@@ -1747,7 +1700,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		do_look(ch, (char *)"auto");
 
 		Wiznet::instance()->report((char *)"$N has left real life behind.", ch, NULL,
-								   WIZ_LOGINS, WIZ_SITES, get_trust(ch));
+								   WIZ_LOGINS, WIZ_SITES, ch->getTrust());
 
 		if (ch->pet != NULL)
 		{

@@ -43,6 +43,7 @@
 #include <ctype.h>
 #include "merc.h"
 #include "clans/ClanManager.h"
+#include "NonPlayerCharacter.h"
 #include "tables.h"
 #include "lookup.h"
 

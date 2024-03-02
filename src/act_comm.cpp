@@ -38,6 +38,7 @@
 #include "recycle.h"
 #include "tables.h"
 #include "Wiznet.h"
+#include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
 #include "clans/ClanManager.h"
 
@@ -92,7 +93,7 @@ void do_delete( Character *ch, char *argument)
     send_to_char("Typing delete with an argument will undo delete status.\n\r",
 	ch);
     ch->pcdata->confirm_delete = TRUE;
-    Wiznet::instance()->report("$N is contemplating deletion.",ch,NULL,0,0,get_trust(ch));
+    Wiznet::instance()->report("$N is contemplating deletion.",ch,NULL,0,0,ch->getTrust());
 }
 	    
 
@@ -1400,7 +1401,7 @@ And there {Rw{ra{Rs{x {CIndustrial {WLight{x and {MMagic{x\n\r"
     act("$n has left the game.", ch, NULL, NULL, TO_ROOM);
     snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s has quit.", ch->getName());
     log_string(log_buf);
-    Wiznet::instance()->report("$N rejoins the real world.", ch, NULL, WIZ_LOGINS, 0, get_trust(ch));
+    Wiznet::instance()->report("$N rejoins the real world.", ch, NULL, WIZ_LOGINS, 0, ch->getTrust());
 
     /*
      * After extract_char the ch is no longer valid!
