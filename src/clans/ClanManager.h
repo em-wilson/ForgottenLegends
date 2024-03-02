@@ -1,8 +1,11 @@
 #ifndef CLANMANAGER_H
 #define CLANMANAGER_H
 
+#include "../Character.h"
 #include "Clan.h"
 #include "ClanWriter.h"
+#include <list>
+#include <vector>
 
 using std::list;
 using std::unordered_map;

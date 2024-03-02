@@ -2,15 +2,20 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include "merc.h"
+#include "Game.h"
+
+// Connected State Handlers
+#include "connected_state_handlers/GetNameStateHandler.h"
+#include "connected_state_handlers/GetOldPasswordStateHandler.h"
 
 /* Needs to be global because of do_copyover */
 int port, control;
 
 char                str_boot_time[MAX_INPUT_LENGTH];
-void    game_loop_unix          args( ( int control ) );
+void    game_loop_unix          args( ( Game *game, int control ) );
 int     init_socket             args( ( int port ) );
 
-
+extern ClanManager * clan_manager;
 
 
 //int     main                    args( ( int argc, char **argv ) );
@@ -69,18 +74,27 @@ int main( int argc, char **argv )
                fCopyOver = FALSE;
     }
 
+    Game game = Game();
+
     /*
      * Run the game.
      */
     if (!fCopyOver)
          control = init_socket( port );
 
+    clan_manager = new ClanManager(new ClanWriter(CLAN_DIR, CLAN_LIST));
+    
+    ConnectedStateManager csm = ConnectedStateManager(&game);
+    csm.addHandler(new GetNameStateHandler(clan_manager));
+    csm.addHandler(new GetOldPasswordStateHandler());
+    game.setConnectedStateManager(&csm);
+
     boot_db();
     snprintf(log_buf, 2*MAX_INPUT_LENGTH, "ROM is ready to rock on port %d.", port );
     log_string( log_buf );
     if (fCopyOver)
        copyover_recover();
-    game_loop_unix( control );
+    game_loop_unix( &game, control );
     close (control);
 
     /*

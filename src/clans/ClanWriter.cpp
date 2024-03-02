@@ -94,7 +94,6 @@ void ClanWriter::delete_clan( Clan *clan ) {
     char strsave[MAX_STRING_LENGTH];
 
     snprintf(strsave, sizeof(strsave), "%s%s%s", DATA_DIR, CLAN_DIR, clan->getFilename().c_str() );
-    // TODO: Should be done by clan writer
     DISPOSE( clan );
 
 }

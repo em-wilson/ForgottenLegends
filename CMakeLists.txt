@@ -26,6 +26,7 @@ set(SOURCE_FILES
     src/bow.cpp
     src/Character.cpp
     src/Character.h
+    src/ConnectedStateManager.cpp src/ConnectedStateManager.h
     src/clans/Clan.cpp
     src/clans/Clan.h
     src/clans/ClanManager.cpp
@@ -34,6 +35,9 @@ set(SOURCE_FILES
     src/clans/ClanWriter.h
     src/clans/IClanWriter.h
     src/clan.h
+    src/connected_state_handlers/AbstractStateHandler.cpp src/connected_state_handlers/AbstractStateHandler.h
+    src/connected_state_handlers/GetOldPasswordStateHandler.cpp
+    src/connected_state_handlers/GetNameStateHandler.cpp src/connected_state_handlers/GetNameStateHandler.h
     src/colordef.h
     src/comm.cpp
     src/const.cpp
@@ -43,6 +47,7 @@ set(SOURCE_FILES
     src/effects.cpp
     src/fight.cpp
     src/flags.cpp
+    src/Game.cpp src/Game.h
     src/handler.cpp
     src/healer.cpp
     src/interp.cpp

@@ -1,6 +1,8 @@
 #ifndef CLAN_H
 #define CLAN_H
 
+#include <string>
+
 using std::string;
 
 class Clan {

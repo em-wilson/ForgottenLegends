@@ -3,6 +3,8 @@
 
 #include <list>
 #include <string>
+#include "clans/Clan.h"
+#include "merc.h"
 #include "pc_data.h"
 
 /*

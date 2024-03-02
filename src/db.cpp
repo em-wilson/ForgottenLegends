@@ -318,7 +318,6 @@ void boot_db()
 	}
     }
 
-    clan_manager = new ClanManager(new ClanWriter(CLAN_DIR, CLAN_LIST));
     load_clans();
     /*
      * Read in all the area files.
