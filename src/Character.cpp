@@ -35,7 +35,6 @@ Character::Character()
     this->short_descr = &str_empty[0];
     this->long_descr = &str_empty[0];
     this->prompt = &str_empty[0];
-    this->prefix = &str_empty[0];
     this->group = 0;
     this->sex = 0;
     this->class_num = 0;
@@ -112,7 +111,6 @@ Character::~Character()
     if ( this->short_descr ) free_string( this->short_descr );
     if ( this->long_descr ) free_string( this->long_descr );
     if ( this->prompt ) free_string( this->prompt );
-    if ( this->prefix ) free_string( this->prefix );
     if ( this->material ) free_string( this->material );
 
     for (OBJ_DATA *obj = this->carrying; obj != NULL; obj = obj_next)

@@ -54,7 +54,6 @@ public:
     char *		short_descr;
     char *		long_descr;
     char *		prompt;
-    char *		prefix;
     short int		group;
     short int		sex;
     short int		class_num;

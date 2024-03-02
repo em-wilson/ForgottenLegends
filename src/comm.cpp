@@ -892,10 +892,10 @@ void bust_a_prompt(Character *ch)
 	str = ch->prompt;
 	if (!str || str[0] == '\0')
 	{
-		snprintf(buf, sizeof(buf), "{c<%d to level>\n\r<%d/%dhp %d/%dm %d/%dmv>{x %s",
+		snprintf(buf, sizeof(buf), "{c<%d to level>\n\r<%d/%dhp %d/%dm %d/%dmv>{x ",
 				 (ch->level + 1) * exp_per_level(ch, ch->pcdata->points) - ch->exp,
 				 ch->hit, ch->max_hit, ch->mana, ch->max_mana, ch->move,
-				 ch->max_move, ch->prefix);
+				 ch->max_move);
 		send_to_char(buf, ch);
 		return;
 	}
@@ -1026,8 +1026,6 @@ void bust_a_prompt(Character *ch)
 	colourconv(pbuff, buf, ch);
 	write_to_buffer(ch->desc, buffer, 0);
 
-	if (ch->prefix[0] != '\0')
-		write_to_buffer(ch->desc, ch->prefix, 0);
 	return;
 }
 

@@ -4637,45 +4637,6 @@ void do_holylight( Character *ch, char *argument )
     return;
 }
 
-/* prefix command: it will put the string typed on each line typed */
-
-void do_prefi (Character *ch, char *argument)
-{
-    send_to_char("You cannot abbreviate the prefix command.\r\n",ch);
-    return;
-}
-
-void do_prefix (Character *ch, char *argument)
-{
-    char buf[MAX_INPUT_LENGTH];
-
-    if (argument[0] == '\0')
-    {
-	if (ch->prefix[0] == '\0')
-	{
-	    send_to_char("You have no prefix to clear.\r\n",ch);
-	    return;
-	}
-
-	send_to_char("Prefix removed.\r\n",ch);
-	free_string(ch->prefix);
-	ch->prefix = str_dup("");
-	return;
-    }
-
-    if (ch->prefix[0] != '\0')
-    {
-	snprintf(buf, sizeof(buf),"Prefix changed to %s.\r\n",argument);
-	free_string(ch->prefix);
-    }
-    else
-    {
-	snprintf(buf, sizeof(buf),"Prefix set to %s.\r\n",argument);
-    }
-
-    ch->prefix = str_dup(argument);
-}
-
 #define CH(descriptor)  ((descriptor)->original ? \
 (descriptor)->original : (descriptor)->character)
 

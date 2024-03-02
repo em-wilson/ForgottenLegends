@@ -35,23 +35,11 @@
 void substitute_alias(DESCRIPTOR_DATA *d, char *argument)
 {
     Character *ch;
-    char buf[MAX_STRING_LENGTH],prefix[MAX_INPUT_LENGTH],name[MAX_INPUT_LENGTH];
+    char buf[MAX_STRING_LENGTH],name[MAX_INPUT_LENGTH];
     char *point;
     int alias;
 
     ch = d->original ? d->original : d->character;
-
-    /* check for prefix */
-    if (ch->prefix[0] != '\0' && str_prefix("prefix",argument))
-    {
-	if (strlen(ch->prefix) + strlen(argument) > MAX_INPUT_LENGTH)
-	    send_to_char("Line to long, prefix not processed.\r\n",ch);
-	else
-	{
-	    snprintf(prefix, sizeof(prefix), "%s %s",ch->prefix,argument);
-	    argument = prefix;
-	}
-    }
 
     if (IS_NPC(ch) || ch->pcdata->alias[0] == NULL
     ||	!str_prefix("alias",argument) || !str_prefix("una",argument) 

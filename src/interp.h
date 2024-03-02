@@ -230,7 +230,6 @@ DECLARE_DO_FUN(	do_pose		);
 DECLARE_DO_FUN( do_pour		);
 DECLARE_DO_FUN(	do_practice	);
 DECLARE_DO_FUN( do_prefi	);
-DECLARE_DO_FUN( do_prefix	);
 DECLARE_DO_FUN( do_prompt	);
 DECLARE_DO_FUN( do_protect	);
 DECLARE_DO_FUN(	do_purge	);

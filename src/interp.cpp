@@ -329,8 +329,6 @@ const	struct	cmd_type	cmd_table	[] =
     { "owhere",		do_owhere,	POS_DEAD,	IM,  LOG_NORMAL, 1 },
     { "poofin",		do_bamfin,	POS_DEAD,	IM,  LOG_NORMAL, 1 },
     { "poofout",	do_bamfout,	POS_DEAD,	IM,  LOG_NORMAL, 1 },
-    { "prefi",		do_prefi,	POS_DEAD,	IM,  LOG_NORMAL, 0 },
-    { "prefix",		do_prefix,	POS_DEAD,	IM,  LOG_NORMAL, 1 },
     { "purge",		do_purge,	POS_DEAD,	IM,  LOG_ALWAYS, 1 },
     { "redit",		do_redit,	POS_DEAD,    	IM,  LOG_NORMAL, 1 },
     { "resets",		do_resets,	POS_DEAD,    	IM,  LOG_NORMAL, 1 },

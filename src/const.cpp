@@ -95,28 +95,28 @@ const	struct	weapon_type	weapon_table	[]	=
 const   struct wiznet_type      wiznet_table    []              =
 {
    {    "on",           WIZ_ON,         IM },
-   {    "prefix",	WIZ_PREFIX,	IM },
+   {    "prefix",	    WIZ_PREFIX,	    IM },
    {    "ticks",        WIZ_TICKS,      IM },
    {    "logins",       WIZ_LOGINS,     IM },
    {    "sites",        WIZ_SITES,      L4 },
    {    "links",        WIZ_LINKS,      L7 },
-   {	"newbies",	WIZ_NEWBIE,	IM },
-   {	"spam",		WIZ_SPAM,	L5 },
+   {	"newbies",	    WIZ_NEWBIE,	    IM },
+   {	"spam",		    WIZ_SPAM,	    L5 },
    {    "deaths",       WIZ_DEATHS,     IM },
    {    "resets",       WIZ_RESETS,     L4 },
    {    "mobdeaths",    WIZ_MOBDEATHS,  L4 },
-   {    "flags",	WIZ_FLAGS,	L5 },
+   {    "flags",	    WIZ_FLAGS,	L5 },
    {	"penalties",	WIZ_PENALTIES,	L5 },
-   {	"saccing",	WIZ_SACCING,	L5 },
-   {	"levels",	WIZ_LEVELS,	IM },
-   {	"load",		WIZ_LOAD,	L2 },
-   {	"restore",	WIZ_RESTORE,	L2 },
-   {	"snoops",	WIZ_SNOOPS,	L2 },
-   {	"switches",	WIZ_SWITCHES,	L2 },
-   {	"secure",	WIZ_SECURE,	L1 },
-   {	"logs",		WIZ_LOG,	ML },
-   {	"clans",	WIZ_CLANS,	L4 },
-   {	NULL,		0,		0  }
+   {	"saccing",	    WIZ_SACCING,	L5 },
+   {	"levels",	    WIZ_LEVELS,	IM },
+   {	"load",		    WIZ_LOAD,	L2 },
+   {	"restore",	    WIZ_RESTORE,	L2 },
+   {	"snoops",	    WIZ_SNOOPS,	L2 },
+   {	"switches",	    WIZ_SWITCHES,	L2 },
+   {	"secure",	    WIZ_SECURE,	L1 },
+   {	"logs",		    WIZ_LOG,	ML },
+   {	"clans",	    WIZ_CLANS,	L4 },
+   {	NULL,		    0,		0  }
 };
 
 /* attack table  -- not very organized :( */
