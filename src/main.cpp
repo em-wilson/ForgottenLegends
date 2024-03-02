@@ -29,13 +29,6 @@ int main( int argc, char **argv )
     bool fCopyOver = FALSE;
 
     /*
-     * Memory debugging if needed.
-     */
-#if defined(MALLOC_DEBUG)
-    malloc_debug( 2 );
-#endif
-
-    /*
      * Init time.
      */
     gettimeofday( &now_time, NULL );

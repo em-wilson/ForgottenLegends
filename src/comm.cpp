@@ -19,13 +19,13 @@
  ***************************************************************************/
 
 /***************************************************************************
- *	ROM 2.4 is copyright 1993-1996 Russ Taylor			   *
- *	ROM has been brought to you by the ROM consortium		   *
- *	    Russ Taylor (rtaylor@efn.org)				   *
- *	    Gabrielle Taylor						   *
- *	    Brian Moore (zump@rom.org)					   *
- *	By using this code, you have agreed to follow the terms of the	   *
- *	ROM license, in the file Rom24/doc/rom.license			   *
+ *	ROM 2.4 is copyright 1993-1996 Russ Taylor			  				   *
+ *	ROM has been brought to you by the ROM consortium		   			   *
+ *	    Russ Taylor (rtaylor@efn.org)				   					   *
+ *	    Gabrielle Taylor						   						   *
+ *	    Brian Moore (zump@rom.org)										   *
+ *	By using this code, you have agreed to follow the terms of the		   *
+ *	ROM license, in the file Rom24/doc/rom.license			   			   *
  ***************************************************************************/
 
 /*
@@ -70,19 +70,6 @@ DECLARE_DO_FUN(do_help);
 DECLARE_DO_FUN(do_look);
 DECLARE_DO_FUN(do_skills);
 DECLARE_DO_FUN(do_outfit);
-
-/*
- * Malloc debugging stuff.
- */
-#if defined(sun)
-#undef MALLOC_DEBUG
-#endif
-
-#if defined(MALLOC_DEBUG)
-#include <malloc.h>
-extern int malloc_debug args((int));
-extern int malloc_verify args((void));
-#endif
 
 /*
  * Signal handling.
