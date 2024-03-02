@@ -24,7 +24,6 @@
 #include "merc.h"
 #include "board.h"
 #include "recycle.h"
-/* #include "do.h" */ /* My do_XXX functions are declared in this file */
 #include "colordef.h"
 #include "clans/ClanManager.h"
 #include "ConnectedState.h"
@@ -72,11 +71,11 @@ BOARD_DATA boards[MAX_BOARD] =
 {
 
 { "General",	"General discussion",           0,	2,	"all",	DEF_INCLUDE,21, NULL, FALSE },
-{ "Ideas",	"Suggestion for improvement",	0,	2,	"all",	DEF_NORMAL, 60, NULL, FALSE }, 
+{ "Ideas",	"Suggestion for improvement",		0,	2,	"all",	DEF_NORMAL, 60, NULL, FALSE }, 
 { "Announce",	"Announcements from Immortals", 0,	L_IMM,	"all",  DEF_NORMAL, 60, NULL, FALSE },
-{ "Bugs",	"Typos, bugs, errors",		0,	1,	"imm",	DEF_NORMAL, 60, NULL, FALSE },
-{ "Personal", 	"Personal messages",		0,	1,	"all",	DEF_EXCLUDE,28, NULL, FALSE },
-{ "Clans",	"Clan notes",			5,	5,	"all",  DEF_NORMAL, 14, NULL, FALSE },
+{ "Bugs",	"Typos, bugs, errors",				0,	1,	"imm",	DEF_NORMAL, 60, NULL, FALSE },
+{ "Personal", 	"Personal messages",			0,	1,	"all",	DEF_EXCLUDE,28, NULL, FALSE },
+{ "Clans",	"Clan notes",						5,	5,	"all",  DEF_NORMAL, 14, NULL, FALSE },
 { "Immortal",	"Immortal discussion",		L_IMM,	L_IMM,	"all",	DEF_NORMAL, 60, NULL, FALSE },
 
 };

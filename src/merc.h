@@ -31,18 +31,10 @@
 /*
  * Accommodate old non-Ansi compilers.
  */
-#if defined(TRADITIONAL)
-#define const
-#define args( list )			( )
-#define DECLARE_DO_FUN( fun )		void fun( )
-#define DECLARE_SPEC_FUN( fun )		bool fun( )
-#define DECLARE_SPELL_FUN( fun )	void fun( )
-#else
 #define args( list )			list
 #define DECLARE_DO_FUN( fun )		DO_FUN    fun
 #define DECLARE_SPEC_FUN( fun )		SPEC_FUN  fun
 #define DECLARE_SPELL_FUN( fun )	SPELL_FUN fun
-#endif
 
 
 
@@ -1922,75 +1914,6 @@ extern		TIME_INFO_DATA		time_info;
 extern		WEATHER_DATA		weather_info;
 extern          OBJ_DATA          *     obj_free;
 extern		bool			MOBtrigger;
-
-/*
- * OS-dependent declarations.
- * These are all very standard library functions,
- *   but some systems have incomplete or non-ansi header files.
- */
-#if	defined(_AIX)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(apollo)
-int	atoi		args( ( const char *string ) );
-void *	calloc		args( ( unsigned nelem, size_t size ) );
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(hpux)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(linux)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(MIPS_OS)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(MSDOS)
-#define NOCRYPT
-#if	defined(unix)
-#undef	unix
-#endif
-#endif
-
-#if	defined(NeXT)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(sequent)
-char *	crypt		args( ( const char *key, const char *salt ) );
-int	fclose		args( ( FILE *stream ) );
-int	fprintf		args( ( FILE *stream, const char *format, ... ) );
-int	fread		args( ( void *ptr, int size, int n, FILE *stream ) );
-int	fseek		args( ( FILE *stream, long offset, int ptrname ) );
-void	perror		args( ( const char *s ) );
-int	ungetc		args( ( int c, FILE *stream ) );
-#endif
-
-#if	defined(sun)
-char *	crypt		args( ( const char *key, const char *salt ) );
-int	fclose		args( ( FILE *stream ) );
-int	fprintf		args( ( FILE *stream, const char *format, ... ) );
-#if	defined(SYSV)
-siz_t	fread		args( ( void *ptr, size_t size, size_t n, 
-			    FILE *stream) );
-#else
-int	fread		args( ( void *ptr, int size, int n, FILE *stream ) );
-#endif
-int	fseek		args( ( FILE *stream, long offset, int ptrname ) );
-void	perror		args( ( const char *s ) );
-int	ungetc		args( ( int c, FILE *stream ) );
-#endif
-
-#if	defined(ultrix)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-
 
 /*
  * The crypt(3) function is not available on some operating systems.

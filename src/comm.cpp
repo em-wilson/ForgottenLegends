@@ -71,20 +71,7 @@ DECLARE_DO_FUN(do_look);
 DECLARE_DO_FUN(do_skills);
 DECLARE_DO_FUN(do_outfit);
 
-/*
- * Signal handling.
- * Apollo has a problem with __attribute(atomic) in signal.h,
- *   I dance around it.
- */
-#if defined(apollo)
-#define __attribute(x)
-#endif
-
 #include <signal.h>
-
-#if defined(apollo)
-#undef __attribute
-#endif
 
 /*
  * Socket and TCP/IP stuff.
