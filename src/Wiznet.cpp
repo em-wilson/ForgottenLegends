@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include "merc.h"
 #include "recycle.h"
+#include "ConnectedState.h"
 #include "Wiznet.h"
 
 Wiznet *Wiznet::instance()
@@ -19,7 +20,7 @@ void Wiznet::report(const char *string, Character *ch, OBJ_DATA *obj,
 
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
-        if (d->connected == CON_PLAYING
+        if (d->connected == ConnectedState::Playing
 		&&  IS_IMMORTAL(d->character) 
 		&&  IS_SET(d->character->wiznet,WIZ_ON) 
 		&&  (!flag || IS_SET(d->character->wiznet,flag))

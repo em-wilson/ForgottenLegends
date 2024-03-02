@@ -41,6 +41,7 @@
 #include "tables.h"
 #include "lookup.h"
 #include "clans/ClanManager.h"
+#include "ConnectedState.h"
 #include "PlayerCharacter.h"
 
 /* command procedures needed */
@@ -1751,8 +1752,8 @@ void do_help( Character *ch, char *argument )
 		add_buf(output,pHelp->text);
 	    found = TRUE;
 	    /* small hack :) */
-	    if (ch->desc != NULL && ch->desc->connected != CON_PLAYING 
-	    &&  		    ch->desc->connected != CON_GEN_GROUPS)
+	    if (ch->desc != NULL && ch->desc->connected != ConnectedState::Playing 
+	    &&  		    ch->desc->connected != ConnectedState::GenGroups)
 		break;
 	}
     }
@@ -1793,7 +1794,7 @@ void do_whois (Character *ch, char *argument)
         char *race;
 	char const *class_name;
 
- 	if (d->connected != CON_PLAYING || !can_see(ch,d->character))
+ 	if (d->connected != ConnectedState::Playing || !can_see(ch,d->character))
 	    continue;
 	
 	wch = ( d->original != NULL ) ? d->original : d->character;
@@ -1977,7 +1978,7 @@ void do_who( Character *ch, char *argument )
          * Check for match against restrictions.
          * Don't use trust as that exposes trusted mortals.
          */
-        if ( d->connected != CON_PLAYING || !can_see( ch, d->character ) )
+        if ( d->connected != ConnectedState::Playing || !can_see( ch, d->character ) )
             continue;
  
         wch   = ( d->original != NULL ) ? d->original : d->character;
@@ -2062,7 +2063,7 @@ void do_count ( Character *ch, char *argument )
     count = 0;
 
     for ( d = descriptor_list; d != NULL; d = d->next )
-        if ( d->connected == CON_PLAYING && can_see( ch, d->character ) )
+        if ( d->connected == ConnectedState::Playing && can_see( ch, d->character ) )
 	    count++;
 
     max_on = UMAX(count,max_on);
@@ -2209,7 +2210,7 @@ void do_where( Character *ch, char *argument )
 	found = FALSE;
 	for ( d = descriptor_list; d; d = d->next )
 	{
-	    if ( d->connected == CON_PLAYING
+	    if ( d->connected == ConnectedState::Playing
 	    && ( victim = d->character ) != NULL
 	    &&   !IS_NPC(victim)
 	    &&   victim->in_room != NULL
@@ -2748,7 +2749,7 @@ void do_nw( Character *ch, char *argument )
     {
         PlayerCharacter* wch = (PlayerCharacter*)d->character;
 
-        if (d->connected != CON_PLAYING || !can_see(ch,wch))
+        if (d->connected != ConnectedState::Playing || !can_see(ch,wch))
             continue;
 
         snprintf(buf, sizeof(buf), "%-15s %-15d\n\r", wch->getName(), nw_lookup(wch));

@@ -39,6 +39,7 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "mob_cmds.h"
+#include "ConnectedState.h"
 #include "NonPlayerCharacter.h"
 
 DECLARE_DO_FUN( do_look 	);
@@ -250,7 +251,7 @@ void do_mpgecho( Character *ch, char *argument )
 
     for ( d = descriptor_list; d; d = d->next )
     {
-	if ( d->connected == CON_PLAYING )
+	if ( d->connected == ConnectedState::Playing )
  	{
 	    if ( IS_IMMORTAL(d->character) )
 		send_to_char( "Mob echo> ", d->character );
@@ -281,7 +282,7 @@ void do_mpzecho( Character *ch, char *argument )
 
     for ( d = descriptor_list; d; d = d->next )
     {
-	if ( d->connected == CON_PLAYING 
+	if ( d->connected == ConnectedState::Playing 
 	&&   d->character->in_room != NULL 
 	&&   d->character->in_room->area == ch->in_room->area )
  	{

@@ -34,6 +34,7 @@
 #include "merc.h"
 #include "music.h"
 #include "recycle.h"
+#include "ConnectedState.h"
 
 int channel_songs[MAX_GLOBAL + 1];
 struct song_data song_table[MAX_SONGS];
@@ -85,7 +86,7 @@ void song_update(void)
 	    {
 		victim = d->original ? d->original : d->character;
 
-        	if ( d->connected == CON_PLAYING &&
+        	if ( d->connected == ConnectedState::Playing &&
              	     !IS_SET(victim->comm,COMM_NOMUSIC) &&
              	     !IS_SET(victim->comm,COMM_QUIET) )
             	     act_new("$t",d->character,buf,NULL,TO_CHAR,POS_SLEEPING);
@@ -350,7 +351,7 @@ void do_play(Character *ch, char *argument)
 		Character *victim;
 		victim = d->original ? d->original : d->character;
 
-        	if ( d->connected == CON_PLAYING &&
+        	if ( d->connected == ConnectedState::Playing &&
              	     !IS_SET(victim->comm,COMM_NOMUSIC) &&
              	     !IS_SET(victim->comm,COMM_QUIET) )
             	     act_new("$t",d->character,buf,NULL,TO_CHAR,POS_SLEEPING);

@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "ConnectedState.h"
 #include "tables.h"
 
 char *flag_string               args ( ( const struct flag_type *flag_table,
@@ -47,7 +48,7 @@ void who_html_update (void)
     char const *class_name;
     char *race;
     
-    if ( d->connected != CON_PLAYING)
+    if ( d->connected != ConnectedState::Playing)
         continue;
 
         wch   = ( d->original != NULL ) ? d->original : d->character;

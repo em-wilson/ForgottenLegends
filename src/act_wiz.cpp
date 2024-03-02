@@ -37,10 +37,11 @@
 #include "recycle.h"
 #include "tables.h"
 #include "lookup.h"
-#include "Wiznet.h"
 #include "clans/ClanManager.h"
+#include "ConnectedState.h"
 #include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
+#include "Wiznet.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_rstat		);
@@ -698,7 +699,7 @@ void do_echo( Character *ch, char *argument )
     
     for ( d = descriptor_list; d; d = d->next )
     {
-	if ( d->connected == CON_PLAYING )
+	if ( d->connected == ConnectedState::Playing )
 	{
 	    if (d->character->getTrust() >= ch->getTrust())
 		send_to_char( "global> ",d->character);
@@ -725,7 +726,7 @@ void do_recho( Character *ch, char *argument )
 
     for ( d = descriptor_list; d; d = d->next )
     {
-	if ( d->connected == CON_PLAYING
+	if ( d->connected == ConnectedState::Playing
 	&&   d->character->in_room == ch->in_room )
 	{
             if (d->character->getTrust() >= ch->getTrust())
@@ -750,7 +751,7 @@ void do_zecho(Character *ch, char *argument)
 
     for (d = descriptor_list; d; d = d->next)
     {
-	if (d->connected == CON_PLAYING
+	if (d->connected == ConnectedState::Playing
 	&&  d->character->in_room != NULL && ch->in_room != NULL
 	&&  d->character->in_room->area == ch->in_room->area)
 	{
@@ -813,7 +814,7 @@ void do_transfer( Character *ch, char *argument )
     {
 	for ( d = descriptor_list; d != NULL; d = d->next )
 	{
-	    if ( d->connected == CON_PLAYING
+	    if ( d->connected == ConnectedState::Playing
 	    &&   d->character != ch
 	    &&   d->character->in_room != NULL
 	    &&   can_see( ch, d->character ) )
@@ -2048,7 +2049,7 @@ void do_mwhere( Character *ch, char *argument )
 	buffer = new_buf();
 	for (d = descriptor_list; d != NULL; d = d->next)
 	{
-	    if (d->character != NULL && d->connected == CON_PLAYING
+	    if (d->character != NULL && d->connected == ConnectedState::Playing
 	    &&  d->character->in_room != NULL && can_see(ch,d->character)
 	    &&  can_see_room(ch,d->character->in_room))
 	    {
@@ -4315,29 +4316,29 @@ void do_sockets( Character *ch, char *argument )
            /* NB: You may need to edit the CON_ values */
            switch( d->connected )
            {
-		case CON_PLAYING:		       strcpy( st, "    PLAYING    " ); break;
-		case CON_GET_NAME:		       strcpy( st, "   Get Name    " ); break;
-		case CON_GET_OLD_PASSWORD:	   strcpy( st, "Get Old Passwd " ); break;
-		case CON_CONFIRM_NEW_NAME:	   strcpy( st, " Confirm Name  " ); break;
-		case CON_GET_NEW_PASSWORD:	   strcpy( st, "Get New Passwd " ); break;
-		case CON_CONFIRM_NEW_PASSWORD: strcpy( st, "Confirm Passwd " ); break;
-		case CON_GET_NEW_RACE:		   strcpy( st, "  Get New Race " ); break;
-		case CON_GET_NEW_SEX:		   strcpy( st, "  Get New Sex  " ); break;
-		case CON_GET_NEW_CLASS:		   strcpy( st, " Get New Class " ); break;
-		case CON_GET_ALIGNMENT:		   strcpy( st, " Get New Align " ); break;
-		case CON_DEFAULT_CHOICE:	   strcpy( st, " Choosing Cust " ); break;
-		case CON_GEN_GROUPS:		   strcpy( st, " Customization " ); break;
-		case CON_PICK_WEAPON:		   strcpy( st, " Picking Weapon" ); break;
-		case CON_READ_IMOTD:		   strcpy( st, " Reading IMOTD " ); break;
-		case CON_BREAK_CONNECT:		   strcpy( st, "   LINKDEAD    " ); break;
-		case CON_READ_MOTD:		       strcpy( st, "  Reading MOTD " ); break;
-		case CON_GET_MORPH:		       strcpy( st, "Choosing  Morph" ); break;
-		case CON_GET_MORPH_ORIG:	   strcpy( st, "Choosing  Morph" ); break;
-		case CON_NOTE_TO:		       strcpy( st, " Writing Notes " ); break;
-		case CON_NOTE_SUBJECT:		   strcpy( st, " Writing Notes " ); break;
-		case CON_NOTE_EXPIRE:		   strcpy( st, " Writing Notes " ); break;
-		case CON_NOTE_TEXT:		       strcpy( st, " Writing Notes " ); break;
-		case CON_NOTE_FINISH:		   strcpy( st, " Writing Notes " ); break;
+		case ConnectedState::Playing:		       strcpy( st, "    PLAYING    " ); break;
+		case ConnectedState::GetName:		       strcpy( st, "   Get Name    " ); break;
+		case ConnectedState::GetOldPassword:	   strcpy( st, "Get Old Passwd " ); break;
+		case ConnectedState::ConfirmNewName:	   strcpy( st, " Confirm Name  " ); break;
+		case ConnectedState::GetNewPassword:	   strcpy( st, "Get New Passwd " ); break;
+		case ConnectedState::ConfirmNewPassword: strcpy( st, "Confirm Passwd " ); break;
+		case ConnectedState::GetNewRace:		   strcpy( st, "  Get New Race " ); break;
+		case ConnectedState::GetNewSex:		   strcpy( st, "  Get New Sex  " ); break;
+		case ConnectedState::GetNewClass:		   strcpy( st, " Get New Class " ); break;
+		case ConnectedState::GetAlignment:		   strcpy( st, " Get New Align " ); break;
+		case ConnectedState::DefaultChoice:	   strcpy( st, " Choosing Cust " ); break;
+		case ConnectedState::GenGroups:		   strcpy( st, " Customization " ); break;
+		case ConnectedState::PickWeapon:		   strcpy( st, " Picking Weapon" ); break;
+		case ConnectedState::ReadImotd:		   strcpy( st, " Reading IMOTD " ); break;
+		case ConnectedState::BreakConnect:		   strcpy( st, "   LINKDEAD    " ); break;
+		case ConnectedState::ReadMotd:		       strcpy( st, "  Reading MOTD " ); break;
+		case ConnectedState::GetMorph:		       strcpy( st, "Choosing  Morph" ); break;
+		case ConnectedState::GetMorphOrig:	   strcpy( st, "Choosing  Morph" ); break;
+		case ConnectedState::NoteTo:		       strcpy( st, " Writing Notes " ); break;
+		case ConnectedState::NoteSubject:		   strcpy( st, " Writing Notes " ); break;
+		case ConnectedState::NoteExpire:		   strcpy( st, " Writing Notes " ); break;
+		case ConnectedState::NoteText:		       strcpy( st, " Writing Notes " ); break;
+		case ConnectedState::NoteFinish:		   strcpy( st, " Writing Notes " ); break;
 		default:			           strcpy( st, "   !UNKNOWN!   " ); break;
            }
            count++;
@@ -4688,7 +4689,7 @@ void do_copyover (Character *ch, char * argument)
                Character * och = CH (d);
                d_next = d->next; /* We delete from the list , so need to save this */
         
-               if (!d->character || d->connected > CON_PLAYING) /* drop those logging on */
+               if (!d->character || d->connected > ConnectedState::Playing) /* drop those logging on */
                {
                        write_to_descriptor (d->descriptor, "\n\rSorry, we are rebooting. Come back in a few minutes.\n\r", 0);
                        close_socket (d); /* throw'em out */
@@ -4771,7 +4772,7 @@ void copyover_recover ()
                d->host = str_dup (host);
                d->next = descriptor_list;
                descriptor_list = d;
-               d->connected = CON_COPYOVER_RECOVER; /* -15, so close_socket frees the char */
+               d->connected = ConnectedState::CopyoverRecover; /* -15, so close_socket frees the char */
         
  
                /* Now, find the pfile */
@@ -4796,7 +4797,7 @@ void copyover_recover ()
                        char_to_room (d->character, d->character->in_room);
                        do_look (d->character, (char*)"auto");
                        act ("$n materializes!", d->character, NULL, NULL, TO_ROOM);
-                       d->connected = CON_PLAYING;
+                       d->connected = ConnectedState::Playing;
 
                        if (d->character->pet != NULL)
                        {

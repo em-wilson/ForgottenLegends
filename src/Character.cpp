@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <ForceFeedback/ForceFeedback.h>
 #include "merc.h"
+#include "ConnectedState.h"
 
 Character::Character()
 {
@@ -314,7 +315,7 @@ void Character::update() {
     AFFECT_DATA *paf;
     AFFECT_DATA *paf_next;
 
-    if ( this->desc && this->desc->connected == CON_PLAYING )
+    if ( this->desc && this->desc->connected == ConnectedState::Playing )
         send_to_char("\n\r",this);
 
     if ( this->position >= POS_STUNNED )

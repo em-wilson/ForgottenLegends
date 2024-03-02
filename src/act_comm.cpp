@@ -37,10 +37,11 @@
 #include "board.h"
 #include "recycle.h"
 #include "tables.h"
-#include "Wiznet.h"
+#include "clans/ClanManager.h"
+#include "ConnectedState.h"
 #include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
-#include "clans/ClanManager.h"
+#include "Wiznet.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_quit	);
@@ -291,7 +292,7 @@ void talk_auction( char *argument )
 
 	victim = d->original ? d->original : d->character;
 
-	if ( d->connected == CON_PLAYING &&
+	if ( d->connected == ConnectedState::Playing &&
 	     !IS_SET(victim->comm,COMM_NOAUCTION) &&
 	     !IS_SET(victim->comm,COMM_QUIET) )
 	{
@@ -346,7 +347,7 @@ void do_gossip( Character *ch, char *argument )
  
         victim = d->original ? d->original : d->character;
  
-        if ( d->connected == CON_PLAYING &&
+        if ( d->connected == ConnectedState::Playing &&
              d->character != ch &&
              !IS_SET(victim->comm,COMM_NOGOSSIP) &&
              !IS_SET(victim->comm,COMM_QUIET) )
@@ -401,7 +402,7 @@ void do_grats( Character *ch, char *argument )
  
         victim = d->original ? d->original : d->character;
  
-        if ( d->connected == CON_PLAYING &&
+        if ( d->connected == ConnectedState::Playing &&
              d->character != ch &&
              !IS_SET(victim->comm,COMM_NOGRATS) &&
              !IS_SET(victim->comm,COMM_QUIET) )
@@ -456,7 +457,7 @@ void do_quote( Character *ch, char *argument )
  
         victim = d->original ? d->original : d->character;
  
-        if ( d->connected == CON_PLAYING &&
+        if ( d->connected == ConnectedState::Playing &&
              d->character != ch &&
              !IS_SET(victim->comm,COMM_NOQUOTE) &&
              !IS_SET(victim->comm,COMM_QUIET) )
@@ -511,7 +512,7 @@ void do_question( Character *ch, char *argument )
  
         victim = d->original ? d->original : d->character;
  
-        if ( d->connected == CON_PLAYING &&
+        if ( d->connected == ConnectedState::Playing &&
              d->character != ch &&
              !IS_SET(victim->comm,COMM_NOQUESTION) &&
              !IS_SET(victim->comm,COMM_QUIET) )
@@ -566,7 +567,7 @@ void do_answer( Character *ch, char *argument )
  
         victim = d->original ? d->original : d->character;
  
-        if ( d->connected == CON_PLAYING &&
+        if ( d->connected == ConnectedState::Playing &&
              d->character != ch &&
              !IS_SET(victim->comm,COMM_NOQUESTION) &&
              !IS_SET(victim->comm,COMM_QUIET) )
@@ -622,7 +623,7 @@ void do_music( Character *ch, char *argument )
  
         victim = d->original ? d->original : d->character;
  
-        if ( d->connected == CON_PLAYING &&
+        if ( d->connected == ConnectedState::Playing &&
              d->character != ch &&
              !IS_SET(victim->comm,COMM_NOMUSIC) &&
              !IS_SET(victim->comm,COMM_QUIET) )
@@ -673,7 +674,7 @@ void do_clantalk( Character *ch, char *argument )
       snprintf(buf, sizeof(buf), "$n clans '%s'", argument );
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
-        if ( d->connected == CON_PLAYING &&
+        if ( d->connected == ConnectedState::Playing &&
              d->character != ch &&
 	     is_same_clan(ch,d->character) &&
              !IS_SET(d->character->comm,COMM_NOCLAN) &&
@@ -712,7 +713,7 @@ void do_immtalk( Character *ch, char *argument )
     act_new("$n: $t",ch,argument,NULL,TO_CHAR,POS_DEAD);
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
-	if ( d->connected == CON_PLAYING && 
+	if ( d->connected == ConnectedState::Playing && 
 	     IS_IMMORTAL(d->character) && 
              !IS_SET(d->character->comm,COMM_NOWIZ) )
 	{
@@ -788,7 +789,7 @@ void do_shout( Character *ch, char *argument )
 
 	victim = d->original ? d->original : d->character;
 
-	if ( d->connected == CON_PLAYING &&
+	if ( d->connected == ConnectedState::Playing &&
 	     d->character != ch &&
 	     !IS_SET(victim->comm, COMM_SHOUTSOFF) &&
 	     !IS_SET(victim->comm, COMM_QUIET) ) 
@@ -912,7 +913,7 @@ void do_reply( Character *ch, char *argument )
     }
 
     if ( ( victim = ch->reply ) == NULL ||
-		(!IS_NPC(victim) && victim->desc->connected != CON_PLAYING))
+		(!IS_NPC(victim) && victim->desc->connected != ConnectedState::Playing))
     {
 	send_to_char( "They aren't here.\n\r", ch );
 	return;
@@ -946,7 +947,7 @@ void do_yell( Character *ch, char *argument )
     
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
-	if ( d->connected == CON_PLAYING
+	if ( d->connected == ConnectedState::Playing
 	&&   d->character != ch
 	&&   d->character->in_room != NULL
 	&&   d->character->in_room->area == ch->in_room->area 
@@ -2072,7 +2073,7 @@ void do_reclass( Character *caller, char *argument)
     char_from_room( ch );
     char_to_room( ch, get_room_index(ROOM_VNUM_NOTE));
 
-    ch->desc->connected = CON_GET_RECLASS;
+    ch->desc->connected = ConnectedState::GetReclass;
 }
 
 void do_info( Character *ch, char *argument )
@@ -2127,7 +2128,7 @@ void do_info( Character *ch, char *argument )
 
         victim = d->original ? d->original : d->character;
 
-        if ( d->connected == CON_PLAYING &&
+        if ( d->connected == ConnectedState::Playing &&
              d->character != ch &&
              !IS_SET(victim->comm,COMM_NOINFO) &&
              !IS_SET(victim->comm,COMM_QUIET) )

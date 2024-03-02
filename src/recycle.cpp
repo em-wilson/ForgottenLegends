@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "recycle.h"
+#include "ConnectedState.h"
 
 /* stuff for recycling ban structures */
 BAN_DATA *ban_free;
@@ -86,7 +87,7 @@ DESCRIPTOR_DATA *new_descriptor(void)
     *d = d_zero;
     VALIDATE(d);
     
-    d->connected       = CON_GET_NAME;
+    d->connected       = ConnectedState::GetName;
     d->descriptor       = 0;
     d->showstr_head    = NULL;
     d->showstr_point = NULL;

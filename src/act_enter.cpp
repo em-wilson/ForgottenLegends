@@ -31,6 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "merc.h"
+#include "ConnectedState.h"
 #include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
 
@@ -251,7 +252,7 @@ void do_detonate( Character *ch, char *argument )
     {
 	for ( d = descriptor_list; d; d = d->next )
 	{
-	    if ( d->connected == CON_PLAYING
+	    if ( d->connected == ConnectedState::Playing
 	    && ( victim = d->character ) != NULL
             && victim != ch
 	    &&   !IS_IMMORTAL(victim)
@@ -358,7 +359,7 @@ void do_detonate( Character *ch, char *argument )
 
       for ( d = descriptor_list; d != NULL; d = d->next )
       {
-	if (d->connected == CON_PLAYING)
+	if (d->connected == ConnectedState::Playing)
     send_to_char("You see a mushroom-shaped cloud appear on the horizon.\n\r",d->character);
       }
 }

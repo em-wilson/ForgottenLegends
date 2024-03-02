@@ -1,6 +1,8 @@
 #ifndef __DESCRIPTOR_H__
 #define __DESCRIPTOR_H__
 
+#include "ConnectedState.h"
+
 #define MAX_INPUT_LENGTH	  256
 
 typedef struct	descriptor_data		DESCRIPTOR_DATA;
@@ -19,7 +21,7 @@ struct	descriptor_data
     bool		        valid;
     char *		        host;
     short int		    descriptor;
-    short int		    connected;
+    ConnectedState		connected;
     bool		        fcommand;
     unsigned char		inbuf		[4 * MAX_INPUT_LENGTH];
     char		        incomm		[MAX_INPUT_LENGTH];

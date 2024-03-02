@@ -38,6 +38,7 @@
 #include "merc.h"
 #include "tables.h"
 #include "clans/ClanManager.h"
+#include "ConnectedState.h"
 #include "PlayerCharacter.h"
 
 DECLARE_DO_FUN( do_clist	);
@@ -101,7 +102,7 @@ void do_cedit( Character *caller, char *argument )
 		    "4: Shop Options\n\r"
 		    "5: Exit Editor\n\r", ch);
 	ch->setClanCust(3);
-	ch->desc->connected = CON_CLAN_CREATE;
+	ch->desc->connected = ConnectedState::ClanCreate;
 	return;
     }
 }

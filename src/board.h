@@ -61,11 +61,11 @@ void save_notes ();
 bool is_note_room (ROOM_INDEX_DATA *room);
 
 /* for nanny */
-void handle_con_note_to 		(DESCRIPTOR_DATA *d, char * argument);
-void handle_con_note_subject 	(DESCRIPTOR_DATA *d, char * argument);
-void handle_con_note_expire 	(DESCRIPTOR_DATA *d, char * argument);
-void handle_con_note_text 		(DESCRIPTOR_DATA *d, char * argument);
-void handle_con_note_finish 	(DESCRIPTOR_DATA *d, char * argument);
+void handle_ConnectedStateNoteTo 		(DESCRIPTOR_DATA *d, char * argument);
+void handle_ConnectedStateNoteSubject 	(DESCRIPTOR_DATA *d, char * argument);
+void handle_ConnectedStateNoteExpire 	(DESCRIPTOR_DATA *d, char * argument);
+void handle_ConnectedStateNoteText 		(DESCRIPTOR_DATA *d, char * argument);
+void handle_ConnectedStateNoteFinish 	(DESCRIPTOR_DATA *d, char * argument);
 
 
 /* Commands */

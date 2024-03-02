@@ -877,7 +877,7 @@ Syntax: sockets
 SOCKETS reports all of the visible users connected to the server, including 
 users in the process of logging in.  The two numbers inside brackets are the 
 channel number and the 'connected' state.  The 'connected' states are listed in 
-merc.h: 0 is CON_PLAYING; non-zero values are various states of logging in.
+merc.h: 0 is ConnectedState::Playing; non-zero values are various states of logging in.
 
 The optional name argument shows the site of a player, or optional can be used
 to identify switched gods (i.e. socket orc shows the name of anyone switched
@@ -1220,7 +1220,8 @@ This spell renders the target character blind.
 ~
 
 0 'ACID BLAST' 'BURNING HANDS' 'COLOUR SPRAY' FIREBALL 'LIGHTNING BOLT'
-  'MAGIC MISSILE' 'SHOCKING GRASP'~
+
+  'MAGIC MISSILE' 'SHOCKING GRASP'~
 Syntax: cast 'acid blast'     <victim>
 Syntax: cast 'burning hands'  <victim>
 Syntax: cast 'colour spray'   <victim>

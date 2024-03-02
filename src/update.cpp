@@ -35,6 +35,7 @@
 #include "music.h"
 #include "tables.h"
 #include "recycle.h"
+#include "ConnectedState.h"
 #include "NonPlayerCharacter.h"
 #include "Wiznet.h"
 
@@ -290,7 +291,7 @@ void weather_update( void )
     {
 	for ( d = descriptor_list; d != NULL; d = d->next )
 	{
-	    if ( d->connected == CON_PLAYING
+	    if ( d->connected == ConnectedState::Playing
 	    &&   IS_OUTSIDE(d->character)
 	    &&   IS_AWAKE(d->character) )
 		send_to_char( buf, d->character );
@@ -333,7 +334,7 @@ void info_update( void ) {
 
         victim = d->character;
 
-        if (d->connected == CON_PLAYING &&
+        if (d->connected == ConnectedState::Playing &&
             !IS_SET(victim->comm, COMM_NOINFO) &&
             !IS_SET(victim->comm, COMM_QUIET)) {
             char buf[MAX_STRING_LENGTH];

@@ -60,9 +60,10 @@
 #include "Game.h"
 #include "recycle.h"
 #include "clan.h"
-#include "Wiznet.h"
+#include "ConnectedState.h"
 #include "clans/ClanManager.h"
 #include "IConnectedStateHandler.h"
+#include "Wiznet.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_help);
@@ -269,7 +270,7 @@ void game_loop_unix(Game *game, int control)
 			{
 				FD_CLR(d->descriptor, &in_set);
 				FD_CLR(d->descriptor, &out_set);
-				if (d->character && d->connected == CON_PLAYING)
+				if (d->character && d->connected == ConnectedState::Playing)
 					save_char_obj(d->character);
 				d->outtop = 0;
 				close_socket(d);
@@ -291,7 +292,7 @@ void game_loop_unix(Game *game, int control)
 				if (!read_from_descriptor(d))
 				{
 					FD_CLR(d->descriptor, &out_set);
-					if (d->character != NULL && d->connected == CON_PLAYING)
+					if (d->character != NULL && d->connected == ConnectedState::Playing)
 						save_char_obj(d->character);
 					d->outtop = 0;
 					close_socket(d);
@@ -327,7 +328,7 @@ void game_loop_unix(Game *game, int control)
 				{
 					switch (d->connected)
 					{
-					case CON_PLAYING:
+					case ConnectedState::Playing:
 						if (!run_olc_editor(d))
 							substitute_alias(d, d->incomm);
 						break;
@@ -356,7 +357,7 @@ void game_loop_unix(Game *game, int control)
 			{
 				if (!process_output(d, TRUE))
 				{
-					if (d->character != NULL && d->connected == CON_PLAYING)
+					if (d->character != NULL && d->connected == ConnectedState::Playing)
 						save_char_obj(d->character);
 					d->outtop = 0;
 					close_socket(d);
@@ -533,7 +534,7 @@ void close_socket(DESCRIPTOR_DATA *dclose)
 		log_string(log_buf);
 		/* cut down on wiznet spam when rebooting */
 		/* If ch is writing note or playing, just lose link otherwise clear char */
-		if ((dclose->connected == CON_PLAYING && !merc_down) || ((dclose->connected >= CON_NOTE_TO) && (dclose->connected <= CON_NOTE_FINISH)))
+		if ((dclose->connected == ConnectedState::Playing && !merc_down) || ((dclose->connected >= ConnectedState::NoteTo) && (dclose->connected <= ConnectedState::NoteFinish)))
 		{
 			act("$n has lost $s link.", ch, NULL, NULL, TO_ROOM);
 			Wiznet::instance()->report((char *)"Net death has claimed $N.", ch, NULL, WIZ_LINKS, 0, 0);
@@ -697,7 +698,7 @@ void read_from_buffer(DESCRIPTOR_DATA *d)
 		}
 		else
 		{
-			if (++d->repeat >= 25 && d->character && d->connected == CON_PLAYING)
+			if (++d->repeat >= 25 && d->character && d->connected == ConnectedState::Playing)
 			{
 				snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s input spamming!", d->host);
 				log_string(log_buf);
@@ -754,11 +755,11 @@ bool process_output(DESCRIPTOR_DATA *d, bool fPrompt)
 		{
 			write_to_buffer(d, "[Hit Return to continue]\n\r", 0);
 		}
-		else if (fPrompt && d->pString && d->connected == CON_PLAYING)
+		else if (fPrompt && d->pString && d->connected == ConnectedState::Playing)
 		{
 			write_to_buffer(d, "> ", 2);
 		}
-		else if (fPrompt && d->connected == CON_PLAYING)
+		else if (fPrompt && d->connected == ConnectedState::Playing)
 		{
 			Character *ch;
 			Character *victim;
@@ -1124,7 +1125,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 	must_have = 0;
 
 	/* Delete leading spaces UNLESS character is writing a note */
-	if (d->connected != CON_NOTE_TEXT)
+	if (d->connected != ConnectedState::NoteText)
 	{
 		while (isspace(*argument))
 			argument++;
@@ -1149,7 +1150,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		close_socket(d);
 		return;
 
-	case CON_GET_NEW_PASSWORD:
+	case ConnectedState::GetNewPassword:
 		write_to_buffer(d, "\n\r", 2);
 
 		if (strlen(argument) < 5)
@@ -1175,17 +1176,17 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		free_string(ch->pcdata->pwd);
 		ch->pcdata->pwd = str_dup(pwdnew);
 		write_to_buffer(d, "Please retype password: ", 0);
-		d->connected = CON_CONFIRM_NEW_PASSWORD;
+		d->connected = ConnectedState::ConfirmNewPassword;
 		break;
 
-	case CON_CONFIRM_NEW_PASSWORD:
+	case ConnectedState::ConfirmNewPassword:
 		write_to_buffer(d, "\n\r", 2);
 
 		if (strcmp(crypt(argument, ch->pcdata->pwd), ch->pcdata->pwd))
 		{
 			write_to_buffer(d, "Passwords don't match.\n\rRetype password: ",
 							0);
-			d->connected = CON_GET_NEW_PASSWORD;
+			d->connected = ConnectedState::GetNewPassword;
 			return;
 		}
 
@@ -1200,10 +1201,10 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		}
 		write_to_buffer(d, "\n\r", 0);
 		write_to_buffer(d, "What is your race (help for more information)? ", 0);
-		d->connected = CON_GET_NEW_RACE;
+		d->connected = ConnectedState::GetNewRace;
 		break;
 
-	case CON_GET_NEW_RACE:
+	case ConnectedState::GetNewRace:
 		one_argument(argument, arg);
 
 		if (!strcmp(arg, "help"))
@@ -1270,15 +1271,15 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 			}
 			write_to_buffer(d, "\n\r", 0);
 			write_to_buffer(d, "What is your morphing race (help for more information)? ", 0);
-			d->connected = CON_GET_MORPH;
+			d->connected = ConnectedState::GetMorph;
 			break;
 		}
 
 		write_to_buffer(d, "What is your sex (M/F)? ", 0);
-		d->connected = CON_GET_NEW_SEX;
+		d->connected = ConnectedState::GetNewSex;
 		break;
 
-	case CON_GET_MORPH:
+	case ConnectedState::GetMorph:
 		one_argument(argument, arg);
 
 		if (!strcmp(arg, "help"))
@@ -1330,10 +1331,10 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		}
 		write_to_buffer(d, "\n\r", 0);
 		write_to_buffer(d, "What is your default race (help for more information)? ", 0);
-		d->connected = CON_GET_MORPH_ORIG;
+		d->connected = ConnectedState::GetMorphOrig;
 		break;
 
-	case CON_GET_MORPH_ORIG:
+	case ConnectedState::GetMorphOrig:
 		one_argument(argument, arg);
 
 		if (!strcmp(arg, "help"))
@@ -1372,10 +1373,10 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		ch->orig_form = omorph;
 
 		write_to_buffer(d, "What is your sex (M/F)? ", 0);
-		d->connected = CON_GET_NEW_SEX;
+		d->connected = ConnectedState::GetNewSex;
 		break;
 
-	case CON_GET_NEW_SEX:
+	case ConnectedState::GetNewSex:
 		switch (argument[0])
 		{
 		case 'm':
@@ -1405,10 +1406,10 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		}
 		strcat(buf, "]: ");
 		write_to_buffer(d, buf, 0);
-		d->connected = CON_GET_NEW_CLASS;
+		d->connected = ConnectedState::GetNewClass;
 		break;
 
-	case CON_GET_NEW_CLASS:
+	case ConnectedState::GetNewClass:
 		iClass = class_lookup(argument);
 
 		if (iClass == -1 || !can_be_class(ch, iClass))
@@ -1443,10 +1444,10 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		write_to_buffer(d, "Do you wish to customize this character?\n\r", 0);
 		write_to_buffer(d, "Customization takes time, but allows a wider range of skills and abilities.\n\r", 0);
 		write_to_buffer(d, "Customize (Y/N)? ", 0);
-		d->connected = CON_DEFAULT_CHOICE;
+		d->connected = ConnectedState::DefaultChoice;
 		break;
 
-	case CON_GET_RECLASS:
+	case ConnectedState::GetReclass:
 		iClass = class_lookup(argument);
 
 		if (iClass == -1 || IS_SET(ch->done, class_table[iClass].flag) || !can_be_class(ch, iClass))
@@ -1473,10 +1474,10 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		must_have = ch->pcdata->points + 15;
 		do_skills(ch, (char *)"all");
 		do_help(ch, (char *)"menu choice");
-		d->connected = CON_RECLASS_CUST;
+		d->connected = ConnectedState::ReclassCust;
 		break;
 
-	case CON_RECLASS_CUST:
+	case ConnectedState::ReclassCust:
 		send_to_char("\n\r", ch);
 		if (!str_cmp(argument, "done"))
 		{
@@ -1492,7 +1493,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 			send_to_char(buf, ch);
 			char_from_room(ch);
 			char_to_room(ch, ((PlayerCharacter *)ch)->getWasNoteRoom());
-			d->connected = CON_PLAYING;
+			d->connected = ConnectedState::Playing;
 			break;
 		}
 		if (!parse_gen_groups(ch, argument))
@@ -1502,7 +1503,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		do_help(ch, (char *)"menu choice");
 		break;
 
-	case CON_DEFAULT_CHOICE:
+	case ConnectedState::DefaultChoice:
 		write_to_buffer(d, "\n\r", 2);
 		switch (argument[0])
 		{
@@ -1515,7 +1516,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 			write_to_buffer(d, (char *)"You already have the following skills:\n\r", 0);
 			do_skills(ch, (char *)"all");
 			do_help(ch, (char *)"menu choice");
-			d->connected = CON_GEN_GROUPS;
+			d->connected = ConnectedState::GenGroups;
 			break;
 		case 'n':
 		case 'N':
@@ -1532,7 +1533,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 				}
 			strcat(buf, "\n\rYour choice? ");
 			write_to_buffer(d, buf, 0);
-			d->connected = CON_PICK_WEAPON;
+			d->connected = ConnectedState::PickWeapon;
 			break;
 		default:
 			write_to_buffer(d, "Please answer (Y/N)? ", 0);
@@ -1540,7 +1541,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		}
 		break;
 
-	case CON_PICK_WEAPON:
+	case ConnectedState::PickWeapon:
 		write_to_buffer(d, "\n\r", 2);
 		weapon = weapon_lookup(argument);
 		if (weapon == -1 || ch->pcdata->learned[*weapon_table[weapon].gsn] <= 0)
@@ -1562,10 +1563,10 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		ch->pcdata->learned[*weapon_table[weapon].gsn] = 40;
 		write_to_buffer(d, "\n\r", 2);
 		do_help(ch, (char *)"motd");
-		d->connected = CON_READ_MOTD;
+		d->connected = ConnectedState::ReadMotd;
 		break;
 
-	case CON_GEN_GROUPS:
+	case ConnectedState::GenGroups:
 		send_to_char("\n\r", ch);
 		if (!str_cmp(argument, "done"))
 		{
@@ -1590,7 +1591,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 				}
 			strcat(buf, "\n\rYour choice? ");
 			write_to_buffer(d, buf, 0);
-			d->connected = CON_PICK_WEAPON;
+			d->connected = ConnectedState::PickWeapon;
 			break;
 		}
 
@@ -1601,36 +1602,36 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		do_help(ch, (char *)"menu choice");
 		break;
 
-	case CON_READ_IMOTD:
+	case ConnectedState::ReadImotd:
 		write_to_buffer(d, "\n\r", 2);
 		do_help(ch, (char *)"motd");
-		d->connected = CON_READ_MOTD;
+		d->connected = ConnectedState::ReadMotd;
 		break;
 
 		/* states for new note system, (c)1995-96 erwin@pip.dknet.dk */
 		/* ch MUST be PC here; have nwrite check for PC status! */
 
-	case CON_NOTE_TO:
-		handle_con_note_to(d, argument);
+	case ConnectedState::NoteTo:
+		handle_ConnectedStateNoteTo(d, argument);
 		break;
 
-	case CON_NOTE_SUBJECT:
-		handle_con_note_subject(d, argument);
+	case ConnectedState::NoteSubject:
+		handle_ConnectedStateNoteSubject(d, argument);
 		break; /* subject */
 
-	case CON_NOTE_EXPIRE:
-		handle_con_note_expire(d, argument);
+	case ConnectedState::NoteExpire:
+		handle_ConnectedStateNoteExpire(d, argument);
 		break;
 
-	case CON_NOTE_TEXT:
-		handle_con_note_text(d, argument);
+	case ConnectedState::NoteText:
+		handle_ConnectedStateNoteText(d, argument);
 		break;
 
-	case CON_NOTE_FINISH:
-		handle_con_note_finish(d, argument);
+	case ConnectedState::NoteFinish:
+		handle_ConnectedStateNoteFinish(d, argument);
 		break;
 
-	case CON_READ_MOTD:
+	case ConnectedState::ReadMotd:
 		if (ch->pcdata == NULL || ch->pcdata->pwd[0] == '\0')
 		{
 			write_to_buffer(d, "Warning! Null password!\n\r", 0);
@@ -1640,7 +1641,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		}
 
 		char_list.push_back(ch);
-		d->connected = CON_PLAYING;
+		d->connected = ConnectedState::Playing;
 		send_to_char("The early bird may get the worm, but it's the second mouse that gets\n\r", ch);
 		send_to_char("the cheese.\n\r\n\r\n\r", ch);
 		reset_char(ch);
@@ -1753,7 +1754,7 @@ bool check_reconnect(DESCRIPTOR_DATA *d, char *name, bool fConn)
 				log_string(log_buf);
 				Wiznet::instance()->report((char *)"$N groks the fullness of $S link.",
 										   ch, NULL, WIZ_LINKS, 0, 0);
-				d->connected = CON_PLAYING;
+				d->connected = ConnectedState::Playing;
 				/* Inform the character of a note in progress and the possbility
 				 * of continuation!
 				 */
@@ -1769,7 +1770,7 @@ bool check_reconnect(DESCRIPTOR_DATA *d, char *name, bool fConn)
 
 void stop_idling(Character *ch)
 {
-	if (ch == NULL || ch->desc == NULL || ch->desc->connected != CON_PLAYING || ch->was_in_room == NULL || ch->in_room != get_room_index(ROOM_VNUM_LIMBO))
+	if (ch == NULL || ch->desc == NULL || ch->desc->connected != ConnectedState::Playing || ch->was_in_room == NULL || ch->in_room != get_room_index(ROOM_VNUM_LIMBO))
 		return;
 
 	ch->timer = 0;

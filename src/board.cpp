@@ -27,6 +27,7 @@
 /* #include "do.h" */ /* My do_XXX functions are declared in this file */
 #include "colordef.h"
 #include "clans/ClanManager.h"
+#include "ConnectedState.h"
 #include "PlayerCharacter.h"
 
 DECLARE_DO_FUN( do_help                );
@@ -533,7 +534,7 @@ static void do_nwrite (Character *caller, char *argument)
 		send_to_char (buf,ch);
 		send_to_char ("\n\r" BOLD YELLOW "To" NO_COLOR ":      ",ch);
 	
-		ch->desc->connected = CON_NOTE_TO;
+		ch->desc->connected = ConnectedState::NoteTo;
 		/* nanny takes over from here */
 		
 	}
@@ -553,7 +554,7 @@ static void do_nwrite (Character *caller, char *argument)
 		                    "=======================================================\n\r",ch);
 		
 
-		ch->desc->connected = CON_NOTE_TEXT;		            
+		ch->desc->connected = ConnectedState::NoteText;		            
 
 	}
 	
@@ -915,15 +916,15 @@ static bool next_board (Character *ch)
 	}
 }
 
-void handle_con_note_to (DESCRIPTOR_DATA *d, char * argument)
+void handle_ConnectedStateNoteTo (DESCRIPTOR_DATA *d, char * argument)
 {
 	char buf [MAX_INPUT_LENGTH];
 	Character *ch = d->character;
 
 	if (!ch->pcdata->in_progress)
 	{
-		d->connected = CON_PLAYING;
-		bug ("nanny: In CON_NOTE_TO, but no note in progress",0);
+		d->connected = ConnectedState::Playing;
+		bug ("nanny: In ConnectedState::NoteTo, but no note in progress",0);
 		return;
 	}
 
@@ -983,18 +984,18 @@ void handle_con_note_to (DESCRIPTOR_DATA *d, char * argument)
 
 	snprintf(buf, sizeof(buf), BOLD YELLOW "\n\rSubject" NO_COLOR ": ");
 	send_to_char(buf,ch);
-	d->connected = CON_NOTE_SUBJECT;
+	d->connected = ConnectedState::NoteSubject;
 }
 
-void handle_con_note_subject (DESCRIPTOR_DATA *d, char * argument)
+void handle_ConnectedStateNoteSubject (DESCRIPTOR_DATA *d, char * argument)
 {
 	char buf [MAX_INPUT_LENGTH];
 	Character *ch = d->character;
 
 	if (!ch->pcdata->in_progress)
 	{
-		d->connected = CON_PLAYING;
-		bug ("nanny: In CON_NOTE_SUBJECT, but no note in progress",0);
+		d->connected = ConnectedState::Playing;
+		bug ("nanny: In ConnectedState::NoteSubject, but no note in progress",0);
 		return;
 	}
 
@@ -1025,7 +1026,7 @@ void handle_con_note_subject (DESCRIPTOR_DATA *d, char * argument)
            				 BOLD YELLOW "Expire" NO_COLOR ":  ",
 		                 ch->pcdata->board->purge_days);
 			send_to_char(buf,ch);
-			d->connected = CON_NOTE_EXPIRE;
+			d->connected = ConnectedState::NoteExpire;
 		}
 		else
 		{
@@ -1036,12 +1037,12 @@ void handle_con_note_subject (DESCRIPTOR_DATA *d, char * argument)
 			snprintf(buf, sizeof(buf), "\n\rEnter text. Type " BOLD "~" NO_COLOR " or " BOLD "END" NO_COLOR " on an empty line to end note.\n\r"
 			                    "=======================================================\n\r");
 			send_to_char(buf,ch);
-			d->connected = CON_NOTE_TEXT;
+			d->connected = ConnectedState::NoteText;
 		}
 	}
 }
 
-void handle_con_note_expire(DESCRIPTOR_DATA *d, char * argument)
+void handle_ConnectedStateNoteExpire(DESCRIPTOR_DATA *d, char * argument)
 {
 	Character *ch = d->character;
 	char buf[MAX_STRING_LENGTH];
@@ -1050,8 +1051,8 @@ void handle_con_note_expire(DESCRIPTOR_DATA *d, char * argument)
 
 	if (!ch->pcdata->in_progress)
 	{
-		d->connected = CON_PLAYING;
-		bug ("nanny: In CON_NOTE_EXPIRE, but no note in progress",0);
+		d->connected = ConnectedState::Playing;
+		bug ("nanny: In ConnectedState::NoteExpire, but no note in progress",0);
 		return;
 	}
 	
@@ -1090,12 +1091,12 @@ void handle_con_note_expire(DESCRIPTOR_DATA *d, char * argument)
 	                    "=======================================================\n\r");
 	send_to_char(buf,ch);
 
-	d->connected = CON_NOTE_TEXT;
+	d->connected = ConnectedState::NoteText;
 }
 
 
 
-void handle_con_note_text (DESCRIPTOR_DATA *d, char * argument)
+void handle_ConnectedStateNoteText (DESCRIPTOR_DATA *d, char * argument)
 {
 	Character *ch = d->character;
 	char buf[MAX_STRING_LENGTH];
@@ -1103,8 +1104,8 @@ void handle_con_note_text (DESCRIPTOR_DATA *d, char * argument)
 	
 	if (!ch->pcdata->in_progress)
 	{
-		d->connected = CON_PLAYING;
-		bug ("nanny: In CON_NOTE_TEXT, but no note in progress",0);
+		d->connected = ConnectedState::Playing;
+		bug ("nanny: In ConnectedState::NoteText, but no note in progress",0);
 		return;
 	}
 
@@ -1116,7 +1117,7 @@ void handle_con_note_text (DESCRIPTOR_DATA *d, char * argument)
 		write_to_buffer (d, "\n\r\n\r",0);
 		send_to_char(szFinishPrompt, ch);
 		write_to_buffer (d, "\n\r", 0);
-		d->connected = CON_NOTE_FINISH;
+		d->connected = ConnectedState::NoteFinish;
 		return;
 	}
 	
@@ -1148,7 +1149,7 @@ void handle_con_note_text (DESCRIPTOR_DATA *d, char * argument)
 		write_to_buffer (d, "Note too long!\n\r", 0);
 		delete ch->pcdata->in_progress;
 		ch->pcdata->in_progress = NULL;			/* important */
-		d->connected = CON_PLAYING;
+		d->connected = ConnectedState::Playing;
 		return;			
 	}
 	
@@ -1161,15 +1162,15 @@ void handle_con_note_text (DESCRIPTOR_DATA *d, char * argument)
 	ch->pcdata->in_progress->setText(letter);
 }
 
-void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
+void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 {
 	char buf[MSL];
 	PlayerCharacter *ch = (PlayerCharacter*)d->character;
 	
 		if (!ch->pcdata->in_progress)
 		{
-			d->connected = CON_PLAYING;
-			bug ("nanny: In CON_NOTE_FINISH, but no note in progress",0);
+			d->connected = ConnectedState::Playing;
+			bug ("nanny: In ConnectedState::NoteFinish, but no note in progress",0);
 			return;
 		}
 		
@@ -1177,7 +1178,7 @@ void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
 		{
 			case 'c': /* keep writing */
 				write_to_buffer (d,"Continuing note...\n\r",0);
-				d->connected = CON_NOTE_TEXT;
+				d->connected = ConnectedState::NoteText;
 				break;
 
 			case 'v': /* view note so far */
@@ -1196,7 +1197,7 @@ void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
 			case 'p': /* post note */
 				finish_note (ch->pcdata->board, ch->pcdata->in_progress);
 				write_to_buffer (d, "Note posted.\n\r",0);
-				d->connected = CON_PLAYING;
+				d->connected = ConnectedState::Playing;
 
 				/* remove AFK status */
 				REMOVE_BIT(ch->comm, COMM_AFK);
@@ -1213,7 +1214,7 @@ void handle_con_note_finish (DESCRIPTOR_DATA *d, char * argument)
 				write_to_buffer (d, "Note cancelled!\n\r",0);
 				delete ch->pcdata->in_progress;
 				ch->pcdata->in_progress = NULL;
-				d->connected = CON_PLAYING;
+				d->connected = ConnectedState::Playing;
 				/* remove afk status */
 				REMOVE_BIT(ch->comm, COMM_AFK);
 

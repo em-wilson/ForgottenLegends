@@ -13,7 +13,7 @@ enum ConnectedState {
     GetMorphOrig            = 8,
     GetNewSex               = 9,
     GetNewClass             = 10,
-    GetAlignmen             = 11,
+    GetAlignment            = 11,
     DefaultChoice           = 12,
     GenGroups               = 13,
     PickWeapon              = 14,

@@ -244,39 +244,6 @@ struct	weather_data
 };
 
 
-
-/*
- * Connected state for a channel.
- */
-#define CON_PLAYING			 0
-#define CON_GET_NAME			 1
-#define CON_GET_OLD_PASSWORD		 2
-#define CON_CONFIRM_NEW_NAME		 3
-#define CON_GET_NEW_PASSWORD		 4
-#define CON_CONFIRM_NEW_PASSWORD	 5
-#define CON_GET_NEW_RACE		 6
-#define CON_GET_MORPH			 7
-#define CON_GET_MORPH_ORIG		 8
-#define CON_GET_NEW_SEX			 9
-#define CON_GET_NEW_CLASS		10
-#define CON_GET_ALIGNMENT		11
-#define CON_DEFAULT_CHOICE		12 
-#define CON_GEN_GROUPS			13 
-#define CON_PICK_WEAPON			14
-#define CON_READ_IMOTD			15
-#define CON_READ_MOTD			16
-#define CON_BREAK_CONNECT		17
-#define CON_NOTE_TO                     18
-#define CON_NOTE_SUBJECT                19
-#define CON_NOTE_EXPIRE                 20
-#define CON_NOTE_TEXT                   21
-#define CON_NOTE_FINISH                 22
-#define CON_COPYOVER_RECOVER            23
-#define CON_GET_RECLASS			24
-#define CON_RECLASS_CUST		25
-#define CON_CLAN_CREATE			26
-
-
 #include "Descriptor.h"
 
 
