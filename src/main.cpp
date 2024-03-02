@@ -9,6 +9,7 @@
 #include "connected_state_handlers/BreakConnectStateHandler.h"
 #include "connected_state_handlers/ConfirmNewNameStateHandler.h"
 #include "connected_state_handlers/GetNameStateHandler.h"
+#include "connected_state_handlers/GetNewPasswordStateHandler.h"
 #include "connected_state_handlers/GetOldPasswordStateHandler.h"
 
 
@@ -83,10 +84,11 @@ int main( int argc, char **argv )
     clan_manager = new ClanManager(new ClanWriter(CLAN_DIR, CLAN_LIST));
     
     ConnectedStateManager csm = ConnectedStateManager(&game);
+    csm.addHandler(new BreakConnectStateHandler());
+    csm.addHandler(new ConfirmNewNameStateHandler());
     csm.addHandler(new GetNameStateHandler(ban_manager, clan_manager));
     csm.addHandler(new GetOldPasswordStateHandler());
-    csm.addHandler(new ConfirmNewNameStateHandler());
-    csm.addHandler(new BreakConnectStateHandler());
+    csm.addHandler(new GetNewPasswordStateHandler());
     game.setConnectedStateManager(&csm);
 
     boot_db();

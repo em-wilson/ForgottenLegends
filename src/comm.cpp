@@ -1092,8 +1092,6 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 	char arg[MAX_INPUT_LENGTH];
 	int must_have;
 	Character *ch;
-	char *pwdnew;
-	char *p;
 	int iClass, race, omorph, i, weapon;
 
 	must_have = 0;
@@ -1123,35 +1121,6 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		bug("Nanny: bad d->connected %d.", d->connected);
 		close_socket(d);
 		return;
-
-	case ConnectedState::GetNewPassword:
-		write_to_buffer(d, "\n\r", 2);
-
-		if (strlen(argument) < 5)
-		{
-			write_to_buffer(d,
-							"Password must be at least five characters long.\n\rPassword: ",
-							0);
-			return;
-		}
-
-		pwdnew = crypt(argument, ch->getName());
-		for (p = pwdnew; *p != '\0'; p++)
-		{
-			if (*p == '~')
-			{
-				write_to_buffer(d,
-								"New password not acceptable, try again.\n\rPassword: ",
-								0);
-				return;
-			}
-		}
-
-		free_string(ch->pcdata->pwd);
-		ch->pcdata->pwd = str_dup(pwdnew);
-		write_to_buffer(d, "Please retype password: ", 0);
-		d->connected = ConnectedState::ConfirmNewPassword;
-		break;
 
 	case ConnectedState::ConfirmNewPassword:
 		write_to_buffer(d, "\n\r", 2);

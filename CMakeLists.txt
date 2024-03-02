@@ -33,9 +33,10 @@ set(SOURCE_FILES
     src/clan.h
     src/connected_state_handlers/AbstractStateHandler.cpp src/connected_state_handlers/AbstractStateHandler.h
     src/connected_state_handlers/BreakConnectStateHandler.cpp src/connected_state_handlers/BreakConnectStateHandler.h
-    src/connected_state_handlers/GetOldPasswordStateHandler.cpp src/connected_state_handlers/GetOldPasswordStateHandler.h
     src/connected_state_handlers/ConfirmNewNameStateHandler.cpp src/connected_state_handlers/ConfirmNewNameStateHandler.h
     src/connected_state_handlers/GetNameStateHandler.cpp src/connected_state_handlers/GetNameStateHandler.h
+    src/connected_state_handlers/GetNewPasswordStateHandler.cpp src/connected_state_handlers/GetNewPasswordStateHandler.h
+    src/connected_state_handlers/GetOldPasswordStateHandler.cpp src/connected_state_handlers/GetOldPasswordStateHandler.h
     src/colordef.h
     src/comm.cpp
     src/const.cpp
