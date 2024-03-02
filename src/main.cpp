@@ -7,6 +7,7 @@
 // Connected State Handlers
 #include "connected_state_handlers/GetNameStateHandler.h"
 #include "connected_state_handlers/GetOldPasswordStateHandler.h"
+#include "connected_state_handlers/ConfirmNewNameStateHandler.h"
 
 /* Needs to be global because of do_copyover */
 int port, control;
@@ -87,6 +88,7 @@ int main( int argc, char **argv )
     ConnectedStateManager csm = ConnectedStateManager(&game);
     csm.addHandler(new GetNameStateHandler(clan_manager));
     csm.addHandler(new GetOldPasswordStateHandler());
+    csm.addHandler(new ConfirmNewNameStateHandler());
     game.setConnectedStateManager(&csm);
 
     boot_db();

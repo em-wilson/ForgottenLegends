@@ -1135,15 +1135,21 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 
 	auto handler = game->getConnectedStateManager()->createHandler(d);
 	if (!handler) {
-		bug("Nanny: bad d->connected %d.", d->connected);
-		close_socket(d);
-		return;
+		// bug("Nanny: bad d->connected %d.", d->connected);
+		// close_socket(d);
+		// return;
 	} else {
 		handler->handle(d, argument);
+		return;
 	}
 
 	switch (d->connected)
 	{
+	default:
+		bug("Nanny: bad d->connected %d.", d->connected);
+		close_socket(d);
+		return;
+
 		/* RT code for breaking link */
 
 	case CON_BREAK_CONNECT:
@@ -1187,31 +1193,6 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 
 		default:
 			write_to_buffer(d, "Please type Y or N? ", 0);
-			break;
-		}
-		break;
-
-	case CON_CONFIRM_NEW_NAME:
-		switch (*argument)
-		{
-		case 'y':
-		case 'Y':
-			snprintf(buf, sizeof(buf), "New character.\n\rGive me a password for %s: %s",
-					 ch->getName(), echo_off_str);
-			write_to_buffer(d, buf, 0);
-			d->connected = CON_GET_NEW_PASSWORD;
-			break;
-
-		case 'n':
-		case 'N':
-			write_to_buffer(d, "Ok, what IS it, then? ", 0);
-			delete d->character;
-			d->character = NULL;
-			d->connected = CON_GET_NAME;
-			break;
-
-		default:
-			write_to_buffer(d, "Please type Yes or No? ", 0);
 			break;
 		}
 		break;
