@@ -319,7 +319,7 @@ void boot_db()
 	}
     }
 
-    load_clans();
+    clan_manager->load_clans();
     /*
      * Read in all the area files.
      */

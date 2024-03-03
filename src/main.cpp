@@ -6,6 +6,10 @@
 #include "Game.h"
 #include "RaceManager.h"
 
+// Clan helpers
+#include "clans/ClanReader.h"
+#include "clans/ClanWriter.h"
+
 // Connected State Handlers
 #include "connected_state_handlers/BreakConnectStateHandler.h"
 #include "connected_state_handlers/ConfirmNewNameStateHandler.h"
@@ -83,7 +87,7 @@ int main( int argc, char **argv )
          control = init_socket( port );
 
     BanManager *ban_manager = new BanManager();
-    clan_manager = new ClanManager(new ClanWriter(CLAN_DIR, CLAN_LIST));
+    clan_manager = new ClanManager(new ClanReader(), new ClanWriter(CLAN_DIR, CLAN_LIST));
     RaceManager *race_manager = new RaceManager();
     
     ConnectedStateManager csm = ConnectedStateManager(&game);

@@ -1,9 +1,17 @@
 #include <catch2/catch_test_macros.hpp>
 #include "merc.h"
 #include "clans/ClanManager.h"
+#include "clans/ClanReader.h"
 #include "clans/ClanWriter.h"
 
 using std::vector;
+
+class FakeClanReader : public IClanReader {
+    public:
+        std::list<Clan *> loadClans() {
+            return std::list<Clan *>();
+        }
+};
 
 class FakeClanWriter : public IClanWriter {
     public:
@@ -36,8 +44,9 @@ class FakeClanWriter : public IClanWriter {
 
 SCENARIO( "Clan Management" ) {
     GIVEN( "A clan exists" ) {
+        FakeClanReader *reader = new FakeClanReader();
         FakeClanWriter *writer = new FakeClanWriter();
-        ClanManager *target = new ClanManager(writer);
+        ClanManager *target = new ClanManager(reader, writer);
         Clan * first_clan = new Clan();
         first_clan->setName("bar");
         target->add_clan(first_clan);

@@ -1,6 +1,8 @@
 #include <time.h>
 #include "merc.h"
 #include "clans/ClanManager.h"
+#include "clans/ClanReader.h"
+#include "clans/ClanWriter.h"
 
 using std::unordered_map;
 using std::string;
@@ -27,7 +29,8 @@ void ClanManager::write_clan_list( )
     _writer->write_clan_list(this->get_all_clans());
 }
 
-ClanManager::ClanManager(IClanWriter *writer) {
+ClanManager::ClanManager(IClanReader *reader, IClanWriter *writer) {
+    _reader = reader;
     _writer = writer;
 }
 
@@ -119,4 +122,12 @@ Clan * ClanManager::delete_clan(Clan *clan) {
 vector<Clan *> ClanManager::get_all_clans() {
     vector<Clan *> v{ std::begin(_clan_list), std::end(_clan_list) };
     return v;
+}
+
+/*
+ * Load in all the clan files.
+ */
+void ClanManager::load_clans( )
+{
+    _clan_list = _reader->loadClans();
 }

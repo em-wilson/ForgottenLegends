@@ -28,8 +28,9 @@ set(SOURCE_FILES
     src/ConnectedStateManager.cpp src/ConnectedStateManager.h
     src/clans/Clan.cpp src/clans/Clan.h
     src/clans/ClanManager.cpp src/clans/ClanManager.h
+    src/clans/ClanReader.cpp src/clans/ClanReader.h
     src/clans/ClanWriter.cpp src/clans/ClanWriter.h
-    src/clans/IClanWriter.h
+    src/clans/IClanReader.h src/clans/IClanWriter.h
     src/clan.h
     src/connected_state_handlers/AbstractStateHandler.cpp src/connected_state_handlers/AbstractStateHandler.h
     src/connected_state_handlers/BreakConnectStateHandler.cpp src/connected_state_handlers/BreakConnectStateHandler.h

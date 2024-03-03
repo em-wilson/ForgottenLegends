@@ -1977,9 +1977,6 @@ void 	substitute_alias args( (DESCRIPTOR_DATA *d, char *input) );
 /* ban.c */
 bool	check_ban	args( ( char *site, int type) );
 
-/* clans.c */
-void    load_clans      args( ( void ) );
-
 /* comm.c */
 int     strlen_color    args( (char *argument)  );
 void	show_string	args( ( struct descriptor_data *d, char *input) );
