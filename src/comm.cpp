@@ -59,7 +59,6 @@
 #include "board.h"
 #include "Game.h"
 #include "recycle.h"
-#include "clan.h"
 #include "ConnectedState.h"
 #include "clans/ClanManager.h"
 #include "IConnectedStateHandler.h"

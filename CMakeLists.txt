@@ -31,7 +31,6 @@ set(SOURCE_FILES
     src/clans/ClanReader.cpp src/clans/ClanReader.h
     src/clans/ClanWriter.cpp src/clans/ClanWriter.h
     src/clans/IClanReader.h src/clans/IClanWriter.h
-    src/clan.h
     src/connected_state_handlers/AbstractStateHandler.cpp src/connected_state_handlers/AbstractStateHandler.h
     src/connected_state_handlers/BreakConnectStateHandler.cpp src/connected_state_handlers/BreakConnectStateHandler.h
     src/connected_state_handlers/ConfirmNewNameStateHandler.cpp src/connected_state_handlers/ConfirmNewNameStateHandler.h
@@ -42,63 +41,50 @@ set(SOURCE_FILES
     src/colordef.h
     src/comm.cpp
     src/const.cpp
-    src/db.cpp
-    src/db.h
+    src/db.cpp src/db.h
     src/db2.cpp
     src/Descriptor.h
     src/effects.cpp
     src/EquipmentListGenerator.cpp src/EquipmentListGenerator.h
+    src/enums/ConnectedState.h
     src/fight.cpp
     src/flags.cpp
     src/Game.cpp src/Game.h
     src/handler.cpp
     src/healer.cpp
-    src/interp.cpp
-    src/interp.h
-    src/lookup.cpp
-    src/lookup.h
-    src/magic.cpp
-    src/magic.h
+    src/interfaces/IConnectedStateHandler.h
+    src/interp.cpp src/interp.h
+    src/lookup.cpp src/lookup.h
+    src/magic.cpp src/magic.h
     src/magic2.cpp
     src/map.cpp
     src/mem.cpp
     src/merc.h
-    src/mob_cmds.cpp
-    src/mob_cmds.h
+    src/mob_cmds.cpp src/mob_cmds.h
     src/mob_prog.cpp
-    src/music.cpp
-    src/music.h
-    src/NonPlayerCharacter.cpp
-    src/NonPlayerCharacter.h
-    src/Note.cpp
-    src/Note.h
-    src/olc.cpp
-    src/olc.h
+    src/music.cpp src/music.h
+    src/NonPlayerCharacter.cpp src/NonPlayerCharacter.h
+    src/Note.cpp src/Note.h
+    src/olc.cpp src/olc.h
     src/olc_act.cpp
     src/olc_mpcode.cpp
     src/olc_save.cpp
-    src/pc_data.cpp
-    src/pc_data.h
-    src/PlayerCharacter.cpp
-    src/PlayerCharacter.h
+    src/pc_data.cpp src/pc_data.h
+    src/PlayerCharacter.cpp src/PlayerCharacter.h
     src/Race.cpp src/Race.h
     src/RaceManager.cpp src/RaceManager.h
-    src/recycle.cpp
-    src/recycle.h
+    src/recycle.cpp src/recycle.h
     src/save.cpp
     src/scan.cpp
     src/search.cpp
     src/skills.cpp
-    src/smclan.cpp
     src/special.cpp
     src/string.cpp
     src/StringHelper.cpp src/StringHelper.h
-    src/tables.cpp
-    src/tables.h
+    src/tables.cpp src/tables.h
     src/telnet.h
     src/update.cpp
-    src/Wiznet.cpp
-    src/Wiznet.h
+    src/Wiznet.cpp src/Wiznet.h
 )
 
 set(TEST_FILES
@@ -109,7 +95,7 @@ set(TEST_FILES
     test/StringHelper.cpp
   )
 
-include_directories(src)
+include_directories(src src/enums src/interfaces)
 add_library(librom STATIC ${SOURCE_FILES})
 add_executable(ForgottenLegends src/main.cpp)
 target_link_libraries(ForgottenLegends librom)
