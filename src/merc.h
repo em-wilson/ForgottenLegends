@@ -126,7 +126,7 @@ typedef void SPELL_FUN	args( ( int sn, int level, bool succesful_cast, Character
 #define MAX_GROUP		   35
 #define MAX_IN_GROUP		   15
 #define MAX_ALIAS		    5           // Temporary - if updating this, also update pc_data.h
-#define MAX_CLASS		   12
+#define MAX_CLASS		   12           // Temporary - if updating this, also update race.h
 #define MAX_PC_RACE		    4
 #define MAX_DAMAGE_MESSAGE	   42
 #define MAX_LEVEL		   60
@@ -332,7 +332,7 @@ struct	shop_data
  */
 
 #define MAX_GUILD 	2
-#define MAX_STATS 	5
+#define MAX_STATS 	5       // Temporary - if updating this, also update race.h
 #define STAT_STR 	0
 #define STAT_INT	1
 #define STAT_WIS	2
@@ -396,40 +396,7 @@ struct attack_type
     int   	damage;			/* damage class */
 };
 
-struct race_type
-{
-    const char *	name;			/* call name of the race */
-    bool	pc_race;		/* can be chosen by pcs */
-    long	act;			/* act bits for the race */
-    long	aff;			/* aff bits for the race */
-    long	off;			/* off bits for the race */
-    long	imm;			/* imm bits for the race */
-    long        res;			/* res bits for the race */
-    long	vuln;			/* vuln bits for the race */
-    long	form;			/* default form flag for the race */
-    long	parts;			/* default parts for the race */
-};
-
-struct pc_race_type  /* additional data for pc races */
-{
-    const char *	name;			/* MUST be in race_type */
-    char 	who_name[6];
-    sh_int	points;			/* cost in points of the race */
-    sh_int	class_mult[MAX_CLASS];	/* exp multiplier for class, * 100 */
-    const char *	skills[5];		/* bonus skills for the race */
-    sh_int 	stats[MAX_STATS];	/* starting stats */
-    sh_int	max_stats[MAX_STATS];	/* maximum stats */
-    sh_int	size;			/* aff bits for the race */
-};
-
-
-struct morph_race_type  /* additional data for pc races */
-{
-    const char *	name;
-    char 	who_name[6];
-    const char *	skills[5];
-};
-
+#include "Race.h"
 
 struct spec_type
 {

@@ -4,12 +4,14 @@
 #include "merc.h"
 #include "BanManager.h"
 #include "Game.h"
+#include "RaceManager.h"
 
 // Connected State Handlers
 #include "connected_state_handlers/BreakConnectStateHandler.h"
 #include "connected_state_handlers/ConfirmNewNameStateHandler.h"
 #include "connected_state_handlers/GetNameStateHandler.h"
 #include "connected_state_handlers/GetNewPasswordStateHandler.h"
+#include "connected_state_handlers/GetNewRaceStateHandler.h"
 #include "connected_state_handlers/GetOldPasswordStateHandler.h"
 
 
@@ -82,6 +84,7 @@ int main( int argc, char **argv )
 
     BanManager *ban_manager = new BanManager();
     clan_manager = new ClanManager(new ClanWriter(CLAN_DIR, CLAN_LIST));
+    RaceManager *race_manager = new RaceManager();
     
     ConnectedStateManager csm = ConnectedStateManager(&game);
     csm.addHandler(new BreakConnectStateHandler());
@@ -89,6 +92,7 @@ int main( int argc, char **argv )
     csm.addHandler(new GetNameStateHandler(ban_manager, clan_manager));
     csm.addHandler(new GetOldPasswordStateHandler());
     csm.addHandler(new GetNewPasswordStateHandler());
+    csm.addHandler(new GetNewRaceStateHandler(race_manager));
     game.setConnectedStateManager(&csm);
 
     boot_db();

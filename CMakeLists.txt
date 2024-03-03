@@ -36,6 +36,7 @@ set(SOURCE_FILES
     src/connected_state_handlers/ConfirmNewNameStateHandler.cpp src/connected_state_handlers/ConfirmNewNameStateHandler.h
     src/connected_state_handlers/GetNameStateHandler.cpp src/connected_state_handlers/GetNameStateHandler.h
     src/connected_state_handlers/GetNewPasswordStateHandler.cpp src/connected_state_handlers/GetNewPasswordStateHandler.h
+    src/connected_state_handlers/GetNewRaceStateHandler.cpp src/connected_state_handlers/GetNewRaceStateHandler.h
     src/connected_state_handlers/GetOldPasswordStateHandler.cpp src/connected_state_handlers/GetOldPasswordStateHandler.h
     src/colordef.h
     src/comm.cpp
@@ -45,6 +46,7 @@ set(SOURCE_FILES
     src/db2.cpp
     src/Descriptor.h
     src/effects.cpp
+    src/EquipmentListGenerator.cpp src/EquipmentListGenerator.h
     src/fight.cpp
     src/flags.cpp
     src/Game.cpp src/Game.h
@@ -78,6 +80,8 @@ set(SOURCE_FILES
     src/pc_data.h
     src/PlayerCharacter.cpp
     src/PlayerCharacter.h
+    src/Race.cpp src/Race.h
+    src/RaceManager.cpp src/RaceManager.h
     src/recycle.cpp
     src/recycle.h
     src/save.cpp
@@ -87,12 +91,14 @@ set(SOURCE_FILES
     src/smclan.cpp
     src/special.cpp
     src/string.cpp
+    src/StringHelper.cpp src/StringHelper.h
     src/tables.cpp
     src/tables.h
     src/telnet.h
     src/update.cpp
     src/Wiznet.cpp
-    src/Wiznet.h src/EquipmentListGenerator.cpp src/EquipmentListGenerator.h)
+    src/Wiznet.h
+)
 
 set(TEST_FILES
     test/main.cpp
