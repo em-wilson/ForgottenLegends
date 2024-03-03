@@ -158,14 +158,14 @@ typedef void SPELL_FUN	args( ( int sn, int level, bool succesful_cast, Character
  */
 #define CLEAR          "[0m"          /* Resets Colour        */
 #define C_RED          "[0;31m"       /* Normal Colours       */
-#define C_GREEN                "[0;32m"
+#define C_GREEN        "[0;32m"
 #define C_YELLOW       "[0;33m"
 #define C_BLUE         "[0;34m"
 #define C_MAGENTA      "[0;35m"
 #define C_CYAN         "[0;36m"
-#define C_WHITE                "[0;37m"
+#define C_WHITE        "[0;37m"
 #define C_D_GREY       "[1;30m"       /* Light Colors         */
-#define C_B_RED                "[1;31m"
+#define C_B_RED        "[1;31m"
 #define C_B_GREEN      "[1;32m"
 #define C_B_YELLOW     "[1;33m"
 #define C_B_BLUE       "[1;34m"

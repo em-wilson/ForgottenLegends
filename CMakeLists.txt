@@ -38,7 +38,6 @@ set(SOURCE_FILES
     src/connected_state_handlers/GetNewPasswordStateHandler.cpp src/connected_state_handlers/GetNewPasswordStateHandler.h
     src/connected_state_handlers/GetNewRaceStateHandler.cpp src/connected_state_handlers/GetNewRaceStateHandler.h
     src/connected_state_handlers/GetOldPasswordStateHandler.cpp src/connected_state_handlers/GetOldPasswordStateHandler.h
-    src/colordef.h
     src/comm.cpp
     src/const.cpp
     src/db.cpp src/db.h

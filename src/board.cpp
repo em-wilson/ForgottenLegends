@@ -24,7 +24,6 @@
 #include "merc.h"
 #include "board.h"
 #include "recycle.h"
-#include "colordef.h"
 #include "clans/ClanManager.h"
 #include "ConnectedState.h"
 #include "PlayerCharacter.h"
@@ -81,7 +80,7 @@ BOARD_DATA boards[MAX_BOARD] =
 };
 
 /* The prompt that the character is given after finishing a note with ~ or END */
-const char * szFinishPrompt = "(" BOLD "C" NO_COLOR ")ontinue, (" BOLD "V" NO_COLOR ")iew, (" BOLD "P" NO_COLOR ")ost or (" BOLD "F" NO_COLOR ")orget it?";
+const char * szFinishPrompt = "(C)ontinue, (V)iew, (P)ost or (F)orget it?";
 
 long last_note_stamp = 0; /* To generate unique timestamps on notes */
 
@@ -242,10 +241,10 @@ static void show_note_to_char (Character *ch, Note *note, int num)
 	output = new_buf();
 	/* Ugly colors ? */	
 	snprintf(buf, sizeof(buf),
-			 "[" BOLD "%4d" NO_COLOR "] " BOLD YELLOW "%s" NO_COLOR ": " GREEN "%s" NO_COLOR "\n\r"
-	         BOLD YELLOW "Date" NO_COLOR ":  %s\n\r"
-			 BOLD YELLOW "To" NO_COLOR ":    %s\n\r"
-	         GREEN "===========================================================================" NO_COLOR "\n\r"
+			 "[%4d] " "{Y%s{x: {g%s{x\n\r"
+	         "{YDate{x:  %s\n\r"
+			 "{YTo{x:    %s\n\r"
+	         "{r==========================================================================={x\n\r"
 	         "%s\n\r",
 	         num, note->sender, note->subject,
 	         note->date,
@@ -489,7 +488,7 @@ static void do_nwrite (Character *caller, char *argument)
 		ch->pcdata->in_progress->date = str_dup (strtime);
 	}
 
-	act (BOLD GREEN "$n starts writing a note." NO_COLOR , ch, NULL, NULL, TO_ROOM);
+	act ("{G$n starts writing a note.{x", ch, NULL, NULL, TO_ROOM);
 
 	/* Make AFK if not already */
 	if (!IS_SET(ch->comm, COMM_AFK))
@@ -501,13 +500,13 @@ static void do_nwrite (Character *caller, char *argument)
 	char_to_room( ch, get_room_index(ROOM_VNUM_NOTE));
 	
 	/* Begin writing the note ! */
-	snprintf(buf, sizeof(buf), "You are now %s a new note on the " BOLD "%s" NO_COLOR " board.\n\r"
+	snprintf(buf, sizeof(buf), "You are now %s a new note on the %s board.\n\r"
 	              "If you are using tintin, type #verbose to turn off alias expansion!\n\r\n\r",
 	               ch->pcdata->in_progress->getText().empty() ? "posting" : "continuing",
 	               ch->pcdata->board->short_name);
 	send_to_char (buf,ch);
 	
-	snprintf(buf, sizeof(buf), BOLD YELLOW "From" NO_COLOR ":    %s\n\r\n\r", ch->getName());
+	snprintf(buf, sizeof(buf), "{YFrom{x:    %s\n\r\n\r", ch->getName());
 	send_to_char (buf,ch);
 
 	if (ch->pcdata->in_progress->getText().empty()) /* Are we continuing an old note or not? */
@@ -515,23 +514,23 @@ static void do_nwrite (Character *caller, char *argument)
 		switch (ch->pcdata->board->force_type)
 		{
 		case DEF_NORMAL:
-			snprintf(buf, sizeof(buf), "If you press Return, default recipient \"" BOLD "%s" NO_COLOR "\" will be chosen.\n\r",
+			snprintf(buf, sizeof(buf), "If you press Return, default recipient \"%s\" will be chosen.\n\r",
 					  ch->pcdata->board->names);
 			break;
 		case DEF_INCLUDE:
-			snprintf(buf, sizeof(buf), "The recipient list MUST include \"" BOLD "%s" NO_COLOR "\". If not, it will be added automatically.\n\r",
+			snprintf(buf, sizeof(buf), "The recipient list MUST include \"%s\". If not, it will be added automatically.\n\r",
 						   ch->pcdata->board->names);
 			break;
 	
 		case DEF_EXCLUDE:
-			snprintf(buf, sizeof(buf), "The recipient of this note must NOT include: \"" BOLD "%s" NO_COLOR "\".",
+			snprintf(buf, sizeof(buf), "The recipient of this note must NOT include: \"%s\".",
 						   ch->pcdata->board->names);
 	
 			break;
 		}			
 		
 		send_to_char (buf,ch);
-		send_to_char ("\n\r" BOLD YELLOW "To" NO_COLOR ":      ",ch);
+		send_to_char ("\n\r{YTo{x:      ",ch);
 	
 		ch->desc->connected = ConnectedState::NoteTo;
 		/* nanny takes over from here */
@@ -539,17 +538,17 @@ static void do_nwrite (Character *caller, char *argument)
 	}
 	else /* we are continuing, print out all the fields and the note so far*/
 	{
-		snprintf(buf, sizeof(buf), BOLD YELLOW "To" NO_COLOR ":      %s\n\r"
-		              BOLD YELLOW "Expires" NO_COLOR ": %s\n\r"
-		              BOLD YELLOW "Subject" NO_COLOR ": %s\n\r", 
+		snprintf(buf, sizeof(buf), "{YTo{x: %s\n\r"
+		              "{YExpires{x: %s\n\r"
+		              "{YSubject{x: %s\n\r", 
 		               ch->pcdata->in_progress->to_list,
 		               ctime(&ch->pcdata->in_progress->expire),
 		               ch->pcdata->in_progress->subject);
 		send_to_char (buf,ch);
-		send_to_char (BOLD GREEN "Your note so far:\n\r" NO_COLOR,ch);
+		send_to_char ("{GYour note so far:{x\n\r",ch);
 		send_to_char (ch->pcdata->in_progress->getText().c_str(),ch);
 		
-		send_to_char ("\n\rEnter text. Type " BOLD "~" NO_COLOR " or " BOLD "END" NO_COLOR " on an empty line to end note.\n\r"
+		send_to_char ("\n\rEnter text. Type ~ or END on an empty line to end note.\n\r"
 		                    "=======================================================\n\r",ch);
 		
 
@@ -673,8 +672,8 @@ static void do_nlist (Character *ch, char *argument)
 				count++;
 	}
 	
-	send_to_char (BOLD "Notes on this board:" NO_COLOR "\n\r"
-	              RED "Num> Author        Subject" NO_COLOR "\n\r",ch);
+	send_to_char ("Notes on this board:\n\r"
+	              "{rNum{x> Author        Subject\n\r",ch);
 	              
 	last_note = ch->pcdata->last_note_read.at(board_number (ch->pcdata->board) );
 	
@@ -686,7 +685,7 @@ static void do_nlist (Character *ch, char *argument)
 			has_shown++; /* note that we want to see X VISIBLE note, not just last X */
 			if (!show || ((count-show) < has_shown))
 			{
-				snprintf(buf, sizeof(buf), BOLD "%3d" NO_COLOR ">" BLUE BOLD "%c" NO_COLOR YELLOW BOLD "%-13s" NO_COLOR YELLOW " %s" NO_COLOR " \n\r",
+				snprintf(buf, sizeof(buf), "%3d> {B%c{x {Y%-13s{x {y%s{x\n\r",
 				               num, 
 				               last_note < p->date_stamp ? '*' : ' ',
 				               p->sender, p->subject);
@@ -764,15 +763,15 @@ void do_board (Character *ch, char *argument)
 		int unread;
 		
 		count = 1;
-		send_to_char (BOLD RED "Num         Name Unread Description" NO_COLOR "\n\r"
-		              RED "=== ============ ====== ===========" NO_COLOR "\n\r",ch);
+		send_to_char ("{RNum         Name Unread Description{x\n\r"
+		              "{r=== ============ ====== ==========={x\n\r",ch);
 		for (i = 0; i < MAX_BOARD; i++)
 		{
 			unread = unread_notes (ch,&boards[i]); /* how many unread notes? */
 			if (unread != BOARD_NOACCESS)
 			{ 
-				snprintf(buf, sizeof(buf), BOLD "%2d" NO_COLOR "> " GREEN BOLD "%12s" NO_COLOR " [%s%4d" NO_COLOR "] " YELLOW "%s" NO_COLOR "\n\r", 
-				                   count, boards[i].short_name, unread ? RED : GREEN, 
+				snprintf(buf, sizeof(buf), "%2d> " "{Y%12s{x [%s%4d{x] " "{Y%s{x\n\r", 
+				                   count, boards[i].short_name, unread ? "{r" : "{g", 
 				                    unread, boards[i].long_name);
 				send_to_char (buf,ch);	                    
 				count++;
@@ -780,7 +779,7 @@ void do_board (Character *ch, char *argument)
 			
 		} /* for each board */
 		
-		snprintf(buf, sizeof(buf), "\n\rYou current board is " BOLD "%s" NO_COLOR ".\n\r", ch->pcdata->board->short_name);
+		snprintf(buf, sizeof(buf), "\n\rYou current board is %s.\n\r", ch->pcdata->board->short_name);
 		send_to_char (buf,ch);
 
 		/* Inform of rights */		
@@ -813,7 +812,7 @@ void do_board (Character *ch, char *argument)
 		if (count == number) /* found the board.. change to it */
 		{
 			ch->pcdata->board = &boards[i];
-			snprintf(buf, sizeof(buf), "Current board changed to " BOLD "%s" NO_COLOR ". %s.\n\r",boards[i].short_name,
+			snprintf(buf, sizeof(buf), "Current board changed to %s. %s.\n\r",boards[i].short_name,
 			              (ch->getTrust() < boards[i].write_level) 
 			              ? "You can only read here" 
 			              : "You can both read and write here");
@@ -845,7 +844,7 @@ void do_board (Character *ch, char *argument)
 	}
 	
 	ch->pcdata->board = &boards[i];
-	snprintf(buf, sizeof(buf), "Current board changed to " BOLD "%s" NO_COLOR ". %s.\n\r",boards[i].short_name,
+	snprintf(buf, sizeof(buf), "Current board changed to %s. %s.\n\r",boards[i].short_name,
 	              (ch->getTrust() < boards[i].write_level) 
 	              ? "You can only read here" 
 	              : "You can both read and write here");
@@ -936,7 +935,7 @@ void handle_ConnectedStateNoteTo (DESCRIPTOR_DATA *d, char * argument)
 			if (!buf[0]) /* empty string? */
 			{
 				ch->pcdata->in_progress->to_list = str_dup (ch->pcdata->board->names);
-				snprintf(buf, sizeof(buf), "Assumed default recipient: " BOLD "%s" NO_COLOR "\n\r", ch->pcdata->board->names);
+				snprintf(buf, sizeof(buf), "Assumed default recipient: %s\n\r", ch->pcdata->board->names);
 				send_to_char(buf, ch);
 			}
 			else
@@ -952,7 +951,7 @@ void handle_ConnectedStateNoteTo (DESCRIPTOR_DATA *d, char * argument)
 				ch->pcdata->in_progress->to_list = str_dup(buf);
 
 				snprintf(buf, sizeof(buf), "\n\rYou did not specify %s as recipient, so it was automatically added.\n\r"
-				         BOLD YELLOW "New To" NO_COLOR " :  %s\n\r",
+				         "{YNew To{x:  %s\n\r",
 						 ch->pcdata->board->names, ch->pcdata->in_progress->to_list);
 				send_to_char(buf,ch);
 			}
@@ -963,7 +962,7 @@ void handle_ConnectedStateNoteTo (DESCRIPTOR_DATA *d, char * argument)
 		case DEF_EXCLUDE: /* forced exclude */
 			if (!buf[0])
 			{
-				snprintf(buf, sizeof(buf), "You must specify a recipient.\n\r" BOLD YELLOW "To" NO_COLOR ":      ");
+				snprintf(buf, sizeof(buf), "You must specify a recipient.\n\r" "{YTo{x:      ");
 				send_to_char(buf,ch);
 				return;
 			}
@@ -971,7 +970,7 @@ void handle_ConnectedStateNoteTo (DESCRIPTOR_DATA *d, char * argument)
 			if (is_full_name (ch->pcdata->board->names, buf))
 			{
 				snprintf(buf, sizeof(buf), "You are not allowed to send notes to %s on this board. Try again.\n\r"
-				         BOLD YELLOW "To" NO_COLOR ":      ", ch->pcdata->board->names);
+				         "{YTo{x:      ", ch->pcdata->board->names);
 				send_to_char(buf,ch);
 				return; /* return from nanny, not changing to the next state! */
 			}
@@ -981,7 +980,7 @@ void handle_ConnectedStateNoteTo (DESCRIPTOR_DATA *d, char * argument)
 		
 	}		
 
-	snprintf(buf, sizeof(buf), BOLD YELLOW "\n\rSubject" NO_COLOR ": ");
+	snprintf(buf, sizeof(buf), "\n\r{YSubject{x: ");
 	send_to_char(buf,ch);
 	d->connected = ConnectedState::NoteSubject;
 }
@@ -1007,7 +1006,7 @@ void handle_ConnectedStateNoteSubject (DESCRIPTOR_DATA *d, char * argument)
 	{
 		char buf1[MSL];
 		send_to_char("Please find a meaningful subject!\n\r",ch);
-		snprintf(buf1, sizeof(buf1), BOLD YELLOW "Subject" NO_COLOR ": ");
+		snprintf(buf1, sizeof(buf1), "{YSubject{x: ");
 		send_to_char(buf1,ch);
 	}
 	else  if (strlen(buf)>60)
@@ -1021,8 +1020,8 @@ void handle_ConnectedStateNoteSubject (DESCRIPTOR_DATA *d, char * argument)
 		if (IS_IMMORTAL(ch)) /* immortals get to choose number of expire days */
 		{
 			snprintf(buf, sizeof(buf),"\n\rHow many days do you want this note to expire in?\n\r"
-			             "Press Enter for default value for this board, " BOLD "%d" NO_COLOR " days.\n\r"
-           				 BOLD YELLOW "Expire" NO_COLOR ":  ",
+			             "Press Enter for default value for this board, %d days.\n\r"
+           				 "{YExpire{x:  ",
 		                 ch->pcdata->board->purge_days);
 			send_to_char(buf,ch);
 			d->connected = ConnectedState::NoteExpire;
@@ -1033,7 +1032,7 @@ void handle_ConnectedStateNoteSubject (DESCRIPTOR_DATA *d, char * argument)
 				current_time + ch->pcdata->board->purge_days * 24L * 3600L;				
 			snprintf(buf, sizeof(buf), "This note will expire %s\r",ctime(&ch->pcdata->in_progress->expire));
 			write_to_buffer (d,buf,0);
-			snprintf(buf, sizeof(buf), "\n\rEnter text. Type " BOLD "~" NO_COLOR " or " BOLD "END" NO_COLOR " on an empty line to end note.\n\r"
+			snprintf(buf, sizeof(buf), "\n\rEnter text. Type ~ or END on an empty line to end note.\n\r"
 			                    "=======================================================\n\r");
 			send_to_char(buf,ch);
 			d->connected = ConnectedState::NoteText;
@@ -1064,7 +1063,7 @@ void handle_ConnectedStateNoteExpire(DESCRIPTOR_DATA *d, char * argument)
 		{
 			char buf1[MSL];
 			write_to_buffer (d,"Write the number of days!\n\r",0);
-			snprintf(buf1, sizeof(buf1), BOLD YELLOW "Expire" NO_COLOR ":  ");
+			snprintf(buf1, sizeof(buf1), "{YExpire{x:  ");
 			send_to_char(buf1,ch);
 			return;
 		}
@@ -1075,7 +1074,7 @@ void handle_ConnectedStateNoteExpire(DESCRIPTOR_DATA *d, char * argument)
 			{
 				char buf1[MSL];
 				write_to_buffer (d, "This is a positive MUD. Use positive numbers only! :)\n\r",0);
-				snprintf(buf1, sizeof(buf1), BOLD YELLOW "Expire" NO_COLOR ":  ");
+				snprintf(buf1, sizeof(buf1), "{YExpire{x:  ");
 				return;
 			}
 		}
@@ -1086,7 +1085,7 @@ void handle_ConnectedStateNoteExpire(DESCRIPTOR_DATA *d, char * argument)
 	
 	/* note that ctime returns XXX\n so we only need to add an \r */
 
-	snprintf(buf, sizeof(buf), "\n\rEnter text. Type " BOLD "~" NO_COLOR " or " BOLD "END" NO_COLOR " on an empty line to end note.\n\r"
+	snprintf(buf, sizeof(buf), "\n\rEnter text. Type ~ or END on an empty line to end note.\n\r"
 	                    "=======================================================\n\r");
 	send_to_char(buf,ch);
 
@@ -1183,7 +1182,7 @@ void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 			case 'v': /* view note so far */
 				if (!ch->pcdata->in_progress->getText().empty())
 				{
-					snprintf(buf, sizeof(buf), GREEN "Your note so far:" NO_COLOR "\n\r");
+					snprintf(buf, sizeof(buf), "{gYour note so far:{x\n\r");
 					send_to_char(buf,ch);
 					send_to_char(ch->pcdata->in_progress->getText().c_str(), ch);
 				}
@@ -1206,7 +1205,7 @@ void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 				char_to_room(ch, ch->getWasNoteRoom());
 
 				ch->pcdata->in_progress = NULL;
-				act (BOLD GREEN "$n finishes $s note." NO_COLOR , ch, NULL, NULL, TO_ROOM);
+				act ("{G$n finishes $s note.{x", ch, NULL, NULL, TO_ROOM);
 				break;
 				
 			case 'f':
@@ -1220,7 +1219,7 @@ void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 				/* Send them home */
 				char_from_room(ch);
 				char_to_room(ch, ch->getWasNoteRoom());
-				act (BOLD GREEN "$n decided not to finish $s note." NO_COLOR , ch, NULL, NULL, TO_ROOM);
+				act ("{G$n decided not to finish $s note.{x", ch, NULL, NULL, TO_ROOM);
 				break;
 			
 			default: /* invalid response */
