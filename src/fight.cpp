@@ -30,9 +30,10 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "clans/ClanManager.h"
 #include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
-#include "clans/ClanManager.h"
+#include "RaceManager.h"
 #include "Wiznet.h"
 
 /* command procedures needed */
@@ -75,6 +76,7 @@ void	set_fighting	args( ( Character *ch, Character *victim ) );
 void	disarm		args( ( Character *ch, Character *victim ) );
 
 extern ClanManager * clan_manager;
+extern RaceManager * race_manager;
 
 /*
  * Control the fights going on.
@@ -160,7 +162,7 @@ void check_assist(Character *ch,Character *victim)
 
 		||   (IS_NPC(rch) && rch->group && rch->group == ch->group)
 
-		||   (IS_NPC(rch) && rch->race == ch->race 
+		||   (IS_NPC(rch) && rch->getRace() == ch->getRace() 
 		   && IS_SET(rch->off_flags,ASSIST_RACE))
 
 		||   (IS_NPC(rch) && IS_SET(rch->off_flags,ASSIST_ALIGN)
@@ -2091,7 +2093,7 @@ void raw_kill( Character *victim )
     extract_char( victim, FALSE );
     while ( victim->affected )
 	affect_remove( victim, victim->affected );
-    victim->affected_by	= race_table[victim->race].aff;
+    victim->affected_by	= victim->getRace()->getAffectFlags();
     for (i = 0; i < 4; i++)
     	victim->armor[i]= 100;
     victim->position	= POS_RESTING;
@@ -3511,7 +3513,7 @@ void do_breath( Character *ch, char *argument )
     char buf[MAX_STRING_LENGTH];
     int bonus = 0;
 
-    if (ch->race != race_lookup("draconian") || ch->level < 10)
+    if (ch->getRace() != race_manager->getRaceByName("draconian") || ch->level < 10)
     {
 	send_to_char("Only adult draconians may use breath weapons.\n\r",ch);
 	return;

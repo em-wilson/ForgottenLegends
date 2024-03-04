@@ -1,0 +1,8 @@
+#RACE
+Name wolf
+IsPlayerRace 0
+Aff dark_vision
+Parts head legs heart brains guts ear eye tail fangs
+End
+
+#$

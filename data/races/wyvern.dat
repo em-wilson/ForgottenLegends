@@ -1,0 +1,10 @@
+#RACE
+Name wyvern
+IsPlayerRace 0
+Aff detect_invis detect_hidden flying
+Imm poison
+Parts head legs heart brains guts feet ear eye tail fangs scales
+Vuln light
+End
+
+#$

@@ -1,0 +1,21 @@
+#RACE
+Name dwarf
+IsPlayerRace 1
+Act npc
+Aff infrared
+Parts head arms legs heart brains guts hands feet fingers ear eye
+Vuln drowning
+End
+
+#PCRACE
+Name dwarf
+ClassMultipliers invoker 0 archer 0 druid 0 rogue 0 ranger 0 mage 150 paladin 0 illusionist 0 thief 125 warrior 100 psioniscist 0 cleric 100
+MaxStats 20 16 19 14 21
+Points 7
+Size 2
+Skills berserk
+Stats 14 12 14 10 15
+WhoName Dwarf
+End
+
+#$

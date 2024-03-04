@@ -8,6 +8,7 @@
 #include "pc_data.h"
 
 class Character;
+class Race;
 
 #define args( list )			    list
 typedef bool    SPEC_FUN	        args( ( Character *ch ) );
@@ -57,7 +58,6 @@ public:
     short int		group;
     short int		sex;
     short int		class_num;
-    short int		race;
     short int		level;
     short int		trust;
     short int		drac;
@@ -137,6 +137,8 @@ public:
     char * getName();
     void setDescription( const char * description );
     char * getDescription();
+    Race * getRace();
+    void setRace(Race * value);
 
     virtual bool isDenied();
     virtual bool isImmortal();
@@ -153,5 +155,6 @@ public:
 private:
     std::string _name;
     std::string _description;
+    Race * _race;
 };
 #endif

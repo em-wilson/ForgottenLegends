@@ -1,0 +1,8 @@
+#RACE
+Name giant
+IsPlayerRace 0
+Parts head arms legs heart brains guts hands feet fingers ear eye
+Vuln lightning mental
+End
+
+#$

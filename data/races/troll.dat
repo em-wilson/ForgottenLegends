@@ -1,0 +1,9 @@
+#RACE
+Name troll
+IsPlayerRace 0
+Aff detect_hidden infrared regeneration
+Parts head arms legs heart brains guts hands feet fingers ear eye claws fangs
+Vuln fire acid
+End
+
+#$

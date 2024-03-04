@@ -119,7 +119,7 @@ Clan * ClanReader::load_clan_file( char *clanfile )
     }
 
     if (!found) {
-		throw new ClanNotFoundInFileException();
+		throw ClanNotFoundInFileException();
     }
 
     return clan;

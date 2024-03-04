@@ -21,6 +21,7 @@
 #include <time.h>
 #include "merc.h"
 #include "NonPlayerCharacter.h"
+#include "RaceManager.h"
 
 /*
  * Globals
@@ -30,7 +31,9 @@ extern          int                     top_area;
 extern          int                     top_exit;
 extern          int                     top_ed;
 extern          int                     top_room;
-extern		int			top_mprog_index;
+extern		    int			            top_mprog_index;
+
+extern RaceManager * race_manager;
 
 AREA_DATA		*	area_free;
 EXIT_DATA		*	exit_free;
@@ -387,7 +390,7 @@ MOB_INDEX_DATA *new_mob_index( void )
     pMob->affected_by   =   0;
     pMob->alignment     =   0;
     pMob->hitroll	=   0;
-    pMob->race          =   race_lookup( "human" ); /* - Hugin */
+    pMob->race          =   race_manager->getRaceByName( "human" )->getLegacyId();
     pMob->form          =   0;           /* ROM patch -- Hugin */
     pMob->parts         =   0;           /* ROM patch -- Hugin */
     pMob->imm_flags     =   0;           /* ROM patch -- Hugin */

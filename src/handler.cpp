@@ -34,6 +34,8 @@
 #include "merc.h"
 #include "magic.h"
 #include "NonPlayerCharacter.h"
+#include "PcRace.h"
+#include "RaceManager.h"
 #include "recycle.h"
 #include "tables.h"
 
@@ -41,6 +43,7 @@
 DECLARE_DO_FUN(do_return	);
 
 
+extern RaceManager * race_manager;
 
 /*
  * Local functions.
@@ -79,7 +82,7 @@ bool is_friend(Character *ch,Character *victim)
     &&  ch->pIndexData == victim->pIndexData)
 	return TRUE;
 
-    if (IS_SET(ch->off_flags,ASSIST_RACE) && ch->race == victim->race)
+    if (IS_SET(ch->off_flags,ASSIST_RACE) && ch->getRace() == victim->getRace())
 	return TRUE;
      
     if (IS_SET(ch->off_flags,ASSIST_ALIGN)
@@ -671,12 +674,12 @@ int get_curr_stat( Character *ch, int stat )
 
     else
     {
-	max = pc_race_table[ch->race].max_stats[stat] + 4;
+	max = ch->getRace()->getPlayerRace()->getMaxStats().at(stat) + 4;
 
 	if (class_table[ch->class_num].attr_prime == stat)
 	    max += 2;
 
-	if ( ch->race == race_lookup("human"))
+	if ( ch->getRace() == race_manager->getRaceByName("human"))
 	    max += 1;
 
  	max = UMIN(max,25);
@@ -693,10 +696,10 @@ int get_max_train( Character *ch, int stat )
     if (IS_NPC(ch) || ch->level > LEVEL_IMMORTAL)
 	return 25;
 
-    max = pc_race_table[ch->race].max_stats[stat];
+    max = ch->getRace()->getPlayerRace()->getMaxStats().at(stat);
     if (class_table[ch->class_num].attr_prime == stat)
     {
-	if (ch->race == race_lookup("human"))
+	if (ch->getRace() == race_manager->getRaceByName("human"))
 	   max += 3;
 	else
 	   max += 2;

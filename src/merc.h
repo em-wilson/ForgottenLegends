@@ -508,29 +508,29 @@ struct	kill_data
  * ACT bits for mobs.
  * Used in #MOBILES.
  */
-#define ACT_IS_NPC		(A)		/* Auto set for mobs	*/
+#define ACT_IS_NPC		        (A)		/* Auto set for mobs	*/
 #define ACT_SENTINEL	    	(B)		/* Stays in one room	*/
 #define ACT_SCAVENGER	      	(C)		/* Picks up objects	*/
-#define ACT_ARCHER		(D)		/* Ranged combat	*/
-#define ACT_AGGRESSIVE		(F)    		/* Attacks PC's		*/
-#define ACT_STAY_AREA		(G)		/* Won't leave area	*/
-#define ACT_WIMPY		(H)
-#define ACT_PET			(I)		/* Auto set for pets	*/
-#define ACT_TRAIN		(J)		/* Can train PC's	*/
-#define ACT_PRACTICE		(K)		/* Can practice PC's	*/
-#define ACT_UNDEAD		(O)	
-#define ACT_CLERIC		(Q)
-#define ACT_MAGE		(R)
-#define ACT_THIEF		(S)
-#define ACT_WARRIOR		(FLAG_T)
-#define ACT_NOALIGN		(U)
-#define ACT_NOPURGE		(FLAG_V)
-#define ACT_OUTDOORS		(W)
-#define ACT_INDOORS		(Y)
-#define ACT_IS_HEALER		(aa)
-#define ACT_GAIN		(bb)
-#define ACT_UPDATE_ALWAYS	(cc)
-#define ACT_IS_CHANGER		(dd)
+#define ACT_ARCHER		        (D)		/* Ranged combat	*/
+#define ACT_AGGRESSIVE		    (F)     /* Attacks PC's		*/
+#define ACT_STAY_AREA		    (G)		/* Won't leave area	*/
+#define ACT_WIMPY		        (H)
+#define ACT_PET			        (I)		/* Auto set for pets	*/
+#define ACT_TRAIN		        (J)		/* Can train PC's	*/
+#define ACT_PRACTICE		    (K)		/* Can practice PC's	*/
+#define ACT_UNDEAD		        (O)	
+#define ACT_CLERIC		        (Q)
+#define ACT_MAGE		        (R)
+#define ACT_THIEF		        (S)
+#define ACT_WARRIOR		        (FLAG_T)
+#define ACT_NOALIGN		        (U)
+#define ACT_NOPURGE		        (FLAG_V)
+#define ACT_OUTDOORS		    (W)
+#define ACT_INDOORS		        (Y)
+#define ACT_IS_HEALER		    (aa)
+#define ACT_GAIN		        (bb)
+#define ACT_UPDATE_ALWAYS	    (cc)
+#define ACT_IS_CHANGER		    (dd)
 
 /* damage classes */
 #define DAM_NONE                0
@@ -1789,7 +1789,7 @@ do                                                              \
 				    || (IS_NPC(ch) && IS_SET(ch->act, ACT_ARCHER)))
 
 /* Werefolk macros by Blizzard */
-#define IS_BUNNY( ch )		(  ch->race == race_lookup("werefolk")	    \
+#define IS_BUNNY( ch )		(  ch->getRace() == race_manager->getRaceByName("werefolk")	    \
 				&& (ch->morph_form == morph_lookup("bunny") \
 			    || ch->morph_form == morph_lookup("werebunny")) \
 				&& IS_SET(ch->act, PLR_IS_MORPHED))
@@ -1844,8 +1844,8 @@ extern	const	struct	weapon_type	weapon_table	[];
 extern  const   struct  item_type	item_table	[];
 extern	const	struct	wiznet_type	wiznet_table	[];
 extern	const	struct	attack_type	attack_table	[];
-extern  const	struct  race_type	race_table	[];
-extern	const	struct	pc_race_type	pc_race_table	[];
+// extern  const	struct  race_type	race_table	[];
+// extern	const	struct	pc_race_type	pc_race_table	[];
 extern	const	struct	morph_race_type	morph_table	[];
 extern  const	struct	spec_type	spec_table	[];
 extern	const	struct	liq_type	liq_table	[];
@@ -1905,26 +1905,27 @@ extern		bool			MOBtrigger;
  *   so players can go ahead and telnet to all the other descriptors.
  * Then we close it whenever we need to open a file (e.g. a save file).
  */
-#define DATA_DIR	"../data/"		/* Data directory */
-#define PLAYER_DIR      "../player/"        	/* Player files */
-#define GOD_DIR         "../gods/"  		/* list of gods */
-#define TEMP_FILE	"../player/romtmp"
-#define NULL_FILE	"/dev/null"		/* To reserve one stream */
-#define NOTE_DIR	"notes/"		/* For boards */
-#define OBJLIST_DIR	"objlist/"		/* For search.o */
+#define DATA_DIR	    "../data/"		            /* Data directory */
+#define PLAYER_DIR      "../player/"        	    /* Player files */
+#define GOD_DIR         "../gods/"  		        /* list of gods */
+#define TEMP_FILE	    "../player/romtmp"
+#define NULL_FILE	    "/dev/null"		            /* To reserve one stream */
+#define NOTE_DIR	    "notes/"		            /* For boards */
+#define OBJLIST_DIR	    "objlist/"		            /* For search.o */
 
-#define AREA_LIST       "area.lst"  /* List of areas*/
-#define BUG_FILE        "../data/misc/bugs.txt" /* For 'bug' and bug()*/
-#define TYPO_FILE       "../data/misc/typos.txt" /* For 'typo'*/
-#define SHUTDOWN_FILE   "../data/misc/shutdown.txt"/* For 'shutdown'*/
-#define BAN_FILE	"../data/misc/ban.txt"
-#define CLAN_DIR        "../data/clans/"        /* Clan data dir */
-#define CLAN_LIST       "clan.lst"      /* List of clan */
-#define MUSIC_FILE	"../data/misc/music.txt"
-#define HELP_ERR	"../data/misc/help.txt" /* For bad helps */
-#define INFO_FILE	"../data/misc/info_text.txt"
-#define UPGRADE_FILE	"../data/misc/upgrade.txt" /* Keeps track of clan upgrades */
-#define ONLINE_FILE "../data/misc/online.html" /* WHO list for players online */
+#define AREA_LIST       "area.lst"                  /* List of areas*/
+#define BUG_FILE        "../data/misc/bugs.txt"     /* For 'bug' and bug()*/
+#define TYPO_FILE       "../data/misc/typos.txt"    /* For 'typo'*/
+#define SHUTDOWN_FILE   "../data/misc/shutdown.txt" /* For 'shutdown'*/
+#define BAN_FILE	    "../data/misc/ban.txt"
+#define CLAN_DIR        "../data/clans/"            /* Clan data dir */
+#define CLAN_LIST       "clan.lst"                  /* List of clan */
+#define MUSIC_FILE	    "../data/misc/music.txt"
+#define HELP_ERR	    "../data/misc/help.txt"     /* For bad helps */
+#define INFO_FILE	    "../data/misc/info_text.txt"
+#define UPGRADE_FILE	"../data/misc/upgrade.txt"  /* Keeps track of clan upgrades */
+#define ONLINE_FILE     "../data/misc/online.html"  /* WHO list for players online */
+#define RACE_DIR        "../data/races/"
 
 
 
@@ -2240,7 +2241,7 @@ char	*olc_ed_vnum	args( ( Character *ch ) );
 
 /* lookup.c */
 int	morph_lookup	args( ( const char *name) );
-int	race_lookup	args( ( const char *name) );
+// int	race_lookup	args( ( const char *name) );
 int	item_lookup	args( ( const char *name) );
 int	liq_lookup	args( ( const char *name) );
 int	nw_lookup	args( ( PlayerCharacter *ch ) );

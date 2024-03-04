@@ -39,7 +39,7 @@ Character::Character()
     this->group = 0;
     this->sex = 0;
     this->class_num = 0;
-    this->race = 0;
+    this->_race = nullptr;
     this->level = 0;
     this->trust = 0;
     this->drac = 0;
@@ -230,7 +230,7 @@ void Character::advance_level( bool hide )
         }
     }
 
-    if (this->level == 10 && (this->race == race_lookup("draconian")))
+    if (this->level == 10 && (this->getRace()->getName() == "draconian"))
     {
 /*
     if (this->alignment > 500)
@@ -306,6 +306,9 @@ void Character::gain_condition( int iCond, int value )
 int Character::getRange() {
     return 0;
 }
+
+Race * Character::getRace() { return _race; }
+void Character::setRace(Race *value) { _race = value; }
 
 bool Character::didJustDie() {
     return false;

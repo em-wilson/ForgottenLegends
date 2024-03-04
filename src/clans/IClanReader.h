@@ -7,6 +7,7 @@ class ClanNotFoundInFileException : public std::exception { };
 
 class IClanReader {
     public:
+        virtual ~IClanReader() {};
         virtual std::list<Clan *> loadClans() = 0;
 };
 

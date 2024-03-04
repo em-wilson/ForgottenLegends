@@ -41,6 +41,7 @@
 #include "ConnectedState.h"
 #include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
+#include "RaceManager.h"
 #include "Wiznet.h"
 
 /* command procedures needed */
@@ -70,6 +71,7 @@ int     close           args( ( int fd ) );
 bool    write_to_descriptor     args( ( int desc, const char *txt, int length ) );
 
 extern ClanManager * clan_manager;
+extern RaceManager * race_manager;
 
 void do_wiznet( Character *ch, char *argument )
 {
@@ -1637,7 +1639,7 @@ void do_mstat( Character *ch, char *argument )
 	"Vnum: %d  Format: %s  Race: %s  Group: %d  Sex: %s  Room: %d\n\r",
 	IS_NPC(victim) ? victim->pIndexData->vnum : 0,
 	IS_NPC(victim) ? victim->pIndexData->new_format ? "new" : "old" : "pc",
-	race_table[victim->race].name,
+	victim->getRace()->getName().c_str(),
 	IS_NPC(victim) ? victim->group : 0, sex_table[victim->sex].name,
 	victim->in_room == NULL    ?        0 : victim->in_room->vnum
 	);
@@ -3529,26 +3531,28 @@ void do_mset( Character *ch, char *argument )
 		int race;
 
 		send_to_char("Race list:\n\r", ch);
-		for ( race = 1; race_table[race].name != NULL; race++ )
-		{
-		    if (!race_table[race].pc_race)
-			break;
-		    if (race == race_lookup("werefolk"))
-			continue;
-		    snprintf(buf, sizeof(buf),"  %s\n\r", race_table[race].name);
-		    send_to_char(buf,ch);
+        for (auto race : race_manager->getAllRaces()) {
+            if (race == race_manager->getRaceByName("werefolk")) {
+                continue;
+            }
+
+            if (race->isPlayerRace()) {
+                snprintf(buf, sizeof(buf),"  %s\n\r", race->getName().c_str());
+                send_to_char(buf,ch);
+            }
 		}
 		return;
 	    }
-	    if (race_lookup(argument) == 0
-		|| race_lookup(argument) == race_lookup("werefolk"))
+
+        Race * race;
+	    if (!(race = race_manager->getRaceByName(argument)) || race == race_manager->getRaceByName("werefolk"))
 	    {
 		send_to_char("That is not a valid race.\n\r",ch);
 		return;
 	    }
 
-	    victim->orig_form = race_lookup(argument);
-	    snprintf(buf, sizeof(buf), "Your original form is now: %s.\n\r", pc_race_table[victim->orig_form].name );
+	    victim->orig_form = race->getLegacyId();
+	    snprintf(buf, sizeof(buf), "Your original form is now: %s.\n\r", race->getName().c_str() );
 	    send_to_char(buf, ch);
 	    send_to_char("Their original form has been changed.\n\r",ch);
 	    return;
@@ -3903,24 +3907,22 @@ void do_mset( Character *ch, char *argument )
 
     if (!str_prefix( arg2, "race" ) )
     {
-	int race;
+        Race * race = race_manager->getRaceByName(arg3);
 
-	race = race_lookup(arg3);
+        if (!race)
+        {
+            send_to_char("That is not a valid race.\n\r",ch);
+            return;
+        }
 
-	if ( race == 0)
-	{
-	    send_to_char("That is not a valid race.\n\r",ch);
-	    return;
-	}
+        if (!IS_NPC(victim) && !race->isPlayerRace())
+        {
+            send_to_char("That is not a valid player race.\n\r",ch);
+            return;
+        }
 
-	if (!IS_NPC(victim) && !race_table[race].pc_race)
-	{
-	    send_to_char("That is not a valid player race.\n\r",ch);
-	    return;
-	}
-
-	victim->race = race;
-	return;
+        victim->setRace(race);
+        return;
     }
    
     if (!str_prefix(arg2,"group"))

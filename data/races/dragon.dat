@@ -1,0 +1,9 @@
+#RACE
+Name dragon
+IsPlayerRace 0
+Aff infrared flying
+Parts head legs heart brains guts hands feet fingers ear eye wings tail claws fangs scales
+Vuln pierce cold
+End
+
+#$

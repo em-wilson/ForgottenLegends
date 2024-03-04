@@ -4,6 +4,9 @@
 #include "merc.h"
 #include "recycle.h"
 #include "NonPlayerCharacter.h"
+#include "RaceManager.h"
+
+extern RaceManager * race_manager;
 
 NonPlayerCharacter::NonPlayerCharacter()
 	: Character() {
@@ -89,7 +92,7 @@ NonPlayerCharacter::NonPlayerCharacter(MOB_INDEX_DATA *pMobIndex)
                 this->sex		= pMobIndex->sex;
                 if (this->sex == 3) /* random sex */
                         this->sex = number_range(1,2);
-                this->race		= pMobIndex->race;
+                this->setRace(race_manager->getRaceByLegacyId(pMobIndex->race));
                 this->form		= pMobIndex->form;
                 this->parts		= pMobIndex->parts;
                 this->size		= pMobIndex->size;
@@ -208,7 +211,7 @@ NonPlayerCharacter::NonPlayerCharacter(MOB_INDEX_DATA *pMobIndex)
                 for (i = 0; i < 3; i++)
                         this->armor[i]	= interpolate(this->level,100,-100);
                 this->armor[3]		= interpolate(this->level,100,0);
-                this->race		= pMobIndex->race;
+                this->setRace(race_manager->getRaceByLegacyId(pMobIndex->race));
                 this->off_flags		= pMobIndex->off_flags;
                 this->imm_flags		= pMobIndex->imm_flags;
                 this->res_flags		= pMobIndex->res_flags;

@@ -1,17 +1,16 @@
-#include <sys/types.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <time.h>
 #include "merc.h"
 #include "ConnectedState.h"
+#include "PcRace.h"
+#include "RaceManager.h"
 #include "tables.h"
 
 char *flag_string               args ( ( const struct flag_type *flag_table,
                                          int bits ) );
 void html_colour( char * in, char * out );
 char *fix_string args( ( const char *str ) );
+
+extern RaceManager * race_manager;
 
 void who_html_update (void)
 {
@@ -46,7 +45,7 @@ void who_html_update (void)
   {
     Character *wch;
     char const *class_name;
-    char *race;
+    string race;
     
     if ( d->connected != ConnectedState::Playing)
         continue;
@@ -73,20 +72,20 @@ void who_html_update (void)
             }
 	}
 
-	    race = str_dup(pc_race_table[wch->race].who_name);
-	    if (wch->race == race_lookup("werefolk"))
+	    race = wch->getRace()->getPlayerRace()->getWhoName();
+	    if (wch->getRace() == race_manager->getRaceByName("werefolk"))
 	    {
 		if (IS_SET(wch->act, PLR_IS_MORPHED))
 		    race = str_dup(morph_table[wch->morph_form].who_name);
 		else
-		    race = str_dup(pc_race_table[wch->orig_form].who_name);
+		    race = race_manager->getRaceByLegacyId(wch->orig_form)->getPlayerRace()->getWhoName();
 	    }
 
 	count++;
 
 	fprintf(fp, "<FONT COLOR=""#C0C0C0"">[<FONT_COLOR=""#FF0000"">");
 	fprintf(fp, "%2d ", wch->level );
-	fprintf(fp, "<FONT COLOR=""#808000"">%6s ", race );
+	fprintf(fp, "<FONT COLOR=""#808000"">%6s ", race.c_str() );
 	fprintf(fp, "<FONT COLOR=""#FFFFFF"">%s<FONT COLOR=""#C0C0C0"">] ", class_name );
 	fprintf(fp, "%s", wch->getName());
 	buf[0] = '\0';

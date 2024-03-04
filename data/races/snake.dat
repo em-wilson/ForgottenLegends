@@ -1,0 +1,8 @@
+#RACE
+Name snake
+IsPlayerRace 0
+Parts head heart brains guts eye long_tongue tail fangs scales
+Vuln cold
+End
+
+#$

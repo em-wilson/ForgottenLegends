@@ -41,6 +41,7 @@
 #include "clans/ClanWriter.h"
 #include "db.h"
 #include "EquipmentListGenerator.h"
+#include "RaceManager.h"
 #include "recycle.h"
 #include "music.h"
 #include "tables.h"
@@ -51,6 +52,7 @@
 
 extern	int	_filbuf		args( (FILE *) );
 ClanManager * clan_manager;
+RaceManager * race_manager;
 
 #if !defined(OLD_RAND)
 /* RedHat 5.x already contains this, so I'm commenting it out.
@@ -1624,7 +1626,7 @@ void clone_mobile(Character *parent, Character *clone)
     clone->group	= parent->group;
     clone->sex		= parent->sex;
     clone->class_num= parent->class_num;
-    clone->race		= parent->race;
+    clone->setRace(parent->getRace());
     clone->level	= parent->level;
     clone->trust	= 0;
     clone->timer	= parent->timer;

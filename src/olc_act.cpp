@@ -24,6 +24,7 @@
 #include "recycle.h"
 #include "lookup.h"
 #include "NonPlayerCharacter.h"
+#include "RaceManager.h"
 
 /* Return TRUE if area changed, FALSE if not. */
 #define REDIT( fun )		bool fun( Character *ch, char *argument )
@@ -33,6 +34,7 @@
 
 
 extern ClanManager * clan_manager;
+extern RaceManager * race_manager;
 struct olc_help_type
 {
     const char *command;
@@ -3694,7 +3696,7 @@ MEDIT( medit_show )
 	pMob->sex == SEX_MALE    ? "male   " :
 	pMob->sex == SEX_FEMALE  ? "female " : 
 	pMob->sex == 3           ? "random " : "neutral",
-	race_table[pMob->race].name );
+	race_manager->getRaceByLegacyId(pMob->race)->getName().c_str() );
     send_to_char( buf, ch );
 
     snprintf(buf, sizeof(buf),
@@ -4719,43 +4721,43 @@ MEDIT( medit_damdice )
 MEDIT( medit_race )
 {
     MOB_INDEX_DATA *pMob;
-    int race;
+	Race * race;
 
     if ( argument[0] != '\0'
-    && ( race = race_lookup( argument ) ) != 0 )
-    {
-	EDIT_MOB( ch, pMob );
+    && ( (race = race_manager->getRaceByName( argument ) ) ) ) {
+		EDIT_MOB( ch, pMob );
 
-	pMob->race = race;
-	pMob->act	  |= race_table[race].act;
-	pMob->affected_by |= race_table[race].aff;
-	pMob->off_flags   |= race_table[race].off;
-	pMob->imm_flags   |= race_table[race].imm;
-	pMob->res_flags   |= race_table[race].res;
-	pMob->vuln_flags  |= race_table[race].vuln;
-	pMob->form        |= race_table[race].form;
-	pMob->parts       |= race_table[race].parts;
+		pMob->race = race->getLegacyId();
+		pMob->act	  |= race->getActFlags();
+		pMob->affected_by |= race->getAffectFlags();
+		pMob->off_flags   |= race->getOffensiveFlags();
+		pMob->imm_flags   |= race->getImmunityFlags();
+		pMob->res_flags   |= race->getResistanceFlags();
+		pMob->vuln_flags  |= race->getVulnerabilityFlags();
+		pMob->form        |= race->getForm();
+		pMob->parts       |= race->getParts();
 
-	send_to_char( "Race set.\n\r", ch );
-	return TRUE;
-    }
-
-    if ( argument[0] == '?' )
-    {
-	char buf[MAX_STRING_LENGTH];
-
-	send_to_char( "Available races are:", ch );
-
-	for ( race = 0; race_table[race].name != NULL; race++ )
-	{
-	    if ( ( race % 3 ) == 0 )
-		send_to_char( "\n\r", ch );
-	    snprintf(buf, sizeof(buf), " %-15s", race_table[race].name );
-	    send_to_char( buf, ch );
+		send_to_char( "Race set.\n\r", ch );
+		return TRUE;
 	}
 
-	send_to_char( "\n\r", ch );
-	return FALSE;
+	if ( argument[0] == '?' )
+	{
+		char buf[MAX_STRING_LENGTH];
+
+		send_to_char( "Available races are:", ch );
+
+		int col = 0;
+		for ( auto race : race_manager->getAllRaces() ) {
+			if ( ( col % 3 ) == 0 )
+			send_to_char( "\n\r", ch );
+			snprintf(buf, sizeof(buf), " %-15s", race->getName().c_str() );
+			send_to_char( buf, ch );
+			col++;
+		}
+
+		send_to_char( "\n\r", ch );
+		return FALSE;
     }
 
     send_to_char( "Syntax:  race [race]\n\r"

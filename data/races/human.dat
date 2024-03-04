@@ -1,0 +1,18 @@
+#RACE
+Name human
+IsPlayerRace 1
+Act npc
+Parts head arms legs heart brains guts hands feet fingers ear eye
+End
+
+#PCRACE
+Name human
+ClassMultipliers invoker 0 archer 0 druid 0 rogue 0 ranger 0 mage 100 paladin 0 illusionist 0 thief 100 warrior 100 psioniscist 0 cleric 100
+MaxStats 22 22 22 22 22
+Points 0
+Size 2
+Stats 15 15 15 15 15
+WhoName Human
+End
+
+#$

@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "magic.h"
+#include "RaceManager.h"
 #include "recycle.h"
 #include "tables.h"
 
@@ -39,6 +40,8 @@
 DECLARE_DO_FUN(do_groups	);
 DECLARE_DO_FUN(do_help		);
 DECLARE_DO_FUN(do_say		);
+
+extern RaceManager * race_manager;
 
 
 /* used to get new skills */
@@ -1038,7 +1041,7 @@ void group_remove(Character *ch, const char *name)
 int skill_level( Character *ch, int sn )
 {
     /* First check is to see if they're a wereperson */
-    if (ch->race == race_lookup("werefolk"))
+    if (ch->getRace() == race_manager->getRaceByName("werefolk"))
     {
 	/* Bunnies first */
 	if (ch->morph_form == morph_lookup("bunny")
@@ -1113,21 +1116,21 @@ int skill_level( Character *ch, int sn )
     }
 
     /* Next check humans */
-    if (ch->race == race_lookup("human"))
+    if (ch->getRace() == race_manager->getRaceByName("human"))
     {
     }
 
     /* Draconians */
-    if (ch->race == race_lookup("draconian"))
+    if (ch->getRace() == race_manager->getRaceByName("draconian"))
     {
-	if (!str_cmp(skill_table[sn].name, "breath"))
-	{
-	    return 10;
-	}
+		if (!str_cmp(skill_table[sn].name, "breath"))
+		{
+			return 10;
+		}
     }
 
     /* Elf */
-    if (ch->race == race_lookup("elf"))
+    if (ch->getRace() == race_manager->getRaceByName("elf"))
     {
 	if (!str_cmp(skill_table[sn].name, "sneak"))
 	{
@@ -1147,27 +1150,27 @@ int skill_level( Character *ch, int sn )
     }
 
     /* Dwarf */
-    if (ch->race == race_lookup("dwarf"))
+    if (ch->getRace() == race_manager->getRaceByName("dwarf"))
     {
-	if (!str_cmp(skill_table[sn].name, "berserk"))
-	{
-	    if (IS_MAGE(ch) || IS_CLERIC(ch) || IS_THIEF(ch))
-		return 40;
-	    else
-		return skill_table[sn].skill_level[ch->class_num];
-	}
+		if (!str_cmp(skill_table[sn].name, "berserk"))
+		{
+			if (IS_MAGE(ch) || IS_CLERIC(ch) || IS_THIEF(ch))
+			return 40;
+			else
+			return skill_table[sn].skill_level[ch->class_num];
+		}
     }
 
     /* Giant */
-    if (ch->race == race_lookup("giant"))
+    if (ch->getRace() == race_manager->getRaceByName("giant"))
     {
-	if (!str_cmp(skill_table[sn].name, "bash"))
-	{
-	    if (IS_MAGE(ch) || IS_CLERIC(ch) || IS_THIEF(ch))
-		return 4;
-	    else
-		return skill_table[sn].skill_level[ch->class_num];
-	}
+		if (!str_cmp(skill_table[sn].name, "bash"))
+		{
+			if (IS_MAGE(ch) || IS_CLERIC(ch) || IS_THIEF(ch))
+			return 4;
+			else
+			return skill_table[sn].skill_level[ch->class_num];
+		}
     }
 
     /* Everything else is set to default */
@@ -1179,96 +1182,96 @@ int skill_level( Character *ch, int sn )
 int skill_rating( Character *ch, int sn )
 {
     /* First check is to see if they're a wereperson */
-    if (ch->race == race_lookup("werefolk"))
+    if (ch->getRace() == race_manager->getRaceByName("werefolk"))
     {
-	/* Bunnies first */
-	if (ch->morph_form == morph_lookup("bunny")
-	|| ch->morph_form == morph_lookup("werebunny"))
-	{
-	    /* Now lets look for bunny skills.  Start with kick */
-	    if (!str_cmp(skill_table[sn].name, "kick"))
-	    {
-		/* Mages don't get it by default, bunnies do */
-		if (IS_MAGE(ch))
-		    return 4;
-		else
-		    return skill_table[sn].rating[ch->class_num];
-	    }
+		/* Bunnies first */
+		if (ch->morph_form == morph_lookup("bunny")
+		|| ch->morph_form == morph_lookup("werebunny"))
+		{
+			/* Now lets look for bunny skills.  Start with kick */
+			if (!str_cmp(skill_table[sn].name, "kick"))
+			{
+			/* Mages don't get it by default, bunnies do */
+			if (IS_MAGE(ch))
+				return 4;
+			else
+				return skill_table[sn].rating[ch->class_num];
+			}
 
-	    /* Now we see a bite */
-	    if (!str_cmp(skill_table[sn].name, "bite"))
-	    {
-		/* Only mammal werefolk get bite, bunnies don't
-		 * hit as hard as other races, and don't fight
-		 * much, so they don't get this skill until later.
-		 * But have you ever seen a bunny bite?  NASTY!
-		 * That's why they're getting the skill here :)
-		 */
-		return 5;
-	    }
-	}
+			/* Now we see a bite */
+			if (!str_cmp(skill_table[sn].name, "bite"))
+			{
+			/* Only mammal werefolk get bite, bunnies don't
+			* hit as hard as other races, and don't fight
+			* much, so they don't get this skill until later.
+			* But have you ever seen a bunny bite?  NASTY!
+			* That's why they're getting the skill here :)
+			*/
+			return 5;
+			}
+		}
 
-	/* Now wolves */
-	if (ch->morph_form == morph_lookup("wolf")
-	|| ch->morph_form == morph_lookup("werewolf"))
-	{
-	    /* They have genetic bite! :) */
-	    if (!str_cmp(skill_table[sn].name, "bite"))
-	    {
-		return 5;
-	    }
-	}
+		/* Now wolves */
+		if (ch->morph_form == morph_lookup("wolf")
+		|| ch->morph_form == morph_lookup("werewolf"))
+		{
+			/* They have genetic bite! :) */
+			if (!str_cmp(skill_table[sn].name, "bite"))
+			{
+			return 5;
+			}
+		}
 
-	/* Now bears */
-	if (ch->morph_form == morph_lookup("bear")
-	|| ch->morph_form == morph_lookup("werebear"))
-	{
-	    /* They have genetic bite! :) */
-	    if (!str_cmp(skill_table[sn].name, "bite"))
-	    {
-		return 5;
-	    }
-	}
+		/* Now bears */
+		if (ch->morph_form == morph_lookup("bear")
+		|| ch->morph_form == morph_lookup("werebear"))
+		{
+			/* They have genetic bite! :) */
+			if (!str_cmp(skill_table[sn].name, "bite"))
+			{
+			return 5;
+			}
+		}
 
-	/* Now eagles */
-	if (ch->morph_form == morph_lookup("eagle"))
-	{
-	}
+		/* Now eagles */
+		if (ch->morph_form == morph_lookup("eagle"))
+		{
+		}
 
-	/* Now rats */
-	if (ch->morph_form == morph_lookup("rat")
-	|| ch->morph_form == morph_lookup("skaven"))
-	{
-	    /* They have genetic bite! :) */
-	    if (!str_cmp(skill_table[sn].name, "bite"))
-	    {
-		return 5;
-	    }
-	}
+		/* Now rats */
+		if (ch->morph_form == morph_lookup("rat")
+		|| ch->morph_form == morph_lookup("skaven"))
+		{
+			/* They have genetic bite! :) */
+			if (!str_cmp(skill_table[sn].name, "bite"))
+			{
+			return 5;
+			}
+		}
 
-	/* Now check for werefolk-only skills */
-	if (!str_cmp(skill_table[sn].name, "morph"))
-	{
-	    return 3;
-	}
+		/* Now check for werefolk-only skills */
+		if (!str_cmp(skill_table[sn].name, "morph"))
+		{
+			return 3;
+		}
     }
 
     /* Next check humans */
-    if (ch->race == race_lookup("human"))
+    if (ch->getRace() == race_manager->getRaceByName("human"))
     {
     }
 
     /* Draconians */
-    if (ch->race == race_lookup("draconian"))
+    if (ch->getRace() == race_manager->getRaceByName("draconian"))
     {
-	if (!str_cmp(skill_table[sn].name, "breath"))
-	{
-	    return 9;
-	}
+		if (!str_cmp(skill_table[sn].name, "breath"))
+		{
+			return 9;
+		}
     }
 
     /* Elf */
-    if (ch->race == race_lookup("elf"))
+    if (ch->getRace() == race_manager->getRaceByName("elf"))
     {
 	if (!str_cmp(skill_table[sn].name, "sneak"))
 	{
@@ -1288,7 +1291,7 @@ int skill_rating( Character *ch, int sn )
     }
 
     /* Dwarf */
-    if (ch->race == race_lookup("dwarf"))
+    if (ch->getRace() == race_manager->getRaceByName("dwarf"))
     {
 	if (!str_cmp(skill_table[sn].name, "berserk"))
 	{
@@ -1300,7 +1303,7 @@ int skill_rating( Character *ch, int sn )
     }
 
     /* Giant */
-    if (ch->race == race_lookup("giant"))
+    if (ch->getRace() == race_manager->getRaceByName("giant"))
     {
 	if (!str_cmp(skill_table[sn].name, "bash"))
 	{

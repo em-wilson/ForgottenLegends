@@ -1,0 +1,8 @@
+#RACE
+Name cat
+IsPlayerRace 0
+Aff dark_vision
+Parts head legs heart brains guts feet ear eye tail claws fangs
+End
+
+#$

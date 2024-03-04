@@ -88,21 +88,6 @@ int size_lookup (const char *name)
    return -1;
 }
 
-/* returns race number */
-int race_lookup (const char *name)
-{
-   int race;
-
-   for ( race = 0; race_table[race].name != NULL; race++)
-   {
-	if (LOWER(name[0]) == LOWER(race_table[race].name[0])
-	&&  !str_prefix( name,race_table[race].name))
-	    return race;
-   }
-
-   return 0;
-} 
-
 /* returns morph race number */
 int morph_lookup (const char *name)
 {

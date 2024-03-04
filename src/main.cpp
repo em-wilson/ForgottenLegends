@@ -5,6 +5,8 @@
 #include "BanManager.h"
 #include "Game.h"
 #include "RaceManager.h"
+#include "RaceReader.h"
+#include "RaceWriter.h"
 
 // Clan helpers
 #include "clans/ClanReader.h"
@@ -27,6 +29,7 @@ void    game_loop_unix          args( ( Game *game, int control ) );
 int     init_socket             args( ( int port ) );
 
 extern ClanManager * clan_manager;
+extern RaceManager * race_manager;
 
 
 //int     main                    args( ( int argc, char **argv ) );
@@ -86,20 +89,31 @@ int main( int argc, char **argv )
     if (!fCopyOver)
          control = init_socket( port );
 
-    BanManager *ban_manager = new BanManager();
+    BanManager ban_manager = BanManager();
     clan_manager = new ClanManager(new ClanReader(), new ClanWriter(CLAN_DIR, CLAN_LIST));
-    RaceManager *race_manager = new RaceManager();
+    race_manager = new RaceManager(new RaceReader(RACE_DIR), new RaceWriter(RACE_DIR));
+    try {
+        race_manager->loadRaces();
+    } catch (RaceNotFoundInFileException rfx) {
+        log_stringf("Error reading race from: %s", rfx.what());
+        return 1;
+    }
     
     ConnectedStateManager csm = ConnectedStateManager(&game);
     csm.addHandler(new BreakConnectStateHandler());
     csm.addHandler(new ConfirmNewNameStateHandler());
-    csm.addHandler(new GetNameStateHandler(ban_manager, clan_manager));
+    csm.addHandler(new GetNameStateHandler(&ban_manager, clan_manager));
     csm.addHandler(new GetOldPasswordStateHandler());
     csm.addHandler(new GetNewPasswordStateHandler());
     csm.addHandler(new GetNewRaceStateHandler(race_manager));
     game.setConnectedStateManager(&csm);
 
-    boot_db();
+    try {
+        boot_db();
+    } catch (std::runtime_error rte) {
+        log_stringf("Error booting database: %s", rte.what());
+        return 1;
+    }
     snprintf(log_buf, 2*MAX_INPUT_LENGTH, "ROM is ready to rock on port %d.", port );
     log_string( log_buf );
     if (fCopyOver)
@@ -111,6 +125,11 @@ int main( int argc, char **argv )
      * That's all, folks.
      */
     log_string( "Normal termination of game." );
+
+    delete clan_manager;
+    delete race_manager;
+    clan_manager = nullptr;
+    race_manager = nullptr;
     exit( 0 );
     return 0;
 }

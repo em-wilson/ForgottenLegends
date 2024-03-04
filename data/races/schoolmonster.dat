@@ -1,0 +1,10 @@
+#RACE
+Name school monster
+IsPlayerRace 0
+Act noalign
+Imm summon charm
+Parts head arms legs heart brains guts feet ear eye tail claws
+Vuln magic
+End
+
+#$

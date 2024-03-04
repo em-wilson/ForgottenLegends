@@ -27,10 +27,13 @@
 #include <time.h>
 #include "merc.h"
 #include "NonPlayerCharacter.h"
+#include "RaceManager.h"
 #include "tables.h"
 #include "olc.h"
 
 #define DIF(a,b) (~((~a)|(b)))
+
+extern RaceManager * race_manager;
 
 /*
  *  Verbose writes reset data in plain english into the comments
@@ -170,7 +173,7 @@ void save_mobprogs( FILE *fp, AREA_DATA *pArea )
  ****************************************************************************/
 void save_mobile( FILE *fp, MOB_INDEX_DATA *pMobIndex )
 {
-    sh_int race = pMobIndex->race;
+    Race * race = race_manager->getRaceByLegacyId(pMobIndex->race);
     MPROG_LIST *pMprog;
     char buf[MAX_STRING_LENGTH];
     long temp;
@@ -180,7 +183,7 @@ void save_mobile( FILE *fp, MOB_INDEX_DATA *pMobIndex )
     fprintf( fp, "%s~\n",	pMobIndex->short_descr );
     fprintf( fp, "%s~\n",	fix_string( pMobIndex->long_descr ) );
     fprintf( fp, "%s~\n",	fix_string( pMobIndex->description) );
-    fprintf( fp, "%s~\n",	race_table[race].name );
+    fprintf( fp, "%s~\n",	race->getName().c_str() );
     fprintf( fp, "%s ",		fwrite_flag( pMobIndex->act,		buf ) );
     fprintf( fp, "%s ",		fwrite_flag( pMobIndex->affected_by,	buf ) );
     fprintf( fp, "%d %d\n",	pMobIndex->alignment , pMobIndex->group);
@@ -216,28 +219,28 @@ void save_mobile( FILE *fp, MOB_INDEX_DATA *pMobIndex )
     fprintf( fp, "%s ",		size_table[pMobIndex->size].name );
     fprintf( fp, "%s\n",	IS_NULLSTR(pMobIndex->material) ? pMobIndex->material : "unknown" );
 
-    if ((temp = DIF(race_table[race].act,pMobIndex->act)))
+    if ((temp = DIF(race->getActFlags(),pMobIndex->act)))
      	fprintf( fp, "F act %s\n", fwrite_flag(temp, buf) );
 
-    if ((temp = DIF(race_table[race].aff,pMobIndex->affected_by)))
+    if ((temp = DIF(race->getAffectFlags(),pMobIndex->affected_by)))
      	fprintf( fp, "F aff %s\n", fwrite_flag(temp, buf) );
 
-    if ((temp = DIF(race_table[race].off,pMobIndex->off_flags)))
+    if ((temp = DIF(race->getOffensiveFlags(),pMobIndex->off_flags)))
      	fprintf( fp, "F off %s\n", fwrite_flag(temp, buf) );
 
-    if ((temp = DIF(race_table[race].imm,pMobIndex->imm_flags)))
+    if ((temp = DIF(race->getImmunityFlags(),pMobIndex->imm_flags)))
      	fprintf( fp, "F imm %s\n", fwrite_flag(temp, buf) );
 
-    if ((temp = DIF(race_table[race].res,pMobIndex->res_flags)))
+    if ((temp = DIF(race->getResistanceFlags(),pMobIndex->res_flags)))
      	fprintf( fp, "F res %s\n", fwrite_flag(temp, buf) );
 
-    if ((temp = DIF(race_table[race].vuln,pMobIndex->vuln_flags)))
+    if ((temp = DIF(race->getVulnerabilityFlags(),pMobIndex->vuln_flags)))
      	fprintf( fp, "F vul %s\n", fwrite_flag(temp, buf) );
 
-    if ((temp = DIF(race_table[race].form,pMobIndex->form)))
+    if ((temp = DIF(race->getForm(),pMobIndex->form)))
      	fprintf( fp, "F for %s\n", fwrite_flag(temp, buf) );
 
-    if ((temp = DIF(race_table[race].parts,pMobIndex->parts)))
+    if ((temp = DIF(race->getParts(),pMobIndex->parts)))
     	fprintf( fp, "F par %s\n", fwrite_flag(temp, buf) );
 
     for (pMprog = pMobIndex->mprogs; pMprog; pMprog = pMprog->next)

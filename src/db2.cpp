@@ -38,8 +38,10 @@
 #include "tables.h"
 #include "lookup.h"
 #include "NonPlayerCharacter.h"
+#include "RaceManager.h"
 
 extern int flag_lookup args((const char *name, const struct flag_type *flag_table));
+extern RaceManager * race_manager;
 
 /* values for db2.c */
 struct		social_type	social_table		[MAX_SOCIALS];
@@ -227,15 +229,15 @@ void load_mobiles( FILE *fp )
         pMobIndex->short_descr          = fread_string( fp );
         pMobIndex->long_descr           = fread_string( fp );
         pMobIndex->description          = fread_string( fp );
-	pMobIndex->race		 	= race_lookup(fread_string( fp ));
+		pMobIndex->race		 			= race_manager->getRaceByName(fread_string( fp ))->getLegacyId();
  
         pMobIndex->long_descr[0]        = UPPER(pMobIndex->long_descr[0]);
         pMobIndex->description[0]       = UPPER(pMobIndex->description[0]);
  
         pMobIndex->act                  = fread_flag( fp ) | ACT_IS_NPC
-					| race_table[pMobIndex->race].act;
+					| race_manager->getRaceByLegacyId(pMobIndex->race)->getActFlags();
         pMobIndex->affected_by          = fread_flag( fp )
-					| race_table[pMobIndex->race].aff;
+					| race_manager->getRaceByLegacyId(pMobIndex->race)->getAffectFlags();
         pMobIndex->pShop                = NULL;
         pMobIndex->alignment            = fread_number( fp );
         pMobIndex->group                = fread_number( fp );
@@ -273,13 +275,13 @@ void load_mobiles( FILE *fp )
 
 	/* read flags and add in data from the race table */
 	pMobIndex->off_flags		= fread_flag( fp ) 
-					| race_table[pMobIndex->race].off;
+					| race_manager->getRaceByLegacyId(pMobIndex->race)->getOffensiveFlags();
 	pMobIndex->imm_flags		= fread_flag( fp )
-					| race_table[pMobIndex->race].imm;
+					| race_manager->getRaceByLegacyId(pMobIndex->race)->getImmunityFlags();
 	pMobIndex->res_flags		= fread_flag( fp )
-					| race_table[pMobIndex->race].res;
+					| race_manager->getRaceByLegacyId(pMobIndex->race)->getResistanceFlags();
 	pMobIndex->vuln_flags		= fread_flag( fp )
-					| race_table[pMobIndex->race].vuln;
+					| race_manager->getRaceByLegacyId(pMobIndex->race)->getVulnerabilityFlags();
 
 	/* vital statistics */
 	pMobIndex->start_pos		= position_lookup(fread_word(fp));
@@ -289,9 +291,9 @@ void load_mobiles( FILE *fp )
 	pMobIndex->wealth		= fread_number( fp );
 
 	pMobIndex->form			= fread_flag( fp )
-					| race_table[pMobIndex->race].form;
+					| race_manager->getRaceByLegacyId(pMobIndex->race)->getForm();
 	pMobIndex->parts		= fread_flag( fp )
-					| race_table[pMobIndex->race].parts;
+					| race_manager->getRaceByLegacyId(pMobIndex->race)->getParts();
 	/* size */
 	CHECK_POS( pMobIndex->size, size_lookup(fread_word(fp)), "size" );
 /*	pMobIndex->size			= size_lookup(fread_word(fp)); */

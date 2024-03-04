@@ -1,0 +1,21 @@
+#RACE
+Name elf
+IsPlayerRace 1
+Act npc
+Aff infrared
+Parts head arms legs heart brains guts hands feet fingers ear eye
+Vuln iron
+End
+
+#PCRACE
+Name elf
+ClassMultipliers invoker 0 archer 0 druid 0 rogue 0 ranger 0 mage 100 paladin 0 illusionist 0 thief 100 warrior 120 psioniscist 0 cleric 125
+MaxStats 16 20 18 21 15
+Points 5
+Size 1
+Skills sneak hide
+Stats 12 14 13 15 11
+WhoName Elf
+End
+
+#$

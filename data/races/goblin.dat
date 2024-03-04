@@ -1,0 +1,9 @@
+#RACE
+Name goblin
+IsPlayerRace 0
+Aff infrared
+Parts head arms legs heart brains guts hands feet fingers ear eye
+Vuln magic
+End
+
+#$

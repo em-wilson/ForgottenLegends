@@ -11,31 +11,33 @@
 #define MAX_STATS 	        5       // Temporary - if updating this, also update race.h
 #endif
 
-struct race_type
-{
-    const char *	name;			/* call name of the race */
-    bool	pc_race;		/* can be chosen by pcs */
-    long	act;			/* act bits for the race */
-    long	aff;			/* aff bits for the race */
-    long	off;			/* off bits for the race */
-    long	imm;			/* imm bits for the race */
-    long        res;			/* res bits for the race */
-    long	vuln;			/* vuln bits for the race */
-    long	form;			/* default form flag for the race */
-    long	parts;			/* default parts for the race */
-};
+class PcRace;
 
-struct pc_race_type  /* additional data for pc races */
-{
-    const char *	name;			/* MUST be in race_type */
-    char 	who_name[6];
-    short int	points;			/* cost in points of the race */
-    short int	class_mult[MAX_CLASS];	/* exp multiplier for class, * 100 */
-    const char *	skills[5];		/* bonus skills for the race */
-    short int 	stats[MAX_STATS];	/* starting stats */
-    short int	max_stats[MAX_STATS];	/* maximum stats */
-    short int	size;			/* aff bits for the race */
-};
+// struct race_type
+// {
+//     const char *	name;			/* call name of the race */
+//     bool	pc_race;		/* can be chosen by pcs */
+//     long	act;			/* act bits for the race */
+//     long	aff;			/* aff bits for the race */
+//     long	off;			/* off bits for the race */
+//     long	imm;			/* imm bits for the race */
+//     long        res;			/* res bits for the race */
+//     long	vuln;			/* vuln bits for the race */
+//     long	form;			/* default form flag for the race */
+//     long	parts;			/* default parts for the race */
+// };
+
+// struct pc_race_type  /* additional data for pc races */
+// {
+//     const char *	name;			/* MUST be in race_type */
+//     char 	who_name[6];
+//     short int	points;			/* cost in points of the race */
+//     short int	class_mult[MAX_CLASS];	/* exp multiplier for class, * 100 */
+//     const char *	skills[5];		/* bonus skills for the race */
+//     short int 	stats[MAX_STATS];	/* starting stats */
+//     short int	max_stats[MAX_STATS];	/* maximum stats */
+//     short int	size;			/* aff bits for the race */
+// };
 
 
 struct morph_race_type  /* additional data for pc races */
@@ -49,6 +51,11 @@ class Race {
     public:
         Race();
         virtual ~Race();
+
+        bool hasPart(long flag);
+
+        long getActFlags();
+        void setActFlags(long value);
 
         long getAffectFlags();
         void setAffectFlags(long value);
@@ -65,28 +72,35 @@ class Race {
         std::string getName();
         void setName(std::string arugment);
 
+
+        long getOffensiveFlags();
+        void setOffensiveFlags(long arugment);
+
         long getParts();
         void setParts(long value);
-
-        bool isPlayerRace();
-        void setPlayerRace(bool value);
 
         long getResistanceFlags();
         void setResistanceFlags(long value);
 
         long getVulnerabilityFlags();
         void setVulnerabilityFlags(long value);
+
+        PcRace * getPlayerRace();
+        bool isPlayerRace();
+        void setPlayerRace(PcRace *value);
     
     private:
+        long _actFlags;
         long _parts;
         long _form;
         long _affectFlags;
         long _immunityFlags;
+        long _offensiveFlags;
         long _resistanceFlags;
         long _vulnerabilityFlags;
         short int _legacyId;
-        bool _isPlayerRace;
         std::string _name;
+        PcRace * _pcRace;
 };
 
 extern	const	struct	pc_race_type	pc_race_table	[];

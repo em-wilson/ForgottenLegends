@@ -1,0 +1,8 @@
+#RACE
+Name lizard
+IsPlayerRace 0
+Parts head legs heart brains guts feet eye tail fangs
+Vuln cold
+End
+
+#$

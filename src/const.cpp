@@ -166,268 +166,268 @@ const 	struct attack_type	attack_table	[MAX_DAMAGE_MESSAGE]	=
     {   NULL,		NULL,		0		}
 };
 
-/* race table */
-const 	struct	race_type	race_table	[]		=
-{
-/*
-    {
-	name,		pc_race?,
-	act bits,	aff_by bits,	off bits,
-	imm,		res,		vuln,
-	form,		parts
-    },
-*/
-    { "unique",		FALSE, 0, 0, 0, 0, 0, 0, 0, 0 },
+// /* race table */
+// const 	struct	race_type	race_table	[]		=
+// {
+// /*
+//     {
+// 	name,		pc_race?,
+// 	act bits,	aff_by bits,	off bits,
+// 	imm,		res,		vuln,
+// 	form,		parts
+//     },
+// */
+//     { "unique",		FALSE, 0, 0, 0, 0, 0, 0, 0, 0 },
 
-    {
-	"human",		TRUE,
-	0,		0, 		0,
-	0, 		0,		0,
-	A|H|M|FLAG_V,	A|B|C|D|E|F|G|H|I|J|K
-    },
+//     {
+// 	"human",		TRUE,
+// 	0,		0, 		0,
+// 	0, 		0,		0,
+// 	A|H|M|FLAG_V,	A|B|C|D|E|F|G|H|I|J|K
+//     },
 
-    {
-	"elf",			TRUE,
-	0,		AFF_INFRARED,	0,
-	0,		RES_CHARM,	VULN_IRON,
-	A|H|M|FLAG_V,	A|B|C|D|E|F|G|H|I|J|K
-    },
+//     {
+// 	"elf",			TRUE,
+// 	0,		AFF_INFRARED,	0,
+// 	0,		RES_CHARM,	VULN_IRON,
+// 	A|H|M|FLAG_V,	A|B|C|D|E|F|G|H|I|J|K
+//     },
 
-    {
-	"dwarf",		TRUE,
-	0,		AFF_INFRARED,	0,
-	0,		RES_POISON|RES_DISEASE, VULN_DROWNING,
-	A|H|M|FLAG_V,	A|B|C|D|E|F|G|H|I|J|K
-    },
+//     {
+// 	"dwarf",		TRUE,
+// 	0,		AFF_INFRARED,	0,
+// 	0,		RES_POISON|RES_DISEASE, VULN_DROWNING,
+// 	A|H|M|FLAG_V,	A|B|C|D|E|F|G|H|I|J|K
+//     },
 
-    {
-	"bat",			FALSE,
-	0,		AFF_FLYING|AFF_DARK_VISION,	OFF_DODGE|OFF_FAST,
-	0,		0,		VULN_LIGHT,
-	A|G|FLAG_V,		A|C|D|E|F|H|J|K|P
-    },
+//     {
+// 	"bat",			FALSE,
+// 	0,		AFF_FLYING|AFF_DARK_VISION,	OFF_DODGE|OFF_FAST,
+// 	0,		0,		VULN_LIGHT,
+// 	A|G|FLAG_V,		A|C|D|E|F|H|J|K|P
+//     },
 
-    {
-	"bear",			FALSE,
-	0,		0,		OFF_CRUSH|OFF_DISARM|OFF_BERSERK,
-	0,		RES_BASH|RES_COLD,	0,
-	A|G|FLAG_V,		A|B|C|D|E|F|H|J|K|U|FLAG_V
-    },
+//     {
+// 	"bear",			FALSE,
+// 	0,		0,		OFF_CRUSH|OFF_DISARM|OFF_BERSERK,
+// 	0,		RES_BASH|RES_COLD,	0,
+// 	A|G|FLAG_V,		A|B|C|D|E|F|H|J|K|U|FLAG_V
+//     },
 
-    {
-	"cat",			FALSE,
-	0,		AFF_DARK_VISION,	OFF_FAST|OFF_DODGE,
-	0,		0,		0,
-	A|G|FLAG_V,		A|C|D|E|F|H|J|K|Q|U|FLAG_V
-    },
+//     {
+// 	"cat",			FALSE,
+// 	0,		AFF_DARK_VISION,	OFF_FAST|OFF_DODGE,
+// 	0,		0,		0,
+// 	A|G|FLAG_V,		A|C|D|E|F|H|J|K|Q|U|FLAG_V
+//     },
 
-    {
-	"centipede",		FALSE,
-	0,		AFF_DARK_VISION,	0,
-	0,		RES_PIERCE|RES_COLD,	VULN_BASH,
-	A|B|G|O,		A|C|K
-    },
+//     {
+// 	"centipede",		FALSE,
+// 	0,		AFF_DARK_VISION,	0,
+// 	0,		RES_PIERCE|RES_COLD,	VULN_BASH,
+// 	A|B|G|O,		A|C|K
+//     },
 
-    {
-	"dog",			FALSE,
-	0,		0,		OFF_FAST,
-	0,		0,		0,
-	A|G|FLAG_V,		A|C|D|E|F|H|J|K|U|FLAG_V
-    },
+//     {
+// 	"dog",			FALSE,
+// 	0,		0,		OFF_FAST,
+// 	0,		0,		0,
+// 	A|G|FLAG_V,		A|C|D|E|F|H|J|K|U|FLAG_V
+//     },
 
-    {
-	"doll",			FALSE,
-	0,		0,		0,
-	IMM_COLD|IMM_POISON|IMM_HOLY|IMM_NEGATIVE|IMM_MENTAL|IMM_DISEASE
-	|IMM_DROWNING,	RES_BASH|RES_LIGHT,
-	VULN_SLASH|VULN_FIRE|VULN_ACID|VULN_LIGHTNING|VULN_ENERGY,
-	E|J|M|cc,	A|B|C|G|H|K
-    },
+//     {
+// 	"doll",			FALSE,
+// 	0,		0,		0,
+// 	IMM_COLD|IMM_POISON|IMM_HOLY|IMM_NEGATIVE|IMM_MENTAL|IMM_DISEASE
+// 	|IMM_DROWNING,	RES_BASH|RES_LIGHT,
+// 	VULN_SLASH|VULN_FIRE|VULN_ACID|VULN_LIGHTNING|VULN_ENERGY,
+// 	E|J|M|cc,	A|B|C|G|H|K
+//     },
 
-    {
-        "draconian",            FALSE,
-        0,              AFF_FLYING,           0,
-        IMM_POISON|IMM_DISEASE, RES_COLD,
-        VULN_SLASH|VULN_PIERCE|VULN_LIGHTNING|RES_FIRE,
-        A|H|M|FLAG_V,        A|B|C|D|E|F|G|H|I|J|K|P|Q
-    },
+//     {
+//         "draconian",            FALSE,
+//         0,              AFF_FLYING,           0,
+//         IMM_POISON|IMM_DISEASE, RES_COLD,
+//         VULN_SLASH|VULN_PIERCE|VULN_LIGHTNING|RES_FIRE,
+//         A|H|M|FLAG_V,        A|B|C|D|E|F|G|H|I|J|K|P|Q
+//     },
 
-    { 	"dragon", 		FALSE,
-	0, 			AFF_INFRARED|AFF_FLYING,	0,
-	0,			RES_FIRE|RES_BASH|RES_CHARM,
-	VULN_PIERCE|VULN_COLD,
-	A|H|Z,		A|C|D|E|F|G|H|I|J|K|P|Q|U|FLAG_V|X
-    },
+//     { 	"dragon", 		FALSE,
+// 	0, 			AFF_INFRARED|AFF_FLYING,	0,
+// 	0,			RES_FIRE|RES_BASH|RES_CHARM,
+// 	VULN_PIERCE|VULN_COLD,
+// 	A|H|Z,		A|C|D|E|F|G|H|I|J|K|P|Q|U|FLAG_V|X
+//     },
 
-    {
-        "duergar",              FALSE,
-        0,              AFF_INFRARED,   0,
-        0,              RES_MAGIC|RES_POISON|RES_DISEASE, VULN_DROWNING,
-        A|H|M|FLAG_V,        A|B|C|D|E|F|G|H|I|J|K
-    },
+//     {
+//         "duergar",              FALSE,
+//         0,              AFF_INFRARED,   0,
+//         0,              RES_MAGIC|RES_POISON|RES_DISEASE, VULN_DROWNING,
+//         A|H|M|FLAG_V,        A|B|C|D|E|F|G|H|I|J|K
+//     },
 
-    {
-	"fido",			FALSE,
-	0,		0,		OFF_DODGE|ASSIST_RACE,
-	0,		0,			VULN_MAGIC,
-	A|B|G|FLAG_V,	A|C|D|E|F|H|J|K|Q|FLAG_V
-    },
+//     {
+// 	"fido",			FALSE,
+// 	0,		0,		OFF_DODGE|ASSIST_RACE,
+// 	0,		0,			VULN_MAGIC,
+// 	A|B|G|FLAG_V,	A|C|D|E|F|H|J|K|Q|FLAG_V
+//     },
 
-    {
-	"fox",			FALSE,
-	0,		AFF_DARK_VISION,	OFF_FAST|OFF_DODGE,
-	0,		0,		0,
-	A|G|FLAG_V,		A|C|D|E|F|H|J|K|Q|FLAG_V
-    },
+//     {
+// 	"fox",			FALSE,
+// 	0,		AFF_DARK_VISION,	OFF_FAST|OFF_DODGE,
+// 	0,		0,		0,
+// 	A|G|FLAG_V,		A|C|D|E|F|H|J|K|Q|FLAG_V
+//     },
 
-    {
-        "giant",        FALSE,
-        0,      0,      0,
-        0,      RES_FIRE|RES_COLD,  VULN_MENTAL|VULN_LIGHTNING,
-        A|H|M|FLAG_V,    A|B|C|D|E|F|G|H|I|J|K
-    },
+//     {
+//         "giant",        FALSE,
+//         0,      0,      0,
+//         0,      RES_FIRE|RES_COLD,  VULN_MENTAL|VULN_LIGHTNING,
+//         A|H|M|FLAG_V,    A|B|C|D|E|F|G|H|I|J|K
+//     },
 
-    {
-       "gnome",                FALSE,
-        0,              AFF_INFRARED,   0,
-        0,              RES_POISON,     VULN_BASH,
-        A|H|M|FLAG_V,        A|B|C|D|E|F|G|H|I|J|K
-    },
+//     {
+//        "gnome",                FALSE,
+//         0,              AFF_INFRARED,   0,
+//         0,              RES_POISON,     VULN_BASH,
+//         A|H|M|FLAG_V,        A|B|C|D|E|F|G|H|I|J|K
+//     },
 
-    {
-	"goblin",		FALSE,
-	0,		AFF_INFRARED,	0,
-	0,		RES_DISEASE,	VULN_MAGIC,
-	A|H|M|FLAG_V,	A|B|C|D|E|F|G|H|I|J|K
-    },
+//     {
+// 	"goblin",		FALSE,
+// 	0,		AFF_INFRARED,	0,
+// 	0,		RES_DISEASE,	VULN_MAGIC,
+// 	A|H|M|FLAG_V,	A|B|C|D|E|F|G|H|I|J|K
+//     },
 
-    {
-	"hobgoblin",		FALSE,
-	0,		AFF_INFRARED,	0,
-	0,		RES_DISEASE|RES_POISON,	0,
-	A|H|M|FLAG_V,        A|B|C|D|E|F|G|H|I|J|K|Y
-    },
+//     {
+// 	"hobgoblin",		FALSE,
+// 	0,		AFF_INFRARED,	0,
+// 	0,		RES_DISEASE|RES_POISON,	0,
+// 	A|H|M|FLAG_V,        A|B|C|D|E|F|G|H|I|J|K|Y
+//     },
 
-    {
-	"kobold",		FALSE,
-	0,		AFF_INFRARED,	0,
-	0,		RES_POISON,	VULN_MAGIC,
-	A|B|H|M|FLAG_V,	A|B|C|D|E|F|G|H|I|J|K|Q
-    },
+//     {
+// 	"kobold",		FALSE,
+// 	0,		AFF_INFRARED,	0,
+// 	0,		RES_POISON,	VULN_MAGIC,
+// 	A|B|H|M|FLAG_V,	A|B|C|D|E|F|G|H|I|J|K|Q
+//     },
 
-    {
-	"lizard",		FALSE,
-	0,		0,		0,
-	0,		RES_POISON,	VULN_COLD,
-	A|G|X|cc,	A|C|D|E|F|H|K|Q|FLAG_V
-    },
+//     {
+// 	"lizard",		FALSE,
+// 	0,		0,		0,
+// 	0,		RES_POISON,	VULN_COLD,
+// 	A|G|X|cc,	A|C|D|E|F|H|K|Q|FLAG_V
+//     },
 
-    {
-	"modron",		FALSE,
-	0,		AFF_INFRARED,		ASSIST_RACE|ASSIST_ALIGN,
-	IMM_CHARM|IMM_DISEASE|IMM_MENTAL|IMM_HOLY|IMM_NEGATIVE,
-			RES_FIRE|RES_COLD|RES_ACID,	0,
-	H,		A|B|C|G|H|J|K
-    },
+//     {
+// 	"modron",		FALSE,
+// 	0,		AFF_INFRARED,		ASSIST_RACE|ASSIST_ALIGN,
+// 	IMM_CHARM|IMM_DISEASE|IMM_MENTAL|IMM_HOLY|IMM_NEGATIVE,
+// 			RES_FIRE|RES_COLD|RES_ACID,	0,
+// 	H,		A|B|C|G|H|J|K
+//     },
 
-    {
-	"orc",			FALSE,
-	0,		AFF_INFRARED,	0,
-	0,		RES_DISEASE,	VULN_LIGHT,
-	A|H|M|FLAG_V,	A|B|C|D|E|F|G|H|I|J|K
-    },
+//     {
+// 	"orc",			FALSE,
+// 	0,		AFF_INFRARED,	0,
+// 	0,		RES_DISEASE,	VULN_LIGHT,
+// 	A|H|M|FLAG_V,	A|B|C|D|E|F|G|H|I|J|K
+//     },
 
-    {
-	"pig",			FALSE,
-	0,		0,		0,
-	0,		0,		0,
-	A|G|FLAG_V,	 	A|C|D|E|F|H|J|K
-    },
+//     {
+// 	"pig",			FALSE,
+// 	0,		0,		0,
+// 	0,		0,		0,
+// 	A|G|FLAG_V,	 	A|C|D|E|F|H|J|K
+//     },
 
-    {
-	"rabbit",		FALSE,
-	0,		0,		OFF_DODGE|OFF_FAST,
-	0,		0,		0,
-	A|G|FLAG_V,		A|C|D|E|F|H|J|K
-    },
+//     {
+// 	"rabbit",		FALSE,
+// 	0,		0,		OFF_DODGE|OFF_FAST,
+// 	0,		0,		0,
+// 	A|G|FLAG_V,		A|C|D|E|F|H|J|K
+//     },
 
-    {
-	"school monster",	FALSE,
-	ACT_NOALIGN,		0,		0,
-	IMM_CHARM|IMM_SUMMON,	0,		VULN_MAGIC,
-	A|M|FLAG_V,		A|B|C|D|E|F|H|J|K|Q|U
-    },
+//     {
+// 	"school monster",	FALSE,
+// 	ACT_NOALIGN,		0,		0,
+// 	IMM_CHARM|IMM_SUMMON,	0,		VULN_MAGIC,
+// 	A|M|FLAG_V,		A|B|C|D|E|F|H|J|K|Q|U
+//     },
 
-    {
-	"snake",		FALSE,
-	0,		0,		0,
-	0,		RES_POISON,	VULN_COLD,
-	A|G|X|Y|cc,	A|D|E|F|K|L|Q|FLAG_V|X
-    },
+//     {
+// 	"snake",		FALSE,
+// 	0,		0,		0,
+// 	0,		RES_POISON,	VULN_COLD,
+// 	A|G|X|Y|cc,	A|D|E|F|K|L|Q|FLAG_V|X
+//     },
 
-    {
-	"song bird",		FALSE,
-	0,		AFF_FLYING,		OFF_FAST|OFF_DODGE,
-	0,		0,		0,
-	A|G|W,		A|C|D|E|F|H|K|P
-    },
+//     {
+// 	"song bird",		FALSE,
+// 	0,		AFF_FLYING,		OFF_FAST|OFF_DODGE,
+// 	0,		0,		0,
+// 	A|G|W,		A|C|D|E|F|H|K|P
+//     },
 
-    {
-        "svirfnebli",           FALSE,
-        0,              AFF_INFRARED,   0,
-        0,              RES_MAGIC|RES_POISON|RES_DISEASE, VULN_BASH,
-        A|H|M|FLAG_V,        A|B|C|D|E|F|G|H|I|J|K
-    },
+//     {
+//         "svirfnebli",           FALSE,
+//         0,              AFF_INFRARED,   0,
+//         0,              RES_MAGIC|RES_POISON|RES_DISEASE, VULN_BASH,
+//         A|H|M|FLAG_V,        A|B|C|D|E|F|G|H|I|J|K
+//     },
 
-    {
-	"troll",		FALSE,
-	0,		AFF_REGENERATION|AFF_INFRARED|AFF_DETECT_HIDDEN,
-	OFF_BERSERK,
-	0,	RES_CHARM|RES_BASH,	VULN_FIRE|VULN_ACID,
-	A|B|H|M|FLAG_V,		A|B|C|D|E|F|G|H|I|J|K|U|FLAG_V
-    },
+//     {
+// 	"troll",		FALSE,
+// 	0,		AFF_REGENERATION|AFF_INFRARED|AFF_DETECT_HIDDEN,
+// 	OFF_BERSERK,
+// 	0,	RES_CHARM|RES_BASH,	VULN_FIRE|VULN_ACID,
+// 	A|B|H|M|FLAG_V,		A|B|C|D|E|F|G|H|I|J|K|U|FLAG_V
+//     },
 
-    {
-	"water fowl",		FALSE,
-	0,		AFF_SWIM|AFF_FLYING,	0,
-	0,		RES_DROWNING,		0,
-	A|G|W,		A|C|D|E|F|H|K|P
-    },
+//     {
+// 	"water fowl",		FALSE,
+// 	0,		AFF_SWIM|AFF_FLYING,	0,
+// 	0,		RES_DROWNING,		0,
+// 	A|G|W,		A|C|D|E|F|H|K|P
+//     },
 
-    {
-    "werefolk",     FALSE,
-    0,      0,      0,
-    0,      0,      0,
-    A|H|M|FLAG_V,    A|B|C|D|E|F|G|H|I|J|K
-    },
+//     {
+//     "werefolk",     FALSE,
+//     0,      0,      0,
+//     0,      0,      0,
+//     A|H|M|FLAG_V,    A|B|C|D|E|F|G|H|I|J|K
+//     },
 
-    {
-	"wolf",			FALSE,
-	0,		AFF_DARK_VISION,	OFF_FAST|OFF_DODGE,
-	0,		0,		0,
-	A|G|FLAG_V,		A|C|D|E|F|J|K|Q|FLAG_V
-    },
+//     {
+// 	"wolf",			FALSE,
+// 	0,		AFF_DARK_VISION,	OFF_FAST|OFF_DODGE,
+// 	0,		0,		0,
+// 	A|G|FLAG_V,		A|C|D|E|F|J|K|Q|FLAG_V
+//     },
 
-    {
-	"wyvern",		FALSE,
-	0,		AFF_FLYING|AFF_DETECT_INVIS|AFF_DETECT_HIDDEN,
-	OFF_BASH|OFF_FAST|OFF_DODGE,
-	IMM_POISON,	0,	VULN_LIGHT,
-	A|B|G|Z,		A|C|D|E|F|H|J|K|Q|FLAG_V|X
-    },
+//     {
+// 	"wyvern",		FALSE,
+// 	0,		AFF_FLYING|AFF_DETECT_INVIS|AFF_DETECT_HIDDEN,
+// 	OFF_BASH|OFF_FAST|OFF_DODGE,
+// 	IMM_POISON,	0,	VULN_LIGHT,
+// 	A|B|G|Z,		A|C|D|E|F|H|J|K|Q|FLAG_V|X
+//     },
 
-    {
-	"unique",		FALSE,
-	0,		0,		0,
-	0,		0,		0,
-	0,		0
-    },
+//     {
+// 	"unique",		FALSE,
+// 	0,		0,		0,
+// 	0,		0,		0,
+// 	0,		0
+//     },
 
 
-    {
-	NULL, 0, 0, 0, 0, 0, 0
-    }
-};
+//     {
+// 	NULL, 0, 0, 0, 0, 0, 0
+//     }
+// };
 
 const	struct	morph_race_type	morph_table	[]	=
 {
@@ -489,36 +489,36 @@ const	struct	morph_race_type	morph_table	[]	=
 	{ "" }
     }
 };
-const	struct	pc_race_type	pc_race_table	[]	=
-{
-    { "null race", "", 0, { 100, 100, 100, 100 },
-      { "" }, { 13, 13, 13, 13, 13 }, { 18, 18, 18, 18, 18 }, 0 },
+// const	struct	pc_race_type	pc_race_table	[]	=
+// {
+//     { "null race", "", 0, { 100, 100, 100, 100 },
+//       { "" }, { 13, 13, 13, 13, 13 }, { 18, 18, 18, 18, 18 }, 0 },
 
-/*
-    {
-	"race name", 	short name, 	points,	{ class multipliers },
-	{ bonus skills },
-	{ base stats },		{ max stats },		size
-    },
-*/
-    {
-	"human",	"Human",	0,	{ 100, 100, 100, 100 },
-	{ "" },
-	{ 15, 15, 15, 15, 15 },	{ 22, 22, 22, 22, 22 }, SIZE_MEDIUM
-    },
+// /*
+//     {
+// 	"race name", 	short name, 	points,	{ class multipliers },
+// 	{ bonus skills },
+// 	{ base stats },		{ max stats },		size
+//     },
+// */
+//     {
+// 	"human",	"Human",	0,	{ 100, 100, 100, 100 },
+// 	{ "" },
+// 	{ 15, 15, 15, 15, 15 },	{ 22, 22, 22, 22, 22 }, SIZE_MEDIUM
+//     },
 
-    {
-	"elf",		" Elf ",	5,	{ 100, 125,  100, 120 },
-	{ "sneak", "hide" },
-	{ 12, 14, 13, 15, 11 },	{ 16, 20, 18, 21, 15 }, SIZE_SMALL
-    },
+//     {
+// 	"elf",		" Elf ",	5,	{ 100, 125,  100, 120 },
+// 	{ "sneak", "hide" },
+// 	{ 12, 14, 13, 15, 11 },	{ 16, 20, 18, 21, 15 }, SIZE_SMALL
+//     },
 
-    {
-	"dwarf",	"Dwarf",	7,	{ 150, 100, 125, 100 },
-	{ "berserk" },
-	{ 14, 12, 14, 10, 15 },	{ 20, 16, 19, 14, 21 }, SIZE_MEDIUM
-    }
-};
+//     {
+// 	"dwarf",	"Dwarf",	7,	{ 150, 100, 125, 100 },
+// 	{ "berserk" },
+// 	{ 14, 12, 14, 10, 15 },	{ 20, 16, 19, 14, 21 }, SIZE_MEDIUM
+//     }
+// };
 
 
 

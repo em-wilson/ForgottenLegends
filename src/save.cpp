@@ -32,10 +32,14 @@
 #include "board.h"
 #include "recycle.h"
 #include "clans/ClanManager.h"
-#include "PlayerCharacter.h"
 #include "NonPlayerCharacter.h"
+#include "PcRace.h"
+#include "PlayerCharacter.h"
+#include "RaceManager.h"
 
 extern ClanManager * clan_manager;
+extern RaceManager * race_manager;
+
 extern  int     _filbuf         args( (FILE *) );
 int rename(const char *oldfname, const char *newfname);
 
@@ -164,8 +168,8 @@ void fwrite_pet( Character *pet, FILE *fp)
     	fprintf(fp,"LnD  %s~\n", pet->long_descr);
     if (pet->getDescription() && pet->getDescription() != pet->pIndexData->description )
     	fprintf(fp,"Desc %s~\n", pet->getDescription());
-    if (pet->race != pet->pIndexData->race)
-    	fprintf(fp,"Race %s~\n", race_table[pet->race].name);
+    if (pet->getRace()->getLegacyId() != pet->pIndexData->race)
+    	fprintf(fp,"Race %s~\n", pet->getRace()->getName().c_str());
     fprintf(fp,"Sex  %d\n", pet->sex);
     if (pet->level != pet->pIndexData->level)
     	fprintf(fp,"Levl %d\n", pet->level);
@@ -429,24 +433,22 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
     {
 	int i;
 
-	if (ch->race == 0)
-	    ch->race = race_lookup("human");
+	if (!ch->getRace()) {
+	    ch->setRace(race_manager->getRaceByName("human"));
+	}
 
-	ch->size = pc_race_table[ch->race].size;
+	ch->size = ch->getRace()->getPlayerRace()->getSize();
 	ch->dam_type = 17; /*punch */
 
-	for (i = 0; i < 5; i++)
-	{
-	    if (pc_race_table[ch->race].skills[i] == NULL)
-		break;
-	    group_add(ch,pc_race_table[ch->race].skills[i],FALSE);
+	for (auto skill : ch->getRace()->getPlayerRace()->getSkills()) {
+	    group_add(ch,skill.c_str(),FALSE);
 	}
-	ch->affected_by = ch->affected_by|race_table[ch->race].aff;
-	ch->imm_flags	= ch->imm_flags | race_table[ch->race].imm;
-	ch->res_flags	= ch->res_flags | race_table[ch->race].res;
-	ch->vuln_flags	= ch->vuln_flags | race_table[ch->race].vuln;
-	ch->form	= race_table[ch->race].form;
-	ch->parts	= race_table[ch->race].parts;
+	ch->affected_by = ch->affected_by| ch->getRace()->getAffectFlags();
+	ch->imm_flags	= ch->imm_flags | ch->getRace()->getImmunityFlags();
+	ch->res_flags	= ch->res_flags | ch->getRace()->getResistanceFlags();
+	ch->vuln_flags	= ch->vuln_flags | ch->getRace()->getVulnerabilityFlags();
+	ch->form	= ch->getRace()->getForm();
+	ch->parts	= ch->getRace()->getParts();
     }
 
 	
@@ -503,6 +505,19 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name )
 				if ( !str_cmp( word, literal ) )	\
 				{					\
 				    field  = value;			\
+				    fMatch = TRUE;			\
+				    break;				\
+				}
+
+/* give to a function */
+#if defined(KEYF)
+#undef KEYF
+#endif
+
+#define KEYF( literal, fn, value )					\
+				if ( !str_cmp( word, literal ) )	\
+				{					\
+				    fn(value);			\
 				    fMatch = TRUE;			\
 				    break;				\
 				}
@@ -879,8 +894,7 @@ void fread_char( Character *ch, FILE *fp )
 	    break;
 
 	case 'R':
-	    KEY( "Race",        ch->race,
-				race_lookup(fread_string( fp )) );
+		KEYF( "Race",        ch->setRace,	race_manager->getRaceByName(fread_string( fp )) );
 	    KEY( "Rnum",	ch->reclass_num,	fread_number( fp ) );
 
             if ( !str_cmp( word, "Range" ) ) {
@@ -1201,7 +1215,7 @@ void fread_pet( Character *ch, FILE *fp )
     	     break;
     	     
 	case 'R':
-    	    KEY( "Race",	pet->race, race_lookup(fread_string(fp)));
+    	    KEYF( "Race",	pet->setRace, race_manager->getRaceByName(fread_string(fp)));
     	    break;
  	    
     	case 'S' :

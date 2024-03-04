@@ -62,6 +62,7 @@
 #include "ConnectedState.h"
 #include "clans/ClanManager.h"
 #include "IConnectedStateHandler.h"
+#include "RaceManager.h"
 #include "Wiznet.h"
 
 /* command procedures needed */
@@ -124,6 +125,7 @@ void stop_idling args((Character * ch));
 void bust_a_prompt args((Character * ch));
 
 extern ClanManager *clan_manager;
+extern RaceManager *race_manager;
 
 /* Needs to be global because of do_copyover */
 extern int port, control;
@@ -1134,12 +1136,11 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 
 		write_to_buffer(d, (const char *)echo_on_str, 0);
 		write_to_buffer(d, "The following races are available:\n\r  ", 0);
-		for (race = 1; race_table[race].name != NULL; race++)
-		{
-			if (!race_table[race].pc_race)
-				break;
-			write_to_buffer(d, race_table[race].name, 0);
-			write_to_buffer(d, " ", 1);
+		for (auto race : race_manager->getAllRaces() ) {
+			if (race->isPlayerRace()) {
+				write_to_buffer(d, race->getName().c_str(), 0);
+				write_to_buffer(d, " ", 1);
+			}
 		}
 		write_to_buffer(d, "\n\r", 0);
 		write_to_buffer(d, "What is your race (help for more information)? ", 0);
@@ -1187,15 +1188,13 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		}
 
 		write_to_buffer(d, "The following races are available:\n\r  ", 0);
-		for (omorph = 1; race_table[omorph].name != NULL; omorph++)
-		{
-			if (!race_table[omorph].pc_race)
-				break;
-			if (omorph == race_lookup("werefolk"))
-				continue;
-			write_to_buffer(d, race_table[omorph].name, 0);
-			write_to_buffer(d, " ", 1);
+		for (auto race : race_manager->getAllRaces() ) {
+			if (race->isPlayerRace() && race != race_manager->getRaceByName("werefolk")) {
+				write_to_buffer(d, race->getName().c_str(), 0);
+				write_to_buffer(d, " ", 1);
+			}
 		}
+
 		write_to_buffer(d, "\n\r", 0);
 		write_to_buffer(d, "What is your default race (help for more information)? ", 0);
 		d->connected = ConnectedState::GetMorphOrig;
@@ -1216,28 +1215,26 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 			break;
 		}
 
-		omorph = race_lookup(argument);
+		Race *omorph;
 
-		if (omorph == 0 || !race_table[omorph].pc_race || omorph == race_lookup("werefolk"))
+		if (!(omorph = race_manager->getRaceByName(argument)) || omorph == race_manager->getRaceByName("werefolk"))
 		{
 			write_to_buffer(d, "That is not a valid race.\n\r", 0);
 			write_to_buffer(d, "The following races are available:\n\r  ", 0);
-			for (omorph = 1; race_table[omorph].name != NULL; omorph++)
-			{
-				if (!race_table[omorph].pc_race)
-					break;
-				if (omorph == race_lookup("werefolk"))
-					continue;
-				write_to_buffer(d, race_table[omorph].name, 0);
-				write_to_buffer(d, " ", 1);
+			for (auto race : race_manager->getAllRaces() ) {
+				if (race->isPlayerRace() && race != race_manager->getRaceByName("werefolk")) {
+					write_to_buffer(d, race->getName().c_str(), 0);
+					write_to_buffer(d, " ", 1);
+				}
 			}
+
 			write_to_buffer(d, "\n\r", 0);
 			write_to_buffer(d,
 							"What is your default race? (help for more information) ", 0);
 			break;
 		}
 
-		ch->orig_form = omorph;
+		ch->orig_form = omorph->getLegacyId();
 
 		write_to_buffer(d, "What is your sex (M/F)? ", 0);
 		d->connected = ConnectedState::GetNewSex;
@@ -1305,7 +1302,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		** The check looks between 10 and 70 for skill,
 		** so we'll start these guys off at 25
 		*/
-		if (ch->race == race_lookup("werefolk"))
+		if (ch->getRace() == race_manager->getRaceByName("werefolk"))
 			ch->pcdata->learned[gsn_morph] = 25;
 
 		write_to_buffer(d, "Do you wish to customize this character?\n\r", 0);

@@ -2,15 +2,19 @@
 #include <sys/types.h>
 #include "merc.h"
 #include "board.h"
+#include "PcRace.h"
 #include "PlayerCharacter.h"
+#include "RaceManager.h"
 #include "Wiznet.h"
+
+extern class RaceManager * race_manager;
 
 PlayerCharacter::PlayerCharacter()
         : Character() {
         this->pcdata = new PC_DATA();
 
         this->id				= PlayerCharacter::get_pc_id();
-        this->race				= race_lookup("human");
+        this->setRace(race_manager->getRaceByName("human"));
         this->act				= PLR_NOSUMMON;
         this->comm				= COMM_COMBINE
                 | COMM_PROMPT;
@@ -159,15 +163,15 @@ void PlayerCharacter::writeToFile(FILE *fp) {
                 fprintf( fp, "Desc %s~\n",	this->getDescription()	);
         if (this->prompt != NULL || !str_cmp(this->prompt,"<%X to level>%c<%h/%Hhp %m/%Mm %v/%Vmv> "))
                 fprintf( fp, "Prom %s~\n",      this->prompt  	);
-        fprintf( fp, "Race %s~\n", pc_race_table[this->race].name );
+        fprintf( fp, "Race %s~\n", this->getRace()->getPlayerRace()->getName().c_str() );
 
-        if (this->race == race_lookup("werefolk"))
+        if (this->getRace() == race_manager->getRaceByName("werefolk"))
         {
                 fprintf( fp, "O_fo %d\n", this->orig_form		);
                 fprintf( fp, "M_fo %d\n", this->morph_form		);
         }
 
-        if (this->race == race_lookup("draconian") && this->level >= 10)
+        if (this->getRace() == race_manager->getRaceByName("draconian") && this->level >= 10)
         {
                 fprintf( fp, "Drac %d\n", this->drac );
                 fprintf( fp, "Brea %d\n", this->breathe);

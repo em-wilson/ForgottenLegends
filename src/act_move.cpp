@@ -31,6 +31,7 @@
 #include <string.h>
 #include "merc.h"
 #include "NonPlayerCharacter.h"
+#include "RaceManager.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_look		);
@@ -60,6 +61,8 @@ const	sh_int	movement_loss	[SECT_MAX]	=
  */
 int	find_door	args( ( Character *ch, char *arg ) );
 bool	has_key		args( ( Character *ch, int key ) );
+
+extern RaceManager * race_manager;
 
 
 
@@ -1636,10 +1639,10 @@ void do_morph( Character *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
 
-    if (ch->race != race_lookup("werefolk"))
+    if (ch->getRace() != race_manager->getRaceByName("werefolk"))
     {
-	send_to_char("You cannot morph.\n\r",ch);
-	return;
+		send_to_char("You cannot morph.\n\r",ch);
+		return;
     }
 
     if (number_range(10, 70) > get_skill(ch, gsn_morph))
@@ -1653,12 +1656,12 @@ void do_morph( Character *ch, char *argument )
     if (IS_SET(ch->act, PLR_IS_MORPHED))
     {
 	snprintf(buf, sizeof(buf), "You morph into a%s %s.\n\r",
-	    pc_race_table[ch->orig_form].name[0] == 'e' ? "n" : "",
-	    pc_race_table[ch->orig_form].name );
+	    race_manager->getRaceByLegacyId(ch->orig_form)->getName().at(0) == 'e' ? "n" : "",
+	    race_manager->getRaceByLegacyId(ch->orig_form)->getName().c_str() );
 	send_to_char(buf,ch);
 	snprintf(buf, sizeof(buf), "$n morphs into a%s %s.",
-	    pc_race_table[ch->orig_form].name[0] == 'e' ? "n" : "",
-	    pc_race_table[ch->orig_form].name );
+	    race_manager->getRaceByLegacyId(ch->orig_form)->getName().at(0) == 'e' ? "n" : "",
+	    race_manager->getRaceByLegacyId(ch->orig_form)->getName().c_str() );
 	act(buf,ch,NULL,NULL,TO_ROOM);
 	REMOVE_BIT(ch->act, PLR_IS_MORPHED);
 	check_improve(ch,gsn_morph,TRUE,2);

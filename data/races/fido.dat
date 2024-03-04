@@ -1,0 +1,8 @@
+#RACE
+Name fido
+IsPlayerRace 0
+Parts head legs heart brains guts feet ear eye tail fangs
+Vuln magic
+End
+
+#$

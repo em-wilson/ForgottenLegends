@@ -1,0 +1,9 @@
+#RACE
+Name bat
+IsPlayerRace 0
+Aff flying dark_vision
+Parts head legs heart brains guts feet ear eye wings
+Vuln light
+End
+
+#$

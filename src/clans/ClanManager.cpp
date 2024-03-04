@@ -35,9 +35,13 @@ ClanManager::ClanManager(IClanReader *reader, IClanWriter *writer) {
 }
 
 ClanManager::~ClanManager() {
+    if (_reader) {
+        delete _reader;
+        _reader = nullptr;
+    }
     if (_writer) {
         delete _writer;
-        _writer = NULL;
+        _writer = nullptr;
     }
 }
 

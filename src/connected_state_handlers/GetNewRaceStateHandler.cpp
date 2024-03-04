@@ -3,6 +3,7 @@
 #include "ConnectedState.h"
 #include "Descriptor.h"
 #include "GetNewRaceStateHandler.h"
+#include "PcRace.h"
 #include "Race.h"
 #include "RaceManager.h"
 
@@ -42,19 +43,19 @@ void GetNewRaceStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
         return;
     }
 
-    Race race;
+    Race * race;
     
     try {
         race = race_manager->getRaceByName(argument);
-        if (!race.isPlayerRace()) {
-            throw new InvalidRaceException();
+        if (!race->isPlayerRace()) {
+            throw InvalidRaceException(argument);
         }
     } catch (InvalidRaceException) {
-        write_to_buffer(d, "That is not a valid race.\n\r", 0);
+        write_to_buffer(d, "That is not a valid race->\n\r", 0);
         write_to_buffer(d, "The following races are available:\n\r  ", 0);
         for (auto race : race_manager->getAllRaces()) {
-            if (race.isPlayerRace()) {
-                write_to_buffer(d, race.getName().c_str(), 0);
+            if (race->isPlayerRace()) {
+                write_to_buffer(d, race->getName().c_str(), 0);
                 write_to_buffer(d, " ", 1);
             }
         }
@@ -63,30 +64,27 @@ void GetNewRaceStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
         return;
     }
 
-    ch->race = race.getLegacyId();
+    ch->setRace(race);
     /* initialize stats */
     for (int i = 0; i < MAX_STATS; i++)
-        ch->perm_stat[i] = pc_race_table[race.getLegacyId()].stats[i];
-    ch->affected_by = ch->affected_by | race.getAffectFlags();
-    ch->imm_flags = ch->imm_flags | race.getImmunityFlags();
-    ch->res_flags = ch->res_flags | race.getResistanceFlags();
-    ch->vuln_flags = ch->vuln_flags | race.getVulnerabilityFlags();
-    ch->form = race.getForm();
-    ch->parts = race.getParts();
+        ch->perm_stat[i] = race->getPlayerRace()->getStats().at(i);
+    ch->affected_by = ch->affected_by | race->getAffectFlags();
+    ch->imm_flags = ch->imm_flags | race->getImmunityFlags();
+    ch->res_flags = ch->res_flags | race->getResistanceFlags();
+    ch->vuln_flags = ch->vuln_flags | race->getVulnerabilityFlags();
+    ch->form = race->getForm();
+    ch->parts = race->getParts();
 
     /* add skills */
-    for (int i = 0; i < 5; i++)
-    {
-        if (pc_race_table[race.getLegacyId()].skills[i] == NULL)
-            break;
-        group_add(ch, pc_race_table[race.getLegacyId()].skills[i], false);
+    for (auto skill : race->getPlayerRace()->getSkills()) {
+        group_add(ch, skill.c_str(), false);
     }
     /* add cost */
-    ch->pcdata->points = pc_race_table[race.getLegacyId()].points;
-    ch->size = pc_race_table[race.getLegacyId()].size;
+    ch->pcdata->points = race->getPlayerRace()->getPoints();
+    ch->size = race->getPlayerRace()->getSize();
 
     // Werefolk not present currently
-    // if (race_lookup(race_table[race.getLegacyId()].name) == race_lookup("werefolk"))
+    // if (race_lookup(race_table[race->getLegacyId()].name) == race_lookup("werefolk"))
     // {
     //     int morph;
     //     write_to_buffer(d, "As a werefolk, you may morph into the following forms:\n\r ", 0);

@@ -1,0 +1,9 @@
+#RACE
+Name doll
+IsPlayerRace 0
+Imm cold poison negative holy mental disease drowning
+Parts head arms legs hands feet eye
+Vuln slash fire lightning acid energy
+End
+
+#$

@@ -1,0 +1,8 @@
+#RACE
+Name water fowl
+IsPlayerRace 0
+Aff flying swim
+Parts head legs heart brains guts feet eye wings
+End
+
+#$

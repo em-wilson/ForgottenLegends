@@ -1,0 +1,10 @@
+#RACE
+Name draconian
+IsPlayerRace 0
+Aff flying
+Imm poison disease
+Parts head arms legs heart brains guts hands feet fingers ear eye wings tail
+Vuln pierce slash fire lightning
+End
+
+#$

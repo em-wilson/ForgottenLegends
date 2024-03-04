@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.5)
 project(ForgottenLegends)
 
+# Set default C++ version to 17 (required for filesystem services)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Add include path for cmake modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
@@ -69,8 +74,11 @@ set(SOURCE_FILES
     src/olc_mpcode.cpp
     src/olc_save.cpp
     src/pc_data.cpp src/pc_data.h
+    src/PcRace.cpp src/PcRace.h
     src/PlayerCharacter.cpp src/PlayerCharacter.h
     src/Race.cpp src/Race.h
+    src/RaceReader.cpp src/RaceReader.h
+    src/RaceWriter.cpp src/RaceWriter.h
     src/RaceManager.cpp src/RaceManager.h
     src/recycle.cpp src/recycle.h
     src/save.cpp
