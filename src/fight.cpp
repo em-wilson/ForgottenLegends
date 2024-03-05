@@ -968,8 +968,8 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
 	if ( !IS_NPC(victim) )
 	{
 	    snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s killed by %s at %d",
-		victim->getName(),
-		(IS_NPC(ch) ? ch->short_descr : ch->getName()),
+		victim->getName().c_str(),
+		(IS_NPC(ch) ? ch->short_descr : ch->getName().c_str()),
 		ch->in_room->vnum );
 	    log_string( log_buf );
 
@@ -984,8 +984,8 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
 	}
 
         snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s got toasted by %s at %s [room %d]",
-            (IS_NPC(victim) ? victim->short_descr : victim->getName()),
-            (IS_NPC(ch) ? ch->short_descr : ch->getName()),
+            (IS_NPC(victim) ? victim->short_descr : victim->getName().c_str()),
+            (IS_NPC(ch) ? ch->short_descr : ch->getName().c_str()),
             ch->in_room->name, ch->in_room->vnum);
  
 	clan_manager->handle_kill(ch, victim);
@@ -1295,8 +1295,8 @@ dam_type, bool show ) {
 	if ( !IS_NPC(victim) )
 	{
 	    snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s killed by %s at %d",
-		victim->getName(),
-		(IS_NPC(ch) ? ch->short_descr : ch->getName()),
+		victim->getName().c_str(),
+		(IS_NPC(ch) ? ch->short_descr : ch->getName().c_str()),
 		victim->in_room->vnum );
 	    log_string( log_buf );
 
@@ -1311,8 +1311,8 @@ dam_type, bool show ) {
 	}
 
         snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s got toasted by %s at %s [room %d]",
-            (IS_NPC(victim) ? victim->short_descr : victim->getName()),
-            (IS_NPC(ch) ? ch->short_descr : ch->getName()),
+            (IS_NPC(victim) ? victim->short_descr : victim->getName().c_str()),
+            (IS_NPC(ch) ? ch->short_descr : ch->getName().c_str()),
             ch->in_room->name, ch->in_room->vnum);
  
         if (IS_NPC(victim))
@@ -1642,7 +1642,7 @@ void check_killer( Character *ch, Character *victim )
 	    char buf[MAX_STRING_LENGTH];
 
 	    snprintf(buf, sizeof(buf), "Check_killer: %s bad AFF_CHARM",
-		IS_NPC(ch) ? ch->short_descr : ch->getName() );
+		IS_NPC(ch) ? ch->short_descr : ch->getName().c_str() );
 	    bug( buf, 0 );
 	    affect_strip( ch, gsn_charm_person );
 	    REMOVE_BIT( ch->affected_by, AFF_CHARM );
@@ -1666,7 +1666,7 @@ void check_killer( Character *ch, Character *victim )
     ||	 ch->fighting  == victim)
 	return;
 
-    snprintf(buf, sizeof(buf),"$N is attempting to murder %s",victim->getName());
+    snprintf(buf, sizeof(buf),"$N is attempting to murder %s",victim->getName().c_str());
     Wiznet::instance()->report(buf,ch,NULL,WIZ_FLAGS,0,0);
     save_char_obj( ch );
     return;
@@ -1847,7 +1847,7 @@ void make_corpse( Character *ch )
     OBJ_DATA *corpse;
     OBJ_DATA *obj;
     OBJ_DATA *obj_next;
-    char *name;
+    string name;
 
     if ( IS_NPC(ch) )
     {
@@ -1869,7 +1869,7 @@ void make_corpse( Character *ch )
 	corpse->timer	= number_range( 25, 40 );
 	REMOVE_BIT(ch->act,PLR_CANLOOT);
 	if (!IS_CLANNED(ch))
-	    corpse->owner = str_dup(ch->getName());
+	    corpse->owner = str_dup(ch->getName().c_str());
 	else
 	{
 	    corpse->owner = NULL;
@@ -1886,11 +1886,11 @@ void make_corpse( Character *ch )
 
     corpse->level = ch->level;
 
-    snprintf(buf, sizeof(buf), corpse->short_descr, name );
+    snprintf(buf, sizeof(buf), corpse->short_descr, name.c_str() );
     free_string( corpse->short_descr );
     corpse->short_descr = str_dup( buf );
 
-    snprintf(buf, sizeof(buf), corpse->description, name );
+    snprintf(buf, sizeof(buf), corpse->description, name.c_str() );
     free_string( corpse->description );
     corpse->description = str_dup( buf );
 
@@ -2024,17 +2024,17 @@ void death_cry( Character *ch )
     {
 	char buf[MAX_STRING_LENGTH];
 	OBJ_DATA *obj;
-	char *name;
+	string name;
 
-	name		= IS_NPC(ch) ? ch->short_descr : ch->getName();
+	name		= ch->isNPC() ? ch->short_descr : ch->getName();
 	obj		= create_object( get_obj_index( vnum ), 0 );
 	obj->timer	= number_range( 4, 7 );
 
-	snprintf(buf, sizeof(buf), obj->short_descr, name );
+	snprintf(buf, sizeof(buf), obj->short_descr, name.c_str() );
 	free_string( obj->short_descr );
 	obj->short_descr = str_dup( buf );
 
-	snprintf(buf, sizeof(buf), obj->description, name );
+	snprintf(buf, sizeof(buf), obj->description, name.c_str() );
 	free_string( obj->description );
 	obj->description = str_dup( buf );
 
@@ -3025,7 +3025,7 @@ void do_murder( Character *ch, char *argument )
     if (IS_NPC(ch))
 	snprintf(buf, sizeof(buf), "Help! I am being attacked by %s!",ch->short_descr);
     else
-    	snprintf(buf, sizeof(buf), "Help!  I am being attacked by %s!", ch->getName() );
+    	snprintf(buf, sizeof(buf), "Help!  I am being attacked by %s!", ch->getName().c_str() );
     do_yell( victim, buf );
     check_killer( ch, victim );
     multi_hit( ch, victim, TYPE_UNDEFINED );
@@ -3771,7 +3771,7 @@ void do_assassinate( Character *ch, char *argument )
 	  do_yell(victim, (char*)"Help! Someone tried to assassinate me!");
 	else
 	  {
-	    snprintf(buf, sizeof(buf), "Help! %s tried to assassinate me!", ch->getName() );
+	    snprintf(buf, sizeof(buf), "Help! %s tried to assassinate me!", ch->getName().c_str() );
 	    do_yell( victim, buf );
 	  }
       }
@@ -3847,7 +3847,7 @@ void do_strangle(Character *ch, char *argument)
 	  do_yell(victim, (char*)"Help! I'm being strangled by someone!");
 	else
 	  {
-	    snprintf(buf, sizeof(buf), "Help! I'm being strangled by %s!", ch->getName() );
+	    snprintf(buf, sizeof(buf), "Help! I'm being strangled by %s!", ch->getName().c_str() );
 	    if (!IS_NPC(victim)) do_yell(victim,buf);
 	  }
       }
@@ -3936,7 +3936,7 @@ void do_blackjack(Character *ch, char *argument)
 	  do_yell(victim, (char*)"Help! I'm being blackjacked by someone!");
 	else
 	  {
-	    snprintf(buf, sizeof(buf), "Help! I'm being blackjacked by %s!", ch->getName() );
+	    snprintf(buf, sizeof(buf), "Help! I'm being blackjacked by %s!", ch->getName().c_str() );
 	    if (!IS_NPC(victim)) do_yell(victim,buf);
 	  }
 	}

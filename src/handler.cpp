@@ -744,10 +744,10 @@ int can_carry_w( Character *ch )
  * See if a string is one of the names of an object.
  */
 
-bool is_name ( char *str, char *namelist )
+bool is_name ( const char *str, const char *namelist )
 {
     char name[MAX_INPUT_LENGTH], part[MAX_INPUT_LENGTH];
-    char *list, *string;
+    char *list;
 
     /* fix crash on NULL namelist */
     if (namelist == NULL || namelist[0] == '\0')
@@ -757,17 +757,17 @@ bool is_name ( char *str, char *namelist )
     if (str[0] == '\0')
 	return FALSE;
 
-    string = str;
+    char * string = str_dup(str);
     /* we need ALL parts of string to match part of namelist */
     for ( ; ; )  /* start parsing string */
     {
-	str = one_argument(str,part);
+	str = one_argument((char*)str,part);
 
 	if (part[0] == '\0' )
 	    return TRUE;
 
 	/* check to see if this is part of namelist */
-	list = namelist;
+	list = str_dup(namelist);
 	for ( ; ; )  /* start parsing namelist */
 	{
 	    list = one_argument(list,name);
@@ -781,6 +781,9 @@ bool is_name ( char *str, char *namelist )
 		break;
 	}
     }
+
+    free_string(list);
+    free_string(string);
 }
 
 bool is_exact_name(char *str, char *namelist )
@@ -1954,7 +1957,7 @@ Character *get_char_room( Character *ch, char *argument )
 	return ch;
     for ( rch = ch->in_room->people; rch != NULL; rch = rch->next_in_room )
     {
-	if ( !can_see( ch, rch ) || !is_name( arg, rch->getName() ) )
+	if ( !can_see( ch, rch ) || !is_name( arg, rch->getName().c_str() ) )
 	    continue;
 	if ( ++count == number )
 	    return rch;
@@ -1985,7 +1988,7 @@ Character *get_char_world( Character *ch, char *argument )
     {
         wch = *it;
         if ( wch->in_room == NULL || !can_see( ch, wch ) 
-        ||   !is_name( arg, wch->getName() ) )
+        ||   !is_name( arg, wch->getName().c_str() ) )
             continue;
         if ( ++count == number )
             return wch;
@@ -2327,7 +2330,7 @@ bool is_room_owner(Character *ch, ROOM_INDEX_DATA *room)
     if (room->owner == NULL || room->owner[0] == '\0')
 	return FALSE;
 
-    return is_name(ch->getName(),room->owner);
+    return is_name(ch->getName().c_str(),room->owner);
 }
 
 /*
@@ -2981,7 +2984,7 @@ Character *get_char_area( Character *ch, char *argument )
     {
         ach = *it;
         if (ach->in_room->area != ch->in_room->area
-        ||  !can_see( ch, ach ) || !is_name( arg, ach->getName() ))
+        ||  !can_see( ch, ach ) || !is_name( arg, ach->getName().c_str() ))
             continue; 
         if (++count == number)
             return ach;

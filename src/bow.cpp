@@ -191,7 +191,7 @@ Character * find_char( Character *ch, char *search, ROOM_INDEX_DATA *scan_room )
 	*/
 	if (str_cmp(search, "random"))
 	{
-	    if (is_name( search, rch->getName() ) && can_see(ch, rch))
+	    if (is_name( search, rch->getName().c_str() ) && can_see(ch, rch))
 		return rch;
 	}
 

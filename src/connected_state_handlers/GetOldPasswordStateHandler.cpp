@@ -1,3 +1,4 @@
+#include <string>
 #include <sys/time.h>
 #include <unistd.h> // crypt
 #include "GetOldPasswordStateHandler.h"
@@ -5,6 +6,7 @@
 #include "ConnectedState.h"
 #include "Descriptor.h"
 #include "telnet.h"
+#include "SocketHelper.h"
 #include "Wiznet.h"
 
 extern DESCRIPTOR_DATA *descriptor_list;
@@ -17,9 +19,7 @@ DECLARE_DO_FUN(do_help);
 
 bool str_cmp( const char *astr, const char *bstr );
 
-void close_socket(DESCRIPTOR_DATA *dclose);
 void log_string( const char *str );
-void write_to_buffer(DESCRIPTOR_DATA *d, const char *txt, int length);
 
 GetOldPasswordStateHandler::GetOldPasswordStateHandler() : AbstractStateHandler(ConnectedState::GetOldPassword) {
 
@@ -28,16 +28,16 @@ GetOldPasswordStateHandler::GetOldPasswordStateHandler() : AbstractStateHandler(
 /*
  * Check if already playing.
  */
-bool GetOldPasswordStateHandler::check_playing(DESCRIPTOR_DATA *d, char *name)
+bool GetOldPasswordStateHandler::check_playing(DESCRIPTOR_DATA *d, string name)
 {
 	DESCRIPTOR_DATA *dold;
 
 	for (dold = descriptor_list; dold; dold = dold->next)
 	{
-		if (dold != d && dold->character != NULL && dold->connected != ConnectedState::GetName && dold->connected != ConnectedState::GetOldPassword && !str_cmp(name, dold->original ? dold->original->getName() : dold->character->getName()))
+		if (dold != d && dold->character != NULL && dold->connected != ConnectedState::GetName && dold->connected != ConnectedState::GetOldPassword && name == (dold->original ? dold->original->getName() : dold->character->getName()))
 		{
-			write_to_buffer(d, "That character is already playing.\n\r", 0);
-			write_to_buffer(d, "Do you wish to connect anyway (Y/N)?", 0);
+			SocketHelper::write_to_buffer(d, "That character is already playing.\n\r", 0);
+			SocketHelper::write_to_buffer(d, "Do you wish to connect anyway (Y/N)?", 0);
 			d->connected = ConnectedState::BreakConnect;
 			return true;
 		}
@@ -50,24 +50,24 @@ void GetOldPasswordStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 	char log_buf[2*MAX_INPUT_LENGTH];
     Character *ch = d->character;
 
-    write_to_buffer(d, "\n\r", 2);
+    SocketHelper::write_to_buffer(d, "\n\r", 2);
 
-    if (strcmp(crypt(argument, ch->pcdata->pwd), ch->pcdata->pwd))
+    if (string(crypt(argument, ch->pcdata->getPassword().c_str())) != ch->pcdata->getPassword())
     {
-        write_to_buffer(d, "Wrong password.\n\r", 0);
-        close_socket(d);
+        SocketHelper::write_to_buffer(d, "Wrong password.\n\r", 0);
+        SocketHelper::close_socket(d);
         return;
     }
 
-    write_to_buffer(d, (const char *)echo_on_str, 0);
+    SocketHelper::write_to_buffer(d, (const char *)echo_on_str, 0);
 
     if (check_playing(d, ch->getName()))
         return;
 
-    if (check_reconnect(d, ch->getName(), true))
+    if (SocketHelper::check_reconnect(d, true))
         return;
 
-    snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s has connected.", ch->getName(), d->host);
+    snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s has connected.", ch->getName().c_str(), d->host);
     log_string(log_buf);
     Wiznet::instance()->report(log_buf, NULL, NULL, WIZ_SITES, 0, ch->getTrust());
 

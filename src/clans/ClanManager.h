@@ -28,6 +28,7 @@ class ClanManager
         void add_player(Character *ch, Clan *clan);
         void add_playtime(Clan *ch, int seconds);
         void remove_player(Character *ch);
+        bool isClanLeader(Character *ch);
         std::unordered_map<std::string, long> list_clan_nw();
 
     private:

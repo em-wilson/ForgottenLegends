@@ -6,5 +6,5 @@ class GetOldPasswordStateHandler : public AbstractStateHandler {
         void handle(DESCRIPTOR_DATA *_descriptor, char *argument);
 
     private:
-        bool check_playing(DESCRIPTOR_DATA *d, char *name);
+        bool check_playing(DESCRIPTOR_DATA *d, std::string name);
 };

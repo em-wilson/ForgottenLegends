@@ -189,7 +189,7 @@ void do_mpstat( Character *ch, char *argument )
     snprintf(arg, sizeof(arg), "Delay   %-6d [%s]\n\r",
 	victim->mprog_delay,
 	victim->mprog_target == NULL 
-		? "No target" : victim->mprog_target->getName() );
+		? "No target" : victim->mprog_target->getName().c_str() );
     send_to_char( arg, ch );
 
     if ( !victim->pIndexData->mprog_flags )
@@ -786,7 +786,7 @@ void do_mptransfer( Character *ch, char *argument )
 	    victim_next = victim->next_in_room;
 	    if ( !IS_NPC(victim) )
 	    {
-		snprintf(buf, sizeof(buf), "%s %s", victim->getName(), arg2 );
+		snprintf(buf, sizeof(buf), "%s %s", victim->getName().c_str(), arg2 );
 		do_mptransfer( ch, buf );
 	    }
 	}
@@ -858,7 +858,7 @@ void do_mpgtransfer( Character *ch, char *argument )
     	victim_next = victim->next_in_room;
     	if( is_same_group( who,victim ) )
     	{
-	    snprintf(buf, sizeof(buf), "%s %s", victim->getName(), arg2 );
+	    snprintf(buf, sizeof(buf), "%s %s", victim->getName().c_str(), arg2 );
 	    do_mptransfer( ch, buf );
     	}
     }

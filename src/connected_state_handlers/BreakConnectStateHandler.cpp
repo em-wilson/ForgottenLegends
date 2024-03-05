@@ -2,12 +2,11 @@
 #include "Character.h"
 #include "ConnectedState.h"
 #include "Descriptor.h"
+#include "SocketHelper.h"
 
 extern DESCRIPTOR_DATA * descriptor_list;
 extern std::list<Character *> char_list;
 bool str_cmp( const char *astr, const char *bstr );
-void close_socket(DESCRIPTOR_DATA *dclose);
-void write_to_buffer(DESCRIPTOR_DATA *d, const char *txt, int length);
 
 BreakConnectStateHandler::BreakConnectStateHandler() : AbstractStateHandler(ConnectedState::BreakConnect) {
     
@@ -29,14 +28,14 @@ void BreakConnectStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
             if (d_old == d || d_old->character == NULL)
                 continue;
 
-            if (str_cmp(ch->getName(), d_old->original ? d_old->original->getName() : d_old->character->getName()))
+            if (ch->getName() != (d_old->original ? d_old->original->getName() : d_old->character->getName()))
                 continue;
 
-            close_socket(d_old);
+            SocketHelper::close_socket(d_old);
         }
-        if (check_reconnect(d, ch->getName(), true))
+        if (SocketHelper::check_reconnect(d, true))
             return;
-        write_to_buffer(d, "Reconnect attempt failed.\n\rName: ", 0);
+        SocketHelper::write_to_buffer(d, "Reconnect attempt failed.\n\rName: ", 0);
         if (d->character != NULL)
         {
             char_list.remove(d->character);
@@ -48,7 +47,7 @@ void BreakConnectStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 
     case 'n':
     case 'N':
-        write_to_buffer(d, "Name: ", 0);
+        SocketHelper::write_to_buffer(d, "Name: ", 0);
         if (d->character != NULL)
         {
             delete d->character;
@@ -58,7 +57,7 @@ void BreakConnectStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
         break;
 
     default:
-        write_to_buffer(d, "Please type Y or N? ", 0);
+        SocketHelper::write_to_buffer(d, "Please type Y or N? ", 0);
         break;
     }
 }

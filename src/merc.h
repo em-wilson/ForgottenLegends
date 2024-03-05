@@ -1775,7 +1775,7 @@ do                                                              \
 #define IS_SWITCHED( ch )       ( ch->desc && ch->desc->original )
 #define IS_BUILDER(ch, Area)	( !IS_NPC(ch) && !IS_SWITCHED( ch ) &&	  \
 				( ch->pcdata->security >= Area->security  \
-				|| strstr( Area->builders, ch->getName() )	  \
+				|| strstr( Area->builders, ch->getName().c_str() )	  \
 				|| strstr( Area->builders, "All" ) ) )
 #define IS_CLANNED(ch)          (!IS_NPC(ch)                             \
                                 && ch->pcdata->clan != NULL)
@@ -1810,7 +1810,7 @@ do                                                              \
  */
 #define PERS(ch, looker)	( can_see( looker, (ch) ) ?		\
 				( IS_NPC(ch) ? (ch)->short_descr	\
-				: (ch)->getName() ) : "someone" )
+				: (ch)->getName().c_str() ) : "someone" )
 
 /*
  * Structure for a social in the socials table.
@@ -1981,9 +1981,6 @@ bool	check_ban	args( ( char *site, int type) );
 /* comm.c */
 int     strlen_color    args( (char *argument)  );
 void	show_string	args( ( struct descriptor_data *d, char *input) );
-void	close_socket	args( ( DESCRIPTOR_DATA *dclose ) );
-void	write_to_buffer	args( ( DESCRIPTOR_DATA *d, const char *txt,
-			    int length ) );
 void printf_to_char  args( ( Character *ch, const char *fmt, ...) ) __attribute__ ((format(printf, 2,3)));
 void	send_to_char	args( ( const char *txt, Character *ch ) );
 void	page_to_char	args( ( const char *txt, Character *ch ) );
@@ -2093,7 +2090,7 @@ int	get_curr_stat	args( ( Character *ch, int stat ) );
 int 	get_max_train	args( ( Character *ch, int stat ) );
 int	can_carry_n	args( ( Character *ch ) );
 int	can_carry_w	args( ( Character *ch ) );
-bool	is_name		args( ( char *str, char *namelist ) );
+bool	is_name		args( ( const char *str, const char *namelist ) );
 bool    is_full_name    args( ( const char *str, char *namelist ) );
 bool	is_exact_name	args( ( char *str, char *namelist ) );
 void	affect_to_char	args( ( Character *ch, AFFECT_DATA *paf ) );

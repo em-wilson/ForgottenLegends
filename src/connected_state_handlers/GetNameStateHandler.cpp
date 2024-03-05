@@ -7,6 +7,7 @@
 #include "AbstractStateHandler.h"
 #include "GetNameStateHandler.h"
 #include "NonPlayerCharacter.h" // for MOB_INDEX_DATA
+#include "SocketHelper.h"
 
 extern bool newlock;
 extern bool wizlock;
@@ -30,17 +31,13 @@ extern bool wizlock;
 
 const unsigned char echo_off_str[] = {IAC, WILL, TELOPT_ECHO, '\0'};
 
-bool is_name ( char *str, char *namelist );
+bool is_name ( const char *str, const char *namelist );
 char *capitalize( const char *str );
 bool load_char_obj( DESCRIPTOR_DATA *d, char *name );
 void log_string( const char *str );
 bool str_cmp( const char *astr, const char *bstr );
 bool str_prefix( const char *astr, const char *bstr );
 bool str_suffix( const char *astr, const char *bstr );
-
-// Socket helpers
-void close_socket(DESCRIPTOR_DATA *dclose);
-void write_to_buffer(DESCRIPTOR_DATA *d, const char *txt, int length);
 
 GetNameStateHandler::GetNameStateHandler(BanManager *ban_manager, ClanManager *clan_manager) : AbstractStateHandler(ConnectedState::GetName) {
 	this->ban_manager = ban_manager;
@@ -147,14 +144,14 @@ void GetNameStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 
     if (argument[0] == '\0')
 		{
-			close_socket(d);
+			SocketHelper::close_socket(d);
 			return;
 		}
 
 		argument[0] = UPPER(argument[0]);
 		if (!check_parse_name(argument))
 		{
-			write_to_buffer(d, "Illegal name, try another.\n\rName: ", 0);
+			SocketHelper::write_to_buffer(d, "Illegal name, try another.\n\rName: ", 0);
 			return;
 		}
 
@@ -165,19 +162,19 @@ void GetNameStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 		{
 			snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "Denying access to %s@%s.", argument, d->host);
 			log_string(log_buf);
-			write_to_buffer(d, "You are denied access.\n\r", 0);
-			close_socket(d);
+			SocketHelper::write_to_buffer(d, "You are denied access.\n\r", 0);
+			SocketHelper::close_socket(d);
 			return;
 		}
 
 		if (ban_manager->isSiteBanned(d))
 		{
-			write_to_buffer(d, "Your site has been banned from this mud.\n\r", 0);
-			close_socket(d);
+			SocketHelper::write_to_buffer(d, "Your site has been banned from this mud.\n\r", 0);
+			SocketHelper::close_socket(d);
 			return;
 		}
 
-		if (check_reconnect(d, argument, false))
+		if (SocketHelper::check_reconnect(d, false))
 		{
 			fOld = true;
 		}
@@ -185,8 +182,8 @@ void GetNameStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 		{
 			if (wizlock && !ch->isImmortal())
 			{
-				write_to_buffer(d, "The game is wizlocked.\n\r", 0);
-				close_socket(d);
+				SocketHelper::write_to_buffer(d, "The game is wizlocked.\n\r", 0);
+				SocketHelper::close_socket(d);
 				return;
 			}
 		}
@@ -194,8 +191,8 @@ void GetNameStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 		if (fOld)
 		{
 			/* Old player */
-			write_to_buffer(d, "Password: ", 0);
-			write_to_buffer(d, (const char *)echo_off_str, 0);
+			SocketHelper::write_to_buffer(d, "Password: ", 0);
+			SocketHelper::write_to_buffer(d, (const char *)echo_off_str, 0);
 			d->connected = ConnectedState::GetOldPassword;
 			return;
 		}
@@ -204,21 +201,21 @@ void GetNameStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 			/* New player */
 			if (newlock)
 			{
-				write_to_buffer(d, "The game is newlocked.\n\r", 0);
-				close_socket(d);
+				SocketHelper::write_to_buffer(d, "The game is newlocked.\n\r", 0);
+				SocketHelper::close_socket(d);
 				return;
 			}
 
 			if (!ban_manager->areNewPlayersAllowed(d))
 			{
-				write_to_buffer(d,
+				SocketHelper::write_to_buffer(d,
 								"New players are not allowed from your site.\n\r", 0);
-				close_socket(d);
+				SocketHelper::close_socket(d);
 				return;
 			}
 
 			snprintf(buf, sizeof(buf), "Did I get that right, %s (Y/N)? ", argument);
-			write_to_buffer(d, buf, 0);
+			SocketHelper::write_to_buffer(d, buf, 0);
 			d->connected = ConnectedState::ConfirmNewName;
 			return;
 		}

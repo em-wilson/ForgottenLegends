@@ -87,7 +87,7 @@ void who_html_update (void)
 	fprintf(fp, "%2d ", wch->level );
 	fprintf(fp, "<FONT COLOR=""#808000"">%6s ", race.c_str() );
 	fprintf(fp, "<FONT COLOR=""#FFFFFF"">%s<FONT COLOR=""#C0C0C0"">] ", class_name );
-	fprintf(fp, "%s", wch->getName());
+	fprintf(fp, "%s", wch->getName().c_str());
 	buf[0] = '\0';
 	buf2 = str_dup(wch->pcdata->title);
 //      snprintf(buf2, sizeof(buf2), "%s", wch->pcdata->title);

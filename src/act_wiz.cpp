@@ -25,6 +25,7 @@
 *	ROM license, in the file Rom24/doc/rom.license			   *
 ***************************************************************************/
 
+#include <sstream>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <time.h>
@@ -42,6 +43,7 @@
 #include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
 #include "RaceManager.h"
+#include "SocketHelper.h"
 #include "Wiznet.h"
 
 /* command procedures needed */
@@ -62,13 +64,9 @@ DECLARE_DO_FUN(do_quit		);
 DECLARE_DO_FUN(do_look		);
 DECLARE_DO_FUN(do_stand		);
 
+using std::stringstream;
 
 
-/*
- * Local functions.
- */
-int     close           args( ( int fd ) );
-bool    write_to_descriptor     args( ( int desc, const char *txt, int length ) );
 
 extern ClanManager * clan_manager;
 extern RaceManager * race_manager;
@@ -323,8 +321,9 @@ void do_nochannels( Character *ch, char *argument )
         send_to_char( "The gods have restored your channel priviliges.\n\r", 
 		      victim );
         send_to_char( "NOCHANNELS removed.\n\r", ch );
-	snprintf(buf, sizeof(buf),"$N restores channels to %s",victim->getName());
-	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+        stringstream ss;
+        ss << "$N restores channels to " << victim->getName();
+        Wiznet::instance()->report(ss.str(),ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
     else
     {
@@ -332,8 +331,9 @@ void do_nochannels( Character *ch, char *argument )
         send_to_char( "The gods have revoked your channel priviliges.\n\r", 
 		       victim );
         send_to_char( "NOCHANNELS set.\n\r", ch );
-	snprintf(buf, sizeof(buf),"$N revokes %s's channels.",victim->getName());
-	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+        stringstream ss;
+        ss << "$N revokes " << victim->getName() << "'s channels.";
+	    Wiznet::instance()->report(ss.str(),ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
  
     return;
@@ -359,7 +359,7 @@ void do_smote(Character *ch, char *argument )
         return;
     }
     
-    if (strstr(argument,ch->getName()) == NULL)
+    if (strstr(argument,ch->getName().c_str()) == NULL)
     {
 	send_to_char("You must include your name in an smote.\n\r",ch);
 	return;
@@ -373,7 +373,7 @@ void do_smote(Character *ch, char *argument )
         if (vch->desc == NULL || vch == ch)
             continue;
  
-        if ((letter = strstr(argument,vch->getName())) == NULL)
+        if ((letter = strstr(argument,vch->getName().c_str())) == NULL)
         {
 	    send_to_char(argument,vch);
 	    send_to_char("\n\r",vch);
@@ -383,23 +383,23 @@ void do_smote(Character *ch, char *argument )
         strcpy(temp,argument);
         temp[strlen(argument) - strlen(letter)] = '\0';
         last[0] = '\0';
-        name = vch->getName();
+        name = str_dup(vch->getName().c_str());
  
         for (; *letter != '\0'; letter++)
         {
-            if (*letter == '\'' && matches == strlen(vch->getName()))
+            if (*letter == '\'' && matches == strlen(vch->getName().c_str()))
             {
                 strcat(temp,"r");
                 continue;
             }
  
-            if (*letter == 's' && matches == strlen(vch->getName()))
+            if (*letter == 's' && matches == strlen(vch->getName().c_str()))
             {
                 matches = 0;
                 continue;
             }
  
-            if (matches == strlen(vch->getName()))
+            if (matches == vch->getName().length())
             {
                 matches = 0;
             }
@@ -408,11 +408,12 @@ void do_smote(Character *ch, char *argument )
             {
                 matches++;
                 name++;
-                if (matches == strlen(vch->getName()))
+                if (matches == vch->getName().length())
                 {
                     strcat(temp,"you");
                     last[0] = '\0';
-                    name = vch->getName();
+                    free_string(name);
+                    name = str_dup(vch->getName().c_str());
                     continue;
                 }
                 strncat(last,letter,1);
@@ -423,11 +424,13 @@ void do_smote(Character *ch, char *argument )
             strcat(temp,last);
             strncat(temp,letter,1);
             last[0] = '\0';
-            name = vch->getName();
+            free_string(name);
+            name = str_dup(vch->getName().c_str());
         }
  
-	send_to_char(temp,vch);
-	send_to_char("\n\r",vch);
+        free_string(name);
+        send_to_char(temp,vch);
+        send_to_char("\n\r",vch);
     }
  
     return;
@@ -448,7 +451,7 @@ void do_bamfin( Character *ch, char *argument )
 	    return;
 	}
 
-	if ( strstr(argument,ch->getName()) == NULL)
+	if ( strstr(argument,ch->getName().c_str()) == NULL)
 	{
 	    send_to_char("You must include your name.\n\r",ch);
 	    return;
@@ -480,7 +483,7 @@ void do_bamfout( Character *ch, char *argument )
             return;
         }
  
-        if ( strstr(argument,ch->getName()) == NULL)
+        if ( strstr(argument,ch->getName().c_str()) == NULL)
         {
             send_to_char("You must include your name.\n\r",ch);
             return;
@@ -499,7 +502,7 @@ void do_bamfout( Character *ch, char *argument )
 
 void do_deny( Character *ch, char *argument )
 {
-    char arg[MAX_INPUT_LENGTH],buf[MAX_STRING_LENGTH];
+    char arg[MAX_INPUT_LENGTH];
     Character *victim;
 
     one_argument( argument, arg );
@@ -529,8 +532,9 @@ void do_deny( Character *ch, char *argument )
 
     SET_BIT(victim->act, PLR_DENY);
     send_to_char( "You are denied access!\n\r", victim );
-    snprintf(buf, sizeof(buf),"$N denies access to %s",victim->getName());
-    Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
+    stringstream ss;
+    ss << "$N denies access to " << victim->getName();
+    Wiznet::instance()->report(ss.str(),ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     send_to_char( "OK.\n\r", ch );
     save_char_obj(victim);
     stop_fighting(victim,TRUE);
@@ -563,7 +567,7 @@ void do_disconnect( Character *ch, char *argument )
     	{
             if ( d->descriptor == desc )
             {
-            	close_socket( d );
+            	SocketHelper::close_socket( d );
             	send_to_char( "Ok.\n\r", ch );
             	return;
             }
@@ -592,7 +596,7 @@ void do_disconnect( Character *ch, char *argument )
     {
 	if ( d == victim->desc )
 	{
-	    close_socket( d );
+	    SocketHelper::close_socket( d );
 	    send_to_char( "Ok.\n\r", ch );
 	    return;
 	}
@@ -821,9 +825,9 @@ void do_transfer( Character *ch, char *argument )
 	    &&   d->character->in_room != NULL
 	    &&   can_see( ch, d->character ) )
 	    {
-		char buf[MAX_STRING_LENGTH];
-		snprintf( buf, sizeof(buf), "%s %s", d->character->getName(), arg2 );
-		do_transfer( ch, buf );
+            stringstream ss;
+            ss << d->character->getName() << " " << arg2;
+	    	do_transfer( ch, ss.str().data() );
 	    }
 	}
 	return;
@@ -1225,7 +1229,7 @@ void do_rstat( Character *ch, char *argument )
 	if (can_see(ch,rch))
         {
 	    send_to_char( " ", ch );
-	    one_argument( rch->getName(), buf );
+	    one_argument( rch->getName().data(), buf );
 	    send_to_char( buf, ch );
 	}
     }
@@ -1316,7 +1320,7 @@ void do_ostat( Character *ch, char *argument )
 	obj->in_room    == NULL    ?        0 : obj->in_room->vnum,
 	obj->in_obj     == NULL    ? "(none)" : obj->in_obj->short_descr,
 	obj->carried_by == NULL    ? "(none)" : 
-	    can_see(ch,obj->carried_by) ? obj->carried_by->getName()
+	    can_see(ch,obj->carried_by) ? obj->carried_by->getName().c_str()
 				 	: "someone",
 	obj->wear_loc );
     send_to_char( buf, ch );
@@ -1632,8 +1636,9 @@ void do_mstat( Character *ch, char *argument )
 	return;
     }
 
-    snprintf( buf, sizeof(buf), "Name: %s\n\r", victim->getName());
-    send_to_char( buf, ch );
+    stringstream ss;
+    ss << "Name: " << victim->getName() << "\n\r";
+    send_to_char( ss.str().c_str(), ch );
 
     snprintf( buf, sizeof(buf), 
 	"Vnum: %d  Format: %s  Race: %s  Group: %d  Sex: %s  Room: %d\n\r",
@@ -1712,11 +1717,11 @@ void do_mstat( Character *ch, char *argument )
 	send_to_char(buf,ch);
     }
     snprintf( buf, sizeof(buf), "Hunting: %s\n\r",
-	victim->hunting ? victim->hunting->getName() : "(none)" );
+	victim->hunting ? victim->hunting->getName().c_str() : "(none)" );
     send_to_char( buf, ch );
 
     snprintf( buf, sizeof(buf), "Fighting: %s\n\r",
-	victim->fighting ? victim->fighting->getName() : "(none)" );
+	victim->fighting ? victim->fighting->getName().c_str() : "(none)" );
     send_to_char( buf, ch );
 
     if ( !IS_NPC(victim) )
@@ -1791,9 +1796,9 @@ void do_mstat( Character *ch, char *argument )
     }
 
     snprintf( buf, sizeof(buf), "Master: %s  Leader: %s  Pet: %s\n\r",
-	victim->master      ? victim->master->getName()   : "(none)",
-	victim->leader      ? victim->leader->getName()   : "(none)",
-	victim->pet 	    ? victim->pet->getName()	     : "(none)");
+	victim->master      ? victim->master->getName().c_str()   : "(none)",
+	victim->leader      ? victim->leader->getName().c_str()   : "(none)",
+	victim->pet 	    ? victim->pet->getName().c_str()	     : "(none)");
     send_to_char( buf, ch );
 
     if (!IS_NPC(victim))
@@ -2059,11 +2064,11 @@ void do_mwhere( Character *ch, char *argument )
 		count++;
 		if (d->original != NULL)
 		    snprintf(buf, sizeof(buf),"%3d) %s (in the body of %s) is in %s [%d]\n\r",
-			count, d->original->getName(),victim->short_descr,
+			count, d->original->getName().c_str(),victim->short_descr,
 			victim->in_room->name,victim->in_room->vnum);
 		else
 		    snprintf(buf, sizeof(buf),"%3d) %s is in %s [%d]\n\r",
-			count, victim->getName(),victim->in_room->name,
+			count, victim->getName().c_str(),victim->in_room->name,
 			victim->in_room->vnum);
 		add_buf(buffer,buf);
 	    }
@@ -2080,13 +2085,13 @@ void do_mwhere( Character *ch, char *argument )
     {
         victim = *it;
 	if ( victim->in_room != NULL
-	&&   is_name( argument, victim->getName() ) )
+	&&   is_name( argument, victim->getName().c_str() ) )
 	{
 	    found = TRUE;
 	    count++;
 	    snprintf( buf, sizeof(buf), "%3d) [%5d] %-28s [%5d] %s\n\r", count,
 		IS_NPC(victim) ? victim->pIndexData->vnum : 0,
-		IS_NPC(victim) ? victim->short_descr : victim->getName(),
+		IS_NPC(victim) ? victim->short_descr : victim->getName().c_str(),
 		victim->in_room->vnum,
 		victim->in_room->name );
 	    add_buf(buffer,buf);
@@ -2122,7 +2127,7 @@ void do_reboot( Character *ch, char *argument )
 
     if (ch->invis_level < LEVEL_HERO)
     {
-    	snprintf( buf, sizeof(buf), "Reboot by %s.", ch->getName() );
+    	snprintf( buf, sizeof(buf), "Reboot by %s.", ch->getName().c_str() );
     	do_echo( ch, buf );
     }
 
@@ -2133,7 +2138,7 @@ void do_reboot( Character *ch, char *argument )
 	vch = d->original ? d->original : d->character;
 	if (vch != NULL)
 	    save_char_obj(vch);
-    	close_socket(d);
+    	SocketHelper::close_socket(d);
     }
     
     return;
@@ -2157,7 +2162,7 @@ void do_shutdown( Character *ch, char *argument )
     Character *vch;
 
     if (ch->invis_level < LEVEL_HERO)
-    snprintf( buf, sizeof(buf), "Shutdown by %s.", ch->getName() );
+    snprintf( buf, sizeof(buf), "Shutdown by %s.", ch->getName().c_str() );
     append_file( ch, SHUTDOWN_FILE, buf );
     strcat( buf, "\n\r" );
     if (ch->invis_level < LEVEL_HERO)
@@ -2169,7 +2174,7 @@ void do_shutdown( Character *ch, char *argument )
 	vch = d->original ? d->original : d->character;
 	if (vch != NULL)
 	    save_char_obj(vch);
-	close_socket(d);
+	    SocketHelper::close_socket(d);
     }
     return;
 }
@@ -2280,7 +2285,7 @@ void do_snoop( Character *ch, char *argument )
 
     victim->desc->snoop_by = ch->desc;
     snprintf(buf, sizeof(buf),"$N starts snooping on %s",
-	(IS_NPC(ch) ? victim->short_descr : victim->getName()));
+	(IS_NPC(ch) ? victim->short_descr : victim->getName().c_str()));
     Wiznet::instance()->report(buf,ch,NULL,WIZ_SNOOPS,WIZ_SECURE,ch->getTrust());
     send_to_char( "Ok.\n\r", ch );
     return;
@@ -2715,7 +2720,7 @@ void do_purge( Character *ch, char *argument )
 	if (ch->getTrust() <= victim->getTrust())
 	{
 	  send_to_char("Maybe that wasn't a good idea...\n\r",ch);
-	  snprintf(buf, sizeof(buf),"%s tried to purge you!\n\r",ch->getName());
+	  snprintf(buf, sizeof(buf),"%s tried to purge you!\n\r",ch->getName().c_str());
 	  send_to_char(buf,victim);
 	  return;
 	}
@@ -2727,7 +2732,7 @@ void do_purge( Character *ch, char *argument )
     	d = victim->desc;
     	extract_char( victim, TRUE );
     	if ( d != NULL )
-          close_socket( d );
+          SocketHelper::close_socket( d );
 
 	return;
     }
@@ -2949,7 +2954,7 @@ void do_restore( Character *ch, char *argument )
     update_pos( victim );
     act( "$n has restored you.", ch, NULL, victim, TO_VICT );
     snprintf(buf, sizeof(buf),"$N restored %s",
-	IS_NPC(victim) ? victim->short_descr : victim->getName() );
+	IS_NPC(victim) ? victim->short_descr : victim->getName().c_str() );
     Wiznet::instance()->report(buf,ch,NULL,WIZ_RESTORE,WIZ_SECURE,ch->getTrust());
     send_to_char( "Ok.\n\r", ch );
     return;
@@ -2992,7 +2997,7 @@ void do_freeze( Character *ch, char *argument )
 	REMOVE_BIT(victim->act, PLR_FREEZE);
 	send_to_char( "You can play again.\n\r", victim );
 	send_to_char( "FREEZE removed.\n\r", ch );
-	snprintf(buf, sizeof(buf),"$N thaws %s.",victim->getName() );
+	snprintf(buf, sizeof(buf),"$N thaws %s.",victim->getName().c_str() );
 	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
     else
@@ -3000,7 +3005,7 @@ void do_freeze( Character *ch, char *argument )
 	SET_BIT(victim->act, PLR_FREEZE);
 	send_to_char( "You can't do ANYthing!\n\r", victim );
 	send_to_char( "FREEZE set.\n\r", ch );
-	snprintf(buf, sizeof(buf),"$N puts %s in the deep freeze.",victim->getName() );
+	snprintf(buf, sizeof(buf),"$N puts %s in the deep freeze.",victim->getName().c_str() );
 	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
 
@@ -3101,7 +3106,7 @@ void do_noemote( Character *ch, char *argument )
 	REMOVE_BIT(victim->comm, COMM_NOEMOTE);
 	send_to_char( "You can emote again.\n\r", victim );
 	send_to_char( "NOEMOTE removed.\n\r", ch );
-	snprintf(buf, sizeof(buf),"$N restores emotes to %s.",victim->getName() );
+	snprintf(buf, sizeof(buf),"$N restores emotes to %s.",victim->getName().c_str() );
 	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
     else
@@ -3109,7 +3114,7 @@ void do_noemote( Character *ch, char *argument )
 	SET_BIT(victim->comm, COMM_NOEMOTE);
 	send_to_char( "You can't emote!\n\r", victim );
 	send_to_char( "NOEMOTE set.\n\r", ch );
-	snprintf(buf, sizeof(buf),"$N revokes %s's emotes.",victim->getName() );
+	snprintf(buf, sizeof(buf),"$N revokes %s's emotes.",victim->getName().c_str() );
 	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
 
@@ -3154,7 +3159,7 @@ void do_noshout( Character *ch, char *argument )
 	REMOVE_BIT(victim->comm, COMM_NOSHOUT);
 	send_to_char( "You can shout again.\n\r", victim );
 	send_to_char( "NOSHOUT removed.\n\r", ch );
-	snprintf(buf, sizeof(buf),"$N restores shouts to %s.",victim->getName() );
+	snprintf(buf, sizeof(buf),"$N restores shouts to %s.",victim->getName().c_str() );
 	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
     else
@@ -3162,7 +3167,7 @@ void do_noshout( Character *ch, char *argument )
 	SET_BIT(victim->comm, COMM_NOSHOUT);
 	send_to_char( "You can't shout!\n\r", victim );
 	send_to_char( "NOSHOUT set.\n\r", ch );
-	snprintf(buf, sizeof(buf),"$N revokes %s's shouts.",victim->getName() );
+	snprintf(buf, sizeof(buf),"$N revokes %s's shouts.",victim->getName().c_str() );
 	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
 
@@ -3201,7 +3206,7 @@ void do_notell( Character *ch, char *argument )
 	REMOVE_BIT(victim->comm, COMM_NOTELL);
 	send_to_char( "You can tell again.\n\r", victim );
 	send_to_char( "NOTELL removed.\n\r", ch );
-	snprintf(buf, sizeof(buf),"$N restores tells to %s.",victim->getName() );
+	snprintf(buf, sizeof(buf),"$N restores tells to %s.",victim->getName().c_str() );
 	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
     else
@@ -3209,7 +3214,7 @@ void do_notell( Character *ch, char *argument )
 	SET_BIT(victim->comm, COMM_NOTELL);
 	send_to_char( "You can't tell!\n\r", victim );
 	send_to_char( "NOTELL set.\n\r", ch );
-	snprintf(buf, sizeof(buf),"$N revokes %s's tells.",victim->getName() );
+	snprintf(buf, sizeof(buf),"$N revokes %s's tells.",victim->getName().c_str() );
 	Wiznet::instance()->report(buf,ch,NULL,WIZ_PENALTIES,WIZ_SECURE,0);
     }
 
@@ -4359,8 +4364,8 @@ void do_sockets( Character *ch, char *argument )
               st,
               s,
               idle,
-              ( d->original ) ? d->original->getName()
-                              : ( d->character )  ? d->character->getName()
+              ( d->original ) ? d->original->getName().c_str()
+                              : ( d->character )  ? d->character->getName().c_str()
                                                   : "(None!)",
               d->host );
               
@@ -4683,7 +4688,7 @@ void do_copyover (Character *ch, char * argument)
        /* do_asave (NULL, ""); - autosave changed areas */
  
  
-       snprintf(buf, sizeof(buf), "\n\r *** COPYOVER by %s - please remain seated!\n\r", ch->getName() );
+       snprintf(buf, sizeof(buf), "\n\r *** COPYOVER by %s - please remain seated!\n\r", ch->getName().c_str() );
  
        /* For each playing descriptor, save its state */
        for (d = descriptor_list; d ; d = d_next)
@@ -4693,12 +4698,12 @@ void do_copyover (Character *ch, char * argument)
         
                if (!d->character || d->connected > ConnectedState::Playing) /* drop those logging on */
                {
-                       write_to_descriptor (d->descriptor, "\n\rSorry, we are rebooting. Come back in a few minutes.\n\r", 0);
-                       close_socket (d); /* throw'em out */
+                       SocketHelper::write_to_descriptor (d->descriptor, "\n\rSorry, we are rebooting. Come back in a few minutes.\n\r", 0);
+                       SocketHelper::close_socket (d); /* throw'em out */
                }
                else
                {
-                       fprintf (fp, "%d %s %s\n", d->descriptor, och->getName(), d->host);
+                       fprintf (fp, "%d %s %s\n", d->descriptor, och->getName().c_str(), d->host);
 
 		       if (IS_CLANNED(och))
 		       {
@@ -4706,7 +4711,7 @@ void do_copyover (Character *ch, char * argument)
 		       }
                        save_char_obj (och);
                 
-                       write_to_descriptor (d->descriptor, buf, 0);
+                       SocketHelper::write_to_descriptor (d->descriptor, buf, 0);
                }
        }
  
@@ -4762,7 +4767,7 @@ void copyover_recover ()
                        break;
 
                /* Write something, and check if it goes error-free */   
-               if (!write_to_descriptor (desc, "\n\rRestoring from copyover...\n\r",0))
+               if (!SocketHelper::write_to_descriptor (desc, "\n\rRestoring from copyover...\n\r",0))
                {
                        close (desc); /* nope */
                        continue;
@@ -4783,12 +4788,12 @@ void copyover_recover ()
         
                if (!fOld) /* Player file not found?! */
                {
-                       write_to_descriptor (desc, "\n\rSomehow, your character was lost in the copyover. Sorry.\n\r", 0);
-                       close_socket (d);                
+                       SocketHelper::write_to_descriptor (desc, "\n\rSomehow, your character was lost in the copyover. Sorry.\n\r", 0);
+                       SocketHelper::close_socket (d);                
                }
                else /* ok! */
                {
-                       write_to_descriptor (desc, "\n\rCopyover recovery complete.\n\r",0);
+                       SocketHelper::write_to_descriptor (desc, "\n\rCopyover recovery complete.\n\r",0);
  
                        /* Just In Case */
                        if (!d->character->in_room)
@@ -5006,7 +5011,7 @@ void do_bonus( Character *ch, char *argument)
     victim->gain_exp( value );
    
     snprintf( buf, sizeof(buf),"You have bonused %s a whopping %d experience points.\n\r",
-    		victim->getName(), value);
+    		victim->getName().c_str(), value);
     		send_to_char(buf, ch);
 
     if ( value > 0 )

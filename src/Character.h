@@ -133,8 +133,8 @@ public:
     virtual int mana_gain( ) = 0;
     virtual int move_gain( ) = 0;
     void gain_condition( int iCond, int value );
-    void setName( const char * name );
-    char * getName();
+    void setName( string name );
+    std::string getName();
     void setDescription( const char * description );
     char * getDescription();
     Race * getRace();

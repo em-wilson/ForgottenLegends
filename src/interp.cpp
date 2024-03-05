@@ -35,6 +35,7 @@
 #include "board.h"
 #include "interp.h"
 #include "recycle.h"
+#include "SocketHelper.h"
 #include "Wiznet.h"
 
 bool	check_social	args( ( Character *ch, char *command,
@@ -514,16 +515,16 @@ void interpret( Character *ch, char *argument )
     ||   fLogAll
     ||   cmd_table[cmd].log == LOG_ALWAYS )
     {
-	snprintf(log_buf, 2*MAX_INPUT_LENGTH, "Log %s: %s", ch->getName(), logline );
+	snprintf(log_buf, 2*MAX_INPUT_LENGTH, "Log %s: %s", ch->getName().c_str(), logline );
 	Wiznet::instance()->report(log_buf,ch,NULL,WIZ_SECURE,0,ch->getTrust());
 	log_string( log_buf );
     }
 
     if ( ch->desc != NULL && ch->desc->snoop_by != NULL )
     {
-	write_to_buffer( ch->desc->snoop_by, "% ",    2 );
-	write_to_buffer( ch->desc->snoop_by, logline, 0 );
-	write_to_buffer( ch->desc->snoop_by, "\n\r",  2 );
+        SocketHelper::write_to_buffer( ch->desc->snoop_by, "% ",    2 );
+        SocketHelper::write_to_buffer( ch->desc->snoop_by, logline, 0 );
+        SocketHelper::write_to_buffer( ch->desc->snoop_by, "\n\r",  2 );
     }
 
     if ( !found )

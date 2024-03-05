@@ -83,13 +83,10 @@ void do_cedit( Character *caller, char *argument )
 	}
 
 	PlayerCharacter *ch = (PlayerCharacter*)caller;
-    if (!IS_CLANNED(ch) || str_cmp(ch->getName(),ch->pcdata->clan->getLeader().c_str()))
-    {
-	send_to_char("Only clan leaders may use this command.",ch);
-	return;
-    }
-    else
-    {
+    if (!IS_CLANNED(ch) || ch->getName() != ch->pcdata->clan->getLeader()) {
+      send_to_char("Only clan leaders may use this command.",ch);
+      return;
+    } else {
 		    send_to_char("Clan Customization Menu:\n\r"
 		    "1: Admin Options (leader only)\n\r"
 		    "2: Room Options\n\r"
@@ -135,10 +132,7 @@ void do_induct(Character *ch, char *argument)
 
   clan = ch->pcdata->clan;
 
-  if (!str_cmp(ch->getName(), clan->getLeader().c_str()) || !str_cmp(ch->getName(), clan->getFirstOfficer().c_str()) || !str_cmp(ch->getName(), clan->getSecondOfficer().c_str()))
-    ;
-  else
-  {
+  if (!clan_manager->isClanLeader(ch)) {
     send_to_char("Huh?\n\r", ch);
     return;
   }
@@ -209,10 +203,7 @@ void do_outcast(Character *ch, char *argument)
 
   clan = ch->pcdata->clan;
 
-  if (!str_cmp(ch->getName(), clan->getLeader().c_str()) || !str_cmp(ch->getName(), clan->getFirstOfficer().c_str()) || !str_cmp(ch->getName(), clan->getSecondOfficer().c_str()))
-    ;
-  else
-  {
+  if (!clan_manager->isClanLeader(ch)) {
     send_to_char("Huh?\n\r", ch);
     return;
   }
@@ -248,16 +239,16 @@ void do_outcast(Character *ch, char *argument)
     send_to_char("This player does not belong to your clan!\n\r", ch);
     return;
   }
-  if (!str_cmp(victim->getName(), clan->getLeader().c_str()))
+  if (victim->getName() == clan->getLeader())
   {
     send_to_char("You cannot loner your own leader!\n\r", ch);
     return;
   }
-  if (!str_cmp(victim->getName(), clan->getFirstOfficer().c_str()))
+  if (victim->getName() == clan->getFirstOfficer())
   {
     clan->removeFirstOfficer();
   }
-  if (!str_cmp(victim->getName(), clan->getSecondOfficer().c_str()))
+  if (victim->getName() == clan->getSecondOfficer())
   {
     clan->removeSecondOfficer();
   }

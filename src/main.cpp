@@ -7,6 +7,7 @@
 #include "RaceManager.h"
 #include "RaceReader.h"
 #include "RaceWriter.h"
+#include "RoomManager.h"
 
 // Clan helpers
 #include "clans/ClanReader.h"
@@ -30,6 +31,7 @@ int     init_socket             args( ( int port ) );
 
 extern ClanManager * clan_manager;
 extern RaceManager * race_manager;
+extern RoomManager * room_manager;
 
 
 //int     main                    args( ( int argc, char **argv ) );
@@ -92,6 +94,8 @@ int main( int argc, char **argv )
     BanManager ban_manager = BanManager();
     clan_manager = new ClanManager(new ClanReader(), new ClanWriter(CLAN_DIR, CLAN_LIST));
     race_manager = new RaceManager(new RaceReader(RACE_DIR), new RaceWriter(RACE_DIR));
+    room_manager = new RoomManager();
+
     try {
         race_manager->loadRaces();
     } catch (RaceNotFoundInFileException rfx) {

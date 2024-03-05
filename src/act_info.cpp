@@ -46,6 +46,7 @@
 #include "PlayerCharacter.h"
 #include "PcRace.h"
 #include "RaceManager.h"
+#include "StringHelper.h"
 
 using std::unordered_set;
 
@@ -1381,7 +1382,7 @@ void do_score(Character *ch, char *argument)
 
     snprintf(buf, sizeof(buf),
              "You are %s%s, level %d, %d years old (%d hours).\n\r",
-             ch->getName(),
+             ch->getName().c_str(),
              IS_NPC(ch) ? "" : ch->pcdata->title,
              ch->level, get_age(ch),
              (ch->played + (int)(current_time - ch->logon)) / 3600);
@@ -1826,7 +1827,7 @@ void do_whois(Character *ch, char *argument)
         if (!can_see(ch, wch))
             continue;
 
-        if (!str_prefix(arg, wch->getName()))
+        if (!StringHelper::str_prefix(arg, wch->getName()))
         {
             found = TRUE;
 
@@ -1881,7 +1882,7 @@ void do_whois(Character *ch, char *argument)
                      IS_SET(wch->comm, COMM_AFK) ? "[AFK] " : "",
                      (IS_CLANNED(ch) && IS_CLANNED(wch) && wch->pcdata->clan->hasFlag(CLAN_PK) && ch->pcdata->clan->hasFlag(CLAN_PK) && wch->level + wch->getRange() >= ch->level) ? "{R({rPK{R){x " : "",
                      IS_SET(wch->act, PLR_THIEF) ? "{B({YTHIEF{B){x " : "",
-                     wch->getName(), IS_NPC(wch) ? "" : wch->pcdata->title);
+                     wch->getName().c_str(), IS_NPC(wch) ? "" : wch->pcdata->title);
             add_buf(output, buf);
         }
     }
@@ -2092,7 +2093,7 @@ void do_who(Character *ch, char *argument)
                  IS_SET(wch->comm, COMM_AFK) ? "[AFK] " : "",
                  (IS_CLANNED(ch) && IS_CLANNED(wch) && wch->pcdata->clan->hasFlag(CLAN_PK) && ch->pcdata->clan->hasFlag(CLAN_PK) && wch->level + wch->getRange() >= ch->level) ? "{R({rPK{R){x " : "",
                  IS_SET(wch->act, PLR_THIEF) ? "{B({YTHIEF{B){x " : "",
-                 wch->getName(),
+                 wch->getName().c_str(),
                  IS_NPC(wch) ? "" : wch->pcdata->title);
         add_buf(output, buf);
     }
@@ -2260,7 +2261,7 @@ void do_where(Character *ch, char *argument)
             {
                 found = TRUE;
                 snprintf(buf, sizeof(buf), "%-28s %s\n\r",
-                         victim->getName(), victim->in_room->name);
+                         victim->getName().c_str(), victim->in_room->name);
                 send_to_char(buf, ch);
             }
         }
@@ -2273,7 +2274,7 @@ void do_where(Character *ch, char *argument)
         for (std::list<Character *>::iterator it = char_list.begin(); it != char_list.end(); it++)
         {
             victim = *it;
-            if (victim->in_room != NULL && victim->in_room->area == ch->in_room->area && !IS_AFFECTED(victim, AFF_HIDE) && !IS_AFFECTED(victim, AFF_SNEAK) && can_see(ch, victim) && is_name(arg, victim->getName()))
+            if (victim->in_room != NULL && victim->in_room->area == ch->in_room->area && !IS_AFFECTED(victim, AFF_HIDE) && !IS_AFFECTED(victim, AFF_SNEAK) && can_see(ch, victim) && is_name(arg, victim->getName().c_str()))
             {
                 found = TRUE;
                 snprintf(buf, sizeof(buf), "%-28s %s\n\r",
@@ -2676,7 +2677,7 @@ void do_password(Character *ch, char *argument)
         return;
     }
 
-    if (strcmp(crypt(arg1, ch->pcdata->pwd), ch->pcdata->pwd))
+    if (string(crypt(arg1, ch->pcdata->getPassword().c_str())) != ch->pcdata->getPassword())
     {
         WAIT_STATE(ch, 40);
         send_to_char("Wrong password.  Wait 10 seconds.\n\r", ch);
@@ -2693,7 +2694,7 @@ void do_password(Character *ch, char *argument)
     /*
      * No tilde allowed because of player file format.
      */
-    pwdnew = crypt(arg2, ch->getName());
+    pwdnew = crypt(arg2, ch->getName().c_str());
     for (p = pwdnew; *p != '\0'; p++)
     {
         if (*p == '~')
@@ -2704,8 +2705,7 @@ void do_password(Character *ch, char *argument)
         }
     }
 
-    free_string(ch->pcdata->pwd);
-    ch->pcdata->pwd = str_dup(pwdnew);
+    ch->pcdata->setPassword(pwdnew);
     save_char_obj(ch);
     send_to_char("Ok.\n\r", ch);
     return;
@@ -2771,7 +2771,7 @@ void do_nw(Character *ch, char *argument)
         if (d->connected != ConnectedState::Playing || !can_see(ch, wch))
             continue;
 
-        snprintf(buf, sizeof(buf), "%-15s %-15d\n\r", wch->getName(), nw_lookup(wch));
+        snprintf(buf, sizeof(buf), "%-15s %-15d\n\r", wch->getName().c_str(), nw_lookup(wch));
         send_to_char(buf, ch);
     }
 }

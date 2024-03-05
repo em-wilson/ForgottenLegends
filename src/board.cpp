@@ -27,6 +27,7 @@
 #include "clans/ClanManager.h"
 #include "ConnectedState.h"
 #include "PlayerCharacter.h"
+#include "SocketHelper.h"
 
 DECLARE_DO_FUN( do_help                );
 
@@ -382,7 +383,7 @@ void load_boards ()
 /* Returns TRUE if the specified note is address to ch */
 bool is_note_to (Character *ch, Note *note)
 {
-	if (!str_cmp (ch->getName(), note->sender))
+	if (!str_cmp (ch->getName().c_str(), note->sender))
 		return TRUE;
 	
 	if (is_full_name ("all", note->to_list))
@@ -404,7 +405,7 @@ bool is_note_to (Character *ch, Note *note)
 		is_full_name ("implementors", note->to_list)))
 		return TRUE;
 		
-	if (is_full_name (ch->getName(), note->to_list))
+	if (is_full_name (ch->getName().c_str(), note->to_list))
 		return TRUE;
 
 	/* Allow a note to e.g. 40 to send to characters level 40 and above */		
@@ -479,7 +480,7 @@ static void do_nwrite (Character *caller, char *argument)
 	if (!ch->pcdata->in_progress)
 	{
 		ch->pcdata->in_progress = new Note();
-		ch->pcdata->in_progress->sender = str_dup (ch->getName());
+		ch->pcdata->in_progress->sender = str_dup (ch->getName().c_str());
 
 		/* convert to ascii. ctime returns a string which last character is \n, so remove that */	
 		strtime = ctime (&current_time);
@@ -506,7 +507,7 @@ static void do_nwrite (Character *caller, char *argument)
 	               ch->pcdata->board->short_name);
 	send_to_char (buf,ch);
 	
-	snprintf(buf, sizeof(buf), "{YFrom{x:    %s\n\r\n\r", ch->getName());
+	snprintf(buf, sizeof(buf), "{YFrom{x:    %s\n\r\n\r", ch->getName().c_str());
 	send_to_char (buf,ch);
 
 	if (ch->pcdata->in_progress->getText().empty()) /* Are we continuing an old note or not? */
@@ -639,7 +640,7 @@ static void do_nremove (Character *ch, char *argument)
 		return;
 	}
 	
-	if (str_cmp(ch->getName(),p->sender) && (ch->getTrust() < MAX_LEVEL))
+	if (str_cmp(ch->getName().c_str(),p->sender) && (ch->getTrust() < MAX_LEVEL))
 	{
 		send_to_char ("You are not authorized to remove this note.\n\r",ch);
 		return;
@@ -1011,7 +1012,7 @@ void handle_ConnectedStateNoteSubject (DESCRIPTOR_DATA *d, char * argument)
 	}
 	else  if (strlen(buf)>60)
 	{
-		write_to_buffer (d, "No, no. This is just the Subject. You're note writing the note yet. Twit.\n\r",0);
+		SocketHelper::write_to_buffer (d, "No, no. This is just the Subject. You're note writing the note yet. Twit.\n\r",0);
 	}
 	else
 	/* advance to next stage */
@@ -1031,7 +1032,7 @@ void handle_ConnectedStateNoteSubject (DESCRIPTOR_DATA *d, char * argument)
 			ch->pcdata->in_progress->expire = 
 				current_time + ch->pcdata->board->purge_days * 24L * 3600L;				
 			snprintf(buf, sizeof(buf), "This note will expire %s\r",ctime(&ch->pcdata->in_progress->expire));
-			write_to_buffer (d,buf,0);
+			SocketHelper::write_to_buffer (d,buf,0);
 			snprintf(buf, sizeof(buf), "\n\rEnter text. Type ~ or END on an empty line to end note.\n\r"
 			                    "=======================================================\n\r");
 			send_to_char(buf,ch);
@@ -1062,7 +1063,7 @@ void handle_ConnectedStateNoteExpire(DESCRIPTOR_DATA *d, char * argument)
 		if (!is_number(buf))
 		{
 			char buf1[MSL];
-			write_to_buffer (d,"Write the number of days!\n\r",0);
+			SocketHelper::write_to_buffer (d,"Write the number of days!\n\r",0);
 			snprintf(buf1, sizeof(buf1), "{YExpire{x:  ");
 			send_to_char(buf1,ch);
 			return;
@@ -1073,7 +1074,7 @@ void handle_ConnectedStateNoteExpire(DESCRIPTOR_DATA *d, char * argument)
 			if (days <= 0)
 			{
 				char buf1[MSL];
-				write_to_buffer (d, "This is a positive MUD. Use positive numbers only! :)\n\r",0);
+				SocketHelper::write_to_buffer (d, "This is a positive MUD. Use positive numbers only! :)\n\r",0);
 				snprintf(buf1, sizeof(buf1), "{YExpire{x:  ");
 				return;
 			}
@@ -1112,9 +1113,9 @@ void handle_ConnectedStateNoteText (DESCRIPTOR_DATA *d, char * argument)
 	strcpy (buf, argument);
 	if ((!str_cmp(buf, "~")) || (!str_cmp(buf, "END")))
 	{
-		write_to_buffer (d, "\n\r\n\r",0);
+		SocketHelper::write_to_buffer (d, "\n\r\n\r",0);
 		send_to_char(szFinishPrompt, ch);
-		write_to_buffer (d, "\n\r", 0);
+		SocketHelper::write_to_buffer (d, "\n\r", 0);
 		d->connected = ConnectedState::NoteFinish;
 		return;
 	}
@@ -1125,7 +1126,7 @@ void handle_ConnectedStateNoteText (DESCRIPTOR_DATA *d, char * argument)
 	
 	if (strlen (buf) > MAX_LINE_LENGTH)
 	{
-		write_to_buffer (d, "Too long line rejected. Do NOT go over 80 characters!\n\r",0);
+		SocketHelper::write_to_buffer (d, "Too long line rejected. Do NOT go over 80 characters!\n\r",0);
 		return;
 	}
 	
@@ -1144,7 +1145,7 @@ void handle_ConnectedStateNoteText (DESCRIPTOR_DATA *d, char * argument)
 	
 	if ((strlen(letter) + strlen (buf)) > MAX_NOTE_TEXT)
 	{ /* Note too long, take appropriate steps */
-		write_to_buffer (d, "Note too long!\n\r", 0);
+		SocketHelper::write_to_buffer (d, "Note too long!\n\r", 0);
 		delete ch->pcdata->in_progress;
 		ch->pcdata->in_progress = NULL;			/* important */
 		d->connected = ConnectedState::Playing;
@@ -1175,7 +1176,7 @@ void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 		switch (tolower(argument[0]))
 		{
 			case 'c': /* keep writing */
-				write_to_buffer (d,"Continuing note...\n\r",0);
+				SocketHelper::write_to_buffer (d,"Continuing note...\n\r",0);
 				d->connected = ConnectedState::NoteText;
 				break;
 
@@ -1187,14 +1188,14 @@ void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 					send_to_char(ch->pcdata->in_progress->getText().c_str(), ch);
 				}
 				else
-					write_to_buffer (d,"You haven't written a thing!\n\r\n\r",0);
+					SocketHelper::write_to_buffer (d,"You haven't written a thing!\n\r\n\r",0);
 				send_to_char(szFinishPrompt, ch);
-				write_to_buffer (d, "\n\r",0);
+				SocketHelper::write_to_buffer (d, "\n\r",0);
 				break;
 
 			case 'p': /* post note */
 				finish_note (ch->pcdata->board, ch->pcdata->in_progress);
-				write_to_buffer (d, "Note posted.\n\r",0);
+				SocketHelper::write_to_buffer (d, "Note posted.\n\r",0);
 				d->connected = ConnectedState::Playing;
 
 				/* remove AFK status */
@@ -1209,7 +1210,7 @@ void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 				break;
 				
 			case 'f':
-				write_to_buffer (d, "Note cancelled!\n\r",0);
+				SocketHelper::write_to_buffer (d, "Note cancelled!\n\r",0);
 				delete ch->pcdata->in_progress;
 				ch->pcdata->in_progress = NULL;
 				d->connected = ConnectedState::Playing;
@@ -1223,9 +1224,9 @@ void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 				break;
 			
 			default: /* invalid response */
-				write_to_buffer (d, "Huh? Valid answers are:\n\r\n\r",0);
+				SocketHelper::write_to_buffer (d, "Huh? Valid answers are:\n\r\n\r",0);
 				send_to_char(szFinishPrompt, ch);
-				write_to_buffer (d, "\n\r",0);
+				SocketHelper::write_to_buffer (d, "\n\r",0);
 				
 		}
 }

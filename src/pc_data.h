@@ -16,37 +16,42 @@ class Note;
  */
 class PC_DATA
 {
-public:
-	static std::list<PC_DATA *> active;
-    PC_DATA *		next;
-    Clan *		clan;
-    BUFFER * 		buffer;
-    bool		valid;
-    char *		pwd;
-    char *		bamfin;
-    char *		bamfout;
-    char *		title;
-    short int		perm_hit;
-    short int		perm_mana;
-    short int		perm_move;
-    short int		true_sex;
-    int			last_level;
-    short int		condition	[4];
-    std::unordered_map<int, short int> learned;
-    std::unordered_map<int, short int> sk_level;
-    std::unordered_map<int, short int> sk_rating;
-    std::unordered_map<int, bool> group_known;
-    short int		points;
-    bool              	confirm_delete;
-    char *		alias[MAX_ALIAS];
-    char * 		alias_sub[MAX_ALIAS];
-    int 		security;	/* OLC */ /* Builder security */
-    BOARD_DATA *        board;                  /* The current board        */
-    std::unordered_map<int, time_t> last_note_read;   /* last note for the boards */
-    Note *         in_progress;
+    public:
+        static std::list<PC_DATA *> active;
+        PC_DATA *		next;
+        Clan *		clan;
+        BUFFER * 		buffer;
+        bool		valid;
+        char *		bamfin;
+        char *		bamfout;
+        char *		title;
+        short int		perm_hit;
+        short int		perm_mana;
+        short int		perm_move;
+        short int		true_sex;
+        int			last_level;
+        short int		condition	[4];
+        std::unordered_map<int, short int> learned;
+        std::unordered_map<int, short int> sk_level;
+        std::unordered_map<int, short int> sk_rating;
+        std::unordered_map<int, bool> group_known;
+        short int		points;
+        bool              	confirm_delete;
+        char *		alias[MAX_ALIAS];
+        char * 		alias_sub[MAX_ALIAS];
+        int 		security;	/* OLC */ /* Builder security */
+        BOARD_DATA *        board;                  /* The current board        */
+        std::unordered_map<int, time_t> last_note_read;   /* last note for the boards */
+        Note *         in_progress;
 
-    PC_DATA();
-    ~PC_DATA();
+        PC_DATA();
+        ~PC_DATA();
+
+        std::string getPassword();
+        void setPassword(std::string value);
+
+    private:
+        std::string _pwd;
 };
 
 

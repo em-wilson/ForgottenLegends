@@ -572,7 +572,7 @@ int cmd_eval( sh_int vnum, char *line, int check,
                 case 't':
                 case 'r':
 		case 'q':
-		    return( lval_char != NULL && is_name( buf, lval_char->getName() ) );
+		    return( lval_char != NULL && is_name( buf, lval_char->getName().c_str() ) );
 		case 'o':
 		case 'p':
 		    return( lval_obj != NULL && is_name( buf, lval_obj->name ) );
@@ -702,30 +702,30 @@ void expand_arg( char *buf,
             default:  bug( "Expand_arg: bad code %d.", *str );
                           i = " <@@@> ";                        break;
             case 'i':
-		one_argument( mob->getName(), fname );
+		one_argument( mob->getName().data(), fname );
 		i = fname;                         		break;
             case 'I': i = mob->short_descr;                     break;
             case 'n': 
 		i = someone;
 		if ( ch != NULL && can_see( mob, ch ) )
 		{
-            	    one_argument( ch->getName(), fname );
+            	    one_argument( ch->getName().data(), fname );
 		    i = capitalize(fname);
 		}						break;
             case 'N': 
 	    	i = (ch != NULL && can_see( mob, ch ) )
-		? ( IS_NPC( ch ) ? ch->short_descr : ch->getName() )
+		? ( IS_NPC( ch ) ? ch->short_descr : ch->getName().c_str() )
 		: someone;                         		break;
             case 't': 
 		i = someone;
 		if ( vch != NULL && can_see( mob, vch ) )
 		{
-            	     one_argument( vch->getName(), fname );
+            	     one_argument( vch->getName().data(), fname );
 		     i = capitalize(fname);
 		}						break;
             case 'T': 
 	    	i = (vch != NULL && can_see( mob, vch ))
-		? ( IS_NPC( vch ) ? vch->short_descr : vch->getName() )
+		? ( IS_NPC( vch ) ? vch->short_descr : vch->getName().c_str() )
 		: someone;                         		break;
             case 'r': 
 		if ( rch == NULL ) 
@@ -733,25 +733,25 @@ void expand_arg( char *buf,
 		i = someone;
 		if( rch != NULL && can_see( mob, rch ) )
 		{
-                    one_argument( rch->getName(), fname );
+                    one_argument( rch->getName().data(), fname );
 		    i = capitalize(fname);
 		} 						break;
             case 'R': 
 		if ( rch == NULL ) 
 		    rch = get_random_char( mob );
 		i  = ( rch != NULL && can_see( mob, rch ) )
-		? ( IS_NPC( ch ) ? ch->short_descr : ch->getName() )
+		? ( IS_NPC( ch ) ? ch->short_descr : ch->getName().c_str() )
 		:someone;					break;
 	    case 'q':
 		i = someone;
 		if ( mob->mprog_target != NULL && can_see( mob, mob->mprog_target ) )
 	        {
-		    one_argument( mob->mprog_target->getName(), fname );
+		    one_argument( mob->mprog_target->getName().data(), fname );
 		    i = capitalize( fname );
 		} 						break;
 	    case 'Q':
 	    	i = (mob->mprog_target != NULL && can_see( mob, mob->mprog_target ))
-		? ( IS_NPC( mob->mprog_target ) ? mob->mprog_target->short_descr : mob->mprog_target->getName() )
+		? ( IS_NPC( mob->mprog_target ) ? mob->mprog_target->short_descr : mob->mprog_target->getName().c_str() )
 		: someone;                         		break;
             case 'j': i = he_she  [URANGE(0, mob->sex, 2)];     break;
             case 'e': 

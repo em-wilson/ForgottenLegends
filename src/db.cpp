@@ -41,18 +41,20 @@
 #include "clans/ClanWriter.h"
 #include "db.h"
 #include "EquipmentListGenerator.h"
+#include "lookup.h"
+#include "music.h"
+#include "NonPlayerCharacter.h"
 #include "RaceManager.h"
 #include "recycle.h"
-#include "music.h"
+#include "RoomManager.h"
 #include "tables.h"
-#include "lookup.h"
 #include "Wiznet.h"
-#include "NonPlayerCharacter.h"
 
 
 extern	int	_filbuf		args( (FILE *) );
 ClanManager * clan_manager;
 RaceManager * race_manager;
+RoomManager * room_manager;
 
 #if !defined(OLD_RAND)
 /* RedHat 5.x already contains this, so I'm commenting it out.
@@ -1953,11 +1955,6 @@ OBJ_INDEX_DATA *get_obj_index( int vnum )
     return NULL;
 }
 
-ROOM_INDEX_DATA *get_limbo_room()
-{
-    return get_room_index(ROOM_VNUM_LIMBO);
-}
-
 /*
  * Translates mob virtual number to its room index struct.
  * Hash table lookup.
@@ -3030,7 +3027,7 @@ void append_file( Character *ch, const char *file, const char *str )
     else
     {
 	fprintf( fp, "[%5d] %s: %s\n",
-	    ch->in_room ? ch->in_room->vnum : 0, ch->getName(), str );
+	    ch->in_room ? ch->in_room->vnum : 0, ch->getName().c_str(), str );
 	fclose( fp );
     }
 

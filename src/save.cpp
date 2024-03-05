@@ -36,6 +36,7 @@
 #include "PcRace.h"
 #include "PlayerCharacter.h"
 #include "RaceManager.h"
+#include "StringHelper.h"
 
 extern ClanManager * clan_manager;
 extern RaceManager * race_manager;
@@ -113,7 +114,7 @@ void save_char_obj( Character *ch )
     if (IS_IMMORTAL(ch) || ch->level >= LEVEL_IMMORTAL)
     {
 	fclose(fpReserve);
-	snprintf(strsave, sizeof(strsave), "%s%s",GOD_DIR, capitalize(ch->getName()));
+	snprintf(strsave, sizeof(strsave), "%s%s",GOD_DIR, StringHelper::capitalize(ch->getName()).c_str());
 	if ((fp = fopen(strsave,"w")) == NULL)
 	{
 	    bug("Save_char_obj: fopen",0);
@@ -121,13 +122,13 @@ void save_char_obj( Character *ch )
  	}
 
 	fprintf(fp,"Lev %2d Trust %2d  %s%s\n",
-	    ch->level, ch->getTrust(), ch->getName(), ch->pcdata->title);
+	    ch->level, ch->getTrust(), ch->getName().c_str(), ch->pcdata->title);
 	fclose( fp );
 	fpReserve = fopen( NULL_FILE, "r" );
     }
 
     fclose( fpReserve );
-    snprintf(strsave, sizeof(strsave), "%s%s", PLAYER_DIR, capitalize( ch->getName() ) );
+    snprintf(strsave, sizeof(strsave), "%s%s", PLAYER_DIR, StringHelper::capitalize( ch->getName() ).c_str() );
     if ( ( fp = fopen( TEMP_FILE, "w" ) ) == NULL )
     {
 	bug( "Save_char_obj: fopen", 0 );
@@ -160,7 +161,7 @@ void fwrite_pet( Character *pet, FILE *fp)
     
     fprintf(fp,"Vnum %d\n",pet->pIndexData->vnum);
     
-    fprintf(fp,"Name %s~\n", pet->getName());
+    fprintf(fp,"Name %s~\n", pet->getName().c_str());
     fprintf(fp,"LogO %ld\n", current_time);
     if (pet->short_descr != pet->pIndexData->short_descr)
     	fprintf(fp,"ShD  %s~\n", pet->short_descr);
@@ -560,7 +561,7 @@ void fread_char( Character *ch, FILE *fp )
     int lastlogoff = current_time;
     int percent;
 
-    snprintf(buf, sizeof(buf),"Loading %s.",ch->getName());
+    snprintf(buf, sizeof(buf),"Loading %s.",ch->getName().c_str());
     log_string(buf);
 
     for ( ; ; )
@@ -721,7 +722,7 @@ void fread_char( Character *ch, FILE *fp )
                     if (i == BOARD_NOTFOUND) /* Does board still exist ? */
                      {
                         snprintf(buf, sizeof(buf), "fread_char: %s had unknown board name: %s. Skipped.",
-                            ch->getName(), boardname);
+                            ch->getName().c_str(), boardname);
                         log_string (buf);
                         fread_number (fp); /* read last_note and skip info */
                     }
@@ -879,8 +880,8 @@ void fread_char( Character *ch, FILE *fp )
 	    break;
 
 	case 'P':
-	    KEY( "Password",	ch->pcdata->pwd,	fread_string( fp ) );
-	    KEY( "Pass",	ch->pcdata->pwd,	fread_string( fp ) );
+	    KEYF( "Password",	ch->pcdata->setPassword,	fread_string( fp ) );
+	    KEYF( "Pass",	ch->pcdata->setPassword,	fread_string( fp ) );
 	    KEY( "Played",	ch->played,		fread_number( fp ) );
 	    KEY( "Plyd",	ch->played,		fread_number( fp ) );
 	    KEY( "Points",	ch->pcdata->points,	fread_number( fp ) );

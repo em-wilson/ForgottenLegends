@@ -8,9 +8,6 @@ class AbstractStateHandler : public IConnectedStateHandler {
         AbstractStateHandler(ConnectedState state);
         bool canHandleState(ConnectedState state);
 
-    protected:
-        bool check_reconnect(DESCRIPTOR_DATA *d, char *name, bool fConn);
-
     private:
         ConnectedState _state;
 };

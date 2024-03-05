@@ -208,7 +208,7 @@ void move_char( Character *ch, int door, bool follow )
 	    if (IS_BUNNY(fch))
 	    {
 		char buf[MSL];
-		snprintf(buf, sizeof(buf),"%s leaves %s.\n\r", can_see(ch,fch) ? ch->getName() : "someone", dir_name[door] );
+		snprintf(buf, sizeof(buf),"%s leaves %s.\n\r", can_see(ch,fch) ? ch->getName().c_str() : "someone", dir_name[door] );
 		send_to_char(buf,ch);
 	    }
 

@@ -1146,7 +1146,7 @@ REDIT( redit_show )
     fcnt = FALSE;
     for ( rch = pRoom->people; rch; rch = rch->next_in_room )
     {
-	one_argument( rch->getName(), buf );
+	one_argument( rch->getName().data(), buf );
 	strcat( buf1, buf );
 	strcat( buf1, " " );
 	fcnt = TRUE;

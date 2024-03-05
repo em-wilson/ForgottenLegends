@@ -13,7 +13,7 @@ Wiznet *Wiznet::instance()
 	return _inst;
 }
 
-void Wiznet::report(const char *string, Character *ch, OBJ_DATA *obj,
+void Wiznet::report(std::string str, Character *ch, OBJ_DATA *obj,
 	    long flag, long flag_skip, int min_level) 
 {
     DESCRIPTOR_DATA *d;
@@ -30,7 +30,7 @@ void Wiznet::report(const char *string, Character *ch, OBJ_DATA *obj,
 	        {
 			    if (IS_SET(d->character->wiznet,WIZ_PREFIX))
 			  		send_to_char("--> ",d->character);
-	            act_new(string,d->character,obj,ch,TO_CHAR,POS_DEAD);
+	            act_new(str.c_str(),d->character,obj,ch,TO_CHAR,POS_DEAD);
 	        }
     }
  

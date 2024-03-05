@@ -81,10 +81,12 @@ set(SOURCE_FILES
     src/RaceWriter.cpp src/RaceWriter.h
     src/RaceManager.cpp src/RaceManager.h
     src/recycle.cpp src/recycle.h
+    src/RoomManager.cpp src/RoomManager.h
     src/save.cpp
     src/scan.cpp
     src/search.cpp
     src/skills.cpp
+    src/SocketHelper.cpp src/SocketHelper.h
     src/special.cpp
     src/string.cpp
     src/StringHelper.cpp src/StringHelper.h

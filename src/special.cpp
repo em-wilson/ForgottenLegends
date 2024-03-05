@@ -138,9 +138,9 @@ bool spec_nasty( Character *ch )
              && (victim->level > ch->level)
              && (victim->level < ch->level + 10))
           {
-	     do_backstab(ch,victim->getName());
+	     do_backstab(ch,victim->getName().data());
              if (ch->position != POS_FIGHTING)
-                 do_murder(ch,victim->getName());
+                 do_murder(ch,victim->getName().data());
              /* should steal some coins right away? :) */
              return TRUE;
           }
@@ -540,7 +540,7 @@ bool spec_executioner( Character *ch )
 	return FALSE;
 
     snprintf(buf, sizeof(buf), "%s is a %s!  PROTECT THE INNOCENT!  MORE BLOOOOD!!!",
-	victim->getName(), crime );
+	victim->getName().c_str(), crime );
     REMOVE_BIT(ch->comm,COMM_NOSHOUT);
     do_yell( ch, buf );
     multi_hit( ch, victim, TYPE_UNDEFINED );
@@ -617,7 +617,7 @@ bool spec_guard( Character *ch )
     if ( victim != NULL && !IS_IMMORTAL(victim))
     {
 	snprintf(buf, sizeof(buf), "%s is a %s!  PROTECT THE INNOCENT!!  BANZAI!!",
-	    victim->getName(), crime );
+	    victim->getName().c_str(), crime );
  	REMOVE_BIT(ch->comm,COMM_NOSHOUT);
 	do_yell( ch, buf );
 	multi_hit( ch, victim, TYPE_UNDEFINED );

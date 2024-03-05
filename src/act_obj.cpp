@@ -74,14 +74,14 @@ bool can_loot(Character *ch, OBJ_DATA *obj)
     for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
     	wch = *it;
-        if (!str_cmp(wch->getName(),obj->owner))
+        if (!str_cmp(wch->getName().c_str(),obj->owner))
             owner = wch;
     }
 
     if (owner == NULL)
 	return TRUE;
 
-    if (!str_cmp(ch->getName(),owner->getName()))
+    if (!str_cmp(ch->getName().c_str(),owner->getName().c_str()))
 	return TRUE;
 
     if (!IS_NPC(owner) && IS_SET(owner->act,PLR_CANLOOT))
@@ -759,18 +759,18 @@ void do_give( Character *ch, char *argument )
 		    ,victim,NULL,ch,TO_VICT);
 		ch->reply = victim;
 		snprintf(buf, sizeof(buf),"%d %s %s", 
-			amount, silver ? "silver" : "gold",ch->getName());
+			amount, silver ? "silver" : "gold",ch->getName().c_str());
 		do_give(victim,buf);
 	    }
 	    else if (can_see(victim,ch))
 	    {
 		snprintf(buf, sizeof(buf),"%d %s %s", 
-			change, silver ? "gold" : "silver",ch->getName());
+			change, silver ? "gold" : "silver",ch->getName().c_str());
 		do_give(victim,buf);
 		if (silver)
 		{
 		    snprintf(buf, sizeof(buf),"%d silver %s", 
-			(95 * amount / 100 - change * 100),ch->getName());
+			(95 * amount / 100 - change * 100),ch->getName().c_str());
 		    do_give(victim,buf);
 		}
 		act("$n tells you 'Thank you, come again.'",
@@ -1869,7 +1869,7 @@ void do_sacrifice( Character *ch, char *argument )
 
     one_argument( argument, arg );
 
-    if ( arg[0] == '\0' || !str_cmp( arg, ch->getName() ) )
+    if ( arg[0] == '\0' || !str_cmp( arg, ch->getName().c_str() ) )
     {
 	act( "$n offers $mself to Mota, who graciously declines.",
 	    ch, NULL, NULL, TO_ROOM );
@@ -2305,17 +2305,17 @@ void do_steal( Character *ch, char *argument )
 	switch(number_range(0,3))
 	{
 	case 0 :
-	   snprintf(buf, sizeof(buf), "%s is a lousy thief!", ch->getName() );
+	   snprintf(buf, sizeof(buf), "%s is a lousy thief!", ch->getName().c_str() );
 	   break;
         case 1 :
 	   snprintf(buf, sizeof(buf), "%s couldn't rob %s way out of a paper bag!",
-		    ch->getName(),(ch->sex == 2) ? "her" : "his");
+		    ch->getName().c_str(),(ch->sex == 2) ? "her" : "his");
 	   break;
 	case 2 :
-	    snprintf(buf, sizeof(buf),"%s tried to rob me!",ch->getName() );
+	    snprintf(buf, sizeof(buf),"%s tried to rob me!",ch->getName().c_str() );
 	    break;
 	case 3 :
-	    snprintf(buf, sizeof(buf),"Keep your hands out of there, %s!",ch->getName() );
+	    snprintf(buf, sizeof(buf),"Keep your hands out of there, %s!",ch->getName().c_str() );
 	    break;
         }
         if (!IS_AWAKE(victim))
@@ -2331,7 +2331,7 @@ void do_steal( Character *ch, char *argument )
 	    }
 	    else
 	    {
-		snprintf(buf, sizeof(buf),"$N tried to steal from %s.",victim->getName());
+		snprintf(buf, sizeof(buf),"$N tried to steal from %s.",victim->getName().c_str());
 		Wiznet::instance()->report(buf,ch,NULL,WIZ_FLAGS,0,0);
 		if ( !IS_SET(ch->act, PLR_THIEF) && !IS_IMMORTAL(ch))
 		{
@@ -2687,12 +2687,12 @@ void do_buy( Character *ch, char *argument )
 	argument = one_argument( argument, arg );
 	if ( arg[0] != '\0' )
 	{
-	    snprintf(buf, sizeof(buf), "%s %s", pet->getName(), arg );
+	    snprintf(buf, sizeof(buf), "%s %s", pet->getName().c_str(), arg );
 	    pet->setName(buf);
 	}
 
 	snprintf(buf, sizeof(buf), "%sA neck tag says 'I belong to %s'.\n\r",
-	    pet->getDescription(), ch->getName() );
+	    pet->getDescription(), ch->getName().c_str() );
     pet->setDescription( buf );
 
 	char_to_room( pet, ch->in_room );

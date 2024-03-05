@@ -9,6 +9,8 @@ typedef struct	descriptor_data		DESCRIPTOR_DATA;
 
 class Character;
 
+void free_descriptor(DESCRIPTOR_DATA *d);
+
 /*
  * Descriptor (channel) structure.
  */

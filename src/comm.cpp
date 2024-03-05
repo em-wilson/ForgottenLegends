@@ -63,6 +63,7 @@
 #include "clans/ClanManager.h"
 #include "IConnectedStateHandler.h"
 #include "RaceManager.h"
+#include "SocketHelper.h"
 #include "Wiznet.h"
 
 /* command procedures needed */
@@ -111,13 +112,10 @@ void game_loop_unix args((Game * game, int control));
 int init_socket args((int port));
 void init_descriptor args((int control));
 bool read_from_descriptor args((DESCRIPTOR_DATA * d));
-bool write_to_descriptor args((int desc, const char *txt, int length));
 
 /*
  * Other local functions (OS-independent).
  */
-bool check_reconnect args((DESCRIPTOR_DATA * d, char *name,
-						   bool fConn));
 void nanny args((Game * game, DESCRIPTOR_DATA *d, char *argument));
 bool process_output args((DESCRIPTOR_DATA * d, bool fPrompt));
 void read_from_buffer args((DESCRIPTOR_DATA * d));
@@ -248,7 +246,7 @@ void game_loop_unix(Game *game, int control)
 				if (d->character && d->connected == ConnectedState::Playing)
 					save_char_obj(d->character);
 				d->outtop = 0;
-				close_socket(d);
+				SocketHelper::close_socket(d);
 			}
 		}
 
@@ -270,7 +268,7 @@ void game_loop_unix(Game *game, int control)
 					if (d->character != NULL && d->connected == ConnectedState::Playing)
 						save_char_obj(d->character);
 					d->outtop = 0;
-					close_socket(d);
+					SocketHelper::close_socket(d);
 					continue;
 				}
 			}
@@ -335,7 +333,7 @@ void game_loop_unix(Game *game, int control)
 					if (d->character != NULL && d->connected == ConnectedState::Playing)
 						save_char_obj(d->character);
 					d->outtop = 0;
-					close_socket(d);
+					SocketHelper::close_socket(d);
 				}
 			}
 		}
@@ -454,7 +452,7 @@ void init_descriptor(int control)
 	 */
 	if (check_ban(dnew->host, BAN_ALL))
 	{
-		write_to_descriptor(desc,
+		SocketHelper::write_to_descriptor(desc,
 							"Your site has been banned from this mud.\n\r", 0);
 		close(desc);
 		free_descriptor(dnew);
@@ -472,87 +470,11 @@ void init_descriptor(int control)
 	{
 		extern char *help_greeting;
 		if (help_greeting[0] == '.')
-			write_to_buffer(dnew, help_greeting + 1, 0);
+			SocketHelper::write_to_buffer(dnew, help_greeting + 1, 0);
 		else
-			write_to_buffer(dnew, help_greeting, 0);
+			SocketHelper::write_to_buffer(dnew, help_greeting, 0);
 	}
 
-	return;
-}
-
-void close_socket(DESCRIPTOR_DATA *dclose)
-{
-	Character *ch;
-
-	if (dclose->outtop > 0)
-		process_output(dclose, FALSE);
-
-	if (dclose->snoop_by != NULL)
-	{
-		write_to_buffer(dclose->snoop_by,
-						"Your victim has left the game.\n\r", 0);
-	}
-
-	{
-		DESCRIPTOR_DATA *d;
-
-		for (d = descriptor_list; d != NULL; d = d->next)
-		{
-			if (d->snoop_by == dclose)
-				d->snoop_by = NULL;
-		}
-	}
-
-	if ((ch = dclose->character) != NULL)
-	{
-		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "Closing link to %s.", ch->getName());
-		log_string(log_buf);
-		/* cut down on wiznet spam when rebooting */
-		/* If ch is writing note or playing, just lose link otherwise clear char */
-		if ((dclose->connected == ConnectedState::Playing && !merc_down) || ((dclose->connected >= ConnectedState::NoteTo) && (dclose->connected <= ConnectedState::NoteFinish)))
-		{
-			act("$n has lost $s link.", ch, NULL, NULL, TO_ROOM);
-			Wiznet::instance()->report((char *)"Net death has claimed $N.", ch, NULL, WIZ_LINKS, 0, 0);
-			ch->desc = NULL;
-		}
-		else
-		{
-			if (dclose->original)
-			{
-				char_list.remove(dclose->original);
-				delete dclose->original;
-				dclose->original = NULL;
-			}
-			else
-			{
-				char_list.remove(dclose->character);
-				delete dclose->character;
-				dclose->character = NULL;
-			}
-		}
-	}
-
-	if (d_next == dclose)
-		d_next = d_next->next;
-
-	if (dclose == descriptor_list)
-	{
-		descriptor_list = descriptor_list->next;
-	}
-	else
-	{
-		DESCRIPTOR_DATA *d;
-
-		for (d = descriptor_list; d && d->next != dclose; d = d->next)
-			;
-		if (d != NULL)
-			d->next = dclose->next;
-		else
-			bug("Close_socket: dclose not found.", 0);
-	}
-
-	close(dclose->descriptor);
-	free_descriptor(dclose);
 	return;
 }
 
@@ -570,7 +492,7 @@ bool read_from_descriptor(DESCRIPTOR_DATA *d)
 	{
 		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s input overflow!", d->host);
 		log_string(log_buf);
-		write_to_descriptor(d->descriptor,
+		SocketHelper::write_to_descriptor(d->descriptor,
 							(char *)"\n\r*** PUT A LID ON IT!!! ***\n\r", 0);
 		return FALSE;
 	}
@@ -635,7 +557,7 @@ void read_from_buffer(DESCRIPTOR_DATA *d)
 	{
 		if (k >= MAX_INPUT_LENGTH - 2)
 		{
-			write_to_descriptor(d->descriptor, (char *)"Line too long.\n\r", 0);
+			SocketHelper::write_to_descriptor(d->descriptor, (char *)"Line too long.\n\r", 0);
 
 			/* skip the rest of the line */
 			for (; d->inbuf[i] != '\0'; i++)
@@ -688,7 +610,7 @@ void read_from_buffer(DESCRIPTOR_DATA *d)
 
 				d->repeat = 0;
 				/*
-						write_to_descriptor( d->descriptor,
+						SocketHelper::write_to_descriptor( d->descriptor,
 							"\n\r*** PUT A LID ON IT!!! ***\n\r", 0 );
 						strcpy( d->incomm, "quit" );
 				*/
@@ -728,11 +650,11 @@ bool process_output(DESCRIPTOR_DATA *d, bool fPrompt)
 	{
 		if (d->showstr_point)
 		{
-			write_to_buffer(d, "[Hit Return to continue]\n\r", 0);
+			SocketHelper::write_to_buffer(d, "[Hit Return to continue]\n\r", 0);
 		}
 		else if (fPrompt && d->pString && d->connected == ConnectedState::Playing)
 		{
-			write_to_buffer(d, "> ", 2);
+			SocketHelper::write_to_buffer(d, "> ", 2);
 		}
 		else if (fPrompt && d->connected == ConnectedState::Playing)
 		{
@@ -793,22 +715,22 @@ bool process_output(DESCRIPTOR_DATA *d, bool fPrompt)
 				}
 
 				snprintf(buf, sizeof(buf), "%s %s \n\r",
-						 IS_NPC(victim) ? victim->short_descr : victim->getName(), wound);
+						 IS_NPC(victim) ? victim->short_descr : victim->getName().c_str(), wound);
 				buf[0] = UPPER(buf[0]);
 				pbuff = buffer;
 				colourconv(pbuff, buf, d->character);
-				write_to_buffer(d, buffer, 0);
+				SocketHelper::write_to_buffer(d, buffer, 0);
 			}
 
 			ch = d->original ? d->original : d->character;
 			if (!IS_SET(ch->comm, COMM_COMPACT))
-				write_to_buffer(d, "\n\r", 2);
+				SocketHelper::write_to_buffer(d, "\n\r", 2);
 
 			if (IS_SET(ch->comm, COMM_PROMPT))
 				bust_a_prompt(d->character);
 
 			if (IS_SET(ch->comm, COMM_TELNET_GA))
-				write_to_buffer(d, (const char *)go_ahead_str, 0);
+				SocketHelper::write_to_buffer(d, (const char *)go_ahead_str, 0);
 		}
 
 		/*
@@ -823,15 +745,15 @@ bool process_output(DESCRIPTOR_DATA *d, bool fPrompt)
 		if (d->snoop_by != NULL)
 		{
 			if (d->character != NULL)
-				write_to_buffer(d->snoop_by, d->character->getName(), 0);
-			write_to_buffer(d->snoop_by, "> ", 2);
-			write_to_buffer(d->snoop_by, d->outbuf, d->outtop);
+				SocketHelper::write_to_buffer(d->snoop_by, d->character->getName().c_str(), 0);
+			SocketHelper::write_to_buffer(d->snoop_by, "> ", 2);
+			SocketHelper::write_to_buffer(d->snoop_by, d->outbuf, d->outtop);
 		}
 
 		/*
 		 * OS-dependent output.
 		 */
-		if (!write_to_descriptor(d->descriptor, d->outbuf, d->outtop))
+		if (!SocketHelper::write_to_descriptor(d->descriptor, d->outbuf, d->outtop))
 		{
 			d->outtop = 0;
 			return FALSE;
@@ -1000,87 +922,9 @@ void bust_a_prompt(Character *ch)
 	*point = '\0';
 	pbuff = buffer;
 	colourconv(pbuff, buf, ch);
-	write_to_buffer(ch->desc, buffer, 0);
+	SocketHelper::write_to_buffer(ch->desc, buffer, 0);
 
 	return;
-}
-
-/*
- * Append onto an output buffer.
- */
-void write_to_buffer(DESCRIPTOR_DATA *d, const char *txt, int length)
-{
-	/*
-	 * Find length in case caller didn't.
-	 */
-	if (length <= 0)
-		length = strlen(txt);
-
-	/*
-	 * Initial \n\r if needed.
-	 */
-	if (d->outtop == 0 && !d->fcommand)
-	{
-		d->outbuf[0] = '\n';
-		d->outbuf[1] = '\r';
-		d->outtop = 2;
-	}
-
-	/*
-	 * Expand the buffer as needed.
-	 */
-	while (d->outtop + length >= d->outsize)
-	{
-		char *outbuf;
-
-		if (d->outsize >= 32000)
-		{
-			bug("Buffer overflow. Closing.\n\r", 0);
-			close_socket(d);
-			return;
-		}
-		outbuf = new char[2 * d->outsize];
-		strncpy(outbuf, d->outbuf, d->outtop);
-		delete[] d->outbuf;
-		d->outbuf = outbuf;
-		d->outsize *= 2;
-	}
-
-	/*
-	 * Copy.
-	 */
-	/*  strcpy( d->outbuf + d->outtop, txt ); */
-	strncpy(d->outbuf + d->outtop, txt, length);
-	d->outtop += length;
-	return;
-}
-
-/*
- * Lowest level output function.
- * Write a block of text to the file descriptor.
- * If this gives errors on very long blocks (like 'ofind all'),
- *   try lowering the max block size.
- */
-bool write_to_descriptor(int desc, const char *txt, int length)
-{
-	int iStart;
-	int nWrite;
-	int nBlock;
-
-	if (length <= 0)
-		length = strlen(txt);
-
-	for (iStart = 0; iStart < length; iStart += nWrite)
-	{
-		nBlock = UMIN(length - iStart, 4096);
-		if ((nWrite = write(desc, txt + iStart, nBlock)) < 0)
-		{
-			perror("Write_to_descriptor");
-			return FALSE;
-		}
-	}
-
-	return TRUE;
 }
 
 /*
@@ -1109,7 +953,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 	auto handler = game->getConnectedStateManager()->createHandler(d);
 	if (!handler) {
 		// bug("Nanny: bad d->connected %d.", d->connected);
-		// close_socket(d);
+		// SocketHelper::close_socket(d);
 		// return;
 	} else {
 		handler->handle(d, argument);
@@ -1120,30 +964,30 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 	{
 	default:
 		bug("Nanny: bad d->connected %d.", d->connected);
-		close_socket(d);
+		SocketHelper::close_socket(d);
 		return;
 
 	case ConnectedState::ConfirmNewPassword:
-		write_to_buffer(d, "\n\r", 2);
+		SocketHelper::write_to_buffer(d, "\n\r", 2);
 
-		if (strcmp(crypt(argument, ch->pcdata->pwd), ch->pcdata->pwd))
+		if (string(crypt(argument, ch->pcdata->getPassword().c_str())) != ch->pcdata->getPassword())
 		{
-			write_to_buffer(d, "Passwords don't match.\n\rRetype password: ",
+			SocketHelper::write_to_buffer(d, "Passwords don't match.\n\rRetype password: ",
 							0);
 			d->connected = ConnectedState::GetNewPassword;
 			return;
 		}
 
-		write_to_buffer(d, (const char *)echo_on_str, 0);
-		write_to_buffer(d, "The following races are available:\n\r  ", 0);
+		SocketHelper::write_to_buffer(d, (const char *)echo_on_str, 0);
+		SocketHelper::write_to_buffer(d, "The following races are available:\n\r  ", 0);
 		for (auto race : race_manager->getAllRaces() ) {
 			if (race->isPlayerRace()) {
-				write_to_buffer(d, race->getName().c_str(), 0);
-				write_to_buffer(d, " ", 1);
+				SocketHelper::write_to_buffer(d, race->getName().c_str(), 0);
+				SocketHelper::write_to_buffer(d, " ", 1);
 			}
 		}
-		write_to_buffer(d, "\n\r", 0);
-		write_to_buffer(d, "What is your race (help for more information)? ", 0);
+		SocketHelper::write_to_buffer(d, "\n\r", 0);
+		SocketHelper::write_to_buffer(d, "What is your race (help for more information)? ", 0);
 		d->connected = ConnectedState::GetNewRace;
 		break;
 
@@ -1157,7 +1001,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 				do_help(ch, (char *)"werefolk");
 			else
 				do_help(ch, argument);
-			write_to_buffer(d,
+			SocketHelper::write_to_buffer(d,
 							"What is your morph race (help for more information)? ", 0);
 			break;
 		}
@@ -1165,15 +1009,15 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		if (morph_lookup(argument) == -1)
 		{
 			int morph;
-			write_to_buffer(d, "That is not a valid race.\n\r", 0);
-			write_to_buffer(d, "The following races are available:\n\r  ", 0);
+			SocketHelper::write_to_buffer(d, "That is not a valid race.\n\r", 0);
+			SocketHelper::write_to_buffer(d, "The following races are available:\n\r  ", 0);
 			for (morph = 0; morph_table[morph].name[0] != '\0'; morph++)
 			{
-				write_to_buffer(d, morph_table[morph].name, 0);
-				write_to_buffer(d, " ", 1);
+				SocketHelper::write_to_buffer(d, morph_table[morph].name, 0);
+				SocketHelper::write_to_buffer(d, " ", 1);
 			}
-			write_to_buffer(d, "\n\r", 0);
-			write_to_buffer(d,
+			SocketHelper::write_to_buffer(d, "\n\r", 0);
+			SocketHelper::write_to_buffer(d,
 							"What is your morph race? (help for more information) ", 0);
 			break;
 		}
@@ -1187,16 +1031,16 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 			group_add(ch, morph_table[ch->morph_form].skills[i], FALSE);
 		}
 
-		write_to_buffer(d, "The following races are available:\n\r  ", 0);
+		SocketHelper::write_to_buffer(d, "The following races are available:\n\r  ", 0);
 		for (auto race : race_manager->getAllRaces() ) {
 			if (race->isPlayerRace() && race != race_manager->getRaceByName("werefolk")) {
-				write_to_buffer(d, race->getName().c_str(), 0);
-				write_to_buffer(d, " ", 1);
+				SocketHelper::write_to_buffer(d, race->getName().c_str(), 0);
+				SocketHelper::write_to_buffer(d, " ", 1);
 			}
 		}
 
-		write_to_buffer(d, "\n\r", 0);
-		write_to_buffer(d, "What is your default race (help for more information)? ", 0);
+		SocketHelper::write_to_buffer(d, "\n\r", 0);
+		SocketHelper::write_to_buffer(d, "What is your default race (help for more information)? ", 0);
 		d->connected = ConnectedState::GetMorphOrig;
 		break;
 
@@ -1210,7 +1054,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 				do_help(ch, (char *)"race help");
 			else
 				do_help(ch, argument);
-			write_to_buffer(d,
+			SocketHelper::write_to_buffer(d,
 							"What is your race (help for more information)? ", 0);
 			break;
 		}
@@ -1219,24 +1063,24 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 
 		if (!(omorph = race_manager->getRaceByName(argument)) || omorph == race_manager->getRaceByName("werefolk"))
 		{
-			write_to_buffer(d, "That is not a valid race.\n\r", 0);
-			write_to_buffer(d, "The following races are available:\n\r  ", 0);
+			SocketHelper::write_to_buffer(d, "That is not a valid race.\n\r", 0);
+			SocketHelper::write_to_buffer(d, "The following races are available:\n\r  ", 0);
 			for (auto race : race_manager->getAllRaces() ) {
 				if (race->isPlayerRace() && race != race_manager->getRaceByName("werefolk")) {
-					write_to_buffer(d, race->getName().c_str(), 0);
-					write_to_buffer(d, " ", 1);
+					SocketHelper::write_to_buffer(d, race->getName().c_str(), 0);
+					SocketHelper::write_to_buffer(d, " ", 1);
 				}
 			}
 
-			write_to_buffer(d, "\n\r", 0);
-			write_to_buffer(d,
+			SocketHelper::write_to_buffer(d, "\n\r", 0);
+			SocketHelper::write_to_buffer(d,
 							"What is your default race? (help for more information) ", 0);
 			break;
 		}
 
 		ch->orig_form = omorph->getLegacyId();
 
-		write_to_buffer(d, "What is your sex (M/F)? ", 0);
+		SocketHelper::write_to_buffer(d, "What is your sex (M/F)? ", 0);
 		d->connected = ConnectedState::GetNewSex;
 		break;
 
@@ -1254,7 +1098,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 			ch->pcdata->true_sex = SEX_FEMALE;
 			break;
 		default:
-			write_to_buffer(d, "That's not a sex.\n\rWhat IS your sex? ", 0);
+			SocketHelper::write_to_buffer(d, "That's not a sex.\n\rWhat IS your sex? ", 0);
 			return;
 		}
 
@@ -1269,7 +1113,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 			strcat(buf, class_table[iClass].name);
 		}
 		strcat(buf, "]: ");
-		write_to_buffer(d, buf, 0);
+		SocketHelper::write_to_buffer(d, buf, 0);
 		d->connected = ConnectedState::GetNewClass;
 		break;
 
@@ -1278,7 +1122,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 
 		if (iClass == -1 || !can_be_class(ch, iClass))
 		{
-			write_to_buffer(d,
+			SocketHelper::write_to_buffer(d,
 							"That's not a class.\n\rWhat IS your class? ", 0);
 			return;
 		}
@@ -1286,12 +1130,12 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		ch->class_num = iClass;
 		SET_BIT(ch->done, class_table[ch->class_num].flag);
 
-		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s new player.", ch->getName(), d->host);
+		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s new player.", ch->getName().c_str(), d->host);
 		log_string(log_buf);
 		Wiznet::instance()->report((char *)"Newbie alert!  $N sighted.", ch, NULL, WIZ_NEWBIE, 0, 0);
 		Wiznet::instance()->report(log_buf, NULL, NULL, WIZ_SITES, 0, ch->getTrust());
 
-		write_to_buffer(d, "\n\r", 0);
+		SocketHelper::write_to_buffer(d, "\n\r", 0);
 
 		group_add(ch, "rom basics", FALSE);
 		group_add(ch, class_table[ch->class_num].base_group, FALSE);
@@ -1305,9 +1149,9 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		if (ch->getRace() == race_manager->getRaceByName("werefolk"))
 			ch->pcdata->learned[gsn_morph] = 25;
 
-		write_to_buffer(d, "Do you wish to customize this character?\n\r", 0);
-		write_to_buffer(d, "Customization takes time, but allows a wider range of skills and abilities.\n\r", 0);
-		write_to_buffer(d, "Customize (Y/N)? ", 0);
+		SocketHelper::write_to_buffer(d, "Do you wish to customize this character?\n\r", 0);
+		SocketHelper::write_to_buffer(d, "Customization takes time, but allows a wider range of skills and abilities.\n\r", 0);
+		SocketHelper::write_to_buffer(d, "Customize (Y/N)? ", 0);
 		d->connected = ConnectedState::DefaultChoice;
 		break;
 
@@ -1316,7 +1160,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 
 		if (iClass == -1 || IS_SET(ch->done, class_table[iClass].flag) || !can_be_class(ch, iClass))
 		{
-			write_to_buffer(d,
+			SocketHelper::write_to_buffer(d,
 							"That class is not an option.\n\rWhat IS your class? ", 0);
 			return;
 		}
@@ -1324,7 +1168,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		ch->class_num = iClass;
 		SET_BIT(ch->done, class_table[ch->class_num].flag);
 
-		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s reclasses as the %s class.", ch->getName(), d->host, class_table[ch->class_num].name);
+		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s reclasses as the %s class.", ch->getName().c_str(), d->host, class_table[ch->class_num].name);
 		log_string(log_buf);
 		Wiznet::instance()->report((char *)"Reclass alert!  $N sighted.", ch, NULL, WIZ_NEWBIE, 0, 0);
 		Wiznet::instance()->report(log_buf, NULL, NULL, WIZ_SITES, 0, ch->getTrust());
@@ -1334,7 +1178,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		ch->gen_data->points_chosen = ch->pcdata->points;
 		do_help(ch, (char *)"group header");
 		list_group_costs(ch);
-		write_to_buffer(d, "You already have the following skills:\n\r", 0);
+		SocketHelper::write_to_buffer(d, "You already have the following skills:\n\r", 0);
 		must_have = ch->pcdata->points + 15;
 		do_skills(ch, (char *)"all");
 		do_help(ch, (char *)"menu choice");
@@ -1368,7 +1212,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		break;
 
 	case ConnectedState::DefaultChoice:
-		write_to_buffer(d, "\n\r", 2);
+		SocketHelper::write_to_buffer(d, "\n\r", 2);
 		switch (argument[0])
 		{
 		case 'y':
@@ -1377,7 +1221,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 			ch->gen_data->points_chosen = ch->pcdata->points;
 			do_help(ch, (char *)"group header");
 			list_group_costs(ch);
-			write_to_buffer(d, (char *)"You already have the following skills:\n\r", 0);
+			SocketHelper::write_to_buffer(d, (char *)"You already have the following skills:\n\r", 0);
 			do_skills(ch, (char *)"all");
 			do_help(ch, (char *)"menu choice");
 			d->connected = ConnectedState::GenGroups;
@@ -1385,8 +1229,8 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		case 'n':
 		case 'N':
 			group_add(ch, class_table[ch->class_num].default_group, TRUE);
-			write_to_buffer(d, "\n\r", 2);
-			write_to_buffer(d,
+			SocketHelper::write_to_buffer(d, "\n\r", 2);
+			SocketHelper::write_to_buffer(d,
 							"Please pick a weapon from the following choices:\n\r", 0);
 			buf[0] = '\0';
 			for (i = 0; weapon_table[i].name != NULL; i++)
@@ -1396,21 +1240,21 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 					strcat(buf, " ");
 				}
 			strcat(buf, "\n\rYour choice? ");
-			write_to_buffer(d, buf, 0);
+			SocketHelper::write_to_buffer(d, buf, 0);
 			d->connected = ConnectedState::PickWeapon;
 			break;
 		default:
-			write_to_buffer(d, "Please answer (Y/N)? ", 0);
+			SocketHelper::write_to_buffer(d, "Please answer (Y/N)? ", 0);
 			return;
 		}
 		break;
 
 	case ConnectedState::PickWeapon:
-		write_to_buffer(d, "\n\r", 2);
+		SocketHelper::write_to_buffer(d, "\n\r", 2);
 		weapon = weapon_lookup(argument);
 		if (weapon == -1 || ch->pcdata->learned[*weapon_table[weapon].gsn] <= 0)
 		{
-			write_to_buffer(d,
+			SocketHelper::write_to_buffer(d,
 							"That's not a valid selection. Choices are:\n\r", 0);
 			buf[0] = '\0';
 			for (i = 0; weapon_table[i].name != NULL; i++)
@@ -1420,12 +1264,12 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 					strcat(buf, " ");
 				}
 			strcat(buf, "\n\rYour choice? ");
-			write_to_buffer(d, buf, 0);
+			SocketHelper::write_to_buffer(d, buf, 0);
 			return;
 		}
 
 		ch->pcdata->learned[*weapon_table[weapon].gsn] = 40;
-		write_to_buffer(d, "\n\r", 2);
+		SocketHelper::write_to_buffer(d, "\n\r", 2);
 		do_help(ch, (char *)"motd");
 		d->connected = ConnectedState::ReadMotd;
 		break;
@@ -1443,8 +1287,8 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 			free_gen_data(ch->gen_data);
 			ch->gen_data = NULL;
 			send_to_char(buf, ch);
-			write_to_buffer(d, "\n\r", 2);
-			write_to_buffer(d,
+			SocketHelper::write_to_buffer(d, "\n\r", 2);
+			SocketHelper::write_to_buffer(d,
 							"Please pick a weapon from the following choices:\n\r", 0);
 			buf[0] = '\0';
 			for (i = 0; weapon_table[i].name != NULL; i++)
@@ -1454,7 +1298,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 					strcat(buf, " ");
 				}
 			strcat(buf, "\n\rYour choice? ");
-			write_to_buffer(d, buf, 0);
+			SocketHelper::write_to_buffer(d, buf, 0);
 			d->connected = ConnectedState::PickWeapon;
 			break;
 		}
@@ -1467,7 +1311,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		break;
 
 	case ConnectedState::ReadImotd:
-		write_to_buffer(d, "\n\r", 2);
+		SocketHelper::write_to_buffer(d, "\n\r", 2);
 		do_help(ch, (char *)"motd");
 		d->connected = ConnectedState::ReadMotd;
 		break;
@@ -1496,11 +1340,11 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		break;
 
 	case ConnectedState::ReadMotd:
-		if (ch->pcdata == NULL || ch->pcdata->pwd[0] == '\0')
+		if (ch->pcdata == NULL || ch->pcdata->getPassword().empty())
 		{
-			write_to_buffer(d, "Warning! Null password!\n\r", 0);
-			write_to_buffer(d, "Please report old password with bug.\n\r", 0);
-			write_to_buffer(d,
+			SocketHelper::write_to_buffer(d, "Warning! Null password!\n\r", 0);
+			SocketHelper::write_to_buffer(d, "Please report old password with bug.\n\r", 0);
+			SocketHelper::write_to_buffer(d,
 							"Type 'password null <new password>' to fix.\n\r", 0);
 		}
 
@@ -1579,59 +1423,6 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 	return;
 }
 
-/*
- * Look for link-dead player to reconnect.
- */
-bool check_reconnect(DESCRIPTOR_DATA *d, char *name, bool fConn)
-{
-	Character *ch;
-
-	for (std::list<Character *>::iterator it = char_list.begin(); it != char_list.end(); it++)
-	{
-		ch = *it;
-		if (!IS_NPC(ch) && (!fConn || !ch->desc) && !str_cmp(d->character->getName(), ch->getName()))
-		{
-			if (fConn == FALSE)
-			{
-				free_string(d->character->pcdata->pwd);
-				d->character->pcdata->pwd = str_dup(ch->pcdata->pwd);
-			}
-			else
-			{
-				delete d->character;
-				d->character = ch;
-				ch->desc = d;
-				ch->timer = 0;
-				send_to_char(
-					"Reconnecting. Type replay to see missed tells.\n\r", ch);
-
-				/* We don't want them showing up in the note room */
-				if (ch->in_room == get_room_index(ROOM_VNUM_NOTE))
-				{
-					char_from_room(ch);
-					char_to_room(ch, get_room_index(ROOM_VNUM_LIMBO));
-				}
-
-				act("$n has reconnected.", ch, NULL, NULL, TO_ROOM);
-
-				snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s reconnected.", ch->getName(), d->host);
-				log_string(log_buf);
-				Wiznet::instance()->report((char *)"$N groks the fullness of $S link.",
-										   ch, NULL, WIZ_LINKS, 0, 0);
-				d->connected = ConnectedState::Playing;
-				/* Inform the character of a note in progress and the possbility
-				 * of continuation!
-				 */
-				if (ch->pcdata->in_progress)
-					send_to_char("You have a note in progress. Type NOTE WRITE to continue it.\n\r", ch);
-			}
-			return TRUE;
-		}
-	}
-
-	return FALSE;
-}
-
 void stop_idling(Character *ch)
 {
 	if (ch == NULL || ch->desc == NULL || ch->desc->connected != ConnectedState::Playing || ch->was_in_room == NULL || ch->in_room != get_room_index(ROOM_VNUM_LIMBO))
@@ -1651,7 +1442,7 @@ void stop_idling(Character *ch)
 void send_to_char_bw(const char *txt, Character *ch)
 {
 	if (txt && ch->desc)
-		write_to_buffer(ch->desc, txt, strlen(txt));
+		SocketHelper::write_to_buffer(ch->desc, txt, strlen(txt));
 	return;
 }
 
@@ -1685,7 +1476,7 @@ void send_to_char(const char *txt, Character *ch)
 				*++point2 = '\0';
 			}
 			*point2 = '\0';
-			write_to_buffer(ch->desc, buf, point2 - buf);
+			SocketHelper::write_to_buffer(ch->desc, buf, point2 - buf);
 		}
 		else
 		{
@@ -1700,7 +1491,7 @@ void send_to_char(const char *txt, Character *ch)
 				*++point2 = '\0';
 			}
 			*point2 = '\0';
-			write_to_buffer(ch->desc, buf, point2 - buf);
+			SocketHelper::write_to_buffer(ch->desc, buf, point2 - buf);
 		}
 	}
 	return;
@@ -1816,7 +1607,7 @@ void show_string(struct descriptor_data *d, char *input)
 		else if (!*scan || (show_lines > 0 && lines >= show_lines))
 		{
 			*scan = '\0';
-			write_to_buffer(d, buffer, strlen(buffer));
+			SocketHelper::write_to_buffer(d, buffer, strlen(buffer));
 			for (chk = d->showstr_point; isspace(*chk); chk++)
 				;
 			if (!*chk)
@@ -1952,7 +1743,7 @@ void act_string(const char *format, Character *to, Character *ch, Character *vch
 	{
 		pbuff = buffer;
 		colourconv(pbuff, buf, to);
-		write_to_buffer(to->desc, buffer, 0);
+		SocketHelper::write_to_buffer(to->desc, buffer, 0);
 	}
 	else if (MOBtrigger)
 	{

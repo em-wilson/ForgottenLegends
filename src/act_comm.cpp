@@ -41,6 +41,8 @@
 #include "ConnectedState.h"
 #include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
+#include "SocketHelper.h"
+#include "StringHelper.h"
 #include "Wiznet.h"
 
 /* command procedures needed */
@@ -73,7 +75,7 @@ void do_delete( Character *ch, char *argument)
 	}
 	else
 	{
-        snprintf(strsave, sizeof(strsave), "%s%s", PLAYER_DIR, capitalize( ch->getName() ) );
+        snprintf(strsave, sizeof(strsave), "%s%s", PLAYER_DIR, StringHelper::capitalize(ch->getName()).c_str() );
 	    Wiznet::instance()->report("$N turns $Mself into line noise.",ch,NULL,0,0,0);
 	    stop_fighting(ch,TRUE);
         clan_manager->handle_player_delete(ch);
@@ -919,7 +921,7 @@ void do_reply( Character *ch, char *argument )
 	return;
     }
 
-    snprintf(buf, sizeof(buf),"%s %s", ch->reply->getName(), argument );
+    snprintf(buf, sizeof(buf),"%s %s", ch->reply->getName().c_str(), argument );
     do_tell(ch,buf);
     return;
 }
@@ -1015,7 +1017,7 @@ void do_pmote( Character *ch, char *argument )
 	if (vch->desc == NULL || vch == ch)
 	    continue;
 
-	if ((letter = strstr(argument,vch->getName())) == NULL)
+	if ((letter = strstr(argument,vch->getName().c_str())) == NULL)
 	{
 	    MOBtrigger = FALSE;
 	    act("$N $t",vch,argument,ch,TO_CHAR);
@@ -1026,23 +1028,23 @@ void do_pmote( Character *ch, char *argument )
 	strcpy(temp,argument);
 	temp[strlen(argument) - strlen(letter)] = '\0';
    	last[0] = '\0';
- 	name = vch->getName();
+ 	name = str_dup(vch->getName().c_str());
 	
 	for (; *letter != '\0'; letter++)
 	{ 
-	    if (*letter == '\'' && matches == strlen(vch->getName()))
+	    if (*letter == '\'' && matches == strlen(vch->getName().c_str()))
 	    {
 		strcat(temp,"r");
 		continue;
 	    }
 
-	    if (*letter == 's' && matches == strlen(vch->getName()))
+	    if (*letter == 's' && matches == strlen(vch->getName().c_str()))
 	    {
 		matches = 0;
 		continue;
 	    }
 	    
- 	    if (matches == strlen(vch->getName()))
+ 	    if (matches == strlen(vch->getName().c_str()))
 	    {
 		matches = 0;
 	    }
@@ -1051,11 +1053,11 @@ void do_pmote( Character *ch, char *argument )
 	    {
 		matches++;
 		name++;
-		if (matches == strlen(vch->getName()))
+		if (matches == vch->getName().length())
 		{
 		    strcat(temp,"you");
 		    last[0] = '\0';
-		    name = vch->getName();
+		    name = str_dup(vch->getName().c_str());
 		    continue;
 		}
 		strncat(last,letter,1);
@@ -1066,14 +1068,15 @@ void do_pmote( Character *ch, char *argument )
 	    strcat(temp,last);
 	    strncat(temp,letter,1);
 	    last[0] = '\0';
-	    name = vch->getName();
+	    name = str_dup(vch->getName().c_str());
 	}
 
 	MOBtrigger = FALSE;
 	act("$N $t",vch,temp,ch,TO_CHAR);
 	MOBtrigger = TRUE;
     }
-	
+
+    free_string(name);
     return;
 }
 
@@ -1400,7 +1403,7 @@ And there {Rw{ra{Rs{x {CIndustrial {WLight{x and {MMagic{x\n\r"
 
     send_to_char("'Good, bad, I'm the guy with the gun.' -Ash\n\r", ch);
     act("$n has left the game.", ch, NULL, NULL, TO_ROOM);
-    snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s has quit.", ch->getName());
+    snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s has quit.", ch->getName().c_str());
     log_string(log_buf);
     Wiznet::instance()->report("$N rejoins the real world.", ch, NULL, WIZ_LOGINS, 0, ch->getTrust());
 
@@ -1419,7 +1422,7 @@ And there {Rw{ra{Rs{x {CIndustrial {WLight{x and {MMagic{x\n\r"
     d = ch->desc;
     extract_char(ch, TRUE);
     if (d != NULL) {
-        close_socket(d);
+        SocketHelper::close_socket(d);
         ch->desc = NULL;
     }
 
@@ -1431,7 +1434,7 @@ And there {Rw{ra{Rs{x {CIndustrial {WLight{x and {MMagic{x\n\r"
         tch = d->original ? d->original : d->character;
         if (tch && tch->id == id) {
             extract_char(tch, TRUE);
-            close_socket(d);
+            SocketHelper::close_socket(d);
         }
     }
 

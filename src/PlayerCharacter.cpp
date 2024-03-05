@@ -23,7 +23,6 @@ PlayerCharacter::PlayerCharacter()
         this->reclass_num			= 0;
         this->pcdata->confirm_delete		= FALSE;
         this->pcdata->board                   = &boards[DEFAULT_BOARD];
-        this->pcdata->pwd			= str_dup( "" );
         this->pcdata->bamfin			= str_dup( "" );
         this->pcdata->bamfout			= str_dup( "" );
         this->pcdata->title			= str_dup( "" );
@@ -60,7 +59,7 @@ void PlayerCharacter::gain_exp( int gain ) {
         {
                 send_to_char( "You raise a level!!  ", this );
                 this->level += 1;
-                snprintf(buf, sizeof(buf),"%s gained level %d",this->getName(),this->level);
+                snprintf(buf, sizeof(buf),"%s gained level %d",this->getName().c_str(),this->level);
                 log_string(buf);
                 snprintf(buf, sizeof(buf),"$N has attained level %d!",this->level);
                 this->advance_level(FALSE);
@@ -151,7 +150,7 @@ void PlayerCharacter::writeToFile(FILE *fp) {
         // If NPC - this should be #MOB
         fprintf( fp, "#PLAYER\n" );
 
-        fprintf( fp, "Name %s~\n",	this->getName()		);
+        fprintf( fp, "Name %s~\n",	this->getName().c_str()		);
         fprintf( fp, "Id   %ld\n", this->id			);
         fprintf( fp, "LogO %ld\n",	current_time		);
         fprintf( fp, "Vers %d\n",   5			);
@@ -259,7 +258,7 @@ void PlayerCharacter::writeToFile(FILE *fp) {
 //        }
 //        else
 //        {
-                fprintf( fp, "Pass %s~\n",	this->pcdata->pwd		);
+                fprintf( fp, "Pass %s~\n",	this->pcdata->getPassword().c_str()		);
                 if (this->pcdata->bamfin[0] != '\0')
                         fprintf( fp, "Bin  %s~\n",	this->pcdata->bamfin);
                 if (this->pcdata->bamfout[0] != '\0')

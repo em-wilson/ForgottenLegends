@@ -144,14 +144,14 @@ void Character::gain_exp( int gain ) {
     return;
 }
 
-void Character::setName( const char * name )
+void Character::setName( string name )
 {
     _name = name;
 }
 
-char * Character::getName()
+string Character::getName()
 {
-    return _name.empty() ? NULL : (char*)_name.c_str();
+    return _name;
 }
 
 void Character::setDescription( const char * description )

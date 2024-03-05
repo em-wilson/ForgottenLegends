@@ -1,10 +1,15 @@
+#include <list>
+#include <string>
 #include <sys/types.h>
 #include "merc.h"
 #include "board.h"
 #include "recycle.h"
 #include "pc_data.h"
 
-std::list<PC_DATA*> PC_DATA::active;
+using std::list;
+using std::string;
+
+list<PC_DATA*> PC_DATA::active;
 
 PC_DATA::PC_DATA()
 {
@@ -27,7 +32,6 @@ PC_DATA::PC_DATA()
     this->next = NULL;
     this->clan = NULL;
     this->buffer = new_buf();
-    this->pwd = NULL;
     this->bamfin = NULL;
     this->bamfout = NULL;
     this->title = NULL;
@@ -57,7 +61,6 @@ PC_DATA::PC_DATA()
 
 PC_DATA::~PC_DATA()
 {
-    if ( this->pwd ) free_string(this->pwd);
     if ( this->bamfin ) free_string(this->bamfin);
     if ( this->bamfout ) free_string(this->bamfout);
     if ( this->title ) free_string(this->title);
@@ -76,3 +79,6 @@ PC_DATA::~PC_DATA()
     INVALIDATE(this);
     PC_DATA::active.remove(this);
 }
+
+string PC_DATA::getPassword() { return _pwd; }
+void PC_DATA::setPassword(string value) { _pwd = value; }

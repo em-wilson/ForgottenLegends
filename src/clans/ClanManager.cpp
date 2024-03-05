@@ -1,5 +1,6 @@
 #include <time.h>
 #include "merc.h"
+#include "Character.h"
 #include "clans/ClanManager.h"
 #include "clans/ClanReader.h"
 #include "clans/ClanWriter.h"
@@ -134,4 +135,26 @@ vector<Clan *> ClanManager::get_all_clans() {
 void ClanManager::load_clans( )
 {
     _clan_list = _reader->loadClans();
+}
+
+bool ClanManager::isClanLeader(Character *ch) {
+    Clan * clan;
+    
+    if (!(clan = ch->pcdata->clan) ) {
+        return false;
+    }
+
+    if (clan->getLeader() == ch->getName()) {
+        return true;
+    }
+
+    if (clan->getFirstOfficer() == ch->getName()) {
+        return true;
+    }
+
+    if (clan->getSecondOfficer() == ch->getName()) {
+        return true;
+    }
+
+    return false;
 }
