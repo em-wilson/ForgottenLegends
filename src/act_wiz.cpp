@@ -40,6 +40,7 @@
 #include "lookup.h"
 #include "clans/ClanManager.h"
 #include "ConnectedState.h"
+#include "ILogger.h"
 #include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
 #include "RaceManager.h"
@@ -4678,7 +4679,7 @@ void do_copyover (Character *ch, char * argument)
        if (!fp)
        {
                send_to_char ("Copyover file not writeable, aborted.\n\r",ch);
-               log_stringf((char*)"Could not write to copyover file: %s", COPYOVER_FILE);
+               logger->log_stringf((char*)"Could not write to copyover file: %s", COPYOVER_FILE);
                perror ("do_copyover:fopen");
                return;
        }
@@ -4747,14 +4748,14 @@ void copyover_recover ()
        int desc;
        bool fOld;
  
-       log_stringf ("Copyover recovery initiated");
+       logger->log_stringf ("Copyover recovery initiated");
  
        fp = fopen (COPYOVER_FILE, "r");
  
        if (!fp) /* there are some descriptors open which will hang forever then ? */
        {
                perror ("copyover_recover:fopen");
-               log_stringf ("Copyover file not found. Exitting.\n\r");
+               logger->log_stringf ("Copyover file not found. Exitting.\n\r");
                exit (1);
        }
 

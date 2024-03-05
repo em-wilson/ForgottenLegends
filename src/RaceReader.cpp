@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include "ILogger.h"
 #include "tables.h"
 #include "PcRace.h"
 #include "Race.h"
@@ -18,7 +19,7 @@ using std::string;
 using std::stringstream;
 using std::vector;
 
-void log_string( const char *str );
+extern ILogger *logger;
 
 RaceReader::RaceReader(string raceDir) {
     _raceDir = raceDir;
@@ -46,7 +47,7 @@ Race * RaceReader::loadRace(std::string path) {
             if (line == "#PCRACE") {
                 PcRace *pc_race = parsePlayerRace(file);
                 race->setPlayerRace(pc_race);
-                log_string("read player race");
+                logger->log_string("read player race");
             }
         }
     }

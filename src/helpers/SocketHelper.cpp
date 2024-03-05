@@ -5,6 +5,7 @@
 #include "Character.h"
 #include "ConnectedState.h"
 #include "Descriptor.h"
+#include "ILogger.h"
 #include "RoomManager.h"
 #include "SocketHelper.h"
 #include "Wiznet.h"
@@ -20,7 +21,6 @@ extern std::list<Character *> char_list;
 
 void act(const char *format, Character *ch, const void *arg1, const void *arg2, int type);
 bool is_note_room( ROOM_INDEX_DATA *room );
-void log_string( const char *str );
 bool process_output(DESCRIPTOR_DATA *d, bool fPrompt);
 
 /*
@@ -57,7 +57,7 @@ bool SocketHelper::check_reconnect(DESCRIPTOR_DATA *d, bool fConn)
 				act("$n has reconnected.", ch, NULL, NULL, ActionTarget::ToRoom);
 
 				snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s reconnected.", ch->getName().c_str(), d->host);
-				log_string(log_buf);
+				logger->log_string(log_buf);
 				Wiznet::instance()->report((char *)"$N groks the fullness of $S link.",
 										   ch, NULL, WIZ_LINKS, 0, 0);
 				d->connected = ConnectedState::Playing;
@@ -100,7 +100,7 @@ void SocketHelper::close_socket(DESCRIPTOR_DATA *dclose)
 	if ((ch = dclose->character) != NULL)
 	{
 		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "Closing link to %s.", ch->getName().c_str());
-		log_string(log_buf);
+		logger->log_string(log_buf);
 		/* cut down on wiznet spam when rebooting */
 		/* If ch is writing note or playing, just lose link otherwise clear char */
 		if ((dclose->connected == ConnectedState::Playing && !merc_down) || ((dclose->connected >= ConnectedState::NoteTo) && (dclose->connected <= ConnectedState::NoteFinish)))

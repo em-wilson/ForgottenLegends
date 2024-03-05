@@ -51,12 +51,16 @@ set(SOURCE_FILES
     src/effects.cpp
     src/EquipmentListGenerator.cpp src/EquipmentListGenerator.h
     src/enums/ConnectedState.h
+    src/FileLogger.cpp src/FileLogger.h
     src/fight.cpp
     src/flags.cpp
     src/Game.cpp src/Game.h
     src/handler.cpp
     src/healer.cpp
+    src/helpers/SocketHelper.cpp src/helpers/SocketHelper.h
+    src/helpers/StringHelper.cpp src/helpers/StringHelper.h
     src/interfaces/IConnectedStateHandler.h
+    src/interfaces/ILogger.h
     src/interp.cpp src/interp.h
     src/lookup.cpp src/lookup.h
     src/magic.cpp src/magic.h
@@ -86,10 +90,8 @@ set(SOURCE_FILES
     src/scan.cpp
     src/search.cpp
     src/skills.cpp
-    src/SocketHelper.cpp src/SocketHelper.h
     src/special.cpp
     src/string.cpp
-    src/StringHelper.cpp src/StringHelper.h
     src/tables.cpp src/tables.h
     src/telnet.h
     src/update.cpp
@@ -104,7 +106,7 @@ set(TEST_FILES
     test/StringHelper.cpp
   )
 
-include_directories(src src/enums src/interfaces)
+include_directories(src src/enums src/helpers src/interfaces)
 add_library(librom STATIC ${SOURCE_FILES})
 add_executable(ForgottenLegends src/main.cpp)
 target_link_libraries(ForgottenLegends librom)

@@ -33,6 +33,7 @@
 #include <time.h>
 #include "merc.h"
 #include "board.h"
+#include "ILogger.h"
 #include "interp.h"
 #include "recycle.h"
 #include "SocketHelper.h"
@@ -517,7 +518,7 @@ void interpret( Character *ch, char *argument )
     {
 	snprintf(log_buf, 2*MAX_INPUT_LENGTH, "Log %s: %s", ch->getName().c_str(), logline );
 	Wiznet::instance()->report(log_buf,ch,NULL,WIZ_SECURE,0,ch->getTrust());
-	log_string( log_buf );
+	logger->log_string( log_buf );
     }
 
     if ( ch->desc != NULL && ch->desc->snoop_by != NULL )

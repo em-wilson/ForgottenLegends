@@ -62,6 +62,7 @@
 #include "ConnectedState.h"
 #include "clans/ClanManager.h"
 #include "IConnectedStateHandler.h"
+#include "ILogger.h"
 #include "RaceManager.h"
 #include "SocketHelper.h"
 #include "Wiznet.h"
@@ -436,7 +437,7 @@ void init_descriptor(int control)
 				 (addr >> 24) & 0xFF, (addr >> 16) & 0xFF,
 				 (addr >> 8) & 0xFF, (addr) & 0xFF);
 		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "Sock.sinaddr:  %s", buf);
-		log_string(log_buf);
+		logger->log_string(log_buf);
 		from = gethostbyaddr((char *)&sock.sin_addr,
 							 sizeof(sock.sin_addr), AF_INET);
 		dnew->host = str_dup(from ? from->h_name : buf);
@@ -491,7 +492,7 @@ bool read_from_descriptor(DESCRIPTOR_DATA *d)
 	if (iStart >= sizeof(d->inbuf) - 10)
 	{
 		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s input overflow!", d->host);
-		log_string(log_buf);
+		logger->log_string(log_buf);
 		SocketHelper::write_to_descriptor(d->descriptor,
 							(char *)"\n\r*** PUT A LID ON IT!!! ***\n\r", 0);
 		return FALSE;
@@ -512,7 +513,7 @@ bool read_from_descriptor(DESCRIPTOR_DATA *d)
 		}
 		else if (nRead == 0)
 		{
-			log_string("EOF encountered on read.");
+			logger->log_string("EOF encountered on read.");
 			return FALSE;
 		}
 		else if (errno == EWOULDBLOCK)
@@ -598,7 +599,7 @@ void read_from_buffer(DESCRIPTOR_DATA *d)
 			if (++d->repeat >= 25 && d->character && d->connected == ConnectedState::Playing)
 			{
 				snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s input spamming!", d->host);
-				log_string(log_buf);
+				logger->log_string(log_buf);
 				Wiznet::instance()->report((char *)"Spam spam spam $N spam spam spam spam spam!",
 										   d->character, NULL, WIZ_SPAM, 0, d->character->getTrust());
 				if (d->incomm[0] == '!')
@@ -1131,7 +1132,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		SET_BIT(ch->done, class_table[ch->class_num].flag);
 
 		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s new player.", ch->getName().c_str(), d->host);
-		log_string(log_buf);
+		logger->log_string(log_buf);
 		Wiznet::instance()->report((char *)"Newbie alert!  $N sighted.", ch, NULL, WIZ_NEWBIE, 0, 0);
 		Wiznet::instance()->report(log_buf, NULL, NULL, WIZ_SITES, 0, ch->getTrust());
 
@@ -1169,7 +1170,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		SET_BIT(ch->done, class_table[ch->class_num].flag);
 
 		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s reclasses as the %s class.", ch->getName().c_str(), d->host, class_table[ch->class_num].name);
-		log_string(log_buf);
+		logger->log_string(log_buf);
 		Wiznet::instance()->report((char *)"Reclass alert!  $N sighted.", ch, NULL, WIZ_NEWBIE, 0, 0);
 		Wiznet::instance()->report(log_buf, NULL, NULL, WIZ_SITES, 0, ch->getTrust());
 
@@ -2007,17 +2008,6 @@ void colourconv(char *buffer, const char *txt, Character *ch)
 		}
 	}
 	return;
-}
-
-void log_stringf(const char *fmt, ...)
-{
-	char buf[2 * MSL];
-	va_list args;
-	va_start(args, fmt);
-	vsnprintf(buf, sizeof(buf), fmt, args);
-	va_end(args);
-
-	log_string(buf);
 }
 
 int strlen_color(char *argument)

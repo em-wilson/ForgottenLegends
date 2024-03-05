@@ -1,6 +1,7 @@
 #include <list>
 #include <sys/time.h>
 #include "merc.h"
+#include "ILogger.h"
 #include "ClanReader.h"
 
 /*
@@ -30,7 +31,7 @@ list<Clan *> ClanReader::loadClans() {
     char clanlist[256];
     char buf[MAX_STRING_LENGTH];
 
-    log_string( "Loading clans..." );
+    logger->log_string( "Loading clans..." );
 
     snprintf(clanlist, sizeof(clanlist), "%s%s", CLAN_DIR, CLAN_LIST );
     fclose( fpReserve );
@@ -43,7 +44,7 @@ list<Clan *> ClanReader::loadClans() {
     for ( ; ; )
     {
 		filename = feof( fpList ) ? (char*)"$" : fread_word( fpList );
-		log_string( filename );
+		logger->log_string( filename );
 		if ( filename[0] == '$' )
 		break;
 
@@ -56,7 +57,7 @@ list<Clan *> ClanReader::loadClans() {
 		}
     }
     fclose( fpList );
-    log_string(" Done clans " );
+    logger->log_string(" Done clans " );
     fpReserve = fopen( NULL_FILE, "r" );
     return clans;
 }

@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include "merc.h"
 #include "BanManager.h"
+#include "FileLogger.h"
 #include "Game.h"
 #include "RaceManager.h"
 #include "RaceReader.h"
@@ -95,11 +96,12 @@ int main( int argc, char **argv )
     clan_manager = new ClanManager(new ClanReader(), new ClanWriter(CLAN_DIR, CLAN_LIST));
     race_manager = new RaceManager(new RaceReader(RACE_DIR), new RaceWriter(RACE_DIR));
     room_manager = new RoomManager();
+    logger = new FileLogger();
 
     try {
         race_manager->loadRaces();
     } catch (RaceNotFoundInFileException rfx) {
-        log_stringf("Error reading race from: %s", rfx.what());
+        logger->log_stringf("Error reading race from: %s", rfx.what());
         return 1;
     }
     
@@ -115,11 +117,11 @@ int main( int argc, char **argv )
     try {
         boot_db();
     } catch (std::runtime_error rte) {
-        log_stringf("Error booting database: %s", rte.what());
+        logger->log_stringf("Error booting database: %s", rte.what());
         return 1;
     }
     snprintf(log_buf, 2*MAX_INPUT_LENGTH, "ROM is ready to rock on port %d.", port );
-    log_string( log_buf );
+    logger->log_string( log_buf );
     if (fCopyOver)
        copyover_recover();
     game_loop_unix( &game, control );
@@ -128,7 +130,7 @@ int main( int argc, char **argv )
     /*
      * That's all, folks.
      */
-    log_string( "Normal termination of game." );
+    logger->log_string( "Normal termination of game." );
 
     delete clan_manager;
     delete race_manager;

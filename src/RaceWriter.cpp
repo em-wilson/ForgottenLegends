@@ -19,7 +19,6 @@ RaceWriter::RaceWriter(const string raceDir) {
 string RaceWriter::generateFlagString(const struct flag_type source[], long flag) {
     ostringstream flags;
     for (int i = 0; source[i].name != NULL; i++) {
-        // log_string(part_flags[i].name);
         if (flag & source[i].bit) {
             if (flags.str().length() > 0) {
                 flags << " ";

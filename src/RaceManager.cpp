@@ -2,6 +2,7 @@
 #include <sstream>
 #include <string>
 #include "merc.h"
+#include "ILogger.h"
 #include "PcRace.h"
 #include "Race.h"
 #include "RaceManager.h"
@@ -11,8 +12,6 @@
 
 using std::string;
 using std::vector;
-
-void log_string( const char *str );
 
 extern	const	struct	class_type	class_table	[MAX_CLASS];
 extern  const	struct  race_type	race_table	[];
@@ -108,15 +107,15 @@ vector<Race *> RaceManager::getAllRaces() {
 // }
 
 void RaceManager::loadRaces() {
-    log_string("Loading races");
+    logger->log_string("Loading races");
     _races = _reader->loadRaces();
     char buf[500];
     snprintf(buf, sizeof(buf), "Found %zu races", _races.size());
-    log_string(buf);
+    logger->log_string(buf);
 }
 
 void RaceManager::saveRaces() {
-    log_string("Saving races...");
+    logger->log_string("Saving races...");
     for (auto race : getAllRaces() ) {
         _writer->saveRace(race);
     }

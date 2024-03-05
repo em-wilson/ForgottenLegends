@@ -32,6 +32,7 @@
 #include "board.h"
 #include "recycle.h"
 #include "clans/ClanManager.h"
+#include "ILogger.h"
 #include "NonPlayerCharacter.h"
 #include "PcRace.h"
 #include "PlayerCharacter.h"
@@ -562,7 +563,7 @@ void fread_char( Character *ch, FILE *fp )
     int percent;
 
     snprintf(buf, sizeof(buf),"Loading %s.",ch->getName().c_str());
-    log_string(buf);
+    logger->log_string(buf);
 
     for ( ; ; )
     {
@@ -723,7 +724,7 @@ void fread_char( Character *ch, FILE *fp )
                      {
                         snprintf(buf, sizeof(buf), "fread_char: %s had unknown board name: %s. Skipped.",
                             ch->getName().c_str(), boardname);
-                        log_string (buf);
+                        logger->log_string (buf);
                         fread_number (fp); /* read last_note and skip info */
                     }
                     else /* Save it */

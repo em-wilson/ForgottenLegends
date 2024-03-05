@@ -26,6 +26,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "ILogger.h"
 #include "NonPlayerCharacter.h"
 #include "RaceManager.h"
 #include "tables.h"
@@ -993,7 +994,7 @@ void do_asave( Character *ch, char *argument )
 	if ( ch )
 		send_to_char( "Saved zones:\n\r", ch );
 	else
-		log_string( "Saved zones:" );
+		logger->log_string( "Saved zones:" );
 
 	snprintf(buf, sizeof(buf), "None.\n\r" );
 
@@ -1014,7 +1015,7 @@ void do_asave( Character *ch, char *argument )
 			send_to_char( "\n\r", ch );
 		}
 		else
-			log_string( buf );
+			logger->log_string( buf );
 		REMOVE_BIT( pArea->area_flags, AREA_CHANGED );
 	    }
 	}
@@ -1024,7 +1025,7 @@ void do_asave( Character *ch, char *argument )
 		if ( ch )
 			send_to_char( buf, ch );
 		else
-			log_string( "None." );
+			logger->log_string( "None." );
 	}
 	return;
     }

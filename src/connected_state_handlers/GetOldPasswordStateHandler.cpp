@@ -5,11 +5,13 @@
 #include "Character.h"
 #include "ConnectedState.h"
 #include "Descriptor.h"
+#include "ILogger.h"
 #include "telnet.h"
 #include "SocketHelper.h"
 #include "Wiznet.h"
 
 extern DESCRIPTOR_DATA *descriptor_list;
+extern ILogger * logger;
 const unsigned char echo_on_str[] = {IAC, WONT, TELOPT_ECHO, '\0'};
 #define args( list )			list
 #define DECLARE_DO_FUN( fun )		DO_FUN    fun
@@ -18,8 +20,6 @@ typedef	void DO_FUN	args( ( Character *ch, char *argument ) );
 DECLARE_DO_FUN(do_help);
 
 bool str_cmp( const char *astr, const char *bstr );
-
-void log_string( const char *str );
 
 GetOldPasswordStateHandler::GetOldPasswordStateHandler() : AbstractStateHandler(ConnectedState::GetOldPassword) {
 
@@ -68,7 +68,7 @@ void GetOldPasswordStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
         return;
 
     snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s has connected.", ch->getName().c_str(), d->host);
-    log_string(log_buf);
+    logger->log_string(log_buf);
     Wiznet::instance()->report(log_buf, NULL, NULL, WIZ_SITES, 0, ch->getTrust());
 
     if (ch->isImmortal())

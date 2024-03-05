@@ -31,6 +31,7 @@
 #include <time.h>
 #include "merc.h"
 #include "clans/ClanManager.h"
+#include "ILogger.h"
 #include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
 #include "RaceManager.h"
@@ -971,7 +972,7 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
 		victim->getName().c_str(),
 		(IS_NPC(ch) ? ch->short_descr : ch->getName().c_str()),
 		ch->in_room->vnum );
-	    log_string( log_buf );
+	    logger->log_string( log_buf );
 
 	    /*
 	     * Dying penalty:
@@ -1298,7 +1299,7 @@ dam_type, bool show ) {
 		victim->getName().c_str(),
 		(IS_NPC(ch) ? ch->short_descr : ch->getName().c_str()),
 		victim->in_room->vnum );
-	    log_string( log_buf );
+	    logger->log_string( log_buf );
 
 	    /*
 	     * Dying penalty:

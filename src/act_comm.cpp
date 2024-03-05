@@ -39,6 +39,7 @@
 #include "tables.h"
 #include "clans/ClanManager.h"
 #include "ConnectedState.h"
+#include "ILogger.h"
 #include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
 #include "SocketHelper.h"
@@ -1404,7 +1405,7 @@ And there {Rw{ra{Rs{x {CIndustrial {WLight{x and {MMagic{x\n\r"
     send_to_char("'Good, bad, I'm the guy with the gun.' -Ash\n\r", ch);
     act("$n has left the game.", ch, NULL, NULL, TO_ROOM);
     snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s has quit.", ch->getName().c_str());
-    log_string(log_buf);
+    logger->log_string(log_buf);
     Wiznet::instance()->report("$N rejoins the real world.", ch, NULL, WIZ_LOGINS, 0, ch->getTrust());
 
     /*

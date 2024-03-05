@@ -41,6 +41,7 @@
 #include "clans/ClanWriter.h"
 #include "db.h"
 #include "EquipmentListGenerator.h"
+#include "interfaces/ILogger.h"
 #include "lookup.h"
 #include "music.h"
 #include "NonPlayerCharacter.h"
@@ -53,6 +54,7 @@
 
 extern	int	_filbuf		args( (FILE *) );
 ClanManager * clan_manager;
+ILogger * logger;
 RaceManager * race_manager;
 RoomManager * room_manager;
 
@@ -3066,7 +3068,7 @@ void bug( const char *str, int param )
 	}
 
 	snprintf(buf, sizeof(buf), "[*****] FILE: %s LINE: %d", strArea, iLine );
-	log_string( buf );
+	logger->log_string( buf );
 /* RT removed because we don't want bugs shutting the mud 
 	if ( ( fp = fopen( "shutdown.txt", "a" ) ) != NULL )
 	{
@@ -3078,7 +3080,7 @@ void bug( const char *str, int param )
 
     strcpy( buf, "[*****] BUG: " );
     snprintf(buf + strlen(buf), sizeof(buf) + strlen(buf), str, param );
-    log_string( buf );
+    logger->log_string( buf );
 /* RT removed due to bug-file spamming 
     fclose( fpReserve );
     if ( ( fp = fopen( BUG_FILE, "a" ) ) != NULL )
@@ -3089,23 +3091,6 @@ void bug( const char *str, int param )
     fpReserve = fopen( NULL_FILE, "r" );
 */
 
-    return;
-}
-
-
-
-/*
- * Writes a string to the log.
- */
-void log_string( const char *str )
-{
-    char *strtime;
-
-    strtime                    = ctime( &current_time );
-    strtime[strlen(strtime)-1] = '\0';
-    fprintf( stderr, "%s :: %s\n", strtime, str );
-    snprintf(strtime, sizeof(strtime), "%s", str);
-    Wiznet::instance()->report( strtime, 0, 0, WIZ_LOG, WIZ_SECURE, 0);
     return;
 }
 

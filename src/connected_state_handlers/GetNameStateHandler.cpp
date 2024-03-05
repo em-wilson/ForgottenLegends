@@ -6,11 +6,14 @@
 #include "Descriptor.h"
 #include "AbstractStateHandler.h"
 #include "GetNameStateHandler.h"
+#include "ILogger.h"
 #include "NonPlayerCharacter.h" // for MOB_INDEX_DATA
 #include "SocketHelper.h"
 
 extern bool newlock;
 extern bool wizlock;
+
+extern ILogger *logger;
 
 #ifndef MAX_STRING_LENGTH
 #define MAX_STRING_LENGTH	 4608
@@ -34,7 +37,6 @@ const unsigned char echo_off_str[] = {IAC, WILL, TELOPT_ECHO, '\0'};
 bool is_name ( const char *str, const char *namelist );
 char *capitalize( const char *str );
 bool load_char_obj( DESCRIPTOR_DATA *d, char *name );
-void log_string( const char *str );
 bool str_cmp( const char *astr, const char *bstr );
 bool str_prefix( const char *astr, const char *bstr );
 bool str_suffix( const char *astr, const char *bstr );
@@ -161,7 +163,7 @@ void GetNameStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 		if (ch->isDenied())
 		{
 			snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "Denying access to %s@%s.", argument, d->host);
-			log_string(log_buf);
+			logger->log_string(log_buf);
 			SocketHelper::write_to_buffer(d, "You are denied access.\n\r", 0);
 			SocketHelper::close_socket(d);
 			return;

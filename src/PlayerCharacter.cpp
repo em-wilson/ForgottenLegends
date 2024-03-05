@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include "merc.h"
 #include "board.h"
+#include "ILogger.h"
 #include "PcRace.h"
 #include "PlayerCharacter.h"
 #include "RaceManager.h"
@@ -14,7 +15,9 @@ PlayerCharacter::PlayerCharacter()
         this->pcdata = new PC_DATA();
 
         this->id				= PlayerCharacter::get_pc_id();
-        this->setRace(race_manager->getRaceByName("human"));
+        if (race_manager) {
+                this->setRace(race_manager->getRaceByName("human"));
+        }
         this->act				= PLR_NOSUMMON;
         this->comm				= COMM_COMBINE
                 | COMM_PROMPT;
@@ -60,7 +63,7 @@ void PlayerCharacter::gain_exp( int gain ) {
                 send_to_char( "You raise a level!!  ", this );
                 this->level += 1;
                 snprintf(buf, sizeof(buf),"%s gained level %d",this->getName().c_str(),this->level);
-                log_string(buf);
+                logger->log_string(buf);
                 snprintf(buf, sizeof(buf),"$N has attained level %d!",this->level);
                 this->advance_level(FALSE);
                 save_char_obj(this);

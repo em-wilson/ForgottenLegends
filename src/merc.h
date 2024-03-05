@@ -90,7 +90,10 @@ typedef struct  mprog_list		MPROG_LIST;
 typedef struct  mprog_code		MPROG_CODE;
 
 class Character;
+class ILogger;
 class PlayerCharacter;
+
+extern ILogger * logger;
 
 /*
  * Function types.

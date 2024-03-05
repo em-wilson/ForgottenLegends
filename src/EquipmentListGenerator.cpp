@@ -11,6 +11,7 @@
 #include <vector>
 #include "merc.h"
 #include "EquipmentListGenerator.h"
+#include "ILogger.h"
 #include "tables.h"
 
 char *flag_string               args ( ( const struct flag_type *flag_table,
@@ -33,7 +34,7 @@ void EquipmentListGenerator::Generate() {
     snprintf(objlist_dir, sizeof(objlist_dir), "%s%s", DATA_DIR, OBJLIST_DIR);
     if ( !EquipmentListGenerator::_DirectoryExists( objlist_dir ) ) {
         snprintf(log_buf, sizeof(log_buf), "Can't generate equipment list. Directory '%s' does not exists.", objlist_dir);
-        log_string(log_buf);
+        logger->log_string(log_buf);
         return;
     }
 
@@ -73,7 +74,7 @@ std::vector<std::string> get_armour_types(long flags) {
 
 void EquipmentListGenerator::build_json_files(const char *objlist_dir) {
     char log_buf[100];
-    log_string( "Generating equipment list..." );
+    logger->log_string( "Generating equipment list..." );
 
     std::map<std::string, std::vector<OBJ_INDEX_DATA*>> itemDict;
 
@@ -133,8 +134,8 @@ void EquipmentListGenerator::build_json_files(const char *objlist_dir) {
     }
 
     snprintf(log_buf, sizeof(log_buf), "Stored %lu categories of items.", itemDict.size());
-    log_string(log_buf);
-    log_string("Done generating equipment list." );
+    logger->log_string(log_buf);
+    logger->log_string("Done generating equipment list." );
 }
 
 void EquipmentListGenerator::storeItemCategory(const char *objListDir, const std::string& fileName,
