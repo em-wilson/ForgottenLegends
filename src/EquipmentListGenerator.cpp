@@ -42,81 +42,31 @@ void EquipmentListGenerator::Generate() {
 }
 
 std::string get_weapon_type(int weapon_value) {
-    switch (weapon_value ) {
-        case WEAPON_AXE:
-            return "axe";
-            break;
-        case WEAPON_DAGGER:
-            return "dagger";
-            break;
-        case WEAPON_EXOTIC:
-            return "exotic";
-            break;
-        case WEAPON_FLAIL:
-            return "flail";
-            break;
-        case WEAPON_MACE:
-            return "mace";
-            break;
-        case WEAPON_POLEARM:
-            return "polearm";
-            break;
-        case WEAPON_SPEAR:
-            return "spear";
-            break;
-        case WEAPON_SWORD:
-            return "sword";
-            break;
-        case WEAPON_WHIP:
-            return "whip";
-            break;
+    for (int i = 0; weapon_class[i].name; i++) {
+        if (weapon_value == weapon_class[i].bit) {
+            return weapon_class[i].name;
+        }
     }
     return "";
 }
 
-std::vector<std::string> get_armour_types(long wear_flags) {
+std::vector<std::string> get_armour_types(long flags) {
     std::vector<std::string> positions;
-    if ( IS_SET(wear_flags, ITEM_WEAR_FINGER)) {
-        positions.emplace_back("finger");
-    }
-    if ( IS_SET(wear_flags, ITEM_WEAR_NECK)) {
-        positions.emplace_back("neck");
-    }
-    if ( IS_SET(wear_flags, ITEM_WEAR_BACK)) {
-        positions.emplace_back("back");
-    }
-    if ( IS_SET(wear_flags, ITEM_WEAR_BODY)) {
-        positions.emplace_back("body");
-    }
-    if ( IS_SET(wear_flags, ITEM_WEAR_HEAD)) {
-        positions.emplace_back("head");
-    }
-    if ( IS_SET(wear_flags, ITEM_WEAR_LEGS)) {
-        positions.emplace_back("legs");
-    }
-    if ( IS_SET(wear_flags, ITEM_WEAR_FEET)) {
-        positions.emplace_back("feet");
-    }
-    if ( IS_SET(wear_flags, ITEM_WEAR_HANDS)) {
-        positions.emplace_back("hands");
-    }
-    if ( IS_SET(wear_flags, ITEM_WEAR_ARMS)) {
-        positions.emplace_back("arms");
-    }
-    if ( IS_SET(wear_flags, ITEM_WEAR_SHIELD)) {
-        positions.emplace_back("shield");
-    }
-    if ( IS_SET(wear_flags, ITEM_WEAR_FLOAT)) {
-        positions.emplace_back("float");
-    }
-    if ( IS_SET(wear_flags, ITEM_WEAR_ABOUT)) {
-        positions.emplace_back("about");
-    }
-    if ( IS_SET(wear_flags, ITEM_WEAR_WAIST)) {
-        positions.emplace_back("waist");
-    }
-    if ( IS_SET(wear_flags, ITEM_WEAR_WRIST)) {
-        positions.emplace_back("wrist");
+    for ( int i = 0; wear_flags[i].name; i++) {
+        switch (wear_flags[i].bit) {
+            case ITEM_TAKE:
+            case ITEM_WIELD:
+            case ITEM_HOLD:
+            case ITEM_NO_SAC:
+            case ITEM_WEAR_BOMB:
+                break;
+
+            default:
+                if (IS_SET(flags, wear_flags[i].bit)) {
+                    positions.emplace_back(wear_flags[i].name);
+                }
+                break;
+        }
     }
     return positions;
 }

@@ -489,7 +489,7 @@ const struct flag_type extra_flags[] =
 
 const struct flag_type wear_flags[] =
 {
-    {	"take",			ITEM_TAKE,		TRUE	},
+    {	"take",			ITEM_TAKE,		    TRUE	},
     {	"finger",		ITEM_WEAR_FINGER,	TRUE	},
     {	"neck",			ITEM_WEAR_NECK,		TRUE	},
     {	"body",			ITEM_WEAR_BODY,		TRUE	},
@@ -502,14 +502,13 @@ const struct flag_type wear_flags[] =
     {	"about",		ITEM_WEAR_ABOUT,	TRUE	},
     {	"waist",		ITEM_WEAR_WAIST,	TRUE	},
     {	"wrist",		ITEM_WEAR_WRIST,	TRUE	},
-    {	"wield",		ITEM_WIELD,		TRUE	},
-    {	"hold",			ITEM_HOLD,		TRUE	},
+    {	"wield",		ITEM_WIELD,		    TRUE	},
+    {	"hold",			ITEM_HOLD,		    TRUE	},
     {   "nosac",		ITEM_NO_SAC,		TRUE	},
     {	"float",		ITEM_WEAR_FLOAT,	TRUE	},
     {	"back",			ITEM_WEAR_BACK,		TRUE	},
-    {	"bomb",		ITEM_WEAR_BOMB,	TRUE	},
-/*    {   "twohands",            ITEM_TWO_HANDS,         TRUE    }, */
-    {	NULL,			0,			0	}
+    {	"bomb",		    ITEM_WEAR_BOMB,	    TRUE	},
+    {	NULL,			0,			        0	    }
 };
 
 /*
