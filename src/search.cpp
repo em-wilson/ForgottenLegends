@@ -1,7 +1,7 @@
 #include <time.h>
 #include "merc.h"
 #include "ConnectedState.h"
-#include "PcRace.h"
+#include "PlayerRace.h"
 #include "RaceManager.h"
 #include "tables.h"
 

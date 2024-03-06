@@ -34,7 +34,7 @@
 #include "merc.h"
 #include "magic.h"
 #include "NonPlayerCharacter.h"
-#include "PcRace.h"
+#include "PlayerRace.h"
 #include "RaceManager.h"
 #include "recycle.h"
 #include "tables.h"

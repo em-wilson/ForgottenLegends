@@ -9,6 +9,7 @@
 #include "RaceReader.h"
 #include "RaceWriter.h"
 #include "RoomManager.h"
+#include "SocketHelper.h"
 
 // Clan helpers
 #include "clans/ClanReader.h"
@@ -17,6 +18,7 @@
 // Connected State Handlers
 #include "connected_state_handlers/BreakConnectStateHandler.h"
 #include "connected_state_handlers/ConfirmNewNameStateHandler.h"
+#include "connected_state_handlers/ConfirmNewPasswordStateHandler.h"
 #include "connected_state_handlers/GetNameStateHandler.h"
 #include "connected_state_handlers/GetNewPasswordStateHandler.h"
 #include "connected_state_handlers/GetNewRaceStateHandler.h"
@@ -28,7 +30,6 @@ int port, control;
 
 char                str_boot_time[MAX_INPUT_LENGTH];
 void    game_loop_unix          args( ( Game *game, int control ) );
-int     init_socket             args( ( int port ) );
 
 extern ClanManager * clan_manager;
 extern RaceManager * race_manager;
@@ -90,7 +91,7 @@ int main( int argc, char **argv )
      * Run the game.
      */
     if (!fCopyOver)
-         control = init_socket( port );
+         control = SocketHelper::init_socket( port );
 
     BanManager ban_manager = BanManager();
     clan_manager = new ClanManager(new ClanReader(), new ClanWriter(CLAN_DIR, CLAN_LIST));
@@ -108,6 +109,7 @@ int main( int argc, char **argv )
     ConnectedStateManager csm = ConnectedStateManager(&game);
     csm.addHandler(new BreakConnectStateHandler());
     csm.addHandler(new ConfirmNewNameStateHandler());
+    csm.addHandler(new ConfirmNewPasswordStateHandler(race_manager));
     csm.addHandler(new GetNameStateHandler(&ban_manager, clan_manager));
     csm.addHandler(new GetOldPasswordStateHandler());
     csm.addHandler(new GetNewPasswordStateHandler());

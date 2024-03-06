@@ -11,7 +11,7 @@
 #define MAX_STATS 	        5       // Temporary - if updating this, also update race.h
 #endif
 
-class PcRace;
+class PlayerRace;
 
 // struct race_type
 // {
@@ -85,9 +85,9 @@ class Race {
         long getVulnerabilityFlags();
         void setVulnerabilityFlags(long value);
 
-        PcRace * getPlayerRace();
+        PlayerRace * getPlayerRace();
         bool isPlayerRace();
-        void setPlayerRace(PcRace *value);
+        void setPlayerRace(PlayerRace *value);
     
     private:
         long _actFlags;
@@ -100,7 +100,7 @@ class Race {
         long _vulnerabilityFlags;
         short int _legacyId;
         std::string _name;
-        PcRace * _pcRace;
+        PlayerRace * _pcRace;
 };
 
 extern	const	struct	pc_race_type	pc_race_table	[];

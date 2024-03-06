@@ -39,6 +39,7 @@ set(SOURCE_FILES
     src/connected_state_handlers/AbstractStateHandler.cpp src/connected_state_handlers/AbstractStateHandler.h
     src/connected_state_handlers/BreakConnectStateHandler.cpp src/connected_state_handlers/BreakConnectStateHandler.h
     src/connected_state_handlers/ConfirmNewNameStateHandler.cpp src/connected_state_handlers/ConfirmNewNameStateHandler.h
+    src/connected_state_handlers/ConfirmNewPasswordStateHandler.cpp src/connected_state_handlers/ConfirmNewPasswordStateHandler.h
     src/connected_state_handlers/GetNameStateHandler.cpp src/connected_state_handlers/GetNameStateHandler.h
     src/connected_state_handlers/GetNewPasswordStateHandler.cpp src/connected_state_handlers/GetNewPasswordStateHandler.h
     src/connected_state_handlers/GetNewRaceStateHandler.cpp src/connected_state_handlers/GetNewRaceStateHandler.h
@@ -78,8 +79,8 @@ set(SOURCE_FILES
     src/olc_mpcode.cpp
     src/olc_save.cpp
     src/pc_data.cpp src/pc_data.h
-    src/PcRace.cpp src/PcRace.h
     src/PlayerCharacter.cpp src/PlayerCharacter.h
+    src/PlayerRace.cpp src/PlayerRace.h
     src/Race.cpp src/Race.h
     src/RaceReader.cpp src/RaceReader.h
     src/RaceWriter.cpp src/RaceWriter.h

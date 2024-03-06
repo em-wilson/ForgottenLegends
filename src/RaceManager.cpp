@@ -3,7 +3,7 @@
 #include <string>
 #include "merc.h"
 #include "ILogger.h"
-#include "PcRace.h"
+#include "PlayerRace.h"
 #include "Race.h"
 #include "RaceManager.h"
 #include "RaceReader.h"
@@ -84,7 +84,7 @@ vector<Race *> RaceManager::getAllRaces() {
 //     result->setVulnerabilityFlags(race_table[race].vuln);
 
 //     if (race_table[race].pc_race) {
-//         PcRace *pcRace = new PcRace();
+//         PlayerRace *pcRace = new PlayerRace();
 //         pcRace->setName(pc_race_table[race].name);
 //         pcRace->setPoints(pc_race_table[race].points);
 //         pcRace->setWhoName(pc_race_table[race].who_name);

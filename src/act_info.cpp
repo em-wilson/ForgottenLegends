@@ -44,7 +44,7 @@
 #include "clans/ClanManager.h"
 #include "ConnectedState.h"
 #include "PlayerCharacter.h"
-#include "PcRace.h"
+#include "PlayerRace.h"
 #include "RaceManager.h"
 #include "StringHelper.h"
 

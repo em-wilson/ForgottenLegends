@@ -1,4 +1,6 @@
 #include <list>
+#include <netinet/in.h>
+#include <sys/socket.h>
 #include <unistd.h>
 #include "merc.h"
 #include "ActionTarget.h"
@@ -148,6 +150,48 @@ void SocketHelper::close_socket(DESCRIPTOR_DATA *dclose)
 	close(dclose->descriptor);
 	free_descriptor(dclose);
 	return;
+}
+
+int SocketHelper::init_socket(int port)
+{
+	static struct sockaddr_in sa_zero;
+	struct sockaddr_in sa;
+	int x = 1;
+	int fd;
+
+	if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	{
+		perror("Init_socket: socket");
+		exit(1);
+	}
+
+	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
+				   (char *)&x, sizeof(x)) < 0)
+	{
+		perror("Init_socket: SO_REUSEADDR");
+		close(fd);
+		exit(1);
+	}
+
+	sa = sa_zero;
+	sa.sin_family = AF_INET;
+	sa.sin_port = htons(port);
+
+	if (bind(fd, (struct sockaddr *)&sa, sizeof(sa)) < 0)
+	{
+		perror("Init socket: bind");
+		close(fd);
+		exit(1);
+	}
+
+	if (listen(fd, 3) < 0)
+	{
+		perror("Init socket: listen");
+		close(fd);
+		exit(1);
+	}
+
+	return fd;
 }
 
 /*

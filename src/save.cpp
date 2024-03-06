@@ -34,7 +34,7 @@
 #include "clans/ClanManager.h"
 #include "ILogger.h"
 #include "NonPlayerCharacter.h"
-#include "PcRace.h"
+#include "PlayerRace.h"
 #include "PlayerCharacter.h"
 #include "RaceManager.h"
 #include "StringHelper.h"

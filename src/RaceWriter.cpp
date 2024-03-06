@@ -2,7 +2,7 @@
 #include <sstream>
 #include <string>
 #include "tables.h"
-#include "PcRace.h"
+#include "PlayerRace.h"
 #include "Race.h"
 #include "RaceWriter.h"
 
@@ -72,7 +72,7 @@ void RaceWriter::saveRace(Race * race) {
     file << "End" << endl << endl;
 
     if (race->isPlayerRace()) {
-        PcRace *player_race = race->getPlayerRace();
+        PlayerRace *player_race = race->getPlayerRace();
         file << "#PCRACE" << endl;
         file << "Name " << player_race->getName() << endl;
         file << "ClassMultipliers " << generateClassMultipliers(player_race) << endl;
@@ -90,7 +90,7 @@ void RaceWriter::saveRace(Race * race) {
     file << "#$" << endl;
 }
 
-string RaceWriter::generateClassMultipliers(PcRace * race) {
+string RaceWriter::generateClassMultipliers(PlayerRace * race) {
     stringstream result;
     for (auto multiplier : race->getClassMultipliers()) {
         if (result.str().size() > 0) {
@@ -112,7 +112,7 @@ string RaceWriter::generateNumberList(std::vector<short int> values) {
     return result.str();
 }
 
-string RaceWriter::generateSkillList(PcRace *race) {
+string RaceWriter::generateSkillList(PlayerRace *race) {
     stringstream result;
     for (auto skill : race->getSkills()) {
         if (result.str().size() > 0) {

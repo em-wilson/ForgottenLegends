@@ -8,7 +8,7 @@ class RaceNotFoundInFileException : public std::runtime_error {
         RaceNotFoundInFileException(std::string msg) : std::runtime_error(msg) {};
 };
 
-class PcRace;
+class PlayerRace;
 class Race;
 
 class RaceReader {
@@ -20,7 +20,7 @@ class RaceReader {
     private:
         Race * loadRace(std::string path);
         Race * parseRace(std::ifstream &file);
-        PcRace * parsePlayerRace(std::ifstream &file);
+        PlayerRace * parsePlayerRace(std::ifstream &file);
         bool readBoolean(std::stringstream &ss);
         std::unordered_map<std::string, short int> readClassMultipliers(std::stringstream &ss);
         long readFlags(const struct flag_type source[], std::stringstream &ss);

@@ -1,5 +1,5 @@
 #include <string>
-#include "PcRace.h"
+#include "PlayerRace.h"
 #include "Race.h"
 
 using std::string;
@@ -40,8 +40,8 @@ void Race::setOffensiveFlags(long value) { _offensiveFlags = value; }
 long Race::getParts() { return _parts; }
 void Race::setParts(long value) { _parts = value; }
 
-PcRace * Race::getPlayerRace() { return _pcRace; }
-void Race::setPlayerRace(PcRace *value) { _pcRace = value; }
+PlayerRace * Race::getPlayerRace() { return _pcRace; }
+void Race::setPlayerRace(PlayerRace *value) { _pcRace = value; }
 bool Race::isPlayerRace() { return _pcRace != nullptr; }
 
 long Race::getResistanceFlags() { return _resistanceFlags; }

@@ -1,12 +1,12 @@
-#ifndef __PCRACE_H__
-#define __PCRACE_H__
+#ifndef __PlayerRace_H__
+#define __PlayerRace_H__
 
 #include <list>
 
-class PcRace {
+class PlayerRace {
     public:
-        PcRace();
-        virtual ~PcRace();
+        PlayerRace();
+        virtual ~PlayerRace();
 
         std::unordered_map<std::string, short int> getClassMultipliers();
         void setClassMultipliers(std::unordered_map<std::string, short int> value);

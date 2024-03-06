@@ -3,7 +3,7 @@
 #include "ConnectedState.h"
 #include "Descriptor.h"
 #include "GetNewRaceStateHandler.h"
-#include "PcRace.h"
+#include "PlayerRace.h"
 #include "Race.h"
 #include "RaceManager.h"
 #include "SocketHelper.h"

@@ -3,7 +3,7 @@
 #include "merc.h"
 #include "board.h"
 #include "ILogger.h"
-#include "PcRace.h"
+#include "PlayerRace.h"
 #include "PlayerCharacter.h"
 #include "RaceManager.h"
 #include "Wiznet.h"

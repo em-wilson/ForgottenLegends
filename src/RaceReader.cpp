@@ -6,7 +6,7 @@
 #include <vector>
 #include "ILogger.h"
 #include "tables.h"
-#include "PcRace.h"
+#include "PlayerRace.h"
 #include "Race.h"
 #include "RaceReader.h"
 
@@ -45,7 +45,7 @@ Race * RaceReader::loadRace(std::string path) {
             std::getline(file, line);
             if (line == "#RACE") { race = parseRace(file); }
             if (line == "#PCRACE") {
-                PcRace *pc_race = parsePlayerRace(file);
+                PlayerRace *pc_race = parsePlayerRace(file);
                 race->setPlayerRace(pc_race);
                 logger->log_string("read player race");
             }
@@ -80,8 +80,8 @@ Race * RaceReader::parseRace(std::ifstream &file) {
     return race;
 }
 
-PcRace * RaceReader::parsePlayerRace(std::ifstream &file) {
-    PcRace * race = new PcRace();
+PlayerRace * RaceReader::parsePlayerRace(std::ifstream &file) {
+    PlayerRace * race = new PlayerRace();
     string line, word;
     while ( file ) {
         std::getline(file, line);

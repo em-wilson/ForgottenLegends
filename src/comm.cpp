@@ -52,7 +52,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdarg.h>
-#include <sys/socket.h>
 #include <unistd.h>
 
 #include "merc.h"
@@ -80,13 +79,10 @@ DECLARE_DO_FUN(do_outfit);
  */
 #include <fcntl.h>
 #include <netdb.h>
-#include <netinet/in.h>
 #include <sys/socket.h>
 #include "telnet.h"
 #include "PlayerCharacter.h"
 
-const unsigned char echo_off_str[] = {IAC, WILL, TELOPT_ECHO, '\0'};
-const unsigned char echo_on_str[] = {IAC, WONT, TELOPT_ECHO, '\0'};
 const unsigned char go_ahead_str[] = {IAC, GA, '\0'};
 
 #if !defined(isascii)
@@ -99,7 +95,6 @@ const unsigned char go_ahead_str[] = {IAC, GA, '\0'};
 DESCRIPTOR_DATA *descriptor_list; /* All open descriptors		*/
 DESCRIPTOR_DATA *d_next;		  /* Next descriptor in loop	*/
 FILE *fpReserve;				  /* Reserved file handle		*/
-bool god;						  /* All new chars are gods!	*/
 bool merc_down;					  /* Shutdown			*/
 bool wizlock;					  /* Game is wizlocked		*/
 bool newlock;					  /* Game is newlocked		*/
@@ -110,7 +105,6 @@ bool MOBtrigger = TRUE;			  /* act() switch                 */
  * OS-dependent local functions.
  */
 void game_loop_unix args((Game * game, int control));
-int init_socket args((int port));
 void init_descriptor args((int control));
 bool read_from_descriptor args((DESCRIPTOR_DATA * d));
 
@@ -128,65 +122,6 @@ extern RaceManager *race_manager;
 
 /* Needs to be global because of do_copyover */
 extern int port, control;
-
-int init_socket(int port)
-{
-	static struct sockaddr_in sa_zero;
-	struct sockaddr_in sa;
-	int x = 1;
-	int fd;
-
-	if ((fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-	{
-		perror("Init_socket: socket");
-		exit(1);
-	}
-
-	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
-				   (char *)&x, sizeof(x)) < 0)
-	{
-		perror("Init_socket: SO_REUSEADDR");
-		close(fd);
-		exit(1);
-	}
-
-#if defined(SO_DONTLINGER) && !defined(SYSV)
-	{
-		struct linger ld;
-
-		ld.l_onoff = 1;
-		ld.l_linger = 1000;
-
-		if (setsockopt(fd, SOL_SOCKET, SO_DONTLINGER,
-					   (char *)&ld, sizeof(ld)) < 0)
-		{
-			perror("Init_socket: SO_DONTLINGER");
-			close(fd);
-			exit(1);
-		}
-	}
-#endif
-
-	sa = sa_zero;
-	sa.sin_family = AF_INET;
-	sa.sin_port = htons(port);
-
-	if (bind(fd, (struct sockaddr *)&sa, sizeof(sa)) < 0)
-	{
-		perror("Init socket: bind");
-		close(fd);
-		exit(1);
-	}
-
-	if (listen(fd, 3) < 0)
-	{
-		perror("Init socket: listen");
-		close(fd);
-		exit(1);
-	}
-
-	return fd;
-}
 
 void game_loop_unix(Game *game, int control)
 {
@@ -967,30 +902,6 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		bug("Nanny: bad d->connected %d.", d->connected);
 		SocketHelper::close_socket(d);
 		return;
-
-	case ConnectedState::ConfirmNewPassword:
-		SocketHelper::write_to_buffer(d, "\n\r", 2);
-
-		if (string(crypt(argument, ch->pcdata->getPassword().c_str())) != ch->pcdata->getPassword())
-		{
-			SocketHelper::write_to_buffer(d, "Passwords don't match.\n\rRetype password: ",
-							0);
-			d->connected = ConnectedState::GetNewPassword;
-			return;
-		}
-
-		SocketHelper::write_to_buffer(d, (const char *)echo_on_str, 0);
-		SocketHelper::write_to_buffer(d, "The following races are available:\n\r  ", 0);
-		for (auto race : race_manager->getAllRaces() ) {
-			if (race->isPlayerRace()) {
-				SocketHelper::write_to_buffer(d, race->getName().c_str(), 0);
-				SocketHelper::write_to_buffer(d, " ", 1);
-			}
-		}
-		SocketHelper::write_to_buffer(d, "\n\r", 0);
-		SocketHelper::write_to_buffer(d, "What is your race (help for more information)? ", 0);
-		d->connected = ConnectedState::GetNewRace;
-		break;
 
 	case ConnectedState::GetMorph:
 		one_argument(argument, arg);
