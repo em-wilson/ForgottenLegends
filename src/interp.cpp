@@ -647,8 +647,8 @@ bool check_social( Character *ch, char *command, char *argument )
     victim = NULL;
     if ( arg[0] == '\0' )
     {
-	act( social_table[cmd].others_no_arg, ch, NULL, victim, TO_ROOM    );
-	act( social_table[cmd].char_no_arg,   ch, NULL, victim, TO_CHAR    );
+	act( social_table[cmd].others_no_arg, ch, NULL, victim, TO_ROOM, POS_RESTING    );
+	act( social_table[cmd].char_no_arg,   ch, NULL, victim, TO_CHAR, POS_RESTING    );
     }
     else if ( ( victim = get_char_room( ch, arg ) ) == NULL )
     {
@@ -656,14 +656,14 @@ bool check_social( Character *ch, char *command, char *argument )
     }
     else if ( victim == ch )
     {
-	act( social_table[cmd].others_auto,   ch, NULL, victim, TO_ROOM    );
-	act( social_table[cmd].char_auto,     ch, NULL, victim, TO_CHAR    );
+	act( social_table[cmd].others_auto,   ch, NULL, victim, TO_ROOM, POS_RESTING    );
+	act( social_table[cmd].char_auto,     ch, NULL, victim, TO_CHAR, POS_RESTING    );
     }
     else
     {
-	act( social_table[cmd].others_found,  ch, NULL, victim, TO_NOTVICT );
-	act( social_table[cmd].char_found,    ch, NULL, victim, TO_CHAR    );
-	act( social_table[cmd].vict_found,    ch, NULL, victim, TO_VICT    );
+	act( social_table[cmd].others_found,  ch, NULL, victim, TO_NOTVICT, POS_RESTING );
+	act( social_table[cmd].char_found,    ch, NULL, victim, TO_CHAR, POS_RESTING    );
+	act( social_table[cmd].vict_found,    ch, NULL, victim, TO_VICT, POS_RESTING    );
 
 	if ( !IS_NPC(ch) && IS_NPC(victim)
 	&&   !IS_AFFECTED(victim, AFF_CHARM)
@@ -676,18 +676,15 @@ bool check_social( Character *ch, char *command, char *argument )
 
 	    case 1: case 2: case 3: case 4:
 	    case 5: case 6: case 7: case 8:
-		act( social_table[cmd].others_found,
-		    victim, NULL, ch, TO_NOTVICT );
-		act( social_table[cmd].char_found,
-		    victim, NULL, ch, TO_CHAR    );
-		act( social_table[cmd].vict_found,
-		    victim, NULL, ch, TO_VICT    );
+		act( social_table[cmd].others_found, victim, NULL, ch, TO_NOTVICT, POS_RESTING );
+		act( social_table[cmd].char_found, victim, NULL, ch, TO_CHAR, POS_RESTING    );
+		act( social_table[cmd].vict_found, victim, NULL, ch, TO_VICT, POS_RESTING    );
 		break;
 
 	    case 9: case 10: case 11: case 12:
-		act( "$n slaps $N.",  victim, NULL, ch, TO_NOTVICT );
-		act( "You slap $N.",  victim, NULL, ch, TO_CHAR    );
-		act( "$n slaps you.", victim, NULL, ch, TO_VICT    );
+		act( "$n slaps $N.",  victim, NULL, ch, TO_NOTVICT, POS_RESTING );
+		act( "You slap $N.",  victim, NULL, ch, TO_CHAR, POS_RESTING    );
+		act( "$n slaps you.", victim, NULL, ch, TO_VICT, POS_RESTING    );
 		break;
 	    }
 	}

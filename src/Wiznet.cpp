@@ -30,7 +30,7 @@ void Wiznet::report(std::string str, Character *ch, OBJ_DATA *obj,
 	        {
 			    if (IS_SET(d->character->wiznet,WIZ_PREFIX))
 			  		send_to_char("--> ",d->character);
-	            act_new(str.c_str(),d->character,obj,ch,TO_CHAR,POS_DEAD);
+	            act(str.c_str(),d->character,obj,ch,TO_CHAR,POS_DEAD);
 	        }
     }
  

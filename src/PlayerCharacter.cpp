@@ -386,12 +386,12 @@ void PlayerCharacter::update() {
                         if ( --obj->value[2] == 0 && this->in_room != NULL )
                         {
                                 --this->in_room->light;
-                                ::act( "$p goes out.", this, obj, NULL, TO_ROOM );
-                                ::act( "$p flickers and goes out.", this, obj, NULL, TO_CHAR );
+                                ::act( "$p goes out.", this, obj, NULL, TO_ROOM, POS_RESTING );
+                                ::act( "$p flickers and goes out.", this, obj, NULL, TO_CHAR, POS_RESTING );
                                 extract_obj( obj );
                         }
                         else if ( obj->value[2] <= 5 && this->in_room != NULL)
-                                ::act("$p flickers.",this,obj,NULL,TO_CHAR);
+                                ::act("$p flickers.",this,obj,NULL,TO_CHAR, POS_RESTING );
                 }
 
                 if ( ++this->timer >= 12 )
@@ -402,7 +402,7 @@ void PlayerCharacter::update() {
                                 if ( this->fighting != NULL )
                                         stop_fighting( this, TRUE );
                                 ::act( "$n disappears into the void.",
-                                        this, NULL, NULL, TO_ROOM );
+                                        this, NULL, NULL, TO_ROOM, POS_RESTING );
                                 send_to_char( "You disappear into the void.\n\r", this );
                                 if (this->level > 1)
                                         save_char_obj( this );

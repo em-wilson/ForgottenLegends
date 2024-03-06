@@ -381,8 +381,7 @@ void Character::update() {
         if (this->in_room == NULL)
             return;
 
-        ::act("$n writhes in agony as plague sores erupt from $s skin.",
-                this,NULL,NULL,TO_ROOM);
+        ::act("$n writhes in agony as plague sores erupt from $s skin.", this,NULL,NULL,TO_ROOM, POS_RESTING);
         send_to_char("You writhe in agony from the plague.\n\r",this);
 
         AFFECT_DATA *af;
@@ -417,7 +416,7 @@ void Character::update() {
                     &&  !IS_AFFECTED(vch,AFF_PLAGUE) && number_bits(4) == 0)
             {
                 send_to_char("You feel hot and feverish.\n\r",vch);
-                ::act("$n shivers and looks very ill.",vch,NULL,NULL,TO_ROOM);
+                ::act("$n shivers and looks very ill.",vch,NULL,NULL,TO_ROOM, POS_RESTING);
                 affect_join(vch,&plague);
             }
         }
@@ -437,7 +436,7 @@ void Character::update() {
 
         if (poison != NULL)
         {
-            ::act( "$n shivers and suffers.", this, NULL, NULL, TO_ROOM );
+            ::act( "$n shivers and suffers.", this, NULL, NULL, TO_ROOM, POS_RESTING );
             send_to_char( "You shiver and suffer.\n\r", this );
             damage_old(this,this,poison->level/10 + 1,gsn_poison,
                     DAM_POISON,FALSE);

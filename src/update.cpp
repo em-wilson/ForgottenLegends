@@ -136,7 +136,7 @@ void mobile_update( void ) {
             if (obj_best) {
                 obj_from_room(obj_best);
                 obj_to_char(obj_best, ch);
-                act("$n gets $p.", ch, obj_best, NULL, TO_ROOM);
+                act("$n gets $p.", ch, obj_best, NULL, TO_ROOM, POS_RESTING );
             }
         }
 
@@ -412,14 +412,14 @@ void obj_update( void )
 			{
 			    rch = obj->carried_by;
 			    act(skill_table[paf->type].msg_obj,
-				rch,obj,NULL,TO_CHAR);
+				rch,obj,NULL,TO_CHAR, POS_RESTING );
 			}
 			if (obj->in_room != NULL 
 			&& obj->in_room->people != NULL)
 			{
 			    rch = obj->in_room->people;
 			    act(skill_table[paf->type].msg_obj,
-				rch,obj,NULL,TO_ALL);
+				rch,obj,NULL,TO_ALL, POS_RESTING );
 			}
                     }
                 }
@@ -463,9 +463,9 @@ void obj_update( void )
 		obj->carried_by->silver += obj->cost/5;
 	    else
 	    {
-	    	act( message, obj->carried_by, obj, NULL, TO_CHAR );
+	    	act( message, obj->carried_by, obj, NULL, TO_CHAR, POS_RESTING );
 		if ( obj->wear_loc == WEAR_FLOAT)
-		    act(message,obj->carried_by,obj,NULL,TO_ROOM);
+		    act(message,obj->carried_by,obj,NULL,TO_ROOM, POS_RESTING );
 	    }
 	}
 	else if ( obj->in_room != NULL
@@ -474,8 +474,8 @@ void obj_update( void )
 	    if (! (obj->in_obj && obj->in_obj->pIndexData->vnum == OBJ_VNUM_PIT
 	           && !CAN_WEAR(obj->in_obj,ITEM_TAKE)))
 	    {
-	    	act( message, rch, obj, NULL, TO_ROOM );
-	    	act( message, rch, obj, NULL, TO_CHAR );
+	    	act( message, rch, obj, NULL, TO_ROOM, POS_RESTING );
+	    	act( message, rch, obj, NULL, TO_CHAR, POS_RESTING );
 	    }
 	}
 

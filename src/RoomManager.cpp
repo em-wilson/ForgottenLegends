@@ -123,7 +123,7 @@ void RoomManager::char_to_room( Character *ch, ROOM_INDEX_DATA *pRoomIndex )
             	!IS_AFFECTED(vch,AFF_PLAGUE) && number_bits(6) == 0)
             {
             	send_to_char("You feel hot and feverish.\n\r",vch);
-            	act("$n shivers and looks very ill.",vch,NULL,NULL,TO_ROOM);
+            	act("$n shivers and looks very ill.",vch,NULL,NULL,TO_ROOM, POS_RESTING );
             	affect_join(vch,&plague);
             }
         }

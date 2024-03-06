@@ -355,7 +355,7 @@ void do_gossip( Character *ch, char *argument )
              !IS_SET(victim->comm,COMM_NOGOSSIP) &&
              !IS_SET(victim->comm,COMM_QUIET) )
         {
-          act_new( "{c$n gossips '$t{c'{x", 
+          act( "{c$n gossips '$t{c'{x", 
 		   ch,argument, d->character, TO_VICT,POS_SLEEPING );
         }
       }
@@ -410,7 +410,7 @@ void do_grats( Character *ch, char *argument )
              !IS_SET(victim->comm,COMM_NOGRATS) &&
              !IS_SET(victim->comm,COMM_QUIET) )
         {
-          act_new( "{y$n grats '$t{y'{x",
+          act( "{y$n grats '$t{y'{x",
                    ch,argument, d->character, TO_VICT,POS_SLEEPING );
         }
       }
@@ -465,7 +465,7 @@ void do_quote( Character *ch, char *argument )
              !IS_SET(victim->comm,COMM_NOQUOTE) &&
              !IS_SET(victim->comm,COMM_QUIET) )
         {
-          act_new( "$n quotes '$t'",
+          act( "$n quotes '$t'",
                    ch,argument, d->character, TO_VICT,POS_SLEEPING );
         }
       }
@@ -520,7 +520,7 @@ void do_question( Character *ch, char *argument )
              !IS_SET(victim->comm,COMM_NOQUESTION) &&
              !IS_SET(victim->comm,COMM_QUIET) )
         {
-	  act_new("$n questions '$t'",
+	  act("$n questions '$t'",
 	 	  ch,argument,d->character,TO_VICT,POS_SLEEPING);
         }
       }
@@ -575,7 +575,7 @@ void do_answer( Character *ch, char *argument )
              !IS_SET(victim->comm,COMM_NOQUESTION) &&
              !IS_SET(victim->comm,COMM_QUIET) )
         {
-	  act_new("$n answers '$t'",
+	  act("$n answers '$t'",
 		  ch,argument,d->character,TO_VICT,POS_SLEEPING);
         }
       }
@@ -631,7 +631,7 @@ void do_music( Character *ch, char *argument )
              !IS_SET(victim->comm,COMM_NOMUSIC) &&
              !IS_SET(victim->comm,COMM_QUIET) )
         {
-	    act_new("$n MUSIC: '$t'",
+	    act("$n MUSIC: '$t'",
 		    ch,argument,d->character,TO_VICT,POS_SLEEPING);
         }
       }
@@ -683,7 +683,7 @@ void do_clantalk( Character *ch, char *argument )
              !IS_SET(d->character->comm,COMM_NOCLAN) &&
 	     !IS_SET(d->character->comm,COMM_QUIET) )
         {
-            act_new("$n clans '$t'",ch,argument,d->character,TO_VICT,POS_DEAD);
+            act("$n clans '$t'",ch,argument,d->character,TO_VICT,POS_DEAD);
         }
     }
 
@@ -713,14 +713,14 @@ void do_immtalk( Character *ch, char *argument )
     REMOVE_BIT(ch->comm,COMM_NOWIZ);
 
     snprintf(buf, sizeof(buf), "$n: %s", argument );
-    act_new("$n: $t",ch,argument,NULL,TO_CHAR,POS_DEAD);
+    act("$n: $t",ch,argument,NULL,TO_CHAR,POS_DEAD);
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
 	if ( d->connected == ConnectedState::Playing && 
 	     IS_IMMORTAL(d->character) && 
              !IS_SET(d->character->comm,COMM_NOWIZ) )
 	{
-	    act_new("$n: $t",ch,argument,d->character,TO_VICT,POS_DEAD);
+	    act("$n: $t",ch,argument,d->character,TO_VICT,POS_DEAD);
 	}
     }
 
@@ -737,8 +737,8 @@ void do_say( Character *ch, char *argument )
 	return;
     }
 
-    act( "{g$n says '$T{g'{x", ch, NULL, argument, TO_ROOM );
-    act( "{gYou say '$T{g'{x", ch, NULL, argument, TO_CHAR );
+    act( "{g$n says '$T{g'{x", ch, NULL, argument, TO_ROOM, POS_RESTING );
+    act( "{gYou say '$T{g'{x", ch, NULL, argument, TO_CHAR, POS_RESTING );
 
     if ( !IS_NPC(ch) )
     {
@@ -785,7 +785,7 @@ void do_shout( Character *ch, char *argument )
 
     WAIT_STATE( ch, 12 );
 
-    act( "You shout '$T'", ch, NULL, argument, TO_CHAR );
+    act( "You shout '$T'", ch, NULL, argument, TO_CHAR, POS_RESTING );
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
 	Character *victim;
@@ -797,7 +797,7 @@ void do_shout( Character *ch, char *argument )
 	     !IS_SET(victim->comm, COMM_SHOUTSOFF) &&
 	     !IS_SET(victim->comm, COMM_QUIET) ) 
 	{
-	    act("$n shouts '$t'",ch,argument,d->character,TO_VICT);
+	    act("$n shouts '$t'",ch,argument,d->character,TO_VICT, POS_RESTING);
 	}
     }
 
@@ -849,8 +849,7 @@ void do_tell( Character *ch, char *argument )
 
     if ( victim->desc == NULL && !IS_NPC(victim))
     {
-	act("$N seems to have misplaced $S link...try again later.",
-	    ch,NULL,victim,TO_CHAR);
+	act("$N seems to have misplaced $S link...try again later.", ch,NULL,victim,TO_CHAR, POS_RESTING);
         snprintf(buf, sizeof(buf),"{B%s{C tried to tell you '%s' while you were {GLINKDEAD{C.{x\n\r",PERS(ch,victim),argument);
         buf[0] = UPPER(buf[0]);
         add_buf(victim->pcdata->buffer,buf);
@@ -865,14 +864,14 @@ void do_tell( Character *ch, char *argument )
 
     if ( !(IS_IMMORTAL(ch) && ch->level > LEVEL_IMMORTAL) && !IS_AWAKE(victim) )
     {
-	act( "$E can't hear you.", ch, 0, victim, TO_CHAR );
+	act( "$E can't hear you.", ch, 0, victim, TO_CHAR, POS_RESTING );
 	return;
     }
   
     if ((IS_SET(victim->comm,COMM_QUIET) || IS_SET(victim->comm,COMM_DEAF))
     && !IS_IMMORTAL(ch))
     {
-	act( "$E is not receiving tells.", ch, 0, victim, TO_CHAR );
+	act( "$E is not receiving tells.", ch, 0, victim, TO_CHAR, POS_RESTING );
   	return;
     }
 
@@ -880,20 +879,19 @@ void do_tell( Character *ch, char *argument )
     {
 	if (IS_NPC(victim))
 	{
-	    act("$E is AFK, and not receiving tells.",ch,NULL,victim,TO_CHAR);
+	    act("$E is AFK, and not receiving tells.",ch,NULL,victim,TO_CHAR, POS_RESTING);
 	    return;
 	}
 
-	act("$E is {RAFK{x, but your tell will go through when $E returns.",
-	    ch,NULL,victim,TO_CHAR);
+	act("$E is {RAFK{x, but your tell will go through when $E returns.", ch,NULL,victim,TO_CHAR, POS_RESTING);
 	snprintf(buf, sizeof(buf),"{B%s {Ctried to tell you '%s' while you were {RAFK{x.\n\r",PERS(ch,victim),argument);
 	buf[0] = UPPER(buf[0]);
 	add_buf(victim->pcdata->buffer,buf);
 	return;
     }
 
-    act( "{CYou tell {B$N{C '$t{C'{x", ch, argument, victim, TO_CHAR );
-    act_new("{B$n {Ctells you '$t{C'{x",ch,argument,victim,TO_VICT,POS_DEAD);
+    act( "{CYou tell {B$N{C '$t{C'{x", ch, argument, victim, TO_CHAR, POS_RESTING );
+    act("{B$n {Ctells you '$t{C'{x",ch,argument,victim,TO_VICT,POS_DEAD);
     victim->reply	= ch;
 
     if ( !IS_NPC(ch) && IS_NPC(victim) && HAS_TRIGGER(victim,TRIG_SPEECH) )
@@ -946,7 +944,7 @@ void do_yell( Character *ch, char *argument )
     }
 
 
-    act("You yell '$t'",ch,argument,NULL,TO_CHAR);
+    act("You yell '$t'",ch,argument,NULL,TO_CHAR, POS_RESTING);
     
     for ( d = descriptor_list; d != NULL; d = d->next )
     {
@@ -956,7 +954,7 @@ void do_yell( Character *ch, char *argument )
 	&&   d->character->in_room->area == ch->in_room->area 
         &&   !IS_SET(d->character->comm,COMM_QUIET) )
 	{
-	    act("$n yells '$t'",ch,argument,d->character,TO_VICT);
+	    act("$n yells '$t'",ch,argument,d->character,TO_VICT, POS_RESTING);
 	}
     }
 
@@ -985,8 +983,8 @@ void do_emote( Character *ch, char *argument )
 
     MOBtrigger = FALSE;
     snprintf(buf, sizeof(buf), "$n %s", argument);
-    act( buf, ch, NULL, NULL, TO_ROOM );
-    act( buf, ch, NULL, NULL, TO_CHAR );
+    act( buf, ch, NULL, NULL, TO_ROOM, POS_RESTING );
+    act( buf, ch, NULL, NULL, TO_CHAR, POS_RESTING );
     MOBtrigger = TRUE;
     return;
 }
@@ -1011,7 +1009,7 @@ void do_pmote( Character *ch, char *argument )
         return;
     }
  
-    act( "$n $t", ch, argument, NULL, TO_CHAR );
+    act( "$n $t", ch, argument, NULL, TO_CHAR, POS_RESTING );
 
     for (vch = ch->in_room->people; vch != NULL; vch = vch->next_in_room)
     {
@@ -1021,7 +1019,7 @@ void do_pmote( Character *ch, char *argument )
 	if ((letter = strstr(argument,vch->getName().c_str())) == NULL)
 	{
 	    MOBtrigger = FALSE;
-	    act("$N $t",vch,argument,ch,TO_CHAR);
+	    act("$N $t",vch,argument,ch,TO_CHAR, POS_RESTING);
 	    MOBtrigger = TRUE;
 	    continue;
 	}
@@ -1073,7 +1071,7 @@ void do_pmote( Character *ch, char *argument )
 	}
 
 	MOBtrigger = FALSE;
-	act("$N $t",vch,temp,ch,TO_CHAR);
+	act("$N $t",vch,temp,ch,TO_CHAR, POS_RESTING);
 	MOBtrigger = TRUE;
     }
 
@@ -1327,8 +1325,8 @@ void do_pose( Character *ch, char *argument )
     level = UMIN( (unsigned int)ch->level, sizeof(pose_table) / sizeof(pose_table[0]) - 1 );
     pose  = number_range(0, level);
 
-    act( pose_table[pose].message[2*ch->class_num+0], ch, NULL, NULL, TO_CHAR );
-    act( pose_table[pose].message[2*ch->class_num+1], ch, NULL, NULL, TO_ROOM );
+    act( pose_table[pose].message[2*ch->class_num+0], ch, NULL, NULL, TO_CHAR, POS_RESTING );
+    act( pose_table[pose].message[2*ch->class_num+1], ch, NULL, NULL, TO_ROOM, POS_RESTING );
 
     return;
 }
@@ -1403,7 +1401,7 @@ And there {Rw{ra{Rs{x {CIndustrial {WLight{x and {MMagic{x\n\r"
 */
 
     send_to_char("'Good, bad, I'm the guy with the gun.' -Ash\n\r", ch);
-    act("$n has left the game.", ch, NULL, NULL, TO_ROOM);
+    act("$n has left the game.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
     snprintf(log_buf, 2*MAX_INPUT_LENGTH, "%s has quit.", ch->getName().c_str());
     logger->log_string(log_buf);
     Wiznet::instance()->report("$N rejoins the real world.", ch, NULL, WIZ_LOGINS, 0, ch->getTrust());
@@ -1479,7 +1477,7 @@ void do_follow( Character *ch, char *argument )
 
     if ( IS_AFFECTED(ch, AFF_CHARM) && ch->master != NULL )
     {
-	act( "But you'd rather follow $N!", ch, NULL, ch->master, TO_CHAR );
+	act( "But you'd rather follow $N!", ch, NULL, ch->master, TO_CHAR, POS_RESTING );
 	return;
     }
 
@@ -1496,8 +1494,7 @@ void do_follow( Character *ch, char *argument )
 
     if (!IS_NPC(victim) && IS_SET(victim->act,PLR_NOFOLLOW) && !IS_IMMORTAL(ch))
     {
-	act("$N doesn't seem to want any followers.\n\r",
-             ch,NULL,victim, TO_CHAR);
+	act("$N doesn't seem to want any followers.\n\r", ch,NULL,victim, TO_CHAR, POS_RESTING);
         return;
     }
 
@@ -1523,9 +1520,9 @@ void add_follower( Character *ch, Character *master )
     ch->leader        = NULL;
 
     if ( can_see( master, ch ) )
-	act( "$n now follows you.", ch, NULL, master, TO_VICT );
+	act( "$n now follows you.", ch, NULL, master, TO_VICT, POS_RESTING );
 
-    act( "You now follow $N.",  ch, NULL, master, TO_CHAR );
+    act( "You now follow $N.",  ch, NULL, master, TO_CHAR, POS_RESTING );
 
     return;
 }
@@ -1548,8 +1545,8 @@ void stop_follower( Character *ch )
 
     if ( can_see( ch->master, ch ) && ch->in_room != NULL)
     {
-	act( "$n stops following you.",     ch, NULL, ch->master, TO_VICT    );
-    	act( "You stop following $N.",      ch, NULL, ch->master, TO_CHAR    );
+	    act( "$n stops following you.",     ch, NULL, ch->master, TO_VICT, POS_RESTING    );
+    	act( "You stop following $N.",      ch, NULL, ch->master, TO_CHAR, POS_RESTING    );
     }
     if (ch->master->pet == ch)
 	ch->master->pet = NULL;
@@ -1568,7 +1565,7 @@ void nuke_pets( Character *ch )
     {
     	stop_follower(pet);
     	if (pet->in_room != NULL)
-    	    act("$N slowly fades away.",ch,NULL,pet,TO_NOTVICT);
+    	    act("$N slowly fades away.",ch,NULL,pet,TO_NOTVICT, POS_RESTING);
     	extract_char(pet,TRUE);
     }
     ch->pet = NULL;
@@ -1676,7 +1673,7 @@ void do_order( Character *ch, char *argument )
 	{
 	    found = TRUE;
 	    snprintf(buf, sizeof(buf), "$n orders you to '%s'.", argument );
-	    act( buf, ch, NULL, och, TO_VICT );
+	    act( buf, ch, NULL, och, TO_VICT, POS_RESTING );
 	    interpret( och, argument );
 	}
     }
@@ -1744,7 +1741,7 @@ void do_group( Character *ch, char *argument )
 
     if ( victim->master != ch && ch != victim )
     {
-	act_new("$N isn't following you.",ch,NULL,victim,TO_CHAR,POS_SLEEPING);
+	act("$N isn't following you.",ch,NULL,victim,TO_CHAR,POS_SLEEPING);
 	return;
     }
     
@@ -1756,27 +1753,23 @@ void do_group( Character *ch, char *argument )
     
     if (IS_AFFECTED(ch,AFF_CHARM))
     {
-    	act_new("You like your master too much to leave $m!",
-	    ch,NULL,victim,TO_VICT,POS_SLEEPING);
+    	act("You like your master too much to leave $m!", ch,NULL,victim,TO_VICT,POS_SLEEPING);
     	return;
     }
 
     if ( is_same_group( victim, ch ) && ch != victim )
     {
 	victim->leader = NULL;
-	act_new("$n removes $N from $s group.",
-	    ch,NULL,victim,TO_NOTVICT,POS_RESTING);
-	act_new("$n removes you from $s group.",
-	    ch,NULL,victim,TO_VICT,POS_SLEEPING);
-	act_new("You remove $N from your group.",
-	    ch,NULL,victim,TO_CHAR,POS_SLEEPING);
+	act("$n removes $N from $s group.", ch,NULL,victim,TO_NOTVICT,POS_RESTING);
+	act("$n removes you from $s group.", ch,NULL,victim,TO_VICT,POS_SLEEPING);
+	act("You remove $N from your group.", ch,NULL,victim,TO_CHAR,POS_SLEEPING);
 	return;
     }
 
     victim->leader = ch;
-    act_new("$N joins $n's group.",ch,NULL,victim,TO_NOTVICT,POS_RESTING);
-    act_new("You join $n's group.",ch,NULL,victim,TO_VICT,POS_SLEEPING);
-    act_new("$N joins your group.",ch,NULL,victim,TO_CHAR,POS_SLEEPING);
+    act("$N joins $n's group.",ch,NULL,victim,TO_NOTVICT,POS_RESTING);
+    act("You join $n's group.",ch,NULL,victim,TO_VICT,POS_SLEEPING);
+    act("$N joins your group.",ch,NULL,victim,TO_CHAR,POS_SLEEPING);
     return;
 }
 
@@ -1894,7 +1887,7 @@ void do_split( Character *ch, char *argument )
     {
 	if ( gch != ch && is_same_group(gch,ch) && !IS_AFFECTED(gch,AFF_CHARM))
 	{
-	    act( buf, ch, NULL, gch, TO_VICT );
+	    act( buf, ch, NULL, gch, TO_VICT, POS_RESTING );
 	    gch->gold += share_gold;
 	    gch->silver += share_silver;
 	}
@@ -1925,10 +1918,10 @@ void do_gtell( Character *ch, char *argument )
     {
       gch = *it;
 	if ( is_same_group( gch, ch ) )
-	    act_new("{W$n tells the group '$t{W'{x",
+	    act("{W$n tells the group '$t{W'{x",
 		ch,argument,gch,TO_VICT,POS_SLEEPING);
     }
-    act_new("{WYou tell the group '$t{W'{x", ch, argument,
+    act("{WYou tell the group '$t{W'{x", ch, argument,
 		gch, TO_CHAR, POS_SLEEPING);
     return;
 }
@@ -2137,7 +2130,7 @@ void do_info( Character *ch, char *argument )
              !IS_SET(victim->comm,COMM_NOINFO) &&
              !IS_SET(victim->comm,COMM_QUIET) )
         {
-            act_new("{Y$n INFO: {C'$t{C'{x",
+            act("{Y$n INFO: {C'$t{C'{x",
                     ch,argument,d->character,TO_VICT,POS_SLEEPING);
         }
       }

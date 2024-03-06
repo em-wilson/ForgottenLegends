@@ -118,9 +118,9 @@ void acid_effect(void *vo, int level, int dam, int target)
 	    return;
 
 	if (obj->carried_by != NULL)
-	    act(msg,obj->carried_by,obj,NULL,TO_ALL);
+	    act(msg,obj->carried_by,obj,NULL,TO_ALL, POS_RESTING);
 	else if (obj->in_room != NULL && obj->in_room->people != NULL)
-	    act(msg,obj->in_room->people,obj,NULL,TO_ALL);
+	    act(msg,obj->in_room->people,obj,NULL,TO_ALL, POS_RESTING);
 
 	if (obj->item_type == ITEM_ARMOR)  /* etch it */
 	{
@@ -215,8 +215,8 @@ void cold_effect(void *vo, int level, int dam, int target)
 	{
 	    AFFECT_DATA af;
 
-            act("$n turns blue and shivers.",victim,NULL,NULL,TO_ROOM);
-	    act("A chill sinks deep into your bones.",victim,NULL,NULL,TO_CHAR);
+            act("$n turns blue and shivers.",victim,NULL,NULL,TO_ROOM, POS_RESTING);
+	    act("A chill sinks deep into your bones.",victim,NULL,NULL,TO_CHAR, POS_RESTING);
             af.where     = TO_AFFECTS;
             af.type      = skill_lookup("chill touch");
             af.level     = level;
@@ -283,9 +283,9 @@ void cold_effect(void *vo, int level, int dam, int target)
 	    return;
 
 	if (obj->carried_by != NULL)
-	    act(msg,obj->carried_by,obj,NULL,TO_ALL);
+	    act(msg,obj->carried_by,obj,NULL,TO_ALL, POS_RESTING);
 	else if (obj->in_room != NULL && obj->in_room->people != NULL)
-	    act(msg,obj->in_room->people,obj,NULL,TO_ALL);
+	    act(msg,obj->in_room->people,obj,NULL,TO_ALL, POS_RESTING);
 
 	extract_obj(obj);
 	return;
@@ -319,9 +319,9 @@ void fire_effect(void *vo, int level, int dam, int target)
 	&&  !saves_spell(level / 4 + dam / 20, victim,DAM_FIRE))
 	{
             AFFECT_DATA af;
-            act("$n is blinded by smoke!",victim,NULL,NULL,TO_ROOM);
+            act("$n is blinded by smoke!",victim,NULL,NULL,TO_ROOM, POS_RESTING);
             act("Your eyes tear up from smoke...you can't see a thing!",
-		victim,NULL,NULL,TO_CHAR);
+		victim,NULL,NULL,TO_CHAR, POS_RESTING);
 	 
             af.where        = TO_AFFECTS;
             af.type         = skill_lookup("fire breath");
@@ -407,9 +407,9 @@ void fire_effect(void *vo, int level, int dam, int target)
             return;
  
 	if (obj->carried_by != NULL)
-            act( msg, obj->carried_by, obj, NULL, TO_ALL );
+            act( msg, obj->carried_by, obj, NULL, TO_ALL, POS_RESTING );
 	else if (obj->in_room != NULL && obj->in_room->people != NULL)
-	    act(msg,obj->in_room->people,obj,NULL,TO_ALL);
+	    act(msg,obj->in_room->people,obj,NULL,TO_ALL, POS_RESTING);
 
         if (obj->contains)
         {
@@ -464,7 +464,7 @@ void poison_effect(void *vo,int level, int dam, int target)
 
             send_to_char("You feel poison coursing through your veins.\n\r",
                 victim);
-            act("$n looks very ill.",victim,NULL,NULL,TO_ROOM);
+            act("$n looks very ill.",victim,NULL,NULL,TO_ROOM, POS_RESTING);
 
             af.where     = TO_AFFECTS;
             af.type      = gsn_poison;
@@ -606,9 +606,9 @@ void shock_effect(void *vo,int level, int dam, int target)
 	    return;
 
 	if (obj->carried_by != NULL)
-	    act(msg,obj->carried_by,obj,NULL,TO_ALL);
+	    act(msg,obj->carried_by,obj,NULL,TO_ALL, POS_RESTING);
 	else if (obj->in_room != NULL && obj->in_room->people != NULL)
-	    act(msg,obj->in_room->people,obj,NULL,TO_ALL);
+	    act(msg,obj->in_room->people,obj,NULL,TO_ALL, POS_RESTING);
 
 	extract_obj(obj);
 	return;

@@ -319,7 +319,7 @@ void do_mpasound( Character *ch, char *argument )
       	{
 	    ch->in_room = pexit->u1.to_room;
 	    MOBtrigger  = FALSE;
-	    act( argument, ch, NULL, NULL, TO_ROOM );
+	    act( argument, ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	    MOBtrigger  = TRUE;
 	}
     }
@@ -452,7 +452,7 @@ void do_mpechoaround( Character *ch, char *argument )
     if ( ( victim=get_char_room( ch, arg ) ) == NULL )
 	return;
 
-    act( argument, ch, NULL, victim, TO_NOTVICT );
+    act( argument, ch, NULL, victim, TO_NOTVICT, POS_RESTING );
 }
 
 /*
@@ -473,7 +473,7 @@ void do_mpechoat( Character *ch, char *argument )
     if ( ( victim = get_char_room( ch, arg ) ) == NULL )
 	return;
 
-    act( argument, ch, NULL, victim, TO_VICT );
+    act( argument, ch, NULL, victim, TO_VICT, POS_RESTING );
 }
 
 /*
@@ -485,7 +485,7 @@ void do_mpecho( Character *ch, char *argument )
 {
     if ( argument[0] == '\0' )
 	return;
-    act( argument, ch, NULL, NULL, TO_ROOM );
+    act( argument, ch, NULL, NULL, TO_ROOM, POS_RESTING );
 }
 
 /*

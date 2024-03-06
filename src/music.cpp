@@ -89,7 +89,7 @@ void song_update(void)
         	if ( d->connected == ConnectedState::Playing &&
              	     !IS_SET(victim->comm,COMM_NOMUSIC) &&
              	     !IS_SET(victim->comm,COMM_QUIET) )
-            	     act_new("$t",d->character,buf,NULL,TO_CHAR,POS_SLEEPING);
+            	     act("$t",d->character,buf,NULL,TO_CHAR,POS_SLEEPING);
             }
 	}
     }
@@ -121,7 +121,7 @@ void song_update(void)
 	    snprintf(buf, sizeof(buf),"$p starts playing %s, %s.",
 		song_table[obj->value[1]].group,song_table[obj->value[1]].name);
 	    if (room->people != NULL)
-		act(buf,room->people,obj,NULL,TO_ALL);
+		act(buf,room->people,obj,NULL,TO_ALL, POS_RESTING );
 	    obj->value[0] = 0;
 	    continue;
 	}
@@ -147,7 +147,7 @@ void song_update(void)
 
 	snprintf(buf, sizeof(buf),"$p bops: '%s'",line);
 	if (room->people != NULL)
-	    act(buf,room->people,obj,NULL,TO_ALL);
+	    act(buf,room->people,obj,NULL,TO_ALL, POS_RESTING );
     }
 }
 
@@ -354,7 +354,7 @@ void do_play(Character *ch, char *argument)
         	if ( d->connected == ConnectedState::Playing &&
              	     !IS_SET(victim->comm,COMM_NOMUSIC) &&
              	     !IS_SET(victim->comm,COMM_QUIET) )
-            	     act_new("$t",d->character,buf,NULL,TO_CHAR,POS_SLEEPING);
+            	     act("$t",d->character,buf,NULL,TO_CHAR,POS_SLEEPING);
             }
     }
 

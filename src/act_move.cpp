@@ -99,8 +99,8 @@ void move_char( Character *ch, int door, bool follow )
     &&  (!IS_AFFECTED(ch, AFF_PASS_DOOR) || IS_SET(pexit->exit_info,EX_NOPASS))
     &&   !IS_TRUSTED(ch,ANGEL))
     {
-	act( "The $d is closed.", ch, NULL, pexit->keyword, TO_CHAR );
-	return;
+		act( "The $d is closed.", ch, NULL, pexit->keyword, TO_CHAR, POS_RESTING );
+		return;
     }
 
     if ( IS_AFFECTED(ch, AFF_CHARM)
@@ -201,7 +201,7 @@ void move_char( Character *ch, int door, bool follow )
 
     if ( !IS_AFFECTED(ch, AFF_SNEAK)
     &&   ch->invis_level < LEVEL_HERO)
-	act( "$n leaves $T.", ch, NULL, dir_name[door], TO_ROOM );
+	act( "$n leaves $T.", ch, NULL, dir_name[door], TO_ROOM, POS_RESTING );
 
     if ( IS_AFFECTED(ch, AFF_SNEAK) )
 	for ( fch = in_room->people; fch != NULL; fch = fch->next_in_room )
@@ -216,12 +216,12 @@ void move_char( Character *ch, int door, bool follow )
     char_to_room( ch, to_room );
     if ( !IS_AFFECTED(ch, AFF_SNEAK)
     &&   ch->invis_level < LEVEL_HERO)
-	act( "$n has arrived.", ch, NULL, NULL, TO_ROOM );
+	act( "$n has arrived.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 
     if ( IS_AFFECTED(ch, AFF_SNEAK) )
 	for ( fch = to_room->people; fch != NULL; fch = fch->next_in_room )
 	    if (IS_BUNNY(fch))
-	act("$N has arrived.", fch, NULL, ch, TO_CHAR );
+	act("$N has arrived.", fch, NULL, ch, TO_CHAR, POS_RESTING );
 
     do_look( ch, (char*)"auto" );
 
@@ -243,14 +243,12 @@ void move_char( Character *ch, int door, bool follow )
 	    if (IS_SET(ch->in_room->room_flags,ROOM_LAW)
 	    &&  (IS_NPC(fch) && IS_SET(fch->act,ACT_AGGRESSIVE)))
 	    {
-		act("You can't bring $N into the city.",
-		    ch,NULL,fch,TO_CHAR);
-		act("You aren't allowed in the city.",
-		    fch,NULL,NULL,TO_CHAR);
+		act("You can't bring $N into the city.", ch,NULL,fch,TO_CHAR, POS_RESTING);
+		act("You aren't allowed in the city.", fch,NULL,NULL,TO_CHAR, POS_RESTING);
 		continue;
 	    }
 
-	    act( "You follow $N.", fch, NULL, ch, TO_CHAR );
+	    act( "You follow $N.", fch, NULL, ch, TO_CHAR, POS_RESTING );
 	    move_char( fch, door, TRUE );
 	}
     }
@@ -338,14 +336,14 @@ int find_door( Character *ch, char *arg )
 	    &&   is_name( arg, pexit->keyword ) )
 		return door;
 	}
-	act( "I see no $T here.", ch, NULL, arg, TO_CHAR );
-	return -1;
+		act( "I see no $T here.", ch, NULL, arg, TO_CHAR, POS_RESTING );
+		return -1;
     }
 
     if ( ( pexit = ch->in_room->exit[door] ) == NULL )
     {
-	act( "I see no door $T here.", ch, NULL, arg, TO_CHAR );
-	return -1;
+		act( "I see no door $T here.", ch, NULL, arg, TO_CHAR, POS_RESTING );
+		return -1;
     }
 
     if ( !IS_SET(pexit->exit_info, EX_ISDOOR) )
@@ -397,8 +395,8 @@ void do_open( Character *ch, char *argument )
 	    }
 
 	    REMOVE_BIT(obj->value[1], EX_CLOSED);
-	    act("You open $p.",ch,obj,NULL,TO_CHAR);
-	    act("$n opens $p.",ch,obj,NULL,TO_ROOM);
+	    act("You open $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n opens $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    return;
  	}
 
@@ -413,8 +411,8 @@ void do_open( Character *ch, char *argument )
 	    { send_to_char( "It's locked.\n\r",            ch ); return; }
 
 	REMOVE_BIT(obj->value[1], CONT_CLOSED);
-	act("You open $p.",ch,obj,NULL,TO_CHAR);
-	act( "$n opens $p.", ch, obj, NULL, TO_ROOM );
+	act("You open $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	act( "$n opens $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
 	return;
     }
 
@@ -432,7 +430,7 @@ void do_open( Character *ch, char *argument )
 	    { send_to_char( "It's locked.\n\r",            ch ); return; }
 
 	REMOVE_BIT(pexit->exit_info, EX_CLOSED);
-	act( "$n opens the $d.", ch, NULL, pexit->keyword, TO_ROOM );
+	act( "$n opens the $d.", ch, NULL, pexit->keyword, TO_ROOM, POS_RESTING );
 	send_to_char( "Ok.\n\r", ch );
 
 	/* open the other side */
@@ -444,7 +442,7 @@ void do_open( Character *ch, char *argument )
 
 	    REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
 	    for ( rch = to_room->people; rch != NULL; rch = rch->next_in_room )
-		act( "The $d opens.", rch, NULL, pexit_rev->keyword, TO_CHAR );
+		act( "The $d opens.", rch, NULL, pexit_rev->keyword, TO_CHAR, POS_RESTING );
 	}
     }
 
@@ -487,8 +485,8 @@ void do_close( Character *ch, char *argument )
 	    }
 
 	    SET_BIT(obj->value[1],EX_CLOSED);
-	    act("You close $p.",ch,obj,NULL,TO_CHAR);
-	    act("$n closes $p.",ch,obj,NULL,TO_ROOM);
+	    act("You close $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n closes $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    return;
 	}
 
@@ -501,8 +499,8 @@ void do_close( Character *ch, char *argument )
 	    { send_to_char( "You can't do that.\n\r",      ch ); return; }
 
 	SET_BIT(obj->value[1], CONT_CLOSED);
-	act("You close $p.",ch,obj,NULL,TO_CHAR);
-	act( "$n closes $p.", ch, obj, NULL, TO_ROOM );
+	act("You close $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	act( "$n closes $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
 	return;
     }
 
@@ -518,7 +516,7 @@ void do_close( Character *ch, char *argument )
 	    { send_to_char( "It's already closed.\n\r",    ch ); return; }
 
 	SET_BIT(pexit->exit_info, EX_CLOSED);
-	act( "$n closes the $d.", ch, NULL, pexit->keyword, TO_ROOM );
+	act( "$n closes the $d.", ch, NULL, pexit->keyword, TO_ROOM, POS_RESTING );
 	send_to_char( "Ok.\n\r", ch );
 
 	/* close the other side */
@@ -530,7 +528,7 @@ void do_close( Character *ch, char *argument )
 
 	    SET_BIT( pexit_rev->exit_info, EX_CLOSED );
 	    for ( rch = to_room->people; rch != NULL; rch = rch->next_in_room )
-		act( "The $d closes.", rch, NULL, pexit_rev->keyword, TO_CHAR );
+		act( "The $d closes.", rch, NULL, pexit_rev->keyword, TO_CHAR, POS_RESTING );
 	}
     }
 
@@ -604,8 +602,8 @@ void do_lock( Character *ch, char *argument )
 	    }
 
 	    SET_BIT(obj->value[1],EX_LOCKED);
-	    act("You lock $p.",ch,obj,NULL,TO_CHAR);
-	    act("$n locks $p.",ch,obj,NULL,TO_ROOM);
+	    act("You lock $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n locks $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    return;
 	}
 
@@ -622,8 +620,8 @@ void do_lock( Character *ch, char *argument )
 	    { send_to_char( "It's already locked.\n\r",    ch ); return; }
 
 	SET_BIT(obj->value[1], CONT_LOCKED);
-	act("You lock $p.",ch,obj,NULL,TO_CHAR);
-	act( "$n locks $p.", ch, obj, NULL, TO_ROOM );
+	act("You lock $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	act( "$n locks $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
 	return;
     }
 
@@ -646,7 +644,7 @@ void do_lock( Character *ch, char *argument )
 
 	SET_BIT(pexit->exit_info, EX_LOCKED);
 	send_to_char( "*Click*\n\r", ch );
-	act( "$n locks the $d.", ch, NULL, pexit->keyword, TO_ROOM );
+	act( "$n locks the $d.", ch, NULL, pexit->keyword, TO_ROOM, POS_RESTING );
 
 	/* lock the other side */
 	if ( ( to_room   = pexit->u1.to_room            ) != NULL
@@ -712,8 +710,8 @@ void do_unlock( Character *ch, char *argument )
 	    }
 
 	    REMOVE_BIT(obj->value[1],EX_LOCKED);
-	    act("You unlock $p.",ch,obj,NULL,TO_CHAR);
-	    act("$n unlocks $p.",ch,obj,NULL,TO_ROOM);
+	    act("You unlock $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n unlocks $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    return;
 	}
 
@@ -730,8 +728,8 @@ void do_unlock( Character *ch, char *argument )
 	    { send_to_char( "It's already unlocked.\n\r",  ch ); return; }
 
 	REMOVE_BIT(obj->value[1], CONT_LOCKED);
-	act("You unlock $p.",ch,obj,NULL,TO_CHAR);
-	act( "$n unlocks $p.", ch, obj, NULL, TO_ROOM );
+	act("You unlock $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	act( "$n unlocks $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
 	return;
     }
 
@@ -754,7 +752,7 @@ void do_unlock( Character *ch, char *argument )
 
 	REMOVE_BIT(pexit->exit_info, EX_LOCKED);
 	send_to_char( "*Click*\n\r", ch );
-	act( "$n unlocks the $d.", ch, NULL, pexit->keyword, TO_ROOM );
+	act( "$n unlocks the $d.", ch, NULL, pexit->keyword, TO_ROOM, POS_RESTING );
 
 	/* unlock the other side */
 	if ( ( to_room   = pexit->u1.to_room            ) != NULL
@@ -792,8 +790,7 @@ void do_pick( Character *ch, char *argument )
     {
 	if ( IS_NPC(gch) && IS_AWAKE(gch) && ch->level + 5 < gch->level )
 	{
-	    act( "$N is standing too close to the lock.",
-		ch, NULL, gch, TO_CHAR );
+	    act( "$N is standing too close to the lock.", ch, NULL, gch, TO_CHAR, POS_RESTING );
 	    return;
 	}
     }
@@ -835,8 +832,8 @@ void do_pick( Character *ch, char *argument )
 	    }
 
 	    REMOVE_BIT(obj->value[1],EX_LOCKED);
-	    act("You pick the lock on $p.",ch,obj,NULL,TO_CHAR);
-	    act("$n picks the lock on $p.",ch,obj,NULL,TO_ROOM);
+	    act("You pick the lock on $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n picks the lock on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    check_improve(ch,gsn_pick_lock,TRUE,2);
 	    return;
 	}
@@ -858,8 +855,8 @@ void do_pick( Character *ch, char *argument )
 	    { send_to_char( "You failed.\n\r",             ch ); return; }
 
 	REMOVE_BIT(obj->value[1], CONT_LOCKED);
-        act("You pick the lock on $p.",ch,obj,NULL,TO_CHAR);
-        act("$n picks the lock on $p.",ch,obj,NULL,TO_ROOM);
+        act("You pick the lock on $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+        act("$n picks the lock on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	check_improve(ch,gsn_pick_lock,TRUE,2);
 	return;
     }
@@ -883,7 +880,7 @@ void do_pick( Character *ch, char *argument )
 
 	REMOVE_BIT(pexit->exit_info, EX_LOCKED);
 	send_to_char( "*Click*\n\r", ch );
-	act( "$n picks the $d.", ch, NULL, pexit->keyword, TO_ROOM );
+	act( "$n picks the $d.", ch, NULL, pexit->keyword, TO_ROOM, POS_RESTING );
 	check_improve(ch,gsn_pick_lock,TRUE,2);
 
 	/* pick the other side */
@@ -928,8 +925,7 @@ void do_stand( Character *ch, char *argument )
 	}
 	if (ch->on != obj && count_users(obj) >= obj->value[0])
 	{
-	    act_new("There's no room to stand on $p.",
-		ch,obj,NULL,TO_CHAR,POS_DEAD);
+	    act("There's no room to stand on $p.", ch,obj,NULL,TO_CHAR,POS_DEAD);
 	    return;
 	}
  	ch->on = obj;
@@ -944,23 +940,23 @@ void do_stand( Character *ch, char *argument )
 	if (obj == NULL)
 	{
 	    send_to_char( "You wake and stand up.\n\r", ch );
-	    act( "$n wakes and stands up.", ch, NULL, NULL, TO_ROOM );
+	    act( "$n wakes and stands up.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	    ch->on = NULL;
 	}
 	else if (IS_SET(obj->value[2],STAND_AT))
 	{
-	   act_new("You wake and stand at $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
-	   act("$n wakes and stands at $p.",ch,obj,NULL,TO_ROOM);
+	   act("You wake and stand at $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
+	   act("$n wakes and stands at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	}
 	else if (IS_SET(obj->value[2],STAND_ON))
 	{
-	    act_new("You wake and stand on $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
-	    act("$n wakes and stands on $p.",ch,obj,NULL,TO_ROOM);
+	    act("You wake and stand on $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
+	    act("$n wakes and stands on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	}
 	else 
 	{
-	    act_new("You wake and stand in $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
-	    act("$n wakes and stands in $p.",ch,obj,NULL,TO_ROOM);
+	    act("You wake and stand in $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
+	    act("$n wakes and stands in $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	}
 	ch->position = POS_STANDING;
 	do_look(ch,(char*)"auto");
@@ -970,23 +966,23 @@ void do_stand( Character *ch, char *argument )
 	if (obj == NULL)
 	{
 	    send_to_char( "You stand up.\n\r", ch );
-	    act( "$n stands up.", ch, NULL, NULL, TO_ROOM );
+	    act( "$n stands up.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	    ch->on = NULL;
 	}
 	else if (IS_SET(obj->value[2],STAND_AT))
 	{
-	    act("You stand at $p.",ch,obj,NULL,TO_CHAR);
-	    act("$n stands at $p.",ch,obj,NULL,TO_ROOM);
+	    act("You stand at $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n stands at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	}
 	else if (IS_SET(obj->value[2],STAND_ON))
 	{
-	    act("You stand on $p.",ch,obj,NULL,TO_CHAR);
-	    act("$n stands on $p.",ch,obj,NULL,TO_ROOM);
+	    act("You stand on $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n stands on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	}
 	else
 	{
-	    act("You stand in $p.",ch,obj,NULL,TO_CHAR);
-	    act("$n stands on $p.",ch,obj,NULL,TO_ROOM);
+	    act("You stand in $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n stands on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	}
 	ch->position = POS_STANDING;
 	break;
@@ -1040,7 +1036,7 @@ void do_rest( Character *ch, char *argument )
 
         if (obj != NULL && ch->on != obj && count_users(obj) >= obj->value[0])
         {
-	    act_new("There's no more room on $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
+	    act("There's no more room on $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
 	    return;
     	}
 	
@@ -1059,25 +1055,25 @@ void do_rest( Character *ch, char *argument )
 	if (obj == NULL)
 	{
 	    send_to_char( "You wake up and start resting.\n\r", ch );
-	    act ("$n wakes up and starts resting.",ch,NULL,NULL,TO_ROOM);
+	    act ("$n wakes up and starts resting.",ch,NULL,NULL,TO_ROOM, POS_RESTING);
 	}
 	else if (IS_SET(obj->value[2],REST_AT))
 	{
-	    act_new("You wake up and rest at $p.",
+	    act("You wake up and rest at $p.",
 		    ch,obj,NULL,TO_CHAR,POS_SLEEPING);
-	    act("$n wakes up and rests at $p.",ch,obj,NULL,TO_ROOM);
+	    act("$n wakes up and rests at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	}
         else if (IS_SET(obj->value[2],REST_ON))
         {
-            act_new("You wake up and rest on $p.",
+            act("You wake up and rest on $p.",
                     ch,obj,NULL,TO_CHAR,POS_SLEEPING);
-            act("$n wakes up and rests on $p.",ch,obj,NULL,TO_ROOM);
+            act("$n wakes up and rests on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
         }
         else
         {
-            act_new("You wake up and rest in $p.",
+            act("You wake up and rest in $p.",
                     ch,obj,NULL,TO_CHAR,POS_SLEEPING);
-            act("$n wakes up and rests in $p.",ch,obj,NULL,TO_ROOM);
+            act("$n wakes up and rests in $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
         }
 	ch->position = POS_RESTING;
 	do_look(ch,(char*)"auto");
@@ -1091,22 +1087,22 @@ void do_rest( Character *ch, char *argument )
 	if (obj == NULL)
 	{
 	    send_to_char( "You rest.\n\r", ch );
-	    act( "$n sits down and rests.", ch, NULL, NULL, TO_ROOM );
+	    act( "$n sits down and rests.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	}
         else if (IS_SET(obj->value[2],REST_AT))
         {
-	    act("You sit down at $p and rest.",ch,obj,NULL,TO_CHAR);
-	    act("$n sits down at $p and rests.",ch,obj,NULL,TO_ROOM);
+	    act("You sit down at $p and rest.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n sits down at $p and rests.",ch,obj,NULL,TO_ROOM, POS_RESTING);
         }
         else if (IS_SET(obj->value[2],REST_ON))
         {
-	    act("You sit on $p and rest.",ch,obj,NULL,TO_CHAR);
-	    act("$n sits on $p and rests.",ch,obj,NULL,TO_ROOM);
+	    act("You sit on $p and rest.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n sits on $p and rests.",ch,obj,NULL,TO_ROOM, POS_RESTING);
         }
         else
         {
-	    act("You rest in $p.",ch,obj,NULL,TO_CHAR);
-	    act("$n rests in $p.",ch,obj,NULL,TO_ROOM);
+	    act("You rest in $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n rests in $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
         }
 	ch->position = POS_RESTING;
 	break;
@@ -1115,22 +1111,22 @@ void do_rest( Character *ch, char *argument )
 	if (obj == NULL)
 	{
 	    send_to_char("You rest.\n\r",ch);
-	    act("$n rests.",ch,NULL,NULL,TO_ROOM);
+	    act("$n rests.",ch,NULL,NULL,TO_ROOM, POS_RESTING);
 	}
         else if (IS_SET(obj->value[2],REST_AT))
         {
-	    act("You rest at $p.",ch,obj,NULL,TO_CHAR);
-	    act("$n rests at $p.",ch,obj,NULL,TO_ROOM);
+	    act("You rest at $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n rests at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
         }
         else if (IS_SET(obj->value[2],REST_ON))
         {
-	    act("You rest on $p.",ch,obj,NULL,TO_CHAR);
-	    act("$n rests on $p.",ch,obj,NULL,TO_ROOM);
+	    act("You rest on $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n rests on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
         }
         else
         {
-	    act("You rest in $p.",ch,obj,NULL,TO_CHAR);
-	    act("$n rests in $p.",ch,obj,NULL,TO_ROOM);
+	    act("You rest in $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+	    act("$n rests in $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	}
 	ch->position = POS_RESTING;
 	break;
@@ -1176,7 +1172,7 @@ void do_sit (Character *ch, char *argument )
 
 	if (obj != NULL && ch->on != obj && count_users(obj) >= obj->value[0])
 	{
-	    act_new("There's no more room on $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
+	    act("There's no more room on $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
 	    return;
 	}
 
@@ -1194,22 +1190,22 @@ void do_sit (Character *ch, char *argument )
             if (obj == NULL)
             {
             	send_to_char( "You wake and sit up.\n\r", ch );
-            	act( "$n wakes and sits up.", ch, NULL, NULL, TO_ROOM );
+            	act( "$n wakes and sits up.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
             }
             else if (IS_SET(obj->value[2],SIT_AT))
             {
-            	act_new("You wake and sit at $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
-            	act("$n wakes and sits at $p.",ch,obj,NULL,TO_ROOM);
+            	act("You wake and sit at $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
+            	act("$n wakes and sits at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
             }
             else if (IS_SET(obj->value[2],SIT_ON))
             {
-            	act_new("You wake and sit on $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
-            	act("$n wakes and sits at $p.",ch,obj,NULL,TO_ROOM);
+            	act("You wake and sit on $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
+            	act("$n wakes and sits at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
             }
             else
             {
-            	act_new("You wake and sit in $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
-            	act("$n wakes and sits in $p.",ch,obj,NULL,TO_ROOM);
+            	act("You wake and sit in $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
+            	act("$n wakes and sits in $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
             }
 
 	    ch->position = POS_SITTING;
@@ -1221,14 +1217,14 @@ void do_sit (Character *ch, char *argument )
 		send_to_char("You stop resting.\n\r",ch);
 	    else if (IS_SET(obj->value[2],SIT_AT))
 	    {
-		act("You sit at $p.",ch,obj,NULL,TO_CHAR);
-		act("$n sits at $p.",ch,obj,NULL,TO_ROOM);
+		act("You sit at $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
+		act("$n sits at $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
 	    }
 
 	    else if (IS_SET(obj->value[2],SIT_ON))
 	    {
-		act("You sit on $p.",ch,obj,NULL,TO_CHAR);
-		act("$n sits on $p.",ch,obj,NULL,TO_ROOM);
+		act("You sit on $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
+		act("$n sits on $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
 	    }
 	    ch->position = POS_SITTING;
 	    break;
@@ -1239,22 +1235,22 @@ void do_sit (Character *ch, char *argument )
 	    if (obj == NULL)
     	    {
 		send_to_char("You sit down.\n\r",ch);
-    	        act("$n sits down on the ground.",ch,NULL,NULL,TO_ROOM);
+    	        act("$n sits down on the ground.",ch,NULL,NULL,TO_ROOM,POS_RESTING);
 	    }
 	    else if (IS_SET(obj->value[2],SIT_AT))
 	    {
-		act("You sit down at $p.",ch,obj,NULL,TO_CHAR);
-		act("$n sits down at $p.",ch,obj,NULL,TO_ROOM);
+		act("You sit down at $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
+		act("$n sits down at $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
 	    }
 	    else if (IS_SET(obj->value[2],SIT_ON))
 	    {
-		act("You sit on $p.",ch,obj,NULL,TO_CHAR);
-		act("$n sits on $p.",ch,obj,NULL,TO_ROOM);
+		act("You sit on $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
+		act("$n sits on $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
 	    }
 	    else
 	    {
-		act("You sit down in $p.",ch,obj,NULL,TO_CHAR);
-		act("$n sits down in $p.",ch,obj,NULL,TO_ROOM);
+		act("You sit down in $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
+		act("$n sits down in $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
 	    }
     	    ch->position = POS_SITTING;
     	    break;
@@ -1279,7 +1275,7 @@ void do_sleep( Character *ch, char *argument )
 	if (argument[0] == '\0' && ch->on == NULL)
 	{
 	    send_to_char( "You go to sleep.\n\r", ch );
-	    act( "$n goes to sleep.", ch, NULL, NULL, TO_ROOM );
+	    act( "$n goes to sleep.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	    ch->position = POS_SLEEPING;
 	}
 	else  /* find an object and sleep on it */
@@ -1305,26 +1301,25 @@ void do_sleep( Character *ch, char *argument )
 
 	    if (ch->on != obj && count_users(obj) >= obj->value[0])
 	    {
-		act_new("There is no room on $p for you.",
-		    ch,obj,NULL,TO_CHAR,POS_DEAD);
+		act("There is no room on $p for you.", ch,obj,NULL,TO_CHAR,POS_DEAD);
 		return;
 	    }
 
 	    ch->on = obj;
 	    if (IS_SET(obj->value[2],SLEEP_AT))
 	    {
-		act("You go to sleep at $p.",ch,obj,NULL,TO_CHAR);
-		act("$n goes to sleep at $p.",ch,obj,NULL,TO_ROOM);
+		act("You go to sleep at $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
+		act("$n goes to sleep at $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
 	    }
 	    else if (IS_SET(obj->value[2],SLEEP_ON))
 	    {
-	        act("You go to sleep on $p.",ch,obj,NULL,TO_CHAR);
-	        act("$n goes to sleep on $p.",ch,obj,NULL,TO_ROOM);
+	        act("You go to sleep on $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
+	        act("$n goes to sleep on $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
 	    }
 	    else
 	    {
-		act("You go to sleep in $p.",ch,obj,NULL,TO_CHAR);
-		act("$n goes to sleep in $p.",ch,obj,NULL,TO_ROOM);
+		act("You go to sleep in $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
+		act("$n goes to sleep in $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
 	    }
 	    ch->position = POS_SLEEPING;
 	}
@@ -1356,12 +1351,12 @@ void do_wake( Character *ch, char *argument )
 	{ send_to_char( "They aren't here.\n\r",              ch ); return; }
 
     if ( IS_AWAKE(victim) )
-	{ act( "$N is already awake.", ch, NULL, victim, TO_CHAR ); return; }
+	{ act( "$N is already awake.", ch, NULL, victim, TO_CHAR, POS_RESTING ); return; }
 
     if ( IS_AFFECTED(victim, AFF_SLEEP) )
-	{ act( "You can't wake $M!",   ch, NULL, victim, TO_CHAR );  return; }
+	{ act( "You can't wake $M!",   ch, NULL, victim, TO_CHAR, POS_RESTING );  return; }
 
-    act_new( "$n wakes you.", ch, NULL, victim, TO_VICT,POS_SLEEPING );
+    act( "$n wakes you.", ch, NULL, victim, TO_VICT,POS_SLEEPING );
     do_stand(victim,(char*)"");
     return;
 }
@@ -1444,7 +1439,7 @@ void do_recall( Character *ch, char *argument ) {
         return;
     }
 
-    act("$n prays for transportation!", ch, 0, 0, TO_ROOM);
+    act("$n prays for transportation!", ch, 0, 0, TO_ROOM, POS_RESTING);
 
     if ((location = get_room_index(ROOM_VNUM_TEMPLE)) == NULL) {
         send_to_char("You are completely lost.\n\r", ch);
@@ -1485,11 +1480,11 @@ void do_recall( Character *ch, char *argument ) {
     }
 
     ch->move /= 2;
-    act("$n disappears.", ch, NULL, NULL, TO_ROOM);
+    act("$n disappears.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
 
     char_from_room(ch);
     char_to_room(ch, location);
-    act("$n appears in the room.", ch, NULL, NULL, TO_ROOM);
+    act("$n appears in the room.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
     do_look(ch, (char *) "auto");
 
     if (ch->pet != NULL)
@@ -1597,8 +1592,8 @@ void do_train( Character *ch, char *arguments ) {
         ch->pcdata->perm_hit += 10;
         ch->max_hit += 10;
         ch->hit += 10;
-        act("Your durability increases!", ch, NULL, NULL, TO_CHAR);
-        act("$n's durability increases!", ch, NULL, NULL, TO_ROOM);
+        act("Your durability increases!", ch, NULL, NULL, TO_CHAR, POS_RESTING);
+        act("$n's durability increases!", ch, NULL, NULL, TO_ROOM, POS_RESTING);
         return;
     }
 
@@ -1612,13 +1607,13 @@ void do_train( Character *ch, char *arguments ) {
         ch->pcdata->perm_mana += 10;
         ch->max_mana += 10;
         ch->mana += 10;
-        act("Your power increases!", ch, NULL, NULL, TO_CHAR);
-        act("$n's power increases!", ch, NULL, NULL, TO_ROOM);
+        act("Your power increases!", ch, NULL, NULL, TO_CHAR, POS_RESTING);
+        act("$n's power increases!", ch, NULL, NULL, TO_ROOM, POS_RESTING);
         return;
     }
 
     if (ch->perm_stat[stat] >= get_max_train(ch, stat)) {
-        act("Your $T is already at maximum.", ch, NULL, pOutput, TO_CHAR);
+        act("Your $T is already at maximum.", ch, NULL, pOutput, TO_CHAR, POS_RESTING);
         return;
     }
 
@@ -1630,8 +1625,8 @@ void do_train( Character *ch, char *arguments ) {
     ch->train -= cost;
 
     ch->perm_stat[stat] += 1;
-    act("Your $T increases!", ch, NULL, pOutput, TO_CHAR);
-    act("$n's $T increases!", ch, NULL, pOutput, TO_ROOM);
+    act("Your $T increases!", ch, NULL, pOutput, TO_CHAR, POS_RESTING);
+    act("$n's $T increases!", ch, NULL, pOutput, TO_ROOM, POS_RESTING);
     return;
 }
 
@@ -1662,7 +1657,7 @@ void do_morph( Character *ch, char *argument )
 	snprintf(buf, sizeof(buf), "$n morphs into a%s %s.",
 	    race_manager->getRaceByLegacyId(ch->orig_form)->getName().at(0) == 'e' ? "n" : "",
 	    race_manager->getRaceByLegacyId(ch->orig_form)->getName().c_str() );
-	act(buf,ch,NULL,NULL,TO_ROOM);
+	act(buf,ch,NULL,NULL,TO_ROOM,POS_RESTING);
 	REMOVE_BIT(ch->act, PLR_IS_MORPHED);
 	check_improve(ch,gsn_morph,TRUE,2);
 	WAIT_STATE( ch, skill_table[gsn_morph].beats);
@@ -1676,7 +1671,7 @@ void do_morph( Character *ch, char *argument )
         snprintf(buf, sizeof(buf), "$n morphs into a%s %s.",
             morph_table[ch->morph_form].name[0] == 'e' ? "n" : "",
             morph_table[ch->morph_form].name );
-        act(buf,ch,NULL,NULL,TO_ROOM);
+        act(buf,ch,NULL,NULL,TO_ROOM,POS_RESTING);
 	SET_BIT(ch->act, PLR_IS_MORPHED);
 	check_improve(ch,gsn_morph,TRUE,2);
 	WAIT_STATE( ch, skill_table[gsn_morph].beats);

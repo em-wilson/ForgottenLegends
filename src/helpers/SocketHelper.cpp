@@ -56,7 +56,7 @@ bool SocketHelper::check_reconnect(DESCRIPTOR_DATA *d, bool fConn)
 					room_manager->char_to_room(ch, room_manager->get_limbo_room());
 				}
 
-				act("$n has reconnected.", ch, NULL, NULL, ActionTarget::ToRoom);
+				act("$n has reconnected.", ch, NULL, NULL, ActionTarget::ToRoom, POS_RESTING);
 
 				snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s reconnected.", ch->getName().c_str(), d->host);
 				logger->log_string(log_buf);
@@ -107,7 +107,7 @@ void SocketHelper::close_socket(DESCRIPTOR_DATA *dclose)
 		/* If ch is writing note or playing, just lose link otherwise clear char */
 		if ((dclose->connected == ConnectedState::Playing && !merc_down) || ((dclose->connected >= ConnectedState::NoteTo) && (dclose->connected <= ConnectedState::NoteFinish)))
 		{
-			act("$n has lost $s link.", ch, NULL, NULL, TO_ROOM);
+			act("$n has lost $s link.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 			Wiznet::instance()->report((char *)"Net death has claimed $N.", ch, NULL, WIZ_LINKS, 0, 0);
 			ch->desc = NULL;
 		}

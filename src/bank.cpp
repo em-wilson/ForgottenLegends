@@ -172,7 +172,7 @@ void do_bank_withdraw( Character *ch, char *argument )
 
         ch->silver += amount;  
         obj->value[1] -= amount;
-        act("$n withdraws some silver.", ch, NULL, NULL, TO_ROOM);
+        act("$n withdraws some silver.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
     return;
     }
 
@@ -197,7 +197,7 @@ void do_bank_withdraw( Character *ch, char *argument )
         obj->value[0] -= amount;
         snprintf(buf, sizeof(buf),"You withdraw %d gold.\n\r", amount);
 	send_to_char(buf,ch);
-        act("$n withdraws some gold.", ch, NULL, NULL, TO_ROOM );
+        act("$n withdraws some gold.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
     return;
     }
 
@@ -269,7 +269,7 @@ void do_bank_deposit( Character *ch, char *argument )
 	send_to_char(buf,ch);
 	snprintf(buf, sizeof(buf), "%d", obj->value[1] );
         do_bank_change(ch, buf );
-        act("$n deposits some silver.", ch, NULL, NULL, TO_ROOM);
+        act("$n deposits some silver.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
     return;
     }
 
@@ -292,7 +292,7 @@ void do_bank_deposit( Character *ch, char *argument )
         obj->value[0] += amount;
 	snprintf(buf, sizeof(buf), "You deposit %d gold.\n\r", amount);
 	send_to_char(buf,ch);
-        act("$n deposits some gold.", ch, NULL, NULL, TO_ROOM );
+        act("$n deposits some gold.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
     return;
     }
 

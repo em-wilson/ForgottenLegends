@@ -84,8 +84,8 @@ void spell_portal( int sn, int level, bool succesful_cast, Character *ch, void *
 
     if (stone != NULL && stone->item_type == ITEM_WARP_STONE)
     {
-     	act("You draw upon the power of $p.",ch,stone,NULL,TO_CHAR);
-     	act("It flares brightly and vanishes!",ch,stone,NULL,TO_CHAR);
+     	act("You draw upon the power of $p.",ch,stone,NULL,TO_CHAR, POS_RESTING );
+     	act("It flares brightly and vanishes!",ch,stone,NULL,TO_CHAR, POS_RESTING );
      	extract_obj(stone);
     }
 
@@ -95,8 +95,8 @@ void spell_portal( int sn, int level, bool succesful_cast, Character *ch, void *
 
     obj_to_room(portal,ch->in_room);
 
-    act("$p rises up from the ground.",ch,portal,NULL,TO_ROOM);
-    act("$p rises up before you.",ch,portal,NULL,TO_CHAR);
+    act("$p rises up from the ground.",ch,portal,NULL,TO_ROOM, POS_RESTING );
+    act("$p rises up before you.",ch,portal,NULL,TO_CHAR, POS_RESTING );
 }
 
 void spell_nexus( int sn, int level, bool succesful_cast, Character *ch, void *vo, int target)
@@ -137,8 +137,8 @@ void spell_nexus( int sn, int level, bool succesful_cast, Character *ch, void *v
  
     if (stone != NULL && stone->item_type == ITEM_WARP_STONE)
     {
-        act("You draw upon the power of $p.",ch,stone,NULL,TO_CHAR);
-        act("It flares brightly and vanishes!",ch,stone,NULL,TO_CHAR);
+        act("You draw upon the power of $p.",ch,stone,NULL,TO_CHAR, POS_RESTING );
+        act("It flares brightly and vanishes!",ch,stone,NULL,TO_CHAR, POS_RESTING );
         extract_obj(stone);
     }
 
@@ -149,8 +149,8 @@ void spell_nexus( int sn, int level, bool succesful_cast, Character *ch, void *v
  
     obj_to_room(portal,from_room);
  
-    act("$p rises up from the ground.",ch,portal,NULL,TO_ROOM);
-    act("$p rises up before you.",ch,portal,NULL,TO_CHAR);
+    act("$p rises up from the ground.",ch,portal,NULL,TO_ROOM, POS_RESTING );
+    act("$p rises up before you.",ch,portal,NULL,TO_CHAR, POS_RESTING );
 
     /* no second portal if rooms are the same */
     if (to_room == from_room)
@@ -165,7 +165,7 @@ void spell_nexus( int sn, int level, bool succesful_cast, Character *ch, void *v
 
     if (to_room->people != NULL)
     {
-	act("$p rises up from the ground.",to_room->people,portal,NULL,TO_ROOM);
-	act("$p rises up from the ground.",to_room->people,portal,NULL,TO_CHAR);
+	act("$p rises up from the ground.",to_room->people,portal,NULL,TO_ROOM, POS_RESTING );
+	act("$p rises up from the ground.",to_room->people,portal,NULL,TO_CHAR, POS_RESTING );
     }
 }

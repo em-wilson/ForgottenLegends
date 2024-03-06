@@ -583,7 +583,7 @@ void do_disconnect( Character *ch, char *argument )
 
     if ( victim->desc == NULL )
     {
-	act( "$N doesn't have a descriptor.", ch, NULL, victim, TO_CHAR );
+	act( "$N doesn't have a descriptor.", ch, NULL, victim, TO_CHAR, POS_RESTING );
 	return;
     }
 
@@ -886,12 +886,12 @@ void do_transfer( Character *ch, char *argument )
 
     if ( victim->fighting != NULL )
 	stop_fighting( victim, TRUE );
-    act( "$n disappears in a mushroom cloud.", victim, NULL, NULL, TO_ROOM );
+    act( "$n disappears in a mushroom cloud.", victim, NULL, NULL, TO_ROOM, POS_RESTING );
     char_from_room( victim );
     char_to_room( victim, location );
-    act( "$n arrives from a puff of smoke.", victim, NULL, NULL, TO_ROOM );
+    act( "$n arrives from a puff of smoke.", victim, NULL, NULL, TO_ROOM, POS_RESTING );
     if ( ch != victim )
-	act( "$n has transferred you.", ch, NULL, victim, TO_VICT );
+	act( "$n has transferred you.", ch, NULL, victim, TO_VICT, POS_RESTING );
     do_look( victim, (char*)"auto" );
     send_to_char( "Ok.\n\r", ch );
 }
@@ -1000,9 +1000,9 @@ void do_goto( Character *ch, char *argument )
 	if (rch->getTrust() >= ch->invis_level)
 	{
 	    if (ch->pcdata != NULL && ch->pcdata->bamfout[0] != '\0')
-		act("$t",ch,ch->pcdata->bamfout,rch,TO_VICT);
+		act("$t",ch,ch->pcdata->bamfout,rch,TO_VICT, POS_RESTING);
 	    else
-		act("$n leaves in a swirling mist.",ch,NULL,rch,TO_VICT);
+		act("$n leaves in a swirling mist.",ch,NULL,rch,TO_VICT, POS_RESTING);
 	}
     }
 
@@ -1023,9 +1023,9 @@ void do_goto( Character *ch, char *argument )
         if (rch->getTrust() >= ch->invis_level)
         {
             if (ch->pcdata != NULL && ch->pcdata->bamfin[0] != '\0')
-                act("$t",ch,ch->pcdata->bamfin,rch,TO_VICT);
+                act("$t",ch,ch->pcdata->bamfin,rch,TO_VICT, POS_RESTING);
             else
-                act("$n appears in a swirling mist.",ch,NULL,rch,TO_VICT);
+                act("$n appears in a swirling mist.",ch,NULL,rch,TO_VICT, POS_RESTING);
         }
     }
 
@@ -1064,9 +1064,9 @@ void do_violate( Character *ch, char *argument )
         if (rch->getTrust() >= ch->invis_level)
         {
             if (ch->pcdata != NULL && ch->pcdata->bamfout[0] != '\0')
-                act("$t",ch,ch->pcdata->bamfout,rch,TO_VICT);
+                act("$t",ch,ch->pcdata->bamfout,rch,TO_VICT, POS_RESTING);
             else
-                act("$n leaves in a swirling mist.",ch,NULL,rch,TO_VICT);
+                act("$n leaves in a swirling mist.",ch,NULL,rch,TO_VICT, POS_RESTING);
         }
     }
  
@@ -1087,9 +1087,9 @@ void do_violate( Character *ch, char *argument )
         if (rch->getTrust() >= ch->invis_level)
         {
             if (ch->pcdata != NULL && ch->pcdata->bamfin[0] != '\0')
-                act("$t",ch,ch->pcdata->bamfin,rch,TO_VICT);
+                act("$t",ch,ch->pcdata->bamfin,rch,TO_VICT, POS_RESTING);
             else
-                act("$n appears in a swirling mist.",ch,NULL,rch,TO_VICT);
+                act("$n appears in a swirling mist.",ch,NULL,rch,TO_VICT, POS_RESTING);
         }
     }
  
@@ -2100,7 +2100,7 @@ void do_mwhere( Character *ch, char *argument )
     }
 
     if ( !found )
-	act( "You didn't find any $T.", ch, NULL, argument, TO_CHAR );
+	act( "You didn't find any $T.", ch, NULL, argument, TO_CHAR, POS_RESTING );
     else
     	page_to_char(buf_string(buffer),ch);
 
@@ -2198,13 +2198,13 @@ void do_protect( Character *ch, char *argument)
 
     if (IS_SET(victim->comm,COMM_SNOOP_PROOF))
     {
-	act_new("$N is no longer snoop-proof.",ch,NULL,victim,TO_CHAR,POS_DEAD);
+	act("$N is no longer snoop-proof.",ch,NULL,victim,TO_CHAR,POS_DEAD);
 	send_to_char("Your snoop-proofing was just removed.\n\r",victim);
 	REMOVE_BIT(victim->comm,COMM_SNOOP_PROOF);
     }
     else
     {
-	act_new("$N is now snoop-proof.",ch,NULL,victim,TO_CHAR,POS_DEAD);
+	act("$N is now snoop-proof.",ch,NULL,victim,TO_CHAR,POS_DEAD);
 	send_to_char("You are now immune to snooping.\n\r",victim);
 	SET_BIT(victim->comm,COMM_SNOOP_PROOF);
     }
@@ -2494,8 +2494,8 @@ void do_clone(Character *ch, char *argument )
 	    obj_to_room(clone,ch->in_room);
  	recursive_clone(ch,obj,clone);
 
-	act("$n has created $p.",ch,clone,NULL,TO_ROOM);
-	act("You clone $p.",ch,clone,NULL,TO_CHAR);
+	act("$n has created $p.",ch,clone,NULL,TO_ROOM, POS_RESTING);
+	act("You clone $p.",ch,clone,NULL,TO_CHAR, POS_RESTING);
 	Wiznet::instance()->report("$N clones $p.",ch,clone,WIZ_LOAD,WIZ_SECURE,ch->getTrust());
 	return;
     }
@@ -2537,8 +2537,8 @@ void do_clone(Character *ch, char *argument )
 	    }
 	}
 	char_to_room(clone,ch->in_room);
-        act("$n has created $N.",ch,NULL,clone,TO_ROOM);
-        act("You clone $N.",ch,NULL,clone,TO_CHAR);
+        act("$n has created $N.",ch,NULL,clone,TO_ROOM, POS_RESTING);
+        act("You clone $N.",ch,NULL,clone,TO_CHAR, POS_RESTING);
 	snprintf(buf, sizeof(buf),"$N clones %s.",clone->short_descr);
 	Wiznet::instance()->report(buf,ch,NULL,WIZ_LOAD,WIZ_SECURE,ch->getTrust());
         return;
@@ -2600,7 +2600,7 @@ void do_mload( Character *ch, char *argument )
 
     victim = new NonPlayerCharacter( pMobIndex );
     char_to_room( victim, ch->in_room );
-    act( "$n has created $N!", ch, NULL, victim, TO_ROOM );
+    act( "$n has created $N!", ch, NULL, victim, TO_ROOM, POS_RESTING );
     snprintf(buf, sizeof(buf),"$N loads %s.",victim->short_descr);
     Wiznet::instance()->report(buf,ch,NULL,WIZ_LOAD,WIZ_SECURE,ch->getTrust());
     send_to_char( "Ok.\n\r", ch );
@@ -2659,7 +2659,7 @@ void do_oload( Character *ch, char *argument )
 	obj_to_char( obj, ch );
     else
 	obj_to_room( obj, ch->in_room );
-    act( "$n has created $p!", ch, obj, NULL, TO_ROOM );
+    act( "$n has created $p!", ch, obj, NULL, TO_ROOM, POS_RESTING );
     Wiznet::instance()->report("$N loads $p.",ch,obj,WIZ_LOAD,WIZ_SECURE,ch->getTrust());
     send_to_char( "Ok.\n\r", ch );
     return;
@@ -2698,7 +2698,7 @@ void do_purge( Character *ch, char *argument )
 	      extract_obj( obj );
 	}
 
-	act( "$n purges the room!", ch, NULL, NULL, TO_ROOM);
+	act( "$n purges the room!", ch, NULL, NULL, TO_ROOM, POS_RESTING);
 	send_to_char( "Ok.\n\r", ch );
 	return;
     }
@@ -2726,7 +2726,7 @@ void do_purge( Character *ch, char *argument )
 	  return;
 	}
 
-	act("$n disintegrates $N.",ch,0,victim,TO_NOTVICT);
+	act("$n disintegrates $N.",ch,0,victim,TO_NOTVICT, POS_RESTING);
 
     	if (victim->level > 1)
 	    save_char_obj( victim );
@@ -2738,7 +2738,7 @@ void do_purge( Character *ch, char *argument )
 	return;
     }
 
-    act( "$n purges $N.", ch, NULL, victim, TO_NOTVICT );
+    act( "$n purges $N.", ch, NULL, victim, TO_NOTVICT, POS_RESTING );
     extract_char( victim, TRUE );
     return;
 }
@@ -2899,7 +2899,7 @@ void do_restore( Character *ch, char *argument )
             vch->mana	= vch->max_mana;
             vch->move	= vch->max_move;
             update_pos( vch);
-            act("$n has restored you.",ch,NULL,vch,TO_VICT);
+            act("$n has restored you.",ch,NULL,vch,TO_VICT, POS_RESTING);
         }
 
         snprintf(buf, sizeof(buf),"$N restored room %d.",ch->in_room->vnum);
@@ -2932,7 +2932,7 @@ void do_restore( Character *ch, char *argument )
             victim->move	= victim->max_move;
             update_pos( victim);
 	    if (victim->in_room != NULL)
-                act("$n has restored you.",ch,NULL,victim,TO_VICT);
+                act("$n has restored you.",ch,NULL,victim,TO_VICT, POS_RESTING);
         }
 	send_to_char("All active players restored.\n\r",ch);
 	return;
@@ -2953,7 +2953,7 @@ void do_restore( Character *ch, char *argument )
     victim->mana = victim->max_mana;
     victim->move = victim->max_move;
     update_pos( victim );
-    act( "$n has restored you.", ch, NULL, victim, TO_VICT );
+    act( "$n has restored you.", ch, NULL, victim, TO_VICT, POS_RESTING );
     snprintf(buf, sizeof(buf),"$N restored %s",
 	IS_NPC(victim) ? victim->short_descr : victim->getName().c_str() );
     Wiznet::instance()->report(buf,ch,NULL,WIZ_RESTORE,WIZ_SECURE,ch->getTrust());
@@ -4426,7 +4426,7 @@ void do_force( Character *ch, char *argument )
 
 	    if ( !IS_NPC(vch) && vch->getTrust() < ch->getTrust() )
 	    {
-		act( buf, ch, NULL, vch, TO_VICT );
+		act( buf, ch, NULL, vch, TO_VICT, POS_RESTING );
 		interpret( vch, argument );
 	    }
 	}
@@ -4448,7 +4448,7 @@ void do_force( Character *ch, char *argument )
             if ( !IS_NPC(vch) && vch->getTrust() < ch->getTrust() 
 	    &&	 vch->level < LEVEL_HERO)
             {
-                act( buf, ch, NULL, vch, TO_VICT );
+                act( buf, ch, NULL, vch, TO_VICT, POS_RESTING );
                 interpret( vch, argument );
             }
         }
@@ -4470,7 +4470,7 @@ void do_force( Character *ch, char *argument )
             if ( !IS_NPC(vch) && vch->getTrust() < ch->getTrust()
             &&   vch->level >= LEVEL_HERO)
             {
-                act( buf, ch, NULL, vch, TO_VICT );
+                act( buf, ch, NULL, vch, TO_VICT, POS_RESTING );
                 interpret( vch, argument );
             }
         }
@@ -4511,7 +4511,7 @@ void do_force( Character *ch, char *argument )
 	    return;
 	}
 
-	act( buf, ch, NULL, victim, TO_VICT );
+	act( buf, ch, NULL, victim, TO_VICT, POS_RESTING );
 	interpret( victim, argument );
     }
 
@@ -4539,13 +4539,13 @@ void do_invis( Character *ch, char *argument )
       if ( ch->invis_level)
       {
 	  ch->invis_level = 0;
-	  act( "$n slowly fades into existence.", ch, NULL, NULL, TO_ROOM );
+	  act( "$n slowly fades into existence.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	  send_to_char( "You slowly fade back into existence.\n\r", ch );
       }
       else
       {
 	  ch->invis_level = ch->getTrust();
-	  act( "$n slowly fades into thin air.", ch, NULL, NULL, TO_ROOM );
+	  act( "$n slowly fades into thin air.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	  send_to_char( "You slowly vanish into thin air.\n\r", ch );
       }
     }
@@ -4562,7 +4562,7 @@ void do_invis( Character *ch, char *argument )
       {
 	  ch->reply = NULL;
           ch->invis_level = level;
-          act( "$n slowly fades into thin air.", ch, NULL, NULL, TO_ROOM );
+          act( "$n slowly fades into thin air.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
           send_to_char( "You slowly vanish into thin air.\n\r", ch );
       }
     }
@@ -4590,13 +4590,13 @@ void do_incognito( Character *ch, char *argument )
       if ( ch->incog_level)
       {
           ch->incog_level = 0;
-          act( "$n is no longer cloaked.", ch, NULL, NULL, TO_ROOM );
+          act( "$n is no longer cloaked.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
           send_to_char( "You are no longer cloaked.\n\r", ch );
       }
       else
       {
           ch->incog_level = ch->getTrust();
-          act( "$n cloaks $s presence.", ch, NULL, NULL, TO_ROOM );
+          act( "$n cloaks $s presence.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
           send_to_char( "You cloak your presence.\n\r", ch );
       }
     }
@@ -4613,7 +4613,7 @@ void do_incognito( Character *ch, char *argument )
       {
           ch->reply = NULL;
           ch->incog_level = level;
-          act( "$n cloaks $s presence.", ch, NULL, NULL, TO_ROOM );
+          act( "$n cloaks $s presence.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
           send_to_char( "You cloak your presence.\n\r", ch );
       }
     }
@@ -4804,13 +4804,13 @@ void copyover_recover ()
 
                        char_to_room (d->character, d->character->in_room);
                        do_look (d->character, (char*)"auto");
-                       act ("$n materializes!", d->character, NULL, NULL, TO_ROOM);
+                       act ("$n materializes!", d->character, NULL, NULL, TO_ROOM, POS_RESTING);
                        d->connected = ConnectedState::Playing;
 
                        if (d->character->pet != NULL)
                        {
                            char_to_room(d->character->pet,d->character->in_room);
-                           act("$n materializes!.",d->character->pet,NULL,NULL,TO_ROOM);
+                           act("$n materializes!.",d->character->pet,NULL,NULL,TO_ROOM, POS_RESTING);
                        }
                }
         

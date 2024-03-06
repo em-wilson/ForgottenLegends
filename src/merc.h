@@ -1987,9 +1987,7 @@ void	show_string	args( ( struct descriptor_data *d, char *input) );
 void printf_to_char  args( ( Character *ch, const char *fmt, ...) ) __attribute__ ((format(printf, 2,3)));
 void	send_to_char	args( ( const char *txt, Character *ch ) );
 void	page_to_char	args( ( const char *txt, Character *ch ) );
-void	act		args( ( const char *format, Character *ch,
-			    const void *arg1, const void *arg2, int type ) );
-void	act_new		args( ( const char *format, Character *ch, 
+void	act		args( ( const char *format, Character *ch, 
 			    const void *arg1, const void *arg2, int type,
 			    int min_pos) );
 void    log_stringf            args( ( const char * fmt, ...) );

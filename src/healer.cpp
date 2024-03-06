@@ -59,7 +59,7 @@ void do_heal(Character *ch, char *argument)
     if (arg[0] == '\0')
     {
         /* display price list */
-	act("$N says 'I offer the following spells:'",ch,NULL,mob,TO_CHAR);
+	act("$N says 'I offer the following spells:'",ch,NULL,mob,TO_CHAR, POS_RESTING);
 	send_to_char("  light: cure light wounds      10 gold\n\r",ch);
 	send_to_char("  serious: cure serious wounds  15 gold\n\r",ch);
 	send_to_char("  critic: cure critical wounds  25 gold\n\r",ch);
@@ -157,23 +157,21 @@ void do_heal(Character *ch, char *argument)
 
     else 
     {
-	act("$N says 'Type 'heal' for a list of spells.'",
-	    ch,NULL,mob,TO_CHAR);
+	act("$N says 'Type 'heal' for a list of spells.'", ch,NULL,mob,TO_CHAR, POS_RESTING);
 	return;
     }
 
     if (cost > (ch->gold * 100 + ch->silver))
     {
-	act("$N says 'You do not have enough gold for my services.'",
-	    ch,NULL,mob,TO_CHAR);
-	return;
+	    act("$N says 'You do not have enough gold for my services.'", ch,NULL,mob,TO_CHAR, POS_RESTING);
+	    return;
     }
 
     WAIT_STATE(ch,PULSE_VIOLENCE);
 
     deduct_cost(ch,cost);
     mob->gold += cost;
-    act("$n utters the words '$T'.",mob,NULL,words,TO_ROOM);
+    act("$n utters the words '$T'.",mob,NULL,words,TO_ROOM, POS_RESTING);
   
     if (spell == NULL)  /* restore mana trap...kinda hackish */
     {

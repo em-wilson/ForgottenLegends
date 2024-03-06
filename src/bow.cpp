@@ -58,7 +58,7 @@ void do_shoot( Character *ch, char *argument )
 
     if ( is_safe( ch, victim ) )
     {
-	act( "You take aim at $N, but reconsider.", ch, NULL, victim, TO_CHAR );
+	act( "You take aim at $N, but reconsider.", ch, NULL, victim, TO_CHAR, POS_RESTING );
 	return;
     }
 
@@ -101,10 +101,10 @@ void do_shoot( Character *ch, char *argument )
 	return;
     }
 
-    act( "You let loose an arrow at $N!", ch, NULL, victim, TO_CHAR);
-    act( "$n let loose an arrow at you!", ch, NULL, victim, TO_VICT);
-    act( "$n lets loose an arrow at $N!", ch, NULL, victim, TO_ROOM);
-    act( "$n is struck by an arrow!", victim, NULL, ch, TO_ROOM);
+    act( "You let loose an arrow at $N!", ch, NULL, victim, TO_CHAR, POS_RESTING);
+    act( "$n let loose an arrow at you!", ch, NULL, victim, TO_VICT, POS_RESTING);
+    act( "$n lets loose an arrow at $N!", ch, NULL, victim, TO_ROOM, POS_RESTING);
+    act( "$n is struck by an arrow!", victim, NULL, ch, TO_ROOM, POS_RESTING);
     check_improve(ch,gsn_bow,FALSE,2);
     WAIT_STATE(ch,PULSE_VIOLENCE);
 
@@ -128,13 +128,13 @@ void do_shoot( Character *ch, char *argument )
 	    snprintf(buf, sizeof(buf), "$n calls a guard upon $N!");
 	else
 	    snprintf(buf, sizeof(buf), "$n calls %d guards upon $N!", num);
-	act( buf, victim, NULL, ch, TO_ROOM );
+	act( buf, victim, NULL, ch, TO_ROOM, POS_RESTING );
 
 	if (num < 2)
 	    snprintf(buf, sizeof(buf), "$n calls a guard upon you!");
 	else
 	    snprintf(buf, sizeof(buf), "$n calls %d guards upon you!", num);
-	act( buf, victim, NULL, ch, TO_VICT );
+	act( buf, victim, NULL, ch, TO_VICT, POS_RESTING );
     }
     else
 	victim->hunting = ch;

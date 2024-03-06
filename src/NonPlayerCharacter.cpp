@@ -250,7 +250,7 @@ void NonPlayerCharacter::update() {
                 if (IS_NPC(this) && this->zone != NULL && this->zone != this->in_room->area
                         && this->desc == NULL && this->fighting == NULL
                         && !IS_AFFECTED(this, AFF_CHARM) && number_percent() < 5) {
-                        ::act("$n wanders on home.", this, NULL, NULL, TO_ROOM);
+                        ::act("$n wanders on home.", this, NULL, NULL, TO_ROOM, POS_RESTING );
                         extract_char(this, TRUE);
                         return;
                 }

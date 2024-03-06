@@ -489,7 +489,7 @@ static void do_nwrite (Character *caller, char *argument)
 		ch->pcdata->in_progress->date = str_dup (strtime);
 	}
 
-	act ("{G$n starts writing a note.{x", ch, NULL, NULL, TO_ROOM);
+	act ("{G$n starts writing a note.{x", ch, NULL, NULL, TO_ROOM, POS_RESTING);
 
 	/* Make AFK if not already */
 	if (!IS_SET(ch->comm, COMM_AFK))
@@ -1206,7 +1206,7 @@ void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 				char_to_room(ch, ch->getWasNoteRoom());
 
 				ch->pcdata->in_progress = NULL;
-				act ("{G$n finishes $s note.{x", ch, NULL, NULL, TO_ROOM);
+				act ("{G$n finishes $s note.{x", ch, NULL, NULL, TO_ROOM, POS_RESTING);
 				break;
 				
 			case 'f':
@@ -1220,7 +1220,7 @@ void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 				/* Send them home */
 				char_from_room(ch);
 				char_to_room(ch, ch->getWasNoteRoom());
-				act ("{G$n decided not to finish $s note.{x", ch, NULL, NULL, TO_ROOM);
+				act ("{G$n decided not to finish $s note.{x", ch, NULL, NULL, TO_ROOM, POS_RESTING);
 				break;
 			
 			default: /* invalid response */

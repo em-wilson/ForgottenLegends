@@ -182,8 +182,8 @@ void do_induct(Character *ch, char *argument)
   clan_manager->add_player(victim, clan);
 
   victim->pcdata->clan = clan;
-  act("You induct $N into $t", ch, clan->getName().c_str(), victim, TO_CHAR);
-  act("$n inducts you into $t", ch, clan->getName().c_str(), victim, TO_VICT);
+  act("You induct $N into $t", ch, clan->getName().c_str(), victim, TO_CHAR, POS_RESTING);
+  act("$n inducts you into $t", ch, clan->getName().c_str(), victim, TO_VICT, POS_RESTING);
   save_char_obj(victim);
   clan_manager->save_clan(clan);
   return;
@@ -253,8 +253,8 @@ void do_outcast(Character *ch, char *argument)
     clan->removeSecondOfficer();
   }
   Clan *outcast = clan_manager->get_clan((char *)"outcast");
-  act("You outcast $N from $t", ch, clan->getName().c_str(), victim, TO_CHAR);
-  act("$n outcasts you from $t", ch, clan->getName().c_str(), victim, TO_VICT);
+  act("You outcast $N from $t", ch, clan->getName().c_str(), victim, TO_CHAR, POS_RESTING);
+  act("$n outcasts you from $t", ch, clan->getName().c_str(), victim, TO_VICT, POS_RESTING);
   clan_manager->add_player(victim, outcast);
   save_char_obj(victim); /* clan gets saved when pfile is saved */
   return;

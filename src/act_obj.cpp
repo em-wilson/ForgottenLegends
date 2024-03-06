@@ -109,22 +109,20 @@ void get_obj( Character *ch, OBJ_DATA *obj, OBJ_DATA *container )
 
     if ( ch->carry_number + get_obj_number( obj ) > can_carry_n( ch ) )
     {
-	act( "$d: you can't carry that many items.",
-	    ch, NULL, obj->name, TO_CHAR );
+	act( "$d: you can't carry that many items.", ch, NULL, obj->name, TO_CHAR, POS_RESTING );
 	return;
     }
 
     if ((!obj->in_obj || obj->in_obj->carried_by != ch)
     &&  (get_carry_weight(ch) + get_obj_weight(obj) > can_carry_w(ch)))
     {
-	act( "$d: you can't carry that much weight.",
-	    ch, NULL, obj->name, TO_CHAR );
+	act( "$d: you can't carry that much weight.", ch, NULL, obj->name, TO_CHAR, POS_RESTING );
 	return;
     }
 
     if (!can_loot(ch,obj))
     {
-	act("Corpse looting is not permitted.",ch,NULL,NULL,TO_CHAR );
+	act("Corpse looting is not permitted.",ch,NULL,NULL,TO_CHAR, POS_RESTING );
 	return;
     }
 
@@ -134,7 +132,7 @@ void get_obj( Character *ch, OBJ_DATA *obj, OBJ_DATA *container )
 	    if (gch->on == obj)
 	    {
 		act("$N appears to be using $p.",
-		    ch,obj,gch,TO_CHAR);
+		    ch,obj,gch,TO_CHAR, POS_RESTING);
 		return;
 	    }
     }
@@ -153,15 +151,15 @@ void get_obj( Character *ch, OBJ_DATA *obj, OBJ_DATA *container )
 	&&  !CAN_WEAR(container, ITEM_TAKE)
 	&&  !IS_OBJ_STAT(obj,ITEM_HAD_TIMER))
 	    obj->timer = 0;	
-	act( "You get $p from $P.", ch, obj, container, TO_CHAR );
-	act( "$n gets $p from $P.", ch, obj, container, TO_ROOM );
+	act( "You get $p from $P.", ch, obj, container, TO_CHAR, POS_RESTING );
+	act( "$n gets $p from $P.", ch, obj, container, TO_ROOM, POS_RESTING );
 	REMOVE_BIT(obj->extra_flags,ITEM_HAD_TIMER);
 	obj_from_obj( obj );
     }
     else
     {
-	act( "You get $p.", ch, obj, container, TO_CHAR );
-	act( "$n gets $p.", ch, obj, container, TO_ROOM );
+	act( "You get $p.", ch, obj, container, TO_CHAR, POS_RESTING );
+	act( "$n gets $p.", ch, obj, container, TO_ROOM, POS_RESTING );
 	obj_from_room( obj );
     }
 
@@ -227,7 +225,7 @@ void do_get( Character *ch, char *argument )
 	    obj = get_obj_list( ch, arg1, ch->in_room->contents );
 	    if ( obj == NULL )
 	    {
-		act( "I see no $T here.", ch, NULL, arg1, TO_CHAR );
+		act( "I see no $T here.", ch, NULL, arg1, TO_CHAR, POS_RESTING );
 		return;
 	    }
 
@@ -253,7 +251,7 @@ void do_get( Character *ch, char *argument )
 		if ( arg1[3] == '\0' )
 		    send_to_char( "I see nothing here.\n\r", ch );
 		else
-		    act( "I see no $T here.", ch, NULL, &arg1[4], TO_CHAR );
+		    act( "I see no $T here.", ch, NULL, &arg1[4], TO_CHAR, POS_RESTING );
 	    }
 	}
     }
@@ -268,7 +266,7 @@ void do_get( Character *ch, char *argument )
 
 	if ( ( container = get_obj_here( ch, arg2 ) ) == NULL )
 	{
-	    act( "I see no $T here.", ch, NULL, arg2, TO_CHAR );
+	    act( "I see no $T here.", ch, NULL, arg2, TO_CHAR, POS_RESTING );
 	    return;
 	}
 
@@ -295,7 +293,7 @@ void do_get( Character *ch, char *argument )
 
 	if ( IS_SET(container->value[1], CONT_CLOSED) )
 	{
-	    act( "The $d is closed.", ch, NULL, container->name, TO_CHAR );
+	    act( "The $d is closed.", ch, NULL, container->name, TO_CHAR, POS_RESTING );
 	    return;
 	}
 
@@ -306,7 +304,7 @@ void do_get( Character *ch, char *argument )
 	    if ( obj == NULL )
 	    {
 		act( "I see nothing like that in the $T.",
-		    ch, NULL, arg2, TO_CHAR );
+		    ch, NULL, arg2, TO_CHAR, POS_RESTING );
 		return;
 	    }
 	    get_obj( ch, obj, container );
@@ -336,10 +334,10 @@ void do_get( Character *ch, char *argument )
 	    {
 		if ( arg1[3] == '\0' )
 		    act( "I see nothing in the $T.",
-			ch, NULL, arg2, TO_CHAR );
+			ch, NULL, arg2, TO_CHAR, POS_RESTING );
 		else
 		    act( "I see nothing like that in the $T.",
-			ch, NULL, arg2, TO_CHAR );
+			ch, NULL, arg2, TO_CHAR, POS_RESTING );
 	    }
 	}
     }
@@ -377,7 +375,7 @@ void do_put( Character *ch, char *argument )
 
     if ( ( container = get_obj_here( ch, arg2 ) ) == NULL )
     {
-	act( "I see no $T here.", ch, NULL, arg2, TO_CHAR );
+	act( "I see no $T here.", ch, NULL, arg2, TO_CHAR, POS_RESTING );
 	return;
     }
 
@@ -389,7 +387,7 @@ void do_put( Character *ch, char *argument )
 
     if ( IS_SET(container->value[1], CONT_CLOSED) )
     {
-	act( "The $d is closed.", ch, NULL, container->name, TO_CHAR );
+	act( "The $d is closed.", ch, NULL, container->name, TO_CHAR, POS_RESTING );
 	return;
     }
 
@@ -442,13 +440,13 @@ void do_put( Character *ch, char *argument )
 
 	if (IS_SET(container->value[1],CONT_PUT_ON))
 	{
-	    act("$n puts $p on $P.",ch,obj,container, TO_ROOM);
-	    act("You put $p on $P.",ch,obj,container, TO_CHAR);
+	    act("$n puts $p on $P.",ch,obj,container, TO_ROOM, POS_RESTING);
+	    act("You put $p on $P.",ch,obj,container, TO_CHAR, POS_RESTING);
 	}
 	else
 	{
-	    act( "$n puts $p in $P.", ch, obj, container, TO_ROOM );
-	    act( "You put $p in $P.", ch, obj, container, TO_CHAR );
+	    act( "$n puts $p in $P.", ch, obj, container, TO_ROOM, POS_RESTING );
+	    act( "You put $p in $P.", ch, obj, container, TO_CHAR, POS_RESTING );
 	}
     }
     else
@@ -481,13 +479,13 @@ void do_put( Character *ch, char *argument )
 
         	if (IS_SET(container->value[1],CONT_PUT_ON))
         	{
-            	    act("$n puts $p on $P.",ch,obj,container, TO_ROOM);
-            	    act("You put $p on $P.",ch,obj,container, TO_CHAR);
+            	    act("$n puts $p on $P.",ch,obj,container, TO_ROOM, POS_RESTING);
+            	    act("You put $p on $P.",ch,obj,container, TO_CHAR, POS_RESTING);
         	}
 		else
 		{
-		    act( "$n puts $p in $P.", ch, obj, container, TO_ROOM );
-		    act( "You put $p in $P.", ch, obj, container, TO_CHAR );
+		    act( "$n puts $p in $P.", ch, obj, container, TO_ROOM, POS_RESTING );
+		    act( "You put $p in $P.", ch, obj, container, TO_CHAR, POS_RESTING );
 		}
 	    }
 	}
@@ -588,7 +586,7 @@ void do_drop( Character *ch, char *argument )
 	}
 
 	obj_to_room( create_money( gold, silver ), ch->in_room );
-	act( "$n drops some coins.", ch, NULL, NULL, TO_ROOM );
+	act( "$n drops some coins.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	send_to_char( "OK.\n\r", ch );
 	return;
     }
@@ -610,12 +608,12 @@ void do_drop( Character *ch, char *argument )
 
 	obj_from_char( obj );
 	obj_to_room( obj, ch->in_room );
-	act( "$n drops $p.", ch, obj, NULL, TO_ROOM );
-	act( "You drop $p.", ch, obj, NULL, TO_CHAR );
+	act( "$n drops $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You drop $p.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	if (IS_OBJ_STAT(obj,ITEM_MELT_DROP))
 	{
-	    act("$p dissolves into smoke.",ch,obj,NULL,TO_ROOM);
-	    act("$p dissolves into smoke.",ch,obj,NULL,TO_CHAR);
+	    act("$p dissolves into smoke.",ch,obj,NULL,TO_ROOM,POS_RESTING);
+	    act("$p dissolves into smoke.",ch,obj,NULL,TO_CHAR,POS_RESTING);
 	    extract_obj(obj);
 	}
     }
@@ -635,12 +633,12 @@ void do_drop( Character *ch, char *argument )
 		found = TRUE;
 		obj_from_char( obj );
 		obj_to_room( obj, ch->in_room );
-		act( "$n drops $p.", ch, obj, NULL, TO_ROOM );
-		act( "You drop $p.", ch, obj, NULL, TO_CHAR );
+		act( "$n drops $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
+		act( "You drop $p.", ch, obj, NULL, TO_CHAR, POS_RESTING );
         	if (IS_OBJ_STAT(obj,ITEM_MELT_DROP))
         	{
-             	    act("$p dissolves into smoke.",ch,obj,NULL,TO_ROOM);
-            	    act("$p dissolves into smoke.",ch,obj,NULL,TO_CHAR);
+             	    act("$p dissolves into smoke.",ch,obj,NULL,TO_ROOM,POS_RESTING);
+            	    act("$p dissolves into smoke.",ch,obj,NULL,TO_CHAR,POS_RESTING);
             	    extract_obj(obj);
         	}
 	    }
@@ -650,10 +648,10 @@ void do_drop( Character *ch, char *argument )
 	{
 	    if ( arg[3] == '\0' )
 		act( "You are not carrying anything.",
-		    ch, NULL, arg, TO_CHAR );
+		    ch, NULL, arg, TO_CHAR, POS_RESTING );
 	    else
 		act( "You are not carrying any $T.",
-		    ch, NULL, &arg[4], TO_CHAR );
+		    ch, NULL, &arg[4], TO_CHAR, POS_RESTING );
 	}
     }
 
@@ -727,10 +725,10 @@ void do_give( Character *ch, char *argument )
 	}
 
 	snprintf(buf, sizeof(buf),"$n gives you %d %s.",amount, silver ? "silver" : "gold");
-	act( buf, ch, NULL, victim, TO_VICT    );
-	act( "$n gives $N some coins.",  ch, NULL, victim, TO_NOTVICT );
+	act( buf, ch, NULL, victim, TO_VICT, POS_RESTING    );
+	act( "$n gives $N some coins.",  ch, NULL, victim, TO_NOTVICT, POS_RESTING );
 	snprintf(buf, sizeof(buf),"You give $N %d %s.",amount, silver ? "silver" : "gold");
-	act( buf, ch, NULL, victim, TO_CHAR    );
+	act( buf, ch, NULL, victim, TO_CHAR, POS_RESTING    );
 
 	/*
 	 * Bribe trigger
@@ -756,7 +754,7 @@ void do_give( Character *ch, char *argument )
 	    {
 		act(
 	"$n tells you 'I'm sorry, you did not give me enough to change.'"
-		    ,victim,NULL,ch,TO_VICT);
+		    ,victim,NULL,ch,TO_VICT, POS_RESTING);
 		ch->reply = victim;
 		snprintf(buf, sizeof(buf),"%d %s %s", 
 			amount, silver ? "silver" : "gold",ch->getName().c_str());
@@ -774,7 +772,7 @@ void do_give( Character *ch, char *argument )
 		    do_give(victim,buf);
 		}
 		act("$n tells you 'Thank you, come again.'",
-		    victim,NULL,ch,TO_VICT);
+		    victim,NULL,ch,TO_VICT, POS_RESTING);
 		ch->reply = victim;
 	    }
 	}
@@ -802,7 +800,7 @@ void do_give( Character *ch, char *argument )
     if (IS_NPC(victim) && victim->pIndexData->pShop != NULL)
     {
 	act("$N tells you 'Sorry, you'll have to sell that.'",
-	    ch,NULL,victim,TO_CHAR);
+	    ch,NULL,victim,TO_CHAR, POS_RESTING);
 	ch->reply = victim;
 	return;
     }
@@ -815,28 +813,28 @@ void do_give( Character *ch, char *argument )
 
     if ( victim->carry_number + get_obj_number( obj ) > can_carry_n( victim ) )
     {
-	act( "$N has $S hands full.", ch, NULL, victim, TO_CHAR );
+	act( "$N has $S hands full.", ch, NULL, victim, TO_CHAR, POS_RESTING );
 	return;
     }
 
     if (get_carry_weight(victim) + get_obj_weight(obj) > can_carry_w( victim ) )
     {
-	act( "$N can't carry that much weight.", ch, NULL, victim, TO_CHAR );
+	act( "$N can't carry that much weight.", ch, NULL, victim, TO_CHAR, POS_RESTING );
 	return;
     }
 
     if ( !can_see_obj( victim, obj ) )
     {
-	act( "$N can't see it.", ch, NULL, victim, TO_CHAR );
+	act( "$N can't see it.", ch, NULL, victim, TO_CHAR, POS_RESTING );
 	return;
     }
 
     obj_from_char( obj );
     obj_to_char( obj, victim );
     MOBtrigger = FALSE;
-    act( "$n gives $p to $N.", ch, obj, victim, TO_NOTVICT );
-    act( "$n gives you $p.",   ch, obj, victim, TO_VICT    );
-    act( "You give $p to $N.", ch, obj, victim, TO_CHAR    );
+    act( "$n gives $p to $N.", ch, obj, victim, TO_NOTVICT, POS_RESTING );
+    act( "$n gives you $p.",   ch, obj, victim, TO_VICT, 	POS_RESTING    );
+    act( "You give $p to $N.", ch, obj, victim, TO_CHAR, 	POS_RESTING    );
     MOBtrigger = TRUE;
 
     /*
@@ -881,14 +879,14 @@ void do_envenom(Character *ch, char *argument)
     {
 	if (IS_OBJ_STAT(obj,ITEM_BLESS) || IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
 	{
-	    act("You fail to poison $p.",ch,obj,NULL,TO_CHAR);
+	    act("You fail to poison $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    return;
 	}
 
 	if (number_percent() < skill)  /* success! */
 	{
-	    act("$n treats $p with deadly poison.",ch,obj,NULL,TO_ROOM);
-	    act("You treat $p with deadly poison.",ch,obj,NULL,TO_CHAR);
+	    act("$n treats $p with deadly poison.",ch,obj,NULL,TO_ROOM, POS_RESTING);
+	    act("You treat $p with deadly poison.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    if (!obj->value[3])
 	    {
 		obj->value[3] = 1;
@@ -898,7 +896,7 @@ void do_envenom(Character *ch, char *argument)
 	    return;
 	}
 
-	act("You fail to poison $p.",ch,obj,NULL,TO_CHAR);
+	act("You fail to poison $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	if (!obj->value[3])
 	    check_improve(ch,gsn_envenom,FALSE,4);
 	WAIT_STATE(ch,skill_table[gsn_envenom].beats);
@@ -915,7 +913,7 @@ void do_envenom(Character *ch, char *argument)
         ||  IS_WEAPON_STAT(obj,WEAPON_SHOCKING)
         ||  IS_OBJ_STAT(obj,ITEM_BLESS) || IS_OBJ_STAT(obj,ITEM_BURN_PROOF))
         {
-            act("You can't seem to envenom $p.",ch,obj,NULL,TO_CHAR);
+            act("You can't seem to envenom $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
             return;
         }
 
@@ -928,7 +926,7 @@ void do_envenom(Character *ch, char *argument)
 
         if (IS_WEAPON_STAT(obj,WEAPON_POISON))
         {
-            act("$p is already envenomed.",ch,obj,NULL,TO_CHAR);
+            act("$p is already envenomed.",ch,obj,NULL,TO_CHAR, POS_RESTING);
             return;
         }
 
@@ -945,22 +943,22 @@ void do_envenom(Character *ch, char *argument)
             af.bitvector = WEAPON_POISON;
             affect_to_obj(obj,&af);
  
-            act("$n coats $p with deadly venom.",ch,obj,NULL,TO_ROOM);
-	    act("You coat $p with venom.",ch,obj,NULL,TO_CHAR);
+            act("$n coats $p with deadly venom.",ch,obj,NULL,TO_ROOM, POS_RESTING);
+	    act("You coat $p with venom.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    check_improve(ch,gsn_envenom,TRUE,3);
 	    WAIT_STATE(ch,skill_table[gsn_envenom].beats);
             return;
         }
 	else
 	{
-	    act("You fail to envenom $p.",ch,obj,NULL,TO_CHAR);
+	    act("You fail to envenom $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    check_improve(ch,gsn_envenom,FALSE,3);
 	    WAIT_STATE(ch,skill_table[gsn_envenom].beats);
 	    return;
 	}
     }
  
-    act("You can't poison $p.",ch,obj,NULL,TO_CHAR);
+    act("You can't poison $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
     return;
 }
 
@@ -1023,10 +1021,10 @@ void do_fill( Character *ch, char *argument )
 
     snprintf(buf, sizeof(buf),"You fill $p with %s from $P.",
 	liq_table[fountain->value[2]].liq_name);
-    act( buf, ch, obj,fountain, TO_CHAR );
+    act( buf, ch, obj,fountain, TO_CHAR, POS_RESTING );
     snprintf(buf, sizeof(buf),"$n fills $p with %s from $P.",
 	liq_table[fountain->value[2]].liq_name);
-    act(buf,ch,obj,fountain,TO_ROOM);
+    act(buf,ch,obj,fountain,TO_ROOM, POS_RESTING);
     obj->value[2] = fountain->value[2];
     obj->value[1] = obj->value[0];
     return;
@@ -1072,11 +1070,11 @@ void do_pour (Character *ch, char *argument)
 	out->value[3] = 0;
 	snprintf(buf, sizeof(buf),"You invert $p, spilling %s all over the ground.",
 		liq_table[out->value[2]].liq_name);
-	act(buf,ch,out,NULL,TO_CHAR);
+	act(buf,ch,out,NULL,TO_CHAR, POS_RESTING);
 	
 	snprintf(buf, sizeof(buf),"$n inverts $p, spilling %s all over the ground.",
 		liq_table[out->value[2]].liq_name);
-	act(buf,ch,out,NULL,TO_ROOM);
+	act(buf,ch,out,NULL,TO_ROOM, POS_RESTING);
 	return;
     }
 
@@ -1119,13 +1117,13 @@ void do_pour (Character *ch, char *argument)
 
     if (out->value[1] == 0)
     {
-	act("There's nothing in $p to pour.",ch,out,NULL,TO_CHAR);
+	act("There's nothing in $p to pour.",ch,out,NULL,TO_CHAR, POS_RESTING);
 	return;
     }
 
     if (in->value[1] >= in->value[0])
     {
-	act("$p is already filled to the top.",ch,in,NULL,TO_CHAR);
+	act("$p is already filled to the top.",ch,in,NULL,TO_CHAR, POS_RESTING);
 	return;
     }
 
@@ -1139,22 +1137,22 @@ void do_pour (Character *ch, char *argument)
     {
     	snprintf(buf, sizeof(buf),"You pour %s from $p into $P.",
 	    liq_table[out->value[2]].liq_name);
-    	act(buf,ch,out,in,TO_CHAR);
+    	act(buf,ch,out,in,TO_CHAR, POS_RESTING);
     	snprintf(buf, sizeof(buf),"$n pours %s from $p into $P.",
 	    liq_table[out->value[2]].liq_name);
-    	act(buf,ch,out,in,TO_ROOM);
+    	act(buf,ch,out,in,TO_ROOM, POS_RESTING);
     }
     else
     {
         snprintf(buf, sizeof(buf),"You pour some %s for $N.",
             liq_table[out->value[2]].liq_name);
-        act(buf,ch,NULL,vch,TO_CHAR);
+        act(buf,ch,NULL,vch,TO_CHAR, POS_RESTING);
 	snprintf(buf, sizeof(buf),"$n pours you some %s.",
 	    liq_table[out->value[2]].liq_name);
-	act(buf,ch,NULL,vch,TO_VICT);
+	act(buf,ch,NULL,vch,TO_VICT, POS_RESTING);
         snprintf(buf, sizeof(buf),"$n pours some %s for $N.",
             liq_table[out->value[2]].liq_name);
-        act(buf,ch,NULL,vch,TO_NOTVICT);
+        act(buf,ch,NULL,vch,TO_NOTVICT, POS_RESTING);
 	
     }
 }
@@ -1237,9 +1235,9 @@ void do_drink( Character *ch, char *argument )
     }
 
     act( "$n drinks $T from $p.",
-	ch, obj, liq_table[liquid].liq_name, TO_ROOM );
+	ch, obj, liq_table[liquid].liq_name, TO_ROOM, POS_RESTING );
     act( "You drink $T from $p.",
-	ch, obj, liq_table[liquid].liq_name, TO_CHAR );
+	ch, obj, liq_table[liquid].liq_name, TO_CHAR, POS_RESTING );
 
     ch->gain_condition( COND_DRUNK, amount * liq_table[liquid].liq_affect[COND_DRUNK] / 36 );
     ch->gain_condition( COND_FULL, amount * liq_table[liquid].liq_affect[COND_FULL] / 4 );
@@ -1258,7 +1256,7 @@ void do_drink( Character *ch, char *argument )
 	/* The drink was poisoned ! */
 	AFFECT_DATA af;
 
-	act( "$n chokes and gags.", ch, NULL, NULL, TO_ROOM );
+	act( "$n chokes and gags.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	send_to_char( "You choke and gag.\n\r", ch );
 	af.where     = TO_AFFECTS;
 	af.type      = gsn_poison;
@@ -1311,8 +1309,8 @@ void do_eat( Character *ch, char *argument )
 	}
     }
 
-    act( "$n eats $p.",  ch, obj, NULL, TO_ROOM );
-    act( "You eat $p.", ch, obj, NULL, TO_CHAR );
+    act( "$n eats $p.",  ch, obj, NULL, TO_ROOM, POS_RESTING );
+    act( "You eat $p.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 
     switch ( obj->item_type )
     {
@@ -1336,7 +1334,7 @@ void do_eat( Character *ch, char *argument )
 	    /* The food was poisoned! */
 	    AFFECT_DATA af;
 
-	    act( "$n chokes and gags.", ch, 0, 0, TO_ROOM );
+	    act( "$n chokes and gags.", ch, 0, 0, TO_ROOM, POS_RESTING );
 	    send_to_char( "You choke and gag.\n\r", ch );
 
 	    af.where	 = TO_AFFECTS;
@@ -1378,13 +1376,13 @@ bool remove_obj( Character *ch, int iWear, bool fReplace )
 
     if ( IS_SET(obj->extra_flags, ITEM_NOREMOVE) )
     {
-	act( "You can't remove $p.", ch, obj, NULL, TO_CHAR );
+	act( "You can't remove $p.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	return FALSE;
     }
 
     unequip_char( ch, obj );
-    act( "$n stops using $p.", ch, obj, NULL, TO_ROOM );
-    act( "You stop using $p.", ch, obj, NULL, TO_CHAR );
+    act( "$n stops using $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
+    act( "You stop using $p.", ch, obj, NULL, TO_CHAR, POS_RESTING );
     return TRUE;
 }
 
@@ -1404,8 +1402,7 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
 	snprintf(buf, sizeof(buf), "You must be level %d to use this object.\n\r",
 	    obj->level );
 	send_to_char( buf, ch );
-	act( "$n tries to use $p, but is too inexperienced.",
-	    ch, obj, NULL, TO_ROOM );
+	act( "$n tries to use $p, but is too inexperienced.", ch, obj, NULL, TO_ROOM, POS_RESTING );
 	return;
     }
 
@@ -1413,8 +1410,8 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
     {
 	if ( !remove_obj( ch, WEAR_LIGHT, fReplace ) )
 	    return;
-	act( "$n lights $p and holds it.", ch, obj, NULL, TO_ROOM );
-	act( "You light $p and hold it.",  ch, obj, NULL, TO_CHAR );
+	act( "$n lights $p and holds it.", ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You light $p and hold it.",  ch, obj, NULL, TO_CHAR, POS_RESTING );
 	equip_char( ch, obj, WEAR_LIGHT );
 	return;
     }
@@ -1429,16 +1426,16 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
 
 	if ( get_eq_char( ch, WEAR_FINGER_L ) == NULL )
 	{
-	    act( "$n wears $p on $s left finger.",    ch, obj, NULL, TO_ROOM );
-	    act( "You wear $p on your left finger.",  ch, obj, NULL, TO_CHAR );
+	    act( "$n wears $p on $s left finger.",    ch, obj, NULL, TO_ROOM, POS_RESTING );
+	    act( "You wear $p on your left finger.",  ch, obj, NULL, TO_CHAR, POS_RESTING );
 	    equip_char( ch, obj, WEAR_FINGER_L );
 	    return;
 	}
 
 	if ( get_eq_char( ch, WEAR_FINGER_R ) == NULL )
 	{
-	    act( "$n wears $p on $s right finger.",   ch, obj, NULL, TO_ROOM );
-	    act( "You wear $p on your right finger.", ch, obj, NULL, TO_CHAR );
+	    act( "$n wears $p on $s right finger.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+	    act( "You wear $p on your right finger.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	    equip_char( ch, obj, WEAR_FINGER_R );
 	    return;
 	}
@@ -1458,16 +1455,16 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
 
 	if ( get_eq_char( ch, WEAR_NECK_1 ) == NULL )
 	{
-	    act( "$n wears $p around $s neck.",   ch, obj, NULL, TO_ROOM );
-	    act( "You wear $p around your neck.", ch, obj, NULL, TO_CHAR );
+	    act( "$n wears $p around $s neck.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+	    act( "You wear $p around your neck.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	    equip_char( ch, obj, WEAR_NECK_1 );
 	    return;
 	}
 
 	if ( get_eq_char( ch, WEAR_NECK_2 ) == NULL )
 	{
-	    act( "$n wears $p around $s neck.",   ch, obj, NULL, TO_ROOM );
-	    act( "You wear $p around your neck.", ch, obj, NULL, TO_CHAR );
+	    act( "$n wears $p around $s neck.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+	    act( "You wear $p around your neck.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	    equip_char( ch, obj, WEAR_NECK_2 );
 	    return;
 	}
@@ -1481,8 +1478,8 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
     {
 	if ( !remove_obj( ch, WEAR_BODY, fReplace ) )
 	    return;
-	act( "$n wears $p on $s torso.",   ch, obj, NULL, TO_ROOM );
-	act( "You wear $p on your torso.", ch, obj, NULL, TO_CHAR );
+	act( "$n wears $p on $s torso.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You wear $p on your torso.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	equip_char( ch, obj, WEAR_BODY );
 	return;
     }
@@ -1491,8 +1488,8 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
     {
 	if ( !remove_obj( ch, WEAR_HEAD, fReplace ) )
 	    return;
-	act( "$n wears $p on $s head.",   ch, obj, NULL, TO_ROOM );
-	act( "You wear $p on your head.", ch, obj, NULL, TO_CHAR );
+	act( "$n wears $p on $s head.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You wear $p on your head.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	equip_char( ch, obj, WEAR_HEAD );
 	return;
     }
@@ -1501,8 +1498,8 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
     {
 	if ( !remove_obj( ch, WEAR_BACK, fReplace ) )
 	    return;
-	act( "$n wears $p on $s back.",   ch, obj, NULL, TO_ROOM );
-	act( "You wear $p on your back.", ch, obj, NULL, TO_CHAR );
+	act( "$n wears $p on $s back.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You wear $p on your back.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	equip_char( ch, obj, WEAR_BACK );
 	return;
     }
@@ -1511,8 +1508,8 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
     {
 	if ( !remove_obj( ch, WEAR_LEGS, fReplace ) )
 	    return;
-	act( "$n wears $p on $s legs.",   ch, obj, NULL, TO_ROOM );
-	act( "You wear $p on your legs.", ch, obj, NULL, TO_CHAR );
+	act( "$n wears $p on $s legs.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You wear $p on your legs.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	equip_char( ch, obj, WEAR_LEGS );
 	return;
     }
@@ -1521,8 +1518,8 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
     {
 	if ( !remove_obj( ch, WEAR_FEET, fReplace ) )
 	    return;
-	act( "$n wears $p on $s feet.",   ch, obj, NULL, TO_ROOM );
-	act( "You wear $p on your feet.", ch, obj, NULL, TO_CHAR );
+	act( "$n wears $p on $s feet.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You wear $p on your feet.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	equip_char( ch, obj, WEAR_FEET );
 	return;
     }
@@ -1531,8 +1528,8 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
     {
 	if ( !remove_obj( ch, WEAR_HANDS, fReplace ) )
 	    return;
-	act( "$n wears $p on $s hands.",   ch, obj, NULL, TO_ROOM );
-	act( "You wear $p on your hands.", ch, obj, NULL, TO_CHAR );
+	act( "$n wears $p on $s hands.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You wear $p on your hands.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	equip_char( ch, obj, WEAR_HANDS );
 	return;
     }
@@ -1541,8 +1538,8 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
     {
 	if ( !remove_obj( ch, WEAR_ARMS, fReplace ) )
 	    return;
-	act( "$n wears $p on $s arms.",   ch, obj, NULL, TO_ROOM );
-	act( "You wear $p on your arms.", ch, obj, NULL, TO_CHAR );
+	act( "$n wears $p on $s arms.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You wear $p on your arms.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	equip_char( ch, obj, WEAR_ARMS );
 	return;
     }
@@ -1551,8 +1548,8 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
     {
         if ( !remove_obj( ch, WEAR_BOMB, fReplace ) )
             return;
-        act( "$n wears $p as a bomb.",   ch, obj, NULL, TO_ROOM );
-        act( "You wear $p as a bomb.", ch, obj, NULL, TO_CHAR );
+        act( "$n wears $p as a bomb.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+        act( "You wear $p as a bomb.", ch, obj, NULL, TO_CHAR, POS_RESTING );
         equip_char( ch, obj, WEAR_BOMB );
         return;
     }
@@ -1561,8 +1558,8 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
     {
 	if ( !remove_obj( ch, WEAR_ABOUT, fReplace ) )
 	    return;
-	act( "$n wears $p about $s torso.",   ch, obj, NULL, TO_ROOM );
-	act( "You wear $p about your torso.", ch, obj, NULL, TO_CHAR );
+	act( "$n wears $p about $s torso.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You wear $p about your torso.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	equip_char( ch, obj, WEAR_ABOUT );
 	return;
     }
@@ -1571,8 +1568,8 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
     {
 	if ( !remove_obj( ch, WEAR_WAIST, fReplace ) )
 	    return;
-	act( "$n wears $p about $s waist.",   ch, obj, NULL, TO_ROOM );
-	act( "You wear $p about your waist.", ch, obj, NULL, TO_CHAR );
+	act( "$n wears $p about $s waist.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You wear $p about your waist.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	equip_char( ch, obj, WEAR_WAIST );
 	return;
     }
@@ -1587,20 +1584,16 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
 
 	if ( get_eq_char( ch, WEAR_WRIST_L ) == NULL )
 	{
-	    act( "$n wears $p around $s left wrist.",
-		ch, obj, NULL, TO_ROOM );
-	    act( "You wear $p around your left wrist.",
-		ch, obj, NULL, TO_CHAR );
+	    act( "$n wears $p around $s left wrist.", ch, obj, NULL, TO_ROOM, POS_RESTING );
+	    act( "You wear $p around your left wrist.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	    equip_char( ch, obj, WEAR_WRIST_L );
 	    return;
 	}
 
 	if ( get_eq_char( ch, WEAR_WRIST_R ) == NULL )
 	{
-	    act( "$n wears $p around $s right wrist.",
-		ch, obj, NULL, TO_ROOM );
-	    act( "You wear $p around your right wrist.",
-		ch, obj, NULL, TO_CHAR );
+	    act( "$n wears $p around $s right wrist.", ch, obj, NULL, TO_ROOM, POS_RESTING );
+	    act( "You wear $p around your right wrist.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	    equip_char( ch, obj, WEAR_WRIST_R );
 	    return;
 	}
@@ -1625,8 +1618,8 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
 	    return;
 	}
 
-	act( "$n wears $p as a shield.", ch, obj, NULL, TO_ROOM );
-	act( "You wear $p as a shield.", ch, obj, NULL, TO_CHAR );
+	act( "$n wears $p as a shield.", ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You wear $p as a shield.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	equip_char( ch, obj, WEAR_SHIELD );
 	return;
     }
@@ -1654,8 +1647,8 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
 	    return;
 	}
 
-	act( "$n wields $p.", ch, obj, NULL, TO_ROOM );
-	act( "You wield $p.", ch, obj, NULL, TO_CHAR );
+	act( "$n wields $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You wield $p.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	equip_char( ch, obj, WEAR_WIELD );
 
         sn = get_weapon_sn(ch);
@@ -1666,20 +1659,19 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
         skill = get_weapon_skill(ch,sn);
  
         if (skill >= 100)
-            act("$p feels like a part of you!",ch,obj,NULL,TO_CHAR);
+            act("$p feels like a part of you!",ch,obj,NULL,TO_CHAR, POS_RESTING);
         else if (skill > 85)
-            act("You feel quite confident with $p.",ch,obj,NULL,TO_CHAR);
+            act("You feel quite confident with $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
         else if (skill > 70)
-            act("You are skilled with $p.",ch,obj,NULL,TO_CHAR);
+            act("You are skilled with $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
         else if (skill > 50)
-            act("Your skill with $p is adequate.",ch,obj,NULL,TO_CHAR);
+            act("Your skill with $p is adequate.",ch,obj,NULL,TO_CHAR, POS_RESTING);
         else if (skill > 25)
-            act("$p feels a little clumsy in your hands.",ch,obj,NULL,TO_CHAR);
+            act("$p feels a little clumsy in your hands.",ch,obj,NULL,TO_CHAR, POS_RESTING);
         else if (skill > 1)
-            act("You fumble and almost drop $p.",ch,obj,NULL,TO_CHAR);
+            act("You fumble and almost drop $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
         else
-            act("You don't even know which end is up on $p.",
-                ch,obj,NULL,TO_CHAR);
+            act("You don't even know which end is up on $p.", ch,obj,NULL,TO_CHAR, POS_RESTING);
 
 	return;
     }
@@ -1688,20 +1680,21 @@ void wear_obj( Character *ch, OBJ_DATA *obj, bool fReplace )
     {
 	if ( !remove_obj( ch, WEAR_HOLD, fReplace ) )
 	    return;
-	act( "$n holds $p in $s hand.",   ch, obj, NULL, TO_ROOM );
-	act( "You hold $p in your hand.", ch, obj, NULL, TO_CHAR );
+	act( "$n holds $p in $s hand.",   ch, obj, NULL, TO_ROOM, POS_RESTING );
+	act( "You hold $p in your hand.", ch, obj, NULL, TO_CHAR, POS_RESTING );
 	equip_char( ch, obj, WEAR_HOLD );
 	return;
     }
 
     if ( CAN_WEAR(obj,ITEM_WEAR_FLOAT) )
     {
-	if (!remove_obj(ch,WEAR_FLOAT, fReplace) )
-	    return;
-	act("$n releases $p to float next to $m.",ch,obj,NULL,TO_ROOM);
-	act("You release $p and it floats next to you.",ch,obj,NULL,TO_CHAR);
-	equip_char(ch,obj,WEAR_FLOAT);
-	return;
+		if (!remove_obj(ch,WEAR_FLOAT, fReplace) ) {
+			return;
+		}
+		act("$n releases $p to float next to $m.",ch,obj,NULL,TO_ROOM, POS_RESTING);
+		act("You release $p and it floats next to you.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+		equip_char(ch,obj,WEAR_FLOAT);
+		return;
     }
 
     if ( fReplace )
@@ -1746,8 +1739,7 @@ void do_second (Character *ch, char *argument)
         snprintf(buf, sizeof(buf), "You must be level %d to use this object.\n\r",
             obj->level );
         send_to_char( buf, ch );
-        act( "$n tries to use $p, but is too inexperienced.",
-            ch, obj, NULL, TO_ROOM );
+        act( "$n tries to use $p, but is too inexperienced.", ch, obj, NULL, TO_ROOM, POS_RESTING );
         return;
     }
 
@@ -1782,8 +1774,8 @@ void do_second (Character *ch, char *argument)
 
 /* char CAN use the item! that didn't take long at aaall */
 
-    act ("$n wields $p in $s off-hand.",ch,obj,NULL,TO_ROOM);
-    act ("You wield $p in your off-hand.",ch,obj,NULL,TO_CHAR);
+    act ("$n wields $p in $s off-hand.",ch,obj,NULL,TO_ROOM, POS_RESTING);
+    act ("You wield $p in your off-hand.",ch,obj,NULL,TO_CHAR, POS_RESTING);
     equip_char ( ch, obj, WEAR_SECONDARY);
     return;
 }
@@ -1871,10 +1863,8 @@ void do_sacrifice( Character *ch, char *argument )
 
     if ( arg[0] == '\0' || !str_cmp( arg, ch->getName().c_str() ) )
     {
-	act( "$n offers $mself to Mota, who graciously declines.",
-	    ch, NULL, NULL, TO_ROOM );
-	send_to_char(
-	    "Mota appreciates your offer and may accept it later.\n\r", ch );
+		act( "$n offers $mself to Mota, who graciously declines.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
+		send_to_char( "Mota appreciates your offer and may accept it later.\n\r", ch );
 	return;
     }
 
@@ -1898,8 +1888,8 @@ void do_sacrifice( Character *ch, char *argument )
 
     if ( !CAN_WEAR(obj, ITEM_TAKE) || CAN_WEAR(obj, ITEM_NO_SAC))
     {
-	act( "$p is not an acceptable sacrifice.", ch, obj, 0, TO_CHAR );
-	return;
+		act( "$p is not an acceptable sacrifice.", ch, obj, 0, TO_CHAR, POS_RESTING );
+		return;
     }
 
     if (obj->in_room != NULL)
@@ -1908,7 +1898,7 @@ void do_sacrifice( Character *ch, char *argument )
 	    if (gch->on == obj)
 	    {
 		act("$N appears to be using $p.",
-		    ch,obj,gch,TO_CHAR);
+		    ch,obj,gch,TO_CHAR, POS_RESTING);
 		return;
 	    }
     }
@@ -1946,7 +1936,7 @@ void do_sacrifice( Character *ch, char *argument )
 	}
     }
 
-    act( "$n sacrifices $p to Mota.", ch, obj, NULL, TO_ROOM );
+    act( "$n sacrifices $p to Mota.", ch, obj, NULL, TO_ROOM, POS_RESTING );
     Wiznet::instance()->report("$N sends up $p as a burnt offering.",
 	   ch,obj,WIZ_SACCING,0,0);
     extract_obj( obj );
@@ -1986,8 +1976,8 @@ void do_quaff( Character *ch, char *argument )
 	return;
     }
 
-    act( "$n quaffs $p.", ch, obj, NULL, TO_ROOM );
-    act( "You quaff $p.", ch, obj, NULL ,TO_CHAR );
+    act( "$n quaffs $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
+    act( "You quaff $p.", ch, obj, NULL ,TO_CHAR, POS_RESTING );
 
     obj_cast_spell( obj->value[1], obj->value[0], true, ch, ch, NULL );
     obj_cast_spell( obj->value[2], obj->value[0], true, ch, ch, NULL );
@@ -2036,8 +2026,8 @@ void do_recite( Character *ch, char *argument ) {
         }
     }
 
-    act("$n recites $p.", ch, scroll, NULL, TO_ROOM);
-    act("You recite $p.", ch, scroll, NULL, TO_CHAR);
+    act("$n recites $p.", ch, scroll, NULL, TO_ROOM, POS_RESTING);
+    act("You recite $p.", ch, scroll, NULL, TO_CHAR, POS_RESTING);
 
     if (number_percent() >= 20 + get_skill(ch, gsn_scrolls) * 4 / 5) {
         send_to_char("You mispronounce a syllable.\n\r", ch);
@@ -2086,13 +2076,13 @@ void do_brandish( Character *ch, char *argument )
 
     if ( staff->value[2] > 0 )
     {
-	act( "$n brandishes $p.", ch, staff, NULL, TO_ROOM );
-	act( "You brandish $p.",  ch, staff, NULL, TO_CHAR );
+	act( "$n brandishes $p.", ch, staff, NULL, TO_ROOM, POS_RESTING );
+	act( "You brandish $p.",  ch, staff, NULL, TO_CHAR, POS_RESTING );
 	if ( ch->level < staff->level 
 	||   number_percent() >= 20 + get_skill(ch,gsn_staves) * 4/5)
  	{
-	    act ("You fail to invoke $p.",ch,staff,NULL,TO_CHAR);
-	    act ("...and nothing happens.",ch,NULL,NULL,TO_ROOM);
+	    act ("You fail to invoke $p.",ch,staff,NULL,TO_CHAR, POS_RESTING);
+	    act ("...and nothing happens.",ch,NULL,NULL,TO_ROOM, POS_RESTING);
 	    check_improve(ch,gsn_staves,FALSE,2);
 	}
 	
@@ -2134,8 +2124,8 @@ void do_brandish( Character *ch, char *argument )
 
     if ( --staff->value[2] <= 0 )
     {
-	act( "$n's $p blazes bright and is gone.", ch, staff, NULL, TO_ROOM );
-	act( "Your $p blazes bright and is gone.", ch, staff, NULL, TO_CHAR );
+	act( "$n's $p blazes bright and is gone.", ch, staff, NULL, TO_ROOM, POS_RESTING );
+	act( "Your $p blazes bright and is gone.", ch, staff, NULL, TO_CHAR, POS_RESTING );
 	extract_obj( staff );
     }
 
@@ -2199,23 +2189,21 @@ void do_zap( Character *ch, char *argument )
     {
 	if ( victim != NULL )
 	{
-	    act( "$n zaps $N with $p.", ch, wand, victim, TO_NOTVICT );
-	    act( "You zap $N with $p.", ch, wand, victim, TO_CHAR );
-	    act( "$n zaps you with $p.",ch, wand, victim, TO_VICT );
+	    act( "$n zaps $N with $p.", ch, wand, victim, TO_NOTVICT, POS_RESTING );
+	    act( "You zap $N with $p.", ch, wand, victim, TO_CHAR, POS_RESTING );
+	    act( "$n zaps you with $p.",ch, wand, victim, TO_VICT, POS_RESTING );
 	}
 	else
 	{
-	    act( "$n zaps $P with $p.", ch, wand, obj, TO_ROOM );
-	    act( "You zap $P with $p.", ch, wand, obj, TO_CHAR );
+	    act( "$n zaps $P with $p.", ch, wand, obj, TO_ROOM, POS_RESTING );
+	    act( "You zap $P with $p.", ch, wand, obj, TO_CHAR, POS_RESTING );
 	}
 
  	if (ch->level < wand->level 
 	||  number_percent() >= 20 + get_skill(ch,gsn_wands) * 4/5) 
 	{
-	    act( "Your efforts with $p produce only smoke and sparks.",
-		 ch,wand,NULL,TO_CHAR);
-	    act( "$n's efforts with $p produce only smoke and sparks.",
-		 ch,wand,NULL,TO_ROOM);
+	    act( "Your efforts with $p produce only smoke and sparks.", ch,wand,NULL,TO_CHAR, POS_RESTING);
+	    act( "$n's efforts with $p produce only smoke and sparks.", ch,wand,NULL,TO_ROOM, POS_RESTING);
 	    check_improve(ch,gsn_wands,FALSE,2);
 	}
 	else
@@ -2227,9 +2215,9 @@ void do_zap( Character *ch, char *argument )
 
     if ( --wand->value[2] <= 0 )
     {
-	act( "$n's $p explodes into fragments.", ch, wand, NULL, TO_ROOM );
-	act( "Your $p explodes into fragments.", ch, wand, NULL, TO_CHAR );
-	extract_obj( wand );
+		act( "$n's $p explodes into fragments.", ch, wand, NULL, TO_ROOM, POS_RESTING );
+		act( "Your $p explodes into fragments.", ch, wand, NULL, TO_CHAR, POS_RESTING );
+		extract_obj( wand );
     }
 
     return;
@@ -2300,8 +2288,8 @@ void do_steal( Character *ch, char *argument )
 	affect_strip(ch,gsn_sneak);
 	REMOVE_BIT(ch->affected_by,AFF_SNEAK);
 
-	act( "$n tried to steal from you.\n\r", ch, NULL, victim, TO_VICT    );
-	act( "$n tried to steal from $N.\n\r",  ch, NULL, victim, TO_NOTVICT );
+	act( "$n tried to steal from you.\n\r", ch, NULL, victim, TO_VICT, POS_RESTING    );
+	act( "$n tried to steal from $N.\n\r",  ch, NULL, victim, TO_NOTVICT, POS_RESTING );
 	switch(number_range(0,3))
 	{
 	case 0 :
@@ -2405,7 +2393,7 @@ void do_steal( Character *ch, char *argument )
 
     obj_from_char( obj );
     obj_to_char( obj, ch );
-    act("You pocket $p.",ch,obj,NULL,TO_CHAR);
+    act("You pocket $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
     check_improve(ch,gsn_steal,TRUE,2);
     send_to_char( "Got it!\n\r", ch );
     return;
@@ -2700,7 +2688,7 @@ void do_buy( Character *ch, char *argument )
 	pet->leader = ch;
 	ch->pet = pet;
 	send_to_char( "Enjoy your pet.\n\r", ch );
-	act( "$n bought $N as a pet.", ch, NULL, pet, TO_ROOM );
+	act( "$n bought $N as a pet.", ch, NULL, pet, TO_ROOM, POS_RESTING );
 	return;
     }
     else
@@ -2719,14 +2707,13 @@ void do_buy( Character *ch, char *argument )
 
 	if (number < 1 || number > 200)
 	{
-	    act("$n tells you 'Get real!",keeper,NULL,ch,TO_VICT);
+	    act("$n tells you 'Get real!",keeper,NULL,ch,TO_VICT, POS_RESTING);
 	    return;
 	}
 
 	if ( cost <= 0 || !can_see_obj( ch, obj ) )
 	{
-	    act( "$n tells you 'I don't sell that -- try 'list''.",
-		keeper, NULL, ch, TO_VICT );
+	    act( "$n tells you 'I don't sell that -- try 'list''.", keeper, NULL, ch, TO_VICT, POS_RESTING );
 	    ch->reply = keeper;
 	    return;
 	}
@@ -2746,8 +2733,7 @@ void do_buy( Character *ch, char *argument )
 
 	    if (count < number)
 	    {
-	    	act("$n tells you 'I don't have that many in stock.",
-		    keeper,NULL,ch,TO_VICT);
+	    	act("$n tells you 'I don't have that many in stock.", keeper,NULL,ch,TO_VICT, POS_RESTING);
 	    	ch->reply = keeper;
 	    	return;
 	    }
@@ -2756,19 +2742,16 @@ void do_buy( Character *ch, char *argument )
 	if ( (ch->silver + ch->gold * 100) < cost * number )
 	{
 	    if (number > 1)
-		act("$n tells you 'You can't afford to buy that many.",
-		    keeper,obj,ch,TO_VICT);
+			act("$n tells you 'You can't afford to buy that many.", keeper,obj,ch,TO_VICT, POS_RESTING);
 	    else
-	    	act( "$n tells you 'You can't afford to buy $p'.",
-		    keeper, obj, ch, TO_VICT );
+	    	act( "$n tells you 'You can't afford to buy $p'.", keeper, obj, ch, TO_VICT, POS_RESTING );
 	    ch->reply = keeper;
 	    return;
 	}
 	
 	if ( obj->level > ch->level )
 	{
-	    act( "$n tells you 'You can't use $p yet'.",
-		keeper, obj, ch, TO_VICT );
+	    act( "$n tells you 'You can't use $p yet'.", keeper, obj, ch, TO_VICT, POS_RESTING );
 	    ch->reply = keeper;
 	    return;
 	}
@@ -2791,22 +2774,22 @@ void do_buy( Character *ch, char *argument )
 	&& roll < get_skill(ch,gsn_haggle) && number_range(1, 25) < get_curr_stat(ch, STAT_INT))
 	{
 	    cost -= obj->cost / 2 * roll / 100;
-	    act("You haggle with $N.",ch,NULL,keeper,TO_CHAR);
+	    act("You haggle with $N.",ch,NULL,keeper,TO_CHAR, POS_RESTING);
 	    check_improve(ch,gsn_haggle,TRUE,4);
 	}
 
 	if (number > 1)
 	{
 	    snprintf(buf, sizeof(buf),"$n buys $p[%d].",number);
-	    act(buf,ch,obj,NULL,TO_ROOM);
+	    act(buf,ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    snprintf(buf, sizeof(buf),"You buy $p[%d] for %d silver.",number,cost * number);
-	    act(buf,ch,obj,NULL,TO_CHAR);
+	    act(buf,ch,obj,NULL,TO_CHAR, POS_RESTING);
 	}
 	else
 	{
-	    act( "$n buys $p.", ch, obj, NULL, TO_ROOM );
+	    act( "$n buys $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
 	    snprintf(buf, sizeof(buf),"You buy $p for %d silver.",cost);
-	    act( buf, ch, obj, NULL, TO_CHAR );
+	    act( buf, ch, obj, NULL, TO_CHAR, POS_RESTING );
 	}
 	deduct_cost(ch,cost * number);
 	keeper->gold += cost * number/100;
@@ -2957,8 +2940,7 @@ void do_sell( Character *ch, char *argument )
 
     if ( ( obj = get_obj_carry( ch, arg, ch ) ) == NULL )
     {
-	act( "$n tells you 'You don't have that item'.",
-	    keeper, NULL, ch, TO_VICT );
+	act( "$n tells you 'You don't have that item'.", keeper, NULL, ch, TO_VICT, POS_RESTING );
 	ch->reply = keeper;
 	return;
     }
@@ -2971,20 +2953,20 @@ void do_sell( Character *ch, char *argument )
 
     if (!can_see_obj(keeper,obj))
     {
-	act("$n doesn't see what you are offering.",keeper,NULL,ch,TO_VICT);
-	return;
+		act("$n doesn't see what you are offering.",keeper,NULL,ch,TO_VICT, POS_RESTING);
+		return;
     }
 
     if ( ( cost = get_cost( keeper, obj, FALSE ) ) <= 0 )
     {
-	act( "$n looks uninterested in $p.", keeper, obj, ch, TO_VICT );
+	act( "$n looks uninterested in $p.", keeper, obj, ch, TO_VICT, POS_RESTING );
 	return;
     }
 
     if ( cost > (keeper->silver + 100 * keeper->gold) )
 	keeper->silver = cost;
 
-    act( "$n sells $p.", ch, obj, NULL, TO_ROOM );
+    act( "$n sells $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
     /* haggle */
     roll = number_percent();
     if (!IS_OBJ_STAT(obj,ITEM_SELL_EXTRACT)
@@ -2998,7 +2980,7 @@ void do_sell( Character *ch, char *argument )
     }
     snprintf(buf, sizeof(buf), "You sell $p for %d silver and %d gold piece%s.",
 	cost - (cost/100) * 100, cost/100, cost == 1 ? "" : "s" );
-    act( buf, ch, obj, NULL, TO_CHAR );
+    act( buf, ch, obj, NULL, TO_CHAR, POS_RESTING );
     ch->gold     += cost/100;
     ch->silver 	 += cost - (cost/100) * 100;
     deduct_cost(keeper,cost);
@@ -3047,15 +3029,14 @@ void do_value( Character *ch, char *argument )
 
     if ( ( obj = get_obj_carry( ch, arg, ch ) ) == NULL )
     {
-	act( "$n tells you 'You don't have that item'.",
-	    keeper, NULL, ch, TO_VICT );
+	act( "$n tells you 'You don't have that item'.", keeper, NULL, ch, TO_VICT, POS_RESTING );
 	ch->reply = keeper;
 	return;
     }
 
     if (!can_see_obj(keeper,obj))
     {
-        act("$n doesn't see what you are offering.",keeper,NULL,ch,TO_VICT);
+        act("$n doesn't see what you are offering.",keeper,NULL,ch,TO_VICT, POS_RESTING);
         return;
     }
 
@@ -3067,14 +3048,14 @@ void do_value( Character *ch, char *argument )
 
     if ( ( cost = get_cost( keeper, obj, FALSE ) ) <= 0 )
     {
-	act( "$n looks uninterested in $p.", keeper, obj, ch, TO_VICT );
+	act( "$n looks uninterested in $p.", keeper, obj, ch, TO_VICT, POS_RESTING );
 	return;
     }
 
     snprintf(buf, sizeof(buf), 
 	"$n tells you 'I'll give you %d silver and %d gold coins for $p'.", 
 	cost - (cost/100) * 100, cost/100 );
-    act( buf, keeper, obj, ch, TO_VICT );
+    act( buf, keeper, obj, ch, TO_VICT, POS_RESTING );
     ch->reply = keeper;
 
     return;

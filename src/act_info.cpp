@@ -408,11 +408,11 @@ void show_char_to_char_1(Character *victim, Character *ch)
     if (can_see(victim, ch))
     {
         if (ch == victim)
-            act("$n looks at $mself.", ch, NULL, NULL, TO_ROOM);
+            act("$n looks at $mself.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
         else
         {
-            act("$n looks at you.", ch, NULL, victim, TO_VICT);
-            act("$n looks at $N.", ch, NULL, victim, TO_NOTVICT);
+            act("$n looks at you.", ch, NULL, victim, TO_VICT, POS_RESTING);
+            act("$n looks at $N.", ch, NULL, victim, TO_NOTVICT, POS_RESTING);
         }
     }
 
@@ -422,7 +422,7 @@ void show_char_to_char_1(Character *victim, Character *ch)
     }
     else
     {
-        act("You see nothing special about $M.", ch, NULL, victim, TO_CHAR);
+        act("You see nothing special about $M.", ch, NULL, victim, TO_CHAR, POS_RESTING);
     }
 
     if (victim->max_hit > 0)
@@ -1067,7 +1067,7 @@ void do_look(Character *ch, char *argument)
                 break;
             }
 
-            act("$p holds:", ch, obj, NULL, TO_CHAR);
+            act("$p holds:", ch, obj, NULL, TO_CHAR, POS_RESTING);
             show_list_to_char(obj->contains, ch, TRUE, TRUE);
             break;
         }
@@ -1210,11 +1210,11 @@ void do_look(Character *ch, char *argument)
     {
         if (IS_SET(pexit->exit_info, EX_CLOSED))
         {
-            act("The $d is closed.", ch, NULL, pexit->keyword, TO_CHAR);
+            act("The $d is closed.", ch, NULL, pexit->keyword, TO_CHAR, POS_RESTING);
         }
         else if (IS_SET(pexit->exit_info, EX_ISDOOR))
         {
-            act("The $d is open.", ch, NULL, pexit->keyword, TO_CHAR);
+            act("The $d is open.", ch, NULL, pexit->keyword, TO_CHAR, POS_RESTING);
         }
     }
 
@@ -2230,7 +2230,7 @@ void do_compare(Character *ch, char *argument)
             strncpy(msg, "$p looks worse than $P.", MAX_STRING_LENGTH);
     }
 
-    act(msg, ch, obj1, obj2, TO_CHAR);
+    act(msg, ch, obj1, obj2, TO_CHAR, POS_RESTING);
     delete[] msg;
     return;
 }
@@ -2284,7 +2284,7 @@ void do_where(Character *ch, char *argument)
             }
         }
         if (!found)
-            act("You didn't find any $T.", ch, NULL, arg, TO_CHAR);
+            act("You didn't find any $T.", ch, NULL, arg, TO_CHAR, POS_RESTING);
     }
 
     return;
@@ -2334,7 +2334,7 @@ void do_consider(Character *ch, char *argument)
     else
         strncpy(msg, "Death will thank you for your gift.", MAX_STRING_LENGTH);
 
-    act(msg, ch, NULL, victim, TO_CHAR);
+    act(msg, ch, NULL, victim, TO_CHAR, POS_RESTING);
     delete[] msg;
     return;
 }
@@ -2474,7 +2474,7 @@ void do_report(Character *ch, char *argument)
              ch->move, ch->max_move,
              ch->exp);
 
-    act(buf, ch, NULL, NULL, TO_ROOM);
+    act(buf, ch, NULL, NULL, TO_ROOM, POS_RESTING);
 
     return;
 }
@@ -2565,18 +2565,14 @@ void do_practice(Character *ch, char *argument)
                 ch->pcdata->sk_rating[sn];
             if (ch->pcdata->learned[sn] < adept)
             {
-                act("You practice $T.",
-                    ch, NULL, skill_table[sn].name, TO_CHAR);
-                act("$n practices $T.",
-                    ch, NULL, skill_table[sn].name, TO_ROOM);
+                act("You practice $T.", ch, NULL, skill_table[sn].name, TO_CHAR, POS_RESTING);
+                act("$n practices $T.", ch, NULL, skill_table[sn].name, TO_ROOM, POS_RESTING);
             }
             else
             {
                 ch->pcdata->learned[sn] = adept;
-                act("You are now learned at $T.",
-                    ch, NULL, skill_table[sn].name, TO_CHAR);
-                act("$n is now learned at $T.",
-                    ch, NULL, skill_table[sn].name, TO_ROOM);
+                act("You are now learned at $T.", ch, NULL, skill_table[sn].name, TO_CHAR, POS_RESTING);
+                act("$n is now learned at $T.", ch, NULL, skill_table[sn].name, TO_ROOM, POS_RESTING);
             }
         }
     }

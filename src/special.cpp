@@ -155,11 +155,11 @@ bool spec_nasty( Character *ch )
     switch ( number_bits(2) )
     {
         case 0:  act( "$n rips apart your coin purse, spilling your gold!",
-                     ch, NULL, victim, TO_VICT);
+                     ch, NULL, victim, TO_VICT, POS_RESTING );
                  act( "You slash apart $N's coin purse and gather his gold.",
-                     ch, NULL, victim, TO_CHAR);
+                     ch, NULL, victim, TO_CHAR, POS_RESTING );
                  act( "$N's coin purse is ripped apart!",
-                     ch, NULL, victim, TO_NOTVICT);
+                     ch, NULL, victim, TO_NOTVICT, POS_RESTING );
                  gold = victim->gold / 10;  /* steal 10% of his gold */
                  victim->gold -= gold;
                  ch->gold     += gold;
@@ -292,40 +292,40 @@ bool spec_cast_adept( Character *ch )
     switch ( number_bits( 4 ) )
     {
     case 0:
-	act( "$n utters the word 'abrazak'.", ch, NULL, NULL, TO_ROOM );
+	act( "$n utters the word 'abrazak'.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	spell_armor( skill_lookup( "armor" ), ch->level, true, ch,victim,TARGET_CHAR);
 	return TRUE;
 
     case 1:
-	act( "$n utters the word 'fido'.", ch, NULL, NULL, TO_ROOM );
+	act( "$n utters the word 'fido'.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	spell_bless( skill_lookup( "bless" ), ch->level,true,ch,victim,TARGET_CHAR);
 	return TRUE;
 
     case 2:
-	act("$n utters the words 'judicandus noselacri'.",ch,NULL,NULL,TO_ROOM);
+	act("$n utters the words 'judicandus noselacri'.",ch,NULL,NULL,TO_ROOM, POS_RESTING );
 	spell_cure_blindness( skill_lookup( "cure blindness" ),
 	    ch->level, true, ch, victim,TARGET_CHAR);
 	return TRUE;
 
     case 3:
-	act("$n utters the words 'judicandus dies'.", ch,NULL, NULL, TO_ROOM );
+	act("$n utters the words 'judicandus dies'.", ch,NULL, NULL, TO_ROOM, POS_RESTING );
 	spell_cure_light( skill_lookup( "cure light" ),
 	    ch->level, true, ch, victim,TARGET_CHAR);
 	return TRUE;
 
     case 4:
-	act( "$n utters the words 'judicandus sausabru'.",ch,NULL,NULL,TO_ROOM);
+	act( "$n utters the words 'judicandus sausabru'.",ch,NULL,NULL,TO_ROOM, POS_RESTING );
 	spell_cure_poison( skill_lookup( "cure poison" ),
 	    ch->level, true, ch, victim,TARGET_CHAR);
 	return TRUE;
 
     case 5:
-	act("$n utters the word 'candusima'.", ch, NULL, NULL, TO_ROOM );
+	act("$n utters the word 'candusima'.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	spell_refresh( skill_lookup("refresh"),ch->level,true,ch,victim,TARGET_CHAR);
 	return TRUE;
 
     case 6:
-	act("$n utters the words 'judicandus eugzagz'.",ch,NULL,NULL,TO_ROOM);
+	act("$n utters the words 'judicandus eugzagz'.",ch,NULL,NULL,TO_ROOM, POS_RESTING );
 	spell_cure_disease(skill_lookup("cure disease"),
 	    ch->level,true,ch,victim,TARGET_CHAR);
     }
@@ -565,7 +565,7 @@ bool spec_fido( Character *ch )
 	if ( corpse->item_type != ITEM_CORPSE_NPC )
 	    continue;
 
-	act( "$n savagely devours a corpse.", ch, NULL, NULL, TO_ROOM );
+	act( "$n savagely devours a corpse.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	for ( obj = corpse->contains; obj; obj = obj_next )
 	{
 	    obj_next = obj->next_content;
@@ -627,7 +627,7 @@ bool spec_guard( Character *ch )
     if ( ech != NULL )
     {
 	act( "$n screams 'PROTECT THE INNOCENT!!  BANZAI!!",
-	    ch, NULL, NULL, TO_ROOM );
+	    ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	multi_hit( ch, ech, TYPE_UNDEFINED );
 	return TRUE;
     }
@@ -654,7 +654,7 @@ bool spec_janitor( Character *ch )
 	||   trash->item_type == ITEM_TRASH
 	||   trash->cost < 10 )
 	{
-	    act( "$n picks up some trash.", ch, NULL, NULL, TO_ROOM );
+	    act( "$n picks up some trash.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	    obj_from_room( trash );
 	    obj_to_char( trash, ch );
 	    return TRUE;
@@ -711,40 +711,40 @@ bool spec_mayor( Character *ch )
 
     case 'W':
 	ch->position = POS_STANDING;
-	act( "$n awakens and groans loudly.", ch, NULL, NULL, TO_ROOM );
+	act( "$n awakens and groans loudly.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	break;
 
     case 'S':
 	ch->position = POS_SLEEPING;
-	act( "$n lies down and falls asleep.", ch, NULL, NULL, TO_ROOM );
+	act( "$n lies down and falls asleep.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	break;
 
     case 'a':
-	act( "$n says 'Hello Honey!'", ch, NULL, NULL, TO_ROOM );
+	act( "$n says 'Hello Honey!'", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	break;
 
     case 'b':
 	act( "$n says 'What a view!  I must do something about that dump!'",
-	    ch, NULL, NULL, TO_ROOM );
+	    ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	break;
 
     case 'c':
 	act( "$n says 'Vandals!  Youngsters have no respect for anything!'",
-	    ch, NULL, NULL, TO_ROOM );
+	    ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	break;
 
     case 'd':
-	act( "$n says 'Good day, citizens!'", ch, NULL, NULL, TO_ROOM );
+	act( "$n says 'Good day, citizens!'", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	break;
 
     case 'e':
 	act( "$n says 'I hereby declare the city of Midgaard open!'",
-	    ch, NULL, NULL, TO_ROOM );
+	    ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	break;
 
     case 'E':
 	act( "$n says 'I hereby declare the city of Midgaard closed!'",
-	    ch, NULL, NULL, TO_ROOM );
+	    ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	break;
 
     case 'O':
@@ -777,9 +777,9 @@ bool spec_poison( Character *ch )
     ||   number_percent( ) > 2 * ch->level )
 	return FALSE;
 
-    act( "You bite $N!",  ch, NULL, victim, TO_CHAR    );
-    act( "$n bites $N!",  ch, NULL, victim, TO_NOTVICT );
-    act( "$n bites you!", ch, NULL, victim, TO_VICT    );
+    act( "You bite $N!",  ch, NULL, victim, TO_CHAR, POS_RESTING    );
+    act( "$n bites $N!",  ch, NULL, victim, TO_NOTVICT, POS_RESTING );
+    act( "$n bites you!", ch, NULL, victim, TO_VICT, POS_RESTING    );
     spell_poison( gsn_poison, ch->level, true, ch, victim,TARGET_CHAR);
     return TRUE;
 }
@@ -808,9 +808,9 @@ bool spec_thief( Character *ch )
 	if ( IS_AWAKE(victim) && number_range( 0, ch->level ) == 0 )
 	{
 	    act( "You discover $n's hands in your wallet!",
-		ch, NULL, victim, TO_VICT );
+		ch, NULL, victim, TO_VICT, POS_RESTING );
 	    act( "$N discovers $n's hands in $S wallet!",
-		ch, NULL, victim, TO_NOTVICT );
+		ch, NULL, victim, TO_NOTVICT, POS_RESTING );
 	    return TRUE;
 	}
 	else

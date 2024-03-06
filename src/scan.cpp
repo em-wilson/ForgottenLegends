@@ -53,7 +53,7 @@ void do_scan(Character *ch, char *argument)
 
    if (arg1[0] == '\0')
    {
-      act("$n looks all around.", ch, NULL, NULL, TO_ROOM);
+      act("$n looks all around.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
       send_to_char("Looking around you see:\n\r", ch);
                 scan_list(ch->in_room, ch, 0, -1);
 
@@ -72,8 +72,8 @@ void do_scan(Character *ch, char *argument)
    else if (!str_cmp(arg1, "d") || !str_cmp(arg1, "down"))  door = 5;
    else { send_to_char("Which way do you want to scan?\n\r", ch); return; }
 
-   act("You peer intently $T.", ch, NULL, dir_name[door], TO_CHAR);
-   act("$n peers intently $T.", ch, NULL, dir_name[door], TO_ROOM);
+   act("You peer intently $T.", ch, NULL, dir_name[door], TO_CHAR, POS_RESTING );
+   act("$n peers intently $T.", ch, NULL, dir_name[door], TO_ROOM, POS_RESTING );
    snprintf(buf, sizeof(buf), "Looking %s you see:\n\r", dir_name[door]);
                                                                                   
    scan_room = ch->in_room;

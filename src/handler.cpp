@@ -929,8 +929,8 @@ void affect_modify( Character *ch, AFFECT_DATA *paf, bool fAdd )
 	if ( depth == 0 )
 	{
 	    depth++;
-	    act( "You drop $p.", ch, wield, NULL, TO_CHAR );
-	    act( "$n drops $p.", ch, wield, NULL, TO_ROOM );
+	    act( "You drop $p.", ch, wield, NULL, TO_CHAR, POS_RESTING );
+	    act( "$n drops $p.", ch, wield, NULL, TO_ROOM, POS_RESTING );
 	    obj_from_char( wield );
 	    obj_to_room( wield, ch->in_room );
 	    depth--;
@@ -1381,7 +1381,7 @@ void char_to_room( Character *ch, ROOM_INDEX_DATA *pRoomIndex )
             	!IS_AFFECTED(vch,AFF_PLAGUE) && number_bits(6) == 0)
             {
             	send_to_char("You feel hot and feverish.\n\r",vch);
-            	act("$n shivers and looks very ill.",vch,NULL,NULL,TO_ROOM);
+            	act("$n shivers and looks very ill.",vch,NULL,NULL,TO_ROOM, POS_RESTING);
             	affect_join(vch,&plague);
             }
         }
@@ -1531,8 +1531,8 @@ void equip_char( Character *ch, OBJ_DATA *obj, int iWear )
     ||   ( IS_OBJ_STAT(obj, ITEM_ANTI_GOOD)    && IS_GOOD(ch)    )
     ||   ( IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(ch) ) )
     {
-	act( "You are zapped by $p and drop it.", ch, obj, NULL, TO_CHAR );
-	act( "$n is zapped by $p and drops it.",  ch, obj, NULL, TO_ROOM );
+	act( "You are zapped by $p and drop it.", ch, obj, NULL, TO_CHAR, POS_RESTING );
+	act( "$n is zapped by $p and drops it.",  ch, obj, NULL, TO_ROOM, POS_RESTING );
 	obj_from_char( obj );
 	obj_to_room( obj, ch->in_room );
 	return;

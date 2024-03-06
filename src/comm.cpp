@@ -1315,7 +1315,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 			char_to_room(ch, get_room_index(ROOM_VNUM_LIMBO));
 		}
 
-		act("$n has entered the game.", ch, NULL, NULL, TO_ROOM);
+		act("$n has entered the game.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
 		do_look(ch, (char *)"auto");
 
 		Wiznet::instance()->report((char *)"$N has left real life behind.", ch, NULL,
@@ -1324,7 +1324,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		if (ch->pet != NULL)
 		{
 			char_to_room(ch->pet, ch->in_room);
-			act("$n has entered the game.", ch->pet, NULL, NULL, TO_ROOM);
+			act("$n has entered the game.", ch->pet, NULL, NULL, TO_ROOM, POS_RESTING);
 		}
 
 		send_to_char("\n", ch);
@@ -1344,7 +1344,7 @@ void stop_idling(Character *ch)
 	char_from_room(ch);
 	char_to_room(ch, ch->was_in_room);
 	ch->was_in_room = NULL;
-	act("$n has returned from the void.", ch, NULL, NULL, TO_ROOM);
+	act("$n has returned from the void.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
 	return;
 }
 
@@ -1663,17 +1663,10 @@ void act_string(const char *format, Character *to, Character *ch, Character *vch
 	}
 }
 
-void act(const char *format, Character *ch, const void *arg1, const void *arg2,
-		 int type)
-{
-	/* to be compatible with older code */
-	act_new(format, ch, arg1, arg2, type, POS_RESTING);
-}
-
 /*
- * The colour version of the act_new( ) function, -Lope
+ * The colour version of the act( ) function, -Lope
  */
-void act_new(const char *format, Character *ch, const void *arg1,
+void act(const char *format, Character *ch, const void *arg1,
 			 const void *arg2, int type, int min_pos)
 {
 	Character *to;
@@ -1692,7 +1685,7 @@ void act_new(const char *format, Character *ch, const void *arg1,
 		return;
 
 	to = ch->in_room->people;
-	if (type == TO_VICT)
+	if (type == TO_VICT )
 	{
 		if (!vch)
 		{
@@ -1706,7 +1699,7 @@ void act_new(const char *format, Character *ch, const void *arg1,
 		to = vch->in_room->people;
 	}
 
-	if (type == TO_AREA || type == TO_AREA_OUTSIDE_ROOM)
+	if (type == TO_AREA || type == TO_AREA_OUTSIDE_ROOM )
 	{
 		for (std::list<Character *>::iterator it = char_list.begin(); it != char_list.end(); it++)
 		{
@@ -1731,7 +1724,7 @@ void act_new(const char *format, Character *ch, const void *arg1,
 			if (!to->desc || to->position < min_pos)
 				continue;
 
-			if ((type == TO_CHAR) && to != ch)
+			if ((type == TO_CHAR ) && to != ch)
 				continue;
 			if (type == TO_VICT && (to != vch || to == ch))
 				continue;

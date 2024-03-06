@@ -138,12 +138,12 @@ void do_gain(Character *ch, char *argument)
 	if (ch->practice < 10)
 	{
 	    act("$N tells you 'You are not yet ready.'",
-		ch,NULL,trainer,TO_CHAR);
+		ch,NULL,trainer,TO_CHAR, POS_RESTING );
 	    return;
 	}
 
 	act("$N helps you apply your practice to training",
-		ch,NULL,trainer,TO_CHAR);
+		ch,NULL,trainer,TO_CHAR, POS_RESTING );
 	ch->practice -= 10;
 	ch->train +=1 ;
 	return;
@@ -154,19 +154,19 @@ void do_gain(Character *ch, char *argument)
 	if (ch->train < 2)
 	{
 	    act("$N tells you 'You are not yet ready.'",
-		ch,NULL,trainer,TO_CHAR);
+		ch,NULL,trainer,TO_CHAR, POS_RESTING );
 	    return;
 	}
 
 	if (ch->pcdata->points <= 40)
 	{
 	    act("$N tells you 'There would be no point in that.'",
-		ch,NULL,trainer,TO_CHAR);
+		ch,NULL,trainer,TO_CHAR, POS_RESTING );
 	    return;
 	}
 
 	act("$N trains you, and you feel more at ease with your skills.",
-	    ch,NULL,trainer,TO_CHAR);
+	    ch,NULL,trainer,TO_CHAR, POS_RESTING );
 
 	ch->train -= 2;
 	ch->pcdata->points -= 1;
@@ -182,28 +182,28 @@ void do_gain(Character *ch, char *argument)
 	if (ch->pcdata->group_known[gn])
 	{
 	    act("$N tells you 'You already know that group!'",
-		ch,NULL,trainer,TO_CHAR);
+		ch,NULL,trainer,TO_CHAR, POS_RESTING );
 	    return;
 	}
 
 	if (group_table[gn].rating[ch->class_num] <= 0)
 	{
 	    act("$N tells you 'That group is beyond your powers.'",
-		ch,NULL,trainer,TO_CHAR);
+		ch,NULL,trainer,TO_CHAR, POS_RESTING );
 	    return;
 	}
 
 	if (ch->train < group_table[gn].rating[ch->class_num])
 	{
 	    act("$N tells you 'You are not yet ready for that group.'",
-		ch,NULL,trainer,TO_CHAR);
+		ch,NULL,trainer,TO_CHAR, POS_RESTING );
 	    return;
 	}
 
 	/* add the group */
 	gn_add(ch,gn);
 	act("$N trains you in the art of $t",
-	    ch,group_table[gn].name,trainer,TO_CHAR);
+	    ch,group_table[gn].name,trainer,TO_CHAR, POS_RESTING );
 	ch->train -= group_table[gn].rating[ch->class_num];
 	return;
     }
@@ -214,7 +214,7 @@ void do_gain(Character *ch, char *argument)
 	if (skill_table[sn].spell_fun != spell_null)
 	{
 	    act("$N tells you 'You must learn the full group.'",
-		ch,NULL,trainer,TO_CHAR);
+		ch,NULL,trainer,TO_CHAR, POS_RESTING );
 	    return;
 	}
 	    
@@ -222,21 +222,21 @@ void do_gain(Character *ch, char *argument)
         if (ch->pcdata->learned[sn])
         {
             act("$N tells you 'You already know that skill!'",
-                ch,NULL,trainer,TO_CHAR);
+                ch,NULL,trainer,TO_CHAR, POS_RESTING );
             return;
         }
  
         if (skill_rating(ch,sn) <= 0)
         {
             act("$N tells you 'That skill is beyond your powers.'",
-                ch,NULL,trainer,TO_CHAR);
+                ch,NULL,trainer,TO_CHAR, POS_RESTING );
             return;
         }
  
         if (ch->train < skill_rating(ch,sn))
         {
             act("$N tells you 'You are not yet ready for that skill.'",
-                ch,NULL,trainer,TO_CHAR);
+                ch,NULL,trainer,TO_CHAR, POS_RESTING );
             return;
         }
  
@@ -245,12 +245,12 @@ void do_gain(Character *ch, char *argument)
 	ch->pcdata->sk_level[sn] = skill_level(ch,sn);
 	ch->pcdata->sk_rating[sn] = skill_rating(ch,sn);
         act("$N trains you in the art of $t",
-            ch,skill_table[sn].name,trainer,TO_CHAR);
+            ch,skill_table[sn].name,trainer,TO_CHAR, POS_RESTING );
         ch->train -= skill_rating(ch,sn);
         return;
     }
 
-    act("$N tells you 'I do not understand...'",ch,NULL,trainer,TO_CHAR);
+    act("$N tells you 'I do not understand...'",ch,NULL,trainer,TO_CHAR, POS_RESTING );
 }
     
 
