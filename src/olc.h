@@ -47,6 +47,7 @@ typedef	bool OLC_FUN		args( ( Character *ch, char *argument ) );
 DECLARE_DO_FUN(    do_help    );
 DECLARE_SPELL_FUN( spell_null );
 
+class ExtraDescription;
 
 
 
@@ -281,7 +282,7 @@ DECLARE_OLC_FUN( mpedit_list		);
  * Prototypes
  */
 /* mem.c - memory prototypes. */
-#define ED	EXTRA_DESCR_DATA
+#define ED	ExtraDescription
 RESET_DATA	*new_reset_data		args ( ( void ) );
 void		free_reset_data		args ( ( RESET_DATA *pReset ) );
 AREA_DATA	*new_area		args ( ( void ) );
@@ -289,9 +290,6 @@ void		free_area		args ( ( AREA_DATA *pArea ) );
 EXIT_DATA	*new_exit		args ( ( void ) );
 void		free_exit		args ( ( EXIT_DATA *pExit ) );
 ED 		*new_extra_descr	args ( ( void ) );
-void		free_extra_descr	args ( ( ED *pExtra ) );
-ROOM_INDEX_DATA *new_room_index		args ( ( void ) );
-void		free_room_index		args ( ( ROOM_INDEX_DATA *pRoom ) );
 AFFECT_DATA	*new_affect		args ( ( void ) );
 void		free_affect		args ( ( AFFECT_DATA* pAf ) );
 SHOP_DATA	*new_shop		args ( ( void ) );

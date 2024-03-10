@@ -35,10 +35,13 @@
 
 #include "merc.h"
 #include "db.h"
+#include "ExtraDescription.h"
 #include "tables.h"
 #include "lookup.h"
 #include "NonPlayerCharacter.h"
+#include "Object.h"
 #include "RaceManager.h"
+#include "Room.h"
 
 extern int flag_lookup args((const char *name, const struct flag_type *flag_table));
 extern RaceManager * race_manager;
@@ -523,8 +526,7 @@ void load_objects( FILE *fp )
                 paf->location           = fread_number( fp );
                 paf->modifier           = fread_number( fp );
                 paf->bitvector          = 0;
-                paf->next               = pObjIndex->affected;
-                pObjIndex->affected     = paf;
+				pObjIndex->affected.push_back(paf);
                 top_affect++;
             }
 
@@ -558,25 +560,17 @@ void load_objects( FILE *fp )
                 paf->location           = fread_number(fp);
                 paf->modifier           = fread_number(fp);
                 paf->bitvector          = fread_flag(fp);
-                paf->next               = pObjIndex->affected;
-                pObjIndex->affected     = paf;
+				pObjIndex->affected.push_back(paf);
                 top_affect++;
             }
              else if ( letter == 'E' )
             {
-                EXTRA_DESCR_DATA *ed;
- 
-                ed                      = (EXTRA_DESCR_DATA*)alloc_perm( sizeof(*ed) );
-                ed->keyword             = fread_string( fp );
-                ed->description         = fread_string( fp );
-                ed->next                = pObjIndex->extra_descr;
-                pObjIndex->extra_descr  = ed;
+                ExtraDescription *ed = new ExtraDescription();
+                ed->setKeyword( fread_string( fp ) );
+                ed->setDescription( fread_string( fp ) );
+				pObjIndex->extra_descr.push_back(ed);
                 top_ed++;
             }
- 	    else if ( letter == 'M' )
-	    {
-		pObjIndex->min_stat	= fread_number( fp );
-	    }
             else
             {
                 ungetc( letter, fp );
@@ -648,8 +642,7 @@ void convert_objects( void )
 			break;
 		    }
 
-		    pObj->level = pObj->level < 1 ? pMob->level - 2
-			: UMIN(pObj->level, pMob->level - 2);
+		    pObj->level = pObj->level < 1 ? pMob->level - 2 : UMIN(pObj->level, pMob->level - 2);
 		    break;
 
 		case 'P':
@@ -671,8 +664,7 @@ void convert_objects( void )
 			    break;
 			}
 
-			pObj->level = pObj->level < 1 ? pObjTo->level
-			    : UMIN(pObj->level, pObjTo->level);
+			pObj->level = pObj->level < 1 ? pObjTo->level : UMIN(pObj->level, pObjTo->level);
 		    }
 		    break;
 

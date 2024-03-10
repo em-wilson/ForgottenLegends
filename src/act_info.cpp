@@ -16,13 +16,13 @@
  ***************************************************************************/
 
 /***************************************************************************
- *	ROM 2.4 is copyright 1993-1996 Russ Taylor			   *
- *	ROM has been brought to you by the ROM consortium		   *
- *	    Russ Taylor (rtaylor@efn.org)				   *
- *	    Gabrielle Taylor						   *
- *	    Brian Moore (zump@rom.org)					   *
- *	By using this code, you have agreed to follow the terms of the	   *
- *	ROM license, in the file Rom24/doc/rom.license			   *
+ *	ROM 2.4 is copyright 1993-1996 Russ Taylor		                	   *
+ *	ROM has been brought to you by the ROM consortium	            	   *
+ *	    Russ Taylor (rtaylor@efn.org)			                    	   *
+ *	    Gabrielle Taylor					                        	   *
+ *	    Brian Moore (zump@rom.org)				                    	   *
+ *	By using this code, you have agreed to follow the terms of the	       *
+ *	ROM license, in the file Rom24/doc/rom.license			               *
  ***************************************************************************/
 
 #include <sys/types.h>
@@ -31,6 +31,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <list>
+#include <sstream>
+#include <string>
 #include <time.h>
 #include <unistd.h>
 #include <unordered_set>
@@ -43,12 +46,20 @@
 #include "lookup.h"
 #include "clans/ClanManager.h"
 #include "ConnectedState.h"
+#include "ExtraDescription.h"
+#include "ILogger.h"
+#include "Object.h"
 #include "PlayerCharacter.h"
 #include "PlayerRace.h"
 #include "RaceManager.h"
+#include "Room.h"
 #include "StringHelper.h"
 
+using std::list;
+using std::string;
+using std::stringstream;
 using std::unordered_set;
+using std::vector;
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_exits);
@@ -65,10 +76,6 @@ int max_on = 0;
 /*
  * Local functions.
  */
-char *format_obj_to_char args((OBJ_DATA * obj, Character *ch,
-                               bool fShort));
-void show_list_to_char args((OBJ_DATA * list, Character *ch,
-                             bool fShort, bool fShowNothing));
 void show_char_to_char_0 args((Character * victim, Character *ch));
 void show_char_to_char_1 args((Character * victim, Character *ch));
 void show_char_to_char args((Character * list, Character *ch));
@@ -77,57 +84,54 @@ bool check_blind args((Character * ch));
 extern ClanManager *clan_manager;
 extern RaceManager *race_manager;
 
-char *format_obj_to_char(OBJ_DATA *obj, Character *ch, bool fShort)
+string format_obj_to_char(Object *obj, Character *ch, bool fShort)
 {
-    static char buf[MAX_STRING_LENGTH];
+    stringstream buf;
 
-    buf[0] = '\0';
+    if ((fShort && (obj->getShortDescription().empty())) || (obj->getDescription().empty()))
+        return string();
 
-    if ((fShort && (obj->short_descr == NULL || obj->short_descr[0] == '\0')) || (obj->description == NULL || obj->description[0] == '\0'))
-        return buf;
-
-    if (IS_OBJ_STAT(obj, ITEM_INVIS))
-        strcat(buf, "(Invis) ");
-    if (IS_AFFECTED(ch, AFF_DETECT_EVIL) && IS_OBJ_STAT(obj, ITEM_EVIL))
-        strcat(buf, "(Red Aura) ");
-    if (IS_AFFECTED(ch, AFF_DETECT_GOOD) && IS_OBJ_STAT(obj, ITEM_BLESS))
-        strcat(buf, "(Blue Aura) ");
-    if (IS_AFFECTED(ch, AFF_DETECT_MAGIC) && IS_OBJ_STAT(obj, ITEM_MAGIC))
-        strcat(buf, "(Magical) ");
-    if (IS_OBJ_STAT(obj, ITEM_GLOW))
-        strcat(buf, "(Glowing) ");
-    if (IS_OBJ_STAT(obj, ITEM_HUM))
-        strcat(buf, "(Humming) ");
-
-    if (ch->level <= 20 && ch->level >= obj->level)
-        strcat(buf, "{Y*{x ");
-
-    if (fShort)
-    {
-        if (obj->short_descr != NULL)
-            strcat(buf, obj->short_descr);
+    if (obj->hasStat(ITEM_INVIS)) {
+        buf << "(Invis) ";
     }
-    else
-    {
-        if (obj->description != NULL)
-            strcat(buf, obj->description);
+    if (IS_AFFECTED(ch, AFF_DETECT_EVIL) && obj->hasStat(ITEM_EVIL)) {
+        buf << "(Red Aura) ";
+    }
+    if (IS_AFFECTED(ch, AFF_DETECT_GOOD) && obj->hasStat(ITEM_BLESS)) {
+        buf << "(Blue Aura) ";
+    }
+    if (IS_AFFECTED(ch, AFF_DETECT_MAGIC) && obj->hasStat(ITEM_MAGIC)) {
+        buf << "(Magical) ";
+    }
+    if (obj->hasStat(ITEM_GLOW)) {
+        buf << "(Glowing) ";
+    }
+    if (obj->hasStat(ITEM_HUM)) {
+        buf << "(Humming) ";
     }
 
-    return buf;
+    if (ch->level <= 20 && ch->level >= obj->getLevel()) {
+        buf << "{Y*{x ";
+    }
+
+    if (fShort && !obj->getShortDescription().empty()) {
+            buf << obj->getShortDescription();
+    } else if (!fShort && !obj->getDescription().empty()) {
+            buf << obj->getDescription();
+    }
+
+    return buf.str();
 }
 
 /*
  * Show a list to a character.
  * Can coalesce duplicated items.
  */
-void show_list_to_char(OBJ_DATA *list, Character *ch, bool fShort, bool fShowNothing)
+void show_list_to_char(vector<Object *> list, Character *ch, bool fShort, bool fShowNothing)
 {
     char buf[MAX_STRING_LENGTH];
     std::string output;
     std::vector<std::tuple<std::string, int>> prgpstrShow;
-    char *pstrShow;
-    OBJ_DATA *obj;
-    int count;
     bool fCombine;
 
     if (ch->desc == NULL)
@@ -135,13 +139,7 @@ void show_list_to_char(OBJ_DATA *list, Character *ch, bool fShort, bool fShowNot
         return;
     }
 
-    count = 0;
-    for (obj = list; obj != NULL; obj = obj->next_content)
-    {
-        count++;
-    }
-
-    if (count > 1000)
+    if (list.size() > 1000)
     {
         send_to_char("That is WAY too much junk, drop some of it!\n\r", ch);
         return;
@@ -150,11 +148,12 @@ void show_list_to_char(OBJ_DATA *list, Character *ch, bool fShort, bool fShowNot
     /*
      * Format the list of objects.
      */
-    for (obj = list; obj != NULL; obj = obj->next_content)
+    for (auto obj : list)
     {
-        if (obj->wear_loc == WEAR_NONE && can_see_obj(ch, obj))
+        logger->log_string(obj->getName());
+        if (obj->getWearLocation() == WEAR_NONE && ch->can_see( obj))
         {
-            pstrShow = format_obj_to_char(obj, ch, fShort);
+            string pstrShow = format_obj_to_char(obj, ch, fShort);
 
             fCombine = FALSE;
 
@@ -164,12 +163,12 @@ void show_list_to_char(OBJ_DATA *list, Character *ch, bool fShort, bool fShowNot
                  * Look for duplicates, case sensitive.
                  * Matches tend to be near end so run loop backwords.
                  */
-                for (auto it = prgpstrShow.begin(); it != prgpstrShow.end(); ++it)
+                for (auto it : prgpstrShow)
                 {
-                    auto objName = std::get<0>(*it);
+                    auto objName = std::get<0>(it);
                     if (!objName.compare(pstrShow))
                     {
-                        std::get<1>(*it)++;
+                        std::get<1>(it)++;
                         fCombine = TRUE;
                         break;
                     }
@@ -189,10 +188,10 @@ void show_list_to_char(OBJ_DATA *list, Character *ch, bool fShort, bool fShowNot
     /*
      * Output the formatted list.
      */
-    for (auto it = prgpstrShow.begin(); it != prgpstrShow.end(); ++it)
+    for (auto it : prgpstrShow)
     {
-        auto objName = std::get<0>(*it);
-        auto objCount = std::get<1>(*it);
+        auto objName = std::get<0>(it);
+        auto objCount = std::get<1>(it);
         if (IS_NPC(ch) || IS_SET(ch->comm, COMM_COMBINE))
         {
             if (objCount != 1)
@@ -220,6 +219,9 @@ void show_list_to_char(OBJ_DATA *list, Character *ch, bool fShort, bool fShowNot
     }
     page_to_char(output.c_str(), ch);
     return;
+}
+void show_list_to_char(list<Object *> list, Character *ch, bool fShort, bool fShowNothing) {
+    show_list_to_char(vector<Object *>(list.begin(), list.end()), ch, fShort, fShowNothing);
 }
 
 void show_char_to_char_0(Character *victim, Character *ch)
@@ -261,7 +263,7 @@ void show_char_to_char_0(Character *victim, Character *ch)
     }
 
     strcat(buf, PERS(victim, ch));
-    if (!IS_NPC(victim) && !IS_SET(ch->comm, COMM_BRIEF) && victim->position == POS_STANDING && ch->on == NULL)
+    if (!IS_NPC(victim) && !IS_SET(ch->comm, COMM_BRIEF) && victim->position == POS_STANDING && ch->onObject() == NULL)
         strcat(buf, victim->pcdata->title);
 
     switch (victim->position)
@@ -279,24 +281,21 @@ void show_char_to_char_0(Character *victim, Character *ch)
         strcat(buf, " is lying here stunned.");
         break;
     case POS_SLEEPING:
-        if (victim->on != NULL)
+        if (victim->onObject() != NULL)
         {
-            if (IS_SET(victim->on->value[2], SLEEP_AT))
+            if (IS_SET(victim->onObject()->getValues().at(2), SLEEP_AT))
             {
-                snprintf(message, sizeof(message), " is sleeping at %s.",
-                         victim->on->short_descr);
+                snprintf(message, sizeof(message), " is sleeping at %s.", victim->onObject()->getShortDescription().c_str());
                 strcat(buf, message);
             }
-            else if (IS_SET(victim->on->value[2], SLEEP_ON))
+            else if (IS_SET(victim->onObject()->getValues().at(2), SLEEP_ON))
             {
-                snprintf(message, sizeof(message), " is sleeping on %s.",
-                         victim->on->short_descr);
+                snprintf(message, sizeof(message), " is sleeping on %s.", victim->onObject()->getShortDescription().c_str());
                 strcat(buf, message);
             }
             else
             {
-                snprintf(message, sizeof(message), " is sleeping in %s.",
-                         victim->on->short_descr);
+                snprintf(message, sizeof(message), " is sleeping in %s.", victim->onObject()->getShortDescription().c_str());
                 strcat(buf, message);
             }
         }
@@ -304,24 +303,21 @@ void show_char_to_char_0(Character *victim, Character *ch)
             strcat(buf, " is sleeping here.");
         break;
     case POS_RESTING:
-        if (victim->on != NULL)
+        if (victim->onObject() != NULL)
         {
-            if (IS_SET(victim->on->value[2], REST_AT))
+            if (IS_SET(victim->onObject()->getValues().at(2), REST_AT))
             {
-                snprintf(message, sizeof(message), " is resting at %s.",
-                         victim->on->short_descr);
+                snprintf(message, sizeof(message), " is resting at %s.", victim->onObject()->getShortDescription().c_str());
                 strcat(buf, message);
             }
-            else if (IS_SET(victim->on->value[2], REST_ON))
+            else if (IS_SET(victim->onObject()->getValues().at(2), REST_ON))
             {
-                snprintf(message, sizeof(message), " is resting on %s.",
-                         victim->on->short_descr);
+                snprintf(message, sizeof(message), " is resting on %s.", victim->onObject()->getShortDescription().c_str());
                 strcat(buf, message);
             }
             else
             {
-                snprintf(message, sizeof(message), " is resting in %s.",
-                         victim->on->short_descr);
+                snprintf(message, sizeof(message), " is resting in %s.", victim->onObject()->getShortDescription().c_str());
                 strcat(buf, message);
             }
         }
@@ -329,24 +325,21 @@ void show_char_to_char_0(Character *victim, Character *ch)
             strcat(buf, " is resting here.");
         break;
     case POS_SITTING:
-        if (victim->on != NULL)
+        if (victim->onObject() != NULL)
         {
-            if (IS_SET(victim->on->value[2], SIT_AT))
+            if (IS_SET(victim->onObject()->getValues().at(2), SIT_AT))
             {
-                snprintf(message, sizeof(message), " is sitting at %s.",
-                         victim->on->short_descr);
+                snprintf(message, sizeof(message), " is sitting at %s.", victim->onObject()->getShortDescription().c_str());
                 strcat(buf, message);
             }
-            else if (IS_SET(victim->on->value[2], SIT_ON))
+            else if (IS_SET(victim->onObject()->getValues().at(2), SIT_ON))
             {
-                snprintf(message, sizeof(message), " is sitting on %s.",
-                         victim->on->short_descr);
+                snprintf(message, sizeof(message), " is sitting on %s.", victim->onObject()->getShortDescription().c_str());
                 strcat(buf, message);
             }
             else
             {
-                snprintf(message, sizeof(message), " is sitting in %s.",
-                         victim->on->short_descr);
+                snprintf(message, sizeof(message), " is sitting in %s.", victim->onObject()->getShortDescription().c_str());
                 strcat(buf, message);
             }
         }
@@ -354,24 +347,21 @@ void show_char_to_char_0(Character *victim, Character *ch)
             strcat(buf, " is sitting here.");
         break;
     case POS_STANDING:
-        if (victim->on != NULL)
+        if (victim->onObject() != NULL)
         {
-            if (IS_SET(victim->on->value[2], STAND_AT))
+            if (IS_SET(victim->onObject()->getValues().at(2), STAND_AT))
             {
-                snprintf(message, sizeof(message), " is standing at %s.",
-                         victim->on->short_descr);
+                snprintf(message, sizeof(message), " is standing at %s.", victim->onObject()->getShortDescription().c_str());
                 strcat(buf, message);
             }
-            else if (IS_SET(victim->on->value[2], STAND_ON))
+            else if (IS_SET(victim->onObject()->getValues().at(2), STAND_ON))
             {
-                snprintf(message, sizeof(message), " is standing on %s.",
-                         victim->on->short_descr);
+                snprintf(message, sizeof(message), " is standing on %s.", victim->onObject()->getShortDescription().c_str());
                 strcat(buf, message);
             }
             else
             {
-                snprintf(message, sizeof(message), " is standing in %s.",
-                         victim->on->short_descr);
+                snprintf(message, sizeof(message), " is standing in %s.", victim->onObject()->getShortDescription().c_str());
                 strcat(buf, message);
             }
         }
@@ -405,7 +395,7 @@ void show_char_to_char_1(Character *victim, Character *ch)
     char buf[MAX_STRING_LENGTH];
     int percent;
 
-    if (can_see(victim, ch))
+    if (victim->can_see( ch))
     {
         if (ch == victim)
             act("$n looks at $mself.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
@@ -458,7 +448,7 @@ void show_char_to_char_1(Character *victim, Character *ch)
     {
         send_to_char("\n\rYou peek at the inventory:\n\r", ch);
         check_improve(ch, gsn_peek, TRUE, 4);
-        show_list_to_char(victim->carrying, ch, TRUE, TRUE);
+        show_list_to_char(victim->getCarrying(), ch, TRUE, TRUE);
     }
 
     return;
@@ -476,7 +466,7 @@ void show_char_to_char(Character *list, Character *ch)
         if (ch->getTrust() < rch->invis_level)
             continue;
 
-        if (can_see(ch, rch))
+        if (ch->can_see( rch))
         {
             show_char_to_char_0(rch, ch);
         }
@@ -952,8 +942,8 @@ void do_look(Character *ch, char *argument)
     char arg3[MAX_INPUT_LENGTH];
     EXIT_DATA *pexit;
     Character *victim;
-    OBJ_DATA *obj;
-    char *pdesc;
+    Object *obj;
+    string pdesc;
     int door;
     int number, count;
 
@@ -1034,26 +1024,26 @@ void do_look(Character *ch, char *argument)
             return;
         }
 
-        switch (obj->item_type)
+        switch (obj->getItemType())
         {
         default:
             send_to_char("That is not a container.\n\r", ch);
             break;
 
         case ITEM_DRINK_CON:
-            if (obj->value[1] <= 0)
+            if (obj->getValues().at(1) <= 0)
             {
                 send_to_char("It is empty.\n\r", ch);
                 break;
             }
 
             snprintf(buf, sizeof(buf), "It's %sfilled with  a %s liquid.\n\r",
-                     obj->value[1] < obj->value[0] / 4
+                     obj->getValues().at(1) < obj->getValues().at(0) / 4
                          ? "less than half-"
-                     : obj->value[1] < 3 * obj->value[0] / 4
+                     : obj->getValues().at(1) < 3 * obj->getValues().at(0) / 4
                          ? "about half-"
                          : "more than half-",
-                     liq_table[obj->value[2]].liq_color);
+                     liq_table[obj->getValues().at(2)].liq_color);
 
             send_to_char(buf, ch);
             break;
@@ -1061,14 +1051,14 @@ void do_look(Character *ch, char *argument)
         case ITEM_CONTAINER:
         case ITEM_CORPSE_NPC:
         case ITEM_CORPSE_PC:
-            if (IS_SET(obj->value[1], CONT_CLOSED))
+            if (IS_SET(obj->getValues().at(1), CONT_CLOSED))
             {
                 send_to_char("It is closed.\n\r", ch);
                 break;
             }
 
             act("$p holds:", ch, obj, NULL, TO_CHAR, POS_RESTING);
-            show_list_to_char(obj->contains, ch, TRUE, TRUE);
+            show_list_to_char(obj->getContents(), ch, TRUE, TRUE);
             break;
         }
         return;
@@ -1080,87 +1070,87 @@ void do_look(Character *ch, char *argument)
         return;
     }
 
-    for (obj = ch->carrying; obj != NULL; obj = obj->next_content)
+    for (auto obj : ch->getCarrying())
     {
-        if (can_see_obj(ch, obj))
+        if (ch->can_see( obj))
         { /* player can see object */
-            if (obj->item_type == ITEM_WINDOW)
+            if (obj->getItemType() == ITEM_WINDOW)
             /* Voltecs Window code */
             {
                 look_window(ch, obj);
                 return;
             }
 
-            pdesc = get_extra_descr(arg3, obj->extra_descr);
-            if (pdesc != NULL)
+            pdesc = ExtraDescription::getByKeyword(arg3, obj->getExtraDescriptions());
+            if (!pdesc.empty())
             {
                 if (++count == number)
                 {
-                    send_to_char(pdesc, ch);
+                    send_to_char(pdesc.c_str(), ch);
                     return;
                 }
                 else
                     continue;
             }
 
-            pdesc = get_extra_descr(arg3, obj->pIndexData->extra_descr);
-            if (pdesc != NULL)
+            pdesc = ExtraDescription::getByKeyword(arg3, obj->getObjectIndexData()->extra_descr);
+            if (!pdesc.empty())
             {
                 if (++count == number)
                 {
-                    send_to_char(pdesc, ch);
+                    send_to_char(pdesc.c_str(), ch);
                     return;
                 }
                 else
                     continue;
             }
 
-            if (is_name(arg3, obj->name))
+            if (is_name(arg3, obj->getName().c_str()))
                 if (++count == number)
                 {
-                    send_to_char(obj->description, ch);
+                    send_to_char(obj->getDescription().c_str(), ch);
                     send_to_char("\n\r", ch);
                     return;
                 }
         }
     }
 
-    for (obj = ch->in_room->contents; obj != NULL; obj = obj->next_content)
+    for (auto obj : ch->in_room->contents)
     {
-        if (can_see_obj(ch, obj))
+        if (ch->can_see( obj))
         {
-            pdesc = get_extra_descr(arg3, obj->extra_descr);
-            if (pdesc != NULL)
+            pdesc = ExtraDescription::getByKeyword(arg3, obj->getExtraDescriptions());
+            if (!pdesc.empty())
                 if (++count == number)
                 {
                     send_to_char(pdesc, ch);
                     return;
                 }
 
-            pdesc = get_extra_descr(arg3, obj->pIndexData->extra_descr);
-            if (pdesc != NULL)
+            pdesc = ExtraDescription::getByKeyword(arg3, obj->getObjectIndexData()->extra_descr);
+            if (!pdesc.empty())
                 if (++count == number)
                 {
-                    send_to_char(pdesc, ch);
+                    send_to_char(pdesc.c_str(), ch);
                     return;
                 }
 
-            if (is_name(arg3, obj->name))
+            if (is_name(arg3, obj->getName().c_str()))
                 if (++count == number)
                 {
-                    send_to_char(obj->description, ch);
+                    send_to_char(obj->getDescription().c_str(), ch);
                     send_to_char("\n\r", ch);
                     return;
                 }
         }
     }
 
-    pdesc = get_extra_descr(arg3, ch->in_room->extra_descr);
-    if (pdesc != NULL)
+    pdesc = ExtraDescription::getByKeyword(arg3, ch->in_room->extra_descr);
+    if (!pdesc.empty())
     {
         if (++count == number)
         {
-            send_to_char(pdesc, ch);
+            send_to_char(pdesc.c_str(), ch);
             return;
         }
     }
@@ -1231,7 +1221,7 @@ void do_examine(Character *ch, char *argument)
 {
     char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
-    OBJ_DATA *obj;
+    Object *obj;
 
     one_argument(argument, arg);
 
@@ -1245,7 +1235,7 @@ void do_examine(Character *ch, char *argument)
 
     if ((obj = get_obj_here(ch, arg)) != NULL)
     {
-        switch (obj->item_type)
+        switch (obj->getItemType())
         {
         default:
             break;
@@ -1255,28 +1245,28 @@ void do_examine(Character *ch, char *argument)
             break;
 
         case ITEM_MONEY:
-            if (obj->value[0] == 0)
+            if (obj->getValues().at(0) == 0)
             {
-                if (obj->value[1] == 0)
+                if (obj->getValues().at(1) == 0)
                     snprintf(buf, sizeof(buf), "Odd...there's no coins in the pile.\n\r");
-                else if (obj->value[1] == 1)
+                else if (obj->getValues().at(1) == 1)
                     snprintf(buf, sizeof(buf), "Wow. One gold coin.\n\r");
                 else
                     snprintf(buf, sizeof(buf), "There are %d gold coins in the pile.\n\r",
-                             obj->value[1]);
+                             obj->getValues().at(1));
             }
-            else if (obj->value[1] == 0)
+            else if (obj->getValues().at(1) == 0)
             {
-                if (obj->value[0] == 1)
+                if (obj->getValues().at(0) == 1)
                     snprintf(buf, sizeof(buf), "Wow. One silver coin.\n\r");
                 else
                     snprintf(buf, sizeof(buf), "There are %d silver coins in the pile.\n\r",
-                             obj->value[0]);
+                             obj->getValues().at(0));
             }
             else
                 snprintf(buf, sizeof(buf),
                          "There are %d gold and %d silver coins in the pile.\n\r",
-                         obj->value[1], obj->value[0]);
+                         obj->getValues().at(1), obj->getValues().at(0));
             send_to_char(buf, ch);
             break;
 
@@ -1610,10 +1600,10 @@ void do_affects(Character *ch, char *argument)
     AFFECT_DATA *paf, *paf_last = NULL;
     char buf[MAX_STRING_LENGTH];
 
-    if (ch->affected != NULL)
+    if (!ch->affected.empty())
     {
         send_to_char("You are affected by the following spells:\n\r", ch);
-        for (paf = ch->affected; paf != NULL; paf = paf->next)
+        for (auto paf : ch->affected)
         {
             if (paf_last != NULL && paf->type == paf_last->type)
             {
@@ -1819,12 +1809,12 @@ void do_whois(Character *ch, char *argument)
         string race;
         char const *class_name;
 
-        if (d->connected != ConnectedState::Playing || !can_see(ch, d->character))
+        if (d->connected != ConnectedState::Playing || !ch->can_see( d->character))
             continue;
 
         wch = (d->original != NULL) ? d->original : d->character;
 
-        if (!can_see(ch, wch))
+        if (!ch->can_see( wch))
             continue;
 
         if (!StringHelper::str_prefix(arg, wch->getName()))
@@ -2021,12 +2011,12 @@ void do_who(Character *ch, char *argument)
          * Check for match against restrictions.
          * Don't use trust as that exposes trusted mortals.
          */
-        if (d->connected != ConnectedState::Playing || !can_see(ch, d->character))
+        if (d->connected != ConnectedState::Playing || !ch->can_see( d->character))
             continue;
 
         wch = (d->original != NULL) ? d->original : d->character;
 
-        if (!can_see(ch, wch))
+        if (!ch->can_see( wch))
             continue;
 
         if (wch->level < iLevelLower || wch->level > iLevelUpper || (fImmortalOnly && wch->level < LEVEL_IMMORTAL) || (fClassRestrict && !rgfClass[wch->class_num]) || (fRaceRestrict && rgfRace.find(wch->getRace()->getName()) == rgfRace.end()) || (fClan && !IS_IMMORTAL(ch) && (!IS_CLANNED(wch) || (wch->pcdata->clan != ch->pcdata->clan && ch->in_room != wch->in_room))) || ((fClanRestrict && !IS_IMMORTAL(ch)) && (wch->pcdata->clan != ch->pcdata->clan && wch->in_room != ch->in_room)))
@@ -2114,7 +2104,7 @@ void do_count(Character *ch, char *argument)
     count = 0;
 
     for (d = descriptor_list; d != NULL; d = d->next)
-        if (d->connected == ConnectedState::Playing && can_see(ch, d->character))
+        if (d->connected == ConnectedState::Playing && ch->can_see( d->character))
             count++;
 
     max_on = UMAX(count, max_on);
@@ -2132,7 +2122,7 @@ void do_count(Character *ch, char *argument)
 void do_inventory(Character *ch, char *argument)
 {
     send_to_char("You are carrying:\n\r", ch);
-    show_list_to_char(ch->carrying, ch, TRUE, TRUE);
+    show_list_to_char(ch->getCarrying(), ch, TRUE, TRUE);
     return;
 }
 
@@ -2140,8 +2130,8 @@ void do_compare(Character *ch, char *argument)
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
-    OBJ_DATA *obj1;
-    OBJ_DATA *obj2;
+    Object *obj1;
+    Object *obj2;
     int value1;
     int value2;
     char *msg = new char[MAX_STRING_LENGTH];
@@ -2162,9 +2152,9 @@ void do_compare(Character *ch, char *argument)
 
     if (arg2[0] == '\0')
     {
-        for (obj2 = ch->carrying; obj2 != NULL; obj2 = obj2->next_content)
+        for (auto obj2 : ch->getCarrying())
         {
-            if (obj2->wear_loc != WEAR_NONE && can_see_obj(ch, obj2) && obj1->item_type == obj2->item_type && (obj1->wear_flags & obj2->wear_flags & ~ITEM_TAKE) != 0)
+            if (obj2->getWearLocation() != WEAR_NONE && ch->can_see( obj2) && obj1->getItemType() == obj2->getItemType() && (obj1->getWearFlags() & obj2->getWearFlags() & ~ITEM_TAKE) != 0)
                 break;
         }
 
@@ -2189,33 +2179,33 @@ void do_compare(Character *ch, char *argument)
     {
         strncpy(msg, "You compare $p to itself.  It looks about the same.", MAX_STRING_LENGTH);
     }
-    else if (obj1->item_type != obj2->item_type)
+    else if (obj1->getItemType() != obj2->getItemType())
     {
         strncpy(msg, "You can't compare $p and $P.", MAX_STRING_LENGTH);
     }
     else
     {
-        switch (obj1->item_type)
+        switch (obj1->getItemType())
         {
         default:
             strncpy(msg, "You can't compare $p and $P.", MAX_STRING_LENGTH);
             break;
 
         case ITEM_ARMOR:
-            value1 = obj1->value[0] + obj1->value[1] + obj1->value[2];
-            value2 = obj2->value[0] + obj2->value[1] + obj2->value[2];
+            value1 = obj1->getValues().at(0) + obj1->getValues().at(1) + obj1->getValues().at(2);
+            value2 = obj2->getValues().at(0) + obj2->getValues().at(1) + obj2->getValues().at(2);
             break;
 
         case ITEM_WEAPON:
-            if (obj1->pIndexData->new_format)
-                value1 = (1 + obj1->value[2]) * obj1->value[1];
+            if (obj1->getObjectIndexData()->new_format)
+                value1 = (1 + obj1->getValues().at(2) * obj1->getValues().at(1));
             else
-                value1 = obj1->value[1] + obj1->value[2];
+                value1 = obj1->getValues().at(1) + obj1->getValues().at(2);
 
-            if (obj2->pIndexData->new_format)
-                value2 = (1 + obj2->value[2]) * obj2->value[1];
+            if (obj2->getObjectIndexData()->new_format)
+                value2 = (1 + obj2->getValues().at(2) * obj2->getValues().at(1));
             else
-                value2 = obj2->value[1] + obj2->value[2];
+                value2 = obj2->getValues().at(1) + obj2->getValues().at(2);
             break;
         }
     }
@@ -2257,7 +2247,7 @@ void do_where(Character *ch, char *argument)
         found = FALSE;
         for (d = descriptor_list; d; d = d->next)
         {
-            if (d->connected == ConnectedState::Playing && (victim = d->character) != NULL && !IS_NPC(victim) && victim->in_room != NULL && !IS_SET(victim->in_room->room_flags, ROOM_NOWHERE) && (is_room_owner(ch, victim->in_room) || !room_is_private(victim->in_room)) && victim->in_room->area == ch->in_room->area && can_see(ch, victim))
+            if (d->connected == ConnectedState::Playing && (victim = d->character) != NULL && !IS_NPC(victim) && victim->in_room != NULL && !IS_SET(victim->in_room->room_flags, ROOM_NOWHERE) && (is_room_owner(ch, victim->in_room) || !room_is_private(victim->in_room)) && victim->in_room->area == ch->in_room->area && ch->can_see( victim))
             {
                 found = TRUE;
                 snprintf(buf, sizeof(buf), "%-28s %s\n\r",
@@ -2274,7 +2264,7 @@ void do_where(Character *ch, char *argument)
         for (std::list<Character *>::iterator it = char_list.begin(); it != char_list.end(); it++)
         {
             victim = *it;
-            if (victim->in_room != NULL && victim->in_room->area == ch->in_room->area && !IS_AFFECTED(victim, AFF_HIDE) && !IS_AFFECTED(victim, AFF_SNEAK) && can_see(ch, victim) && is_name(arg, victim->getName().c_str()))
+            if (victim->in_room != NULL && victim->in_room->area == ch->in_room->area && !IS_AFFECTED(victim, AFF_HIDE) && !IS_AFFECTED(victim, AFF_SNEAK) && ch->can_see( victim) && is_name(arg, victim->getName().c_str()))
             {
                 found = TRUE;
                 snprintf(buf, sizeof(buf), "%-28s %s\n\r",
@@ -2707,24 +2697,24 @@ void do_password(Character *ch, char *argument)
     return;
 }
 
-void look_window(Character *ch, OBJ_DATA *obj) /* Voltecs Window code 1998 */
+void look_window(Character *ch, Object *obj) /* Voltecs Window code 1998 */
 {
     char buf[MAX_STRING_LENGTH];
     ROOM_INDEX_DATA *window_room;
 
-    if (obj->value[0] == 0)
+    if (obj->getValues().at(0) == 0)
     {
-        snprintf(buf, sizeof(buf), "%s\n\r", obj->description);
+        snprintf(buf, sizeof(buf), "%s\n\r", obj->getDescription().c_str());
         send_to_char(buf, ch);
         return;
     }
 
-    window_room = get_room_index(obj->value[0]);
+    window_room = get_room_index(obj->getValues().at(0));
 
     if (window_room == NULL)
     {
         send_to_char("!!BUG!! Window looks into a NULL room! Please report!\n\r", ch);
-        bug("Window %d looks into a null room!!!", obj->pIndexData->vnum);
+        bug("Window %d looks into a null room!!!", obj->getObjectIndexData()->vnum);
         return;
     }
 
@@ -2764,7 +2754,7 @@ void do_nw(Character *ch, char *argument)
     {
         PlayerCharacter *wch = (PlayerCharacter *)d->character;
 
-        if (d->connected != ConnectedState::Playing || !can_see(ch, wch))
+        if (d->connected != ConnectedState::Playing || !ch->can_see( wch))
             continue;
 
         snprintf(buf, sizeof(buf), "%-15s %-15d\n\r", wch->getName().c_str(), nw_lookup(wch));
@@ -2772,14 +2762,14 @@ void do_nw(Character *ch, char *argument)
     }
 }
 
-const char *eq_worn(Character *ch, int iWear)
+string eq_worn(Character *ch, int iWear)
 {
-    OBJ_DATA *obj;
+    Object *obj;
 
-    if ((obj = get_eq_char(ch, iWear)) != NULL)
+    if ((obj = ch->getEquipment(iWear)) != NULL)
     {
 
-        if (can_see_obj(ch, obj))
+        if (ch->can_see( obj))
         {
             return (format_obj_to_char(obj, ch, TRUE));
         }
@@ -2818,7 +2808,7 @@ void do_lore(Character *ch, char *argument)
 {
     char object_name[MAX_INPUT_LENGTH + 100];
 
-    OBJ_DATA *obj;
+    Object *obj;
     argument = one_argument(argument, object_name);
     if ((obj = get_obj_carry(ch, object_name, ch)) == NULL)
     {
@@ -2828,51 +2818,51 @@ void do_lore(Character *ch, char *argument)
 
     send_to_char("You ponder the item.\n\r", ch);
     if (number_percent() < get_skill(ch, gsn_lore) &&
-        ch->level >= obj->level)
+        ch->level >= obj->getLevel())
     {
 
         printf_to_char(ch,
                        "Object '%s' is type %s, extra flags %s.\n\rWeight is %d, value is %d, level is %d.\n\r",
 
-                       obj->name,
-                       item_name(obj->item_type),
-                       extra_bit_name(obj->extra_flags),
-                       obj->weight / 10,
-                       obj->cost,
-                       obj->level);
+                       obj->getName().c_str(),
+                       item_name(obj->getItemType()),
+                       extra_bit_name(obj->getExtraFlags()),
+                       obj->getWeight() / 10,
+                       obj->getCost(),
+                       obj->getLevel());
 
-        switch (obj->item_type)
+        switch (obj->getItemType())
         {
         case ITEM_SCROLL:
         case ITEM_POTION:
         case ITEM_PILL:
             printf_to_char(ch, "Some level spells of:");
 
-            if (obj->value[1] >= 0 && obj->value[1] < MAX_SKILL)
+            if (obj->getValues().at(1) >= 0 && obj->getValues().at(1) < MAX_SKILL)
             {
                 send_to_char(" '", ch);
-                send_to_char(skill_table[obj->value[1]].name, ch);
+                send_to_char(skill_table[obj->getValues().at(1)].name, ch);
                 send_to_char("'", ch);
             }
 
-            if (obj->value[2] >= 0 && obj->value[2] < MAX_SKILL)
+            if (obj->getValues().at(2) >= 0 && obj->getValues().at(2) < MAX_SKILL)
             {
                 send_to_char(" '", ch);
-                send_to_char(skill_table[obj->value[2]].name, ch);
+                send_to_char(skill_table[obj->getValues().at(2)].name, ch);
                 send_to_char("'", ch);
             }
 
-            if (obj->value[3] >= 0 && obj->value[3] < MAX_SKILL)
+            if (obj->getValues().at(3) >= 0 && obj->getValues().at(3) < MAX_SKILL)
             {
                 send_to_char(" '", ch);
-                send_to_char(skill_table[obj->value[3]].name, ch);
+                send_to_char(skill_table[obj->getValues().at(3)].name, ch);
                 send_to_char("'", ch);
             }
 
-            if (obj->value[4] >= 0 && obj->value[4] < MAX_SKILL)
+            if (obj->getValues().at(4) >= 0 && obj->getValues().at(4) < MAX_SKILL)
             {
                 send_to_char(" '", ch);
-                send_to_char(skill_table[obj->value[4]].name, ch);
+                send_to_char(skill_table[obj->getValues().at(4)].name, ch);
                 send_to_char("'", ch);
             }
 
@@ -2883,10 +2873,10 @@ void do_lore(Character *ch, char *argument)
         case ITEM_STAFF:
             printf_to_char(ch, "Has some charges of some level");
 
-            if (obj->value[3] >= 0 && obj->value[3] < MAX_SKILL)
+            if (obj->getValues().at(3) >= 0 && obj->getValues().at(3) < MAX_SKILL)
             {
                 send_to_char(" '", ch);
-                send_to_char(skill_table[obj->value[3]].name, ch);
+                send_to_char(skill_table[obj->getValues().at(3)].name, ch);
                 send_to_char("'", ch);
             }
 
@@ -2895,23 +2885,23 @@ void do_lore(Character *ch, char *argument)
 
         case ITEM_DRINK_CON:
             printf_to_char(ch, "It holds %s-colored %s.\n\r",
-                           liq_table[obj->value[2]].liq_color,
-                           liq_table[obj->value[2]].liq_name);
+                           liq_table[obj->getValues().at(2)].liq_color,
+                           liq_table[obj->getValues().at(2)].liq_name);
             break;
 
         case ITEM_CONTAINER:
             printf_to_char(ch, "Capacity: %d#  Maximum weight: %d#  flags: %s\n\r",
-                           obj->value[0], obj->value[3], cont_bit_name(obj->value[1]));
-            if (obj->value[4] != 100)
+                           obj->getValues().at(0), obj->getValues().at(3), cont_bit_name(obj->getValues().at(1)));
+            if (obj->getValues().at(4) != 100)
             {
                 printf_to_char(ch, "Weight multiplier: %d%%\n\r",
-                               obj->value[4]);
+                               obj->getValues().at(4));
             }
             break;
 
         case ITEM_WEAPON:
             send_to_char("Weapon type is ", ch);
-            switch (obj->value[0])
+            switch (obj->getValues().at(0))
             {
             case (WEAPON_EXOTIC):
                 send_to_char("exotic.\n\r", ch);
@@ -2944,24 +2934,24 @@ void do_lore(Character *ch, char *argument)
                 send_to_char("unknown.\n\r", ch);
                 break;
             }
-            if (obj->pIndexData->new_format)
+            if (obj->getObjectIndexData()->new_format)
                 printf_to_char(ch, "Damage is %dd%d (average %d).\n\r",
-                               obj->value[1], obj->value[2],
-                               (1 + obj->value[2]) * obj->value[1] / 2);
+                               obj->getValues().at(1), obj->getValues().at(2),
+                               (1 + obj->getValues().at(2)) * obj->getValues().at(1) / 2);
             else
                 printf_to_char(ch, "Damage is %d to %d (average %d).\n\r",
-                               obj->value[1], obj->value[2],
-                               (obj->value[1] + obj->value[2]) / 2);
-            if (obj->value[4]) /* weapon flags */
+                               obj->getValues().at(1), obj->getValues().at(2),
+                               (obj->getValues().at(1) + obj->getValues().at(2)) / 2);
+            if (obj->getValues().at(4)) /* weapon flags */
             {
-                printf_to_char(ch, "Weapons flags: %s\n\r", weapon_bit_name(obj->value[4]));
+                printf_to_char(ch, "Weapons flags: %s\n\r", weapon_bit_name(obj->getValues().at(4)));
             }
             break;
 
         case ITEM_ARMOR:
             printf_to_char(ch,
                            "Armor class is %d pierce, %d bash, %d slash, and %d vs. magic.\n\r",
-                           obj->value[0], obj->value[1], obj->value[2], obj->value[3]);
+                           obj->getValues().at(0), obj->getValues().at(1), obj->getValues().at(2), obj->getValues().at(3));
             break;
         }
     }
@@ -2972,46 +2962,46 @@ void do_lore(Character *ch, char *argument)
    ch1 is the person seeing the list */
 void show_eq_char(Character *ch, Character *ch1)
 {
-    if (get_eq_char(ch, WEAR_FLOAT) != NULL)
-        printf_to_char(ch1, "{CF{Wloatin{Cg {g: {x%-40s\n\r", eq_worn(ch, WEAR_FLOAT));
-    if (get_eq_char(ch, WEAR_LIGHT) != NULL)
-        printf_to_char(ch1, "{CL{Wigh{Ct    {g: {x%-40s\n\r", eq_worn(ch, WEAR_LIGHT));
-    if (get_eq_char(ch, WEAR_HEAD) != NULL)
-        printf_to_char(ch1, "{CH{Wea{Cd     {g: {x%-40s\n\r", eq_worn(ch, WEAR_HEAD));
-    if (get_eq_char(ch, WEAR_NECK_1) != NULL)
-        printf_to_char(ch1, "{CN{Wec{Ck     {g: {x%-40s\n\r", eq_worn(ch, WEAR_NECK_1));
-    if (get_eq_char(ch, WEAR_NECK_2) != NULL)
-        printf_to_char(ch1, "{CN{Wec{Ck     {g: {x%-40s\n\r", eq_worn(ch, WEAR_NECK_2));
-    if (get_eq_char(ch, WEAR_BODY) != NULL)
-        printf_to_char(ch1, "{CB{Wod{Cy     {g: {x%-40s\n\r", eq_worn(ch, WEAR_BODY));
-    if (get_eq_char(ch, WEAR_ABOUT) != NULL)
-        printf_to_char(ch1, "{CT{Wors{Co    {g: {x%-40s\n\r", eq_worn(ch, WEAR_ABOUT));
-    if (get_eq_char(ch, WEAR_ARMS) != NULL)
-        printf_to_char(ch1, "{CA{Wrm{Cs     {g: {x%-40s\n\r", eq_worn(ch, WEAR_ARMS));
-    if (get_eq_char(ch, WEAR_WRIST_L) != NULL)
-        printf_to_char(ch1, "{CW{Wris{Ct    {g: {x%-40s\n\r", eq_worn(ch, WEAR_WRIST_L));
-    if (get_eq_char(ch, WEAR_WRIST_R) != NULL)
-        printf_to_char(ch1, "{CW{Wris{Ct    {g: {x%-40s\n\r", eq_worn(ch, WEAR_WRIST_R));
-    if (get_eq_char(ch, WEAR_HANDS) != NULL)
-        printf_to_char(ch1, "{CH{Wand{Cs    {g: {x%-40s\n\r", eq_worn(ch, WEAR_HANDS));
-    if (get_eq_char(ch, WEAR_BOMB) != NULL)
-        printf_to_char(ch1, "{CB{Wom{Cb     {g: {x%-40s\n\r", eq_worn(ch, WEAR_BOMB));
-    if (get_eq_char(ch, WEAR_FINGER_L) != NULL)
-        printf_to_char(ch1, "{CF{Winge{Cr   {g: {x%-40s\n\r", eq_worn(ch, WEAR_FINGER_L));
-    if (get_eq_char(ch, WEAR_FINGER_R) != NULL)
-        printf_to_char(ch1, "{CF{Winge{Cr   {g: {x%-40s\n\r", eq_worn(ch, WEAR_FINGER_R));
-    if (get_eq_char(ch, WEAR_WAIST) != NULL)
-        printf_to_char(ch1, "{CW{Wais{Ct    {g: {x%-40s\n\r", eq_worn(ch, WEAR_WAIST));
-    if (get_eq_char(ch, WEAR_WIELD) != NULL)
-        printf_to_char(ch1, "{CP{Wrimar{Cy  {g: {x%-40s\n\r", eq_worn(ch, WEAR_WIELD));
-    if (get_eq_char(ch, WEAR_SECONDARY) != NULL)
-        printf_to_char(ch1, "{CO{WffHan{Cd{x  {g: {x%-40s\n\r", eq_worn(ch, WEAR_SECONDARY));
-    if (get_eq_char(ch, WEAR_SHIELD) != NULL)
-        printf_to_char(ch1, "{CS{Whiel{Cd   {g: {x%-40s\n\r", eq_worn(ch, WEAR_SHIELD));
-    if (get_eq_char(ch, WEAR_HOLD) != NULL)
-        printf_to_char(ch1, "{CH{Wel{Cd     {g: {x%-40s\n\r", eq_worn(ch, WEAR_HOLD));
-    if (get_eq_char(ch, WEAR_LEGS) != NULL)
-        printf_to_char(ch1, "{CL{Weg{Cs     {g: {x%-40s\n\r", eq_worn(ch, WEAR_LEGS));
-    if (get_eq_char(ch, WEAR_FEET) != NULL)
-        printf_to_char(ch1, "{CF{Wee{Ct     {g: {x%-40s\n\r", eq_worn(ch, WEAR_FEET));
+    if (ch->getEquipment(WEAR_FLOAT) != NULL)
+        printf_to_char(ch1, "{CF{Wloatin{Cg {g: {x%-40s\n\r", eq_worn(ch, WEAR_FLOAT).c_str());
+    if (ch->getEquipment(WEAR_LIGHT) != NULL)
+        printf_to_char(ch1, "{CL{Wigh{Ct    {g: {x%-40s\n\r", eq_worn(ch, WEAR_LIGHT).c_str());
+    if (ch->getEquipment(WEAR_HEAD) != NULL)
+        printf_to_char(ch1, "{CH{Wea{Cd     {g: {x%-40s\n\r", eq_worn(ch, WEAR_HEAD).c_str());
+    if (ch->getEquipment(WEAR_NECK_1) != NULL)
+        printf_to_char(ch1, "{CN{Wec{Ck     {g: {x%-40s\n\r", eq_worn(ch, WEAR_NECK_1).c_str());
+    if (ch->getEquipment(WEAR_NECK_2) != NULL)
+        printf_to_char(ch1, "{CN{Wec{Ck     {g: {x%-40s\n\r", eq_worn(ch, WEAR_NECK_2).c_str());
+    if (ch->getEquipment(WEAR_BODY) != NULL)
+        printf_to_char(ch1, "{CB{Wod{Cy     {g: {x%-40s\n\r", eq_worn(ch, WEAR_BODY).c_str());
+    if (ch->getEquipment(WEAR_ABOUT) != NULL)
+        printf_to_char(ch1, "{CT{Wors{Co    {g: {x%-40s\n\r", eq_worn(ch, WEAR_ABOUT).c_str());
+    if (ch->getEquipment(WEAR_ARMS) != NULL)
+        printf_to_char(ch1, "{CA{Wrm{Cs     {g: {x%-40s\n\r", eq_worn(ch, WEAR_ARMS).c_str());
+    if (ch->getEquipment(WEAR_WRIST_L) != NULL)
+        printf_to_char(ch1, "{CW{Wris{Ct    {g: {x%-40s\n\r", eq_worn(ch, WEAR_WRIST_L).c_str());
+    if (ch->getEquipment(WEAR_WRIST_R) != NULL)
+        printf_to_char(ch1, "{CW{Wris{Ct    {g: {x%-40s\n\r", eq_worn(ch, WEAR_WRIST_R).c_str());
+    if (ch->getEquipment(WEAR_HANDS) != NULL)
+        printf_to_char(ch1, "{CH{Wand{Cs    {g: {x%-40s\n\r", eq_worn(ch, WEAR_HANDS).c_str());
+    if (ch->getEquipment(WEAR_BOMB) != NULL)
+        printf_to_char(ch1, "{CB{Wom{Cb     {g: {x%-40s\n\r", eq_worn(ch, WEAR_BOMB).c_str());
+    if (ch->getEquipment(WEAR_FINGER_L) != NULL)
+        printf_to_char(ch1, "{CF{Winge{Cr   {g: {x%-40s\n\r", eq_worn(ch, WEAR_FINGER_L).c_str());
+    if (ch->getEquipment(WEAR_FINGER_R) != NULL)
+        printf_to_char(ch1, "{CF{Winge{Cr   {g: {x%-40s\n\r", eq_worn(ch, WEAR_FINGER_R).c_str());
+    if (ch->getEquipment(WEAR_WAIST) != NULL)
+        printf_to_char(ch1, "{CW{Wais{Ct    {g: {x%-40s\n\r", eq_worn(ch, WEAR_WAIST).c_str());
+    if (ch->getEquipment(WEAR_WIELD) != NULL)
+        printf_to_char(ch1, "{CP{Wrimar{Cy  {g: {x%-40s\n\r", eq_worn(ch, WEAR_WIELD).c_str());
+    if (ch->getEquipment(WEAR_SECONDARY) != NULL)
+        printf_to_char(ch1, "{CO{WffHan{Cd{x  {g: {x%-40s\n\r", eq_worn(ch, WEAR_SECONDARY).c_str());
+    if (ch->getEquipment(WEAR_SHIELD) != NULL)
+        printf_to_char(ch1, "{CS{Whiel{Cd   {g: {x%-40s\n\r", eq_worn(ch, WEAR_SHIELD).c_str());
+    if (ch->getEquipment(WEAR_HOLD) != NULL)
+        printf_to_char(ch1, "{CH{Wel{Cd     {g: {x%-40s\n\r", eq_worn(ch, WEAR_HOLD).c_str());
+    if (ch->getEquipment(WEAR_LEGS) != NULL)
+        printf_to_char(ch1, "{CL{Weg{Cs     {g: {x%-40s\n\r", eq_worn(ch, WEAR_LEGS).c_str());
+    if (ch->getEquipment(WEAR_FEET) != NULL)
+        printf_to_char(ch1, "{CF{Wee{Ct     {g: {x%-40s\n\r", eq_worn(ch, WEAR_FEET).c_str());
 }

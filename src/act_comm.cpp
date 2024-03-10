@@ -42,6 +42,7 @@
 #include "ILogger.h"
 #include "NonPlayerCharacter.h"
 #include "PlayerCharacter.h"
+#include "Room.h"
 #include "SocketHelper.h"
 #include "StringHelper.h"
 #include "Wiznet.h"
@@ -1519,7 +1520,7 @@ void add_follower( Character *ch, Character *master )
     ch->master        = master;
     ch->leader        = NULL;
 
-    if ( can_see( master, ch ) )
+    if ( master->can_see( ch ) )
 	act( "$n now follows you.", ch, NULL, master, TO_VICT, POS_RESTING );
 
     act( "You now follow $N.",  ch, NULL, master, TO_CHAR, POS_RESTING );
@@ -1543,7 +1544,7 @@ void stop_follower( Character *ch )
 	affect_strip( ch, gsn_charm_person );
     }
 
-    if ( can_see( ch->master, ch ) && ch->in_room != NULL)
+    if ( ch->master->can_see( ch ) && ch->in_room != NULL)
     {
 	    act( "$n stops following you.",     ch, NULL, ch->master, TO_VICT, POS_RESTING    );
     	act( "You stop following $N.",      ch, NULL, ch->master, TO_CHAR, POS_RESTING    );

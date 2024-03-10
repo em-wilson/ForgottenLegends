@@ -3,8 +3,8 @@
 
 class ILogger {
     public:
-        virtual void log_string( const char *str ) = 0;
-        virtual void log_stringf(const char *fmt, ...) = 0;
+        virtual void log_string( const std::string str ) = 0;
+        virtual void log_stringf(const std::string fmt, ...) = 0;
 };
 
 #endif

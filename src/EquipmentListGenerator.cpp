@@ -248,7 +248,7 @@ std::string EquipmentListGenerator::itemJson(OBJ_INDEX_DATA *obj) {
     }
 
     std::vector<std::string> modifiers;
-    for ( auto paf = obj->affected; paf; paf = paf->next )
+    for ( auto paf : obj->affected )
     {
         std::ostringstream modifier;
         modifier << (paf->modifier > 0 ? "+" : "") << paf->modifier << flag_string( apply_flags, paf->location );

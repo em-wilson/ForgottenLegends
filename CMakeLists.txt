@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Add include path for cmake modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
+set(CMAKE_BUILD_TYPE Debug)
 
 set(LIB_LIST cryptlib.lib
             cryptlibd.lib)
@@ -51,6 +52,7 @@ set(SOURCE_FILES
     src/Descriptor.h
     src/effects.cpp
     src/EquipmentListGenerator.cpp src/EquipmentListGenerator.h
+    src/ExtraDescription.cpp src/ExtraDescription.h
     src/enums/ConnectedState.h
     src/FileLogger.cpp src/FileLogger.h
     src/fight.cpp
@@ -74,29 +76,31 @@ set(SOURCE_FILES
     src/music.cpp src/music.h
     src/NonPlayerCharacter.cpp src/NonPlayerCharacter.h
     src/Note.cpp src/Note.h
-    src/olc.cpp src/olc.h
-    src/olc_act.cpp
-    src/olc_mpcode.cpp
-    src/olc_save.cpp
+    src/Object.cpp src/Object.h
+    src/ObjectHelper.cpp src/ObjectHelper.h
     src/pc_data.cpp src/pc_data.h
     src/PlayerCharacter.cpp src/PlayerCharacter.h
     src/PlayerRace.cpp src/PlayerRace.h
+    src/Portal.cpp src/Portal.h
     src/Race.cpp src/Race.h
     src/RaceReader.cpp src/RaceReader.h
     src/RaceWriter.cpp src/RaceWriter.h
     src/RaceManager.cpp src/RaceManager.h
     src/recycle.cpp src/recycle.h
+    src/Room.cpp src/Room.h
     src/RoomManager.cpp src/RoomManager.h
     src/save.cpp
     src/scan.cpp
     src/search.cpp
     src/skills.cpp
+    src/ShopKeeper.cpp src/ShopKeeper.h
     src/special.cpp
-    src/string.cpp
     src/tables.cpp src/tables.h
     src/telnet.h
     src/update.cpp
     src/Wiznet.cpp src/Wiznet.h
+    src/olc_legacy.cpp
+
 )
 
 set(TEST_FILES

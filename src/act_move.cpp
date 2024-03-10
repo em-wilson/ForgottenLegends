@@ -31,7 +31,10 @@
 #include <string.h>
 #include "merc.h"
 #include "NonPlayerCharacter.h"
+#include "Object.h"
+#include "ObjectHelper.h"
 #include "RaceManager.h"
+#include "Room.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_look		);
@@ -149,7 +152,6 @@ void move_char( Character *ch, int door, bool follow )
 	||    to_room->sector_type == SECT_WATER_NOSWIM )
   	&&    !IS_AFFECTED(ch,AFF_FLYING))
 	{
-	    OBJ_DATA *obj;
 	    bool found;
 
 	    /*
@@ -160,18 +162,19 @@ void move_char( Character *ch, int door, bool follow )
 	    if (IS_IMMORTAL(ch))
 		found = TRUE;
 
-	    for ( obj = ch->carrying; obj != NULL; obj = obj->next_content )
+	    for ( auto obj : ch->getCarrying() )
 	    {
-		if ( obj->item_type == ITEM_BOAT )
-		{
-		    found = TRUE;
-		    break;
-		}
+			if ( obj->getItemType() == ITEM_BOAT )
+			{
+				found = TRUE;
+				break;
+			}
 	    }
+
 	    if ( !found )
 	    {
-		send_to_char( "You need a boat to go there.\n\r", ch );
-		return;
+			send_to_char( "You need a boat to go there.\n\r", ch );
+			return;
 	    }
 	}
 
@@ -208,7 +211,7 @@ void move_char( Character *ch, int door, bool follow )
 	    if (IS_BUNNY(fch))
 	    {
 		char buf[MSL];
-		snprintf(buf, sizeof(buf),"%s leaves %s.\n\r", can_see(ch,fch) ? ch->getName().c_str() : "someone", dir_name[door] );
+		snprintf(buf, sizeof(buf),"%s leaves %s.\n\r", ch->can_see(fch) ? ch->getName().c_str() : "someone", dir_name[door] );
 		send_to_char(buf,ch);
 	    }
 
@@ -360,7 +363,7 @@ int find_door( Character *ch, char *arg )
 void do_open( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    OBJ_DATA *obj;
+    Object *obj;
     int door;
 
     one_argument( argument, arg );
@@ -374,43 +377,43 @@ void do_open( Character *ch, char *argument )
     if ( ( obj = get_obj_here( ch, arg ) ) != NULL )
     {
  	/* open portal */
-	if (obj->item_type == ITEM_PORTAL)
+	if (obj->getItemType() == ITEM_PORTAL)
 	{
-	    if (!IS_SET(obj->value[1], EX_ISDOOR))
+	    if (!IS_SET(obj->getValues().at(1), EX_ISDOOR))
 	    {
 		send_to_char("You can't do that.\n\r",ch);
 		return;
 	    }
 
-	    if (!IS_SET(obj->value[1], EX_CLOSED))
+	    if (!IS_SET(obj->getValues().at(1), EX_CLOSED))
 	    {
 		send_to_char("It's already open.\n\r",ch);
 		return;
 	    }
 
-	    if (IS_SET(obj->value[1], EX_LOCKED))
+	    if (IS_SET(obj->getValues().at(1), EX_LOCKED))
 	    {
 		send_to_char("It's locked.\n\r",ch);
 		return;
 	    }
 
-	    REMOVE_BIT(obj->value[1], EX_CLOSED);
+	    REMOVE_BIT(obj->getValues().at(1), EX_CLOSED);
 	    act("You open $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n opens $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    return;
  	}
 
 	/* 'open object' */
-	if ( obj->item_type != ITEM_CONTAINER)
+	if ( obj->getItemType() != ITEM_CONTAINER)
 	    { send_to_char( "That's not a container.\n\r", ch ); return; }
-	if ( !IS_SET(obj->value[1], CONT_CLOSED) )
+	if ( !IS_SET(obj->getValues().at(1), CONT_CLOSED) )
 	    { send_to_char( "It's already open.\n\r",      ch ); return; }
-	if ( !IS_SET(obj->value[1], CONT_CLOSEABLE) )
+	if ( !IS_SET(obj->getValues().at(1), CONT_CLOSEABLE) )
 	    { send_to_char( "You can't do that.\n\r",      ch ); return; }
-	if ( IS_SET(obj->value[1], CONT_LOCKED) )
+	if ( IS_SET(obj->getValues().at(1), CONT_LOCKED) )
 	    { send_to_char( "It's locked.\n\r",            ch ); return; }
 
-	REMOVE_BIT(obj->value[1], CONT_CLOSED);
+	REMOVE_BIT(obj->getValues().at(1), CONT_CLOSED);
 	act("You open $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	act( "$n opens $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
 	return;
@@ -454,7 +457,7 @@ void do_open( Character *ch, char *argument )
 void do_close( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    OBJ_DATA *obj;
+    Object *obj;
     int door;
 
     one_argument( argument, arg );
@@ -468,37 +471,37 @@ void do_close( Character *ch, char *argument )
     if ( ( obj = get_obj_here( ch, arg ) ) != NULL )
     {
 	/* portal stuff */
-	if (obj->item_type == ITEM_PORTAL)
+	if (obj->getItemType() == ITEM_PORTAL)
 	{
 
-	    if (!IS_SET(obj->value[1],EX_ISDOOR)
-	    ||   IS_SET(obj->value[1],EX_NOCLOSE))
+	    if (!IS_SET(obj->getValues().at(1),EX_ISDOOR)
+	    ||   IS_SET(obj->getValues().at(1),EX_NOCLOSE))
 	    {
 		send_to_char("You can't do that.\n\r",ch);
 		return;
 	    }
 
-	    if (IS_SET(obj->value[1],EX_CLOSED))
+	    if (IS_SET(obj->getValues().at(1),EX_CLOSED))
 	    {
 		send_to_char("It's already closed.\n\r",ch);
 		return;
 	    }
 
-	    SET_BIT(obj->value[1],EX_CLOSED);
+	    SET_BIT(obj->getValues().at(1),EX_CLOSED);
 	    act("You close $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n closes $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    return;
 	}
 
 	/* 'close object' */
-	if ( obj->item_type != ITEM_CONTAINER )
+	if ( obj->getItemType() != ITEM_CONTAINER )
 	    { send_to_char( "That's not a container.\n\r", ch ); return; }
-	if ( IS_SET(obj->value[1], CONT_CLOSED) )
+	if ( IS_SET(obj->getValues().at(1), CONT_CLOSED) )
 	    { send_to_char( "It's already closed.\n\r",    ch ); return; }
-	if ( !IS_SET(obj->value[1], CONT_CLOSEABLE) )
+	if ( !IS_SET(obj->getValues().at(1), CONT_CLOSEABLE) )
 	    { send_to_char( "You can't do that.\n\r",      ch ); return; }
 
-	SET_BIT(obj->value[1], CONT_CLOSED);
+	SET_BIT(obj->getValues().at(1), CONT_CLOSED);
 	act("You close $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	act( "$n closes $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
 	return;
@@ -539,15 +542,13 @@ void do_close( Character *ch, char *argument )
 
 bool has_key( Character *ch, int key )
 {
-    OBJ_DATA *obj;
-
-    for ( obj = ch->carrying; obj != NULL; obj = obj->next_content )
+    for ( auto obj : ch->getCarrying() )
     {
-	if ( obj->pIndexData->vnum == key )
-	    return TRUE;
-    }
+		if ( obj->getObjectIndexData()->vnum == key )
+			return true;
+		}
 
-    return FALSE;
+    return false;
 }
 
 
@@ -555,7 +556,7 @@ bool has_key( Character *ch, int key )
 void do_lock( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    OBJ_DATA *obj;
+    Object *obj;
     int door;
 
     one_argument( argument, arg );
@@ -569,57 +570,57 @@ void do_lock( Character *ch, char *argument )
     if ( ( obj = get_obj_here( ch, arg ) ) != NULL )
     {
 	/* portal stuff */
-	if (obj->item_type == ITEM_PORTAL)
+	if (obj->getItemType() == ITEM_PORTAL)
 	{
-	    if (!IS_SET(obj->value[1],EX_ISDOOR)
-	    ||  IS_SET(obj->value[1],EX_NOCLOSE))
+	    if (!IS_SET(obj->getValues().at(1),EX_ISDOOR)
+	    ||  IS_SET(obj->getValues().at(1),EX_NOCLOSE))
 	    {
 		send_to_char("You can't do that.\n\r",ch);
 		return;
 	    }
-	    if (!IS_SET(obj->value[1],EX_CLOSED))
+	    if (!IS_SET(obj->getValues().at(1),EX_CLOSED))
 	    {
 		send_to_char("It's not closed.\n\r",ch);
 	 	return;
 	    }
 
-	    if (obj->value[4] < 0 || IS_SET(obj->value[1],EX_NOLOCK))
+	    if (obj->getValues().at(4) < 0 || IS_SET(obj->getValues().at(1),EX_NOLOCK))
 	    {
 		send_to_char("It can't be locked.\n\r",ch);
 		return;
 	    }
 
-	    if (!has_key(ch,obj->value[4]))
+	    if (!has_key(ch,obj->getValues().at(4)))
 	    {
 		send_to_char("You lack the key.\n\r",ch);
 		return;
 	    }
 
-	    if (IS_SET(obj->value[1],EX_LOCKED))
+	    if (IS_SET(obj->getValues().at(1),EX_LOCKED))
 	    {
 		send_to_char("It's already locked.\n\r",ch);
 		return;
 	    }
 
-	    SET_BIT(obj->value[1],EX_LOCKED);
+	    SET_BIT(obj->getValues().at(1),EX_LOCKED);
 	    act("You lock $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n locks $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    return;
 	}
 
 	/* 'lock object' */
-	if ( obj->item_type != ITEM_CONTAINER )
+	if ( obj->getItemType() != ITEM_CONTAINER )
 	    { send_to_char( "That's not a container.\n\r", ch ); return; }
-	if ( !IS_SET(obj->value[1], CONT_CLOSED) )
+	if ( !IS_SET(obj->getValues().at(1), CONT_CLOSED) )
 	    { send_to_char( "It's not closed.\n\r",        ch ); return; }
-	if ( obj->value[2] < 0 )
+	if ( obj->getValues().at(2) < 0 )
 	    { send_to_char( "It can't be locked.\n\r",     ch ); return; }
-	if ( !has_key( ch, obj->value[2] ) )
+	if ( !has_key( ch, obj->getValues().at(2) ) )
 	    { send_to_char( "You lack the key.\n\r",       ch ); return; }
-	if ( IS_SET(obj->value[1], CONT_LOCKED) )
+	if ( IS_SET(obj->getValues().at(1), CONT_LOCKED) )
 	    { send_to_char( "It's already locked.\n\r",    ch ); return; }
 
-	SET_BIT(obj->value[1], CONT_LOCKED);
+	SET_BIT(obj->getValues().at(1), CONT_LOCKED);
 	act("You lock $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	act( "$n locks $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
 	return;
@@ -663,7 +664,7 @@ void do_lock( Character *ch, char *argument )
 void do_unlock( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    OBJ_DATA *obj;
+    Object *obj;
     int door;
 
     one_argument( argument, arg );
@@ -677,57 +678,57 @@ void do_unlock( Character *ch, char *argument )
     if ( ( obj = get_obj_here( ch, arg ) ) != NULL )
     {
  	/* portal stuff */
-	if (obj->item_type == ITEM_PORTAL)
+	if (obj->getItemType() == ITEM_PORTAL)
 	{
-	    if (!IS_SET(obj->value[1],EX_ISDOOR))
+	    if (!IS_SET(obj->getValues().at(1),EX_ISDOOR))
 	    {
 		send_to_char("You can't do that.\n\r",ch);
 		return;
 	    }
 
-	    if (!IS_SET(obj->value[1],EX_CLOSED))
+	    if (!IS_SET(obj->getValues().at(1),EX_CLOSED))
 	    {
 		send_to_char("It's not closed.\n\r",ch);
 		return;
 	    }
 
-	    if (obj->value[4] < 0)
+	    if (obj->getValues().at(4) < 0)
 	    {
 		send_to_char("It can't be unlocked.\n\r",ch);
 		return;
 	    }
 
-	    if (!has_key(ch,obj->value[4]))
+	    if (!has_key(ch,obj->getValues().at(4)))
 	    {
 		send_to_char("You lack the key.\n\r",ch);
 		return;
 	    }
 
-	    if (!IS_SET(obj->value[1],EX_LOCKED))
+	    if (!IS_SET(obj->getValues().at(1),EX_LOCKED))
 	    {
 		send_to_char("It's already unlocked.\n\r",ch);
 		return;
 	    }
 
-	    REMOVE_BIT(obj->value[1],EX_LOCKED);
+	    REMOVE_BIT(obj->getValues().at(1),EX_LOCKED);
 	    act("You unlock $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n unlocks $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    return;
 	}
 
 	/* 'unlock object' */
-	if ( obj->item_type != ITEM_CONTAINER )
+	if ( obj->getItemType() != ITEM_CONTAINER )
 	    { send_to_char( "That's not a container.\n\r", ch ); return; }
-	if ( !IS_SET(obj->value[1], CONT_CLOSED) )
+	if ( !IS_SET(obj->getValues().at(1), CONT_CLOSED) )
 	    { send_to_char( "It's not closed.\n\r",        ch ); return; }
-	if ( obj->value[2] < 0 )
+	if ( obj->getValues().at(2) < 0 )
 	    { send_to_char( "It can't be unlocked.\n\r",   ch ); return; }
-	if ( !has_key( ch, obj->value[2] ) )
+	if ( !has_key( ch, obj->getValues().at(2) ) )
 	    { send_to_char( "You lack the key.\n\r",       ch ); return; }
-	if ( !IS_SET(obj->value[1], CONT_LOCKED) )
+	if ( !IS_SET(obj->getValues().at(1), CONT_LOCKED) )
 	    { send_to_char( "It's already unlocked.\n\r",  ch ); return; }
 
-	REMOVE_BIT(obj->value[1], CONT_LOCKED);
+	REMOVE_BIT(obj->getValues().at(1), CONT_LOCKED);
 	act("You unlock $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	act( "$n unlocks $p.", ch, obj, NULL, TO_ROOM, POS_RESTING );
 	return;
@@ -772,7 +773,7 @@ void do_pick( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     Character *gch;
-    OBJ_DATA *obj;
+    Object *obj;
     int door;
 
     one_argument( argument, arg );
@@ -805,33 +806,33 @@ void do_pick( Character *ch, char *argument )
     if ( ( obj = get_obj_here( ch, arg ) ) != NULL )
     {
 	/* portal stuff */
-	if (obj->item_type == ITEM_PORTAL)
+	if (obj->getItemType() == ITEM_PORTAL)
 	{
-	    if (!IS_SET(obj->value[1],EX_ISDOOR))
+	    if (!IS_SET(obj->getValues().at(1),EX_ISDOOR))
 	    {	
 		send_to_char("You can't do that.\n\r",ch);
 		return;
 	    }
 
-	    if (!IS_SET(obj->value[1],EX_CLOSED))
+	    if (!IS_SET(obj->getValues().at(1),EX_CLOSED))
 	    {
 		send_to_char("It's not closed.\n\r",ch);
 		return;
 	    }
 
-	    if (obj->value[4] < 0)
+	    if (obj->getValues().at(4) < 0)
 	    {
 		send_to_char("It can't be unlocked.\n\r",ch);
 		return;
 	    }
 
-	    if (IS_SET(obj->value[1],EX_PICKPROOF))
+	    if (IS_SET(obj->getValues().at(1),EX_PICKPROOF))
 	    {
 		send_to_char("You failed.\n\r",ch);
 		return;
 	    }
 
-	    REMOVE_BIT(obj->value[1],EX_LOCKED);
+	    REMOVE_BIT(obj->getValues().at(1),EX_LOCKED);
 	    act("You pick the lock on $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n picks the lock on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    check_improve(ch,gsn_pick_lock,TRUE,2);
@@ -843,18 +844,18 @@ void do_pick( Character *ch, char *argument )
 
 	
 	/* 'pick object' */
-	if ( obj->item_type != ITEM_CONTAINER )
+	if ( obj->getItemType() != ITEM_CONTAINER )
 	    { send_to_char( "That's not a container.\n\r", ch ); return; }
-	if ( !IS_SET(obj->value[1], CONT_CLOSED) )
+	if ( !IS_SET(obj->getValues().at(1), CONT_CLOSED) )
 	    { send_to_char( "It's not closed.\n\r",        ch ); return; }
-	if ( obj->value[2] < 0 )
+	if ( obj->getValues().at(2) < 0 )
 	    { send_to_char( "It can't be unlocked.\n\r",   ch ); return; }
-	if ( !IS_SET(obj->value[1], CONT_LOCKED) )
+	if ( !IS_SET(obj->getValues().at(1), CONT_LOCKED) )
 	    { send_to_char( "It's already unlocked.\n\r",  ch ); return; }
-	if ( IS_SET(obj->value[1], CONT_PICKPROOF) )
+	if ( IS_SET(obj->getValues().at(1), CONT_PICKPROOF) )
 	    { send_to_char( "You failed.\n\r",             ch ); return; }
 
-	REMOVE_BIT(obj->value[1], CONT_LOCKED);
+	REMOVE_BIT(obj->getValues().at(1), CONT_LOCKED);
         act("You pick the lock on $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
         act("$n picks the lock on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	check_improve(ch,gsn_pick_lock,TRUE,2);
@@ -900,100 +901,101 @@ void do_pick( Character *ch, char *argument )
 
 void do_stand( Character *ch, char *argument )
 {
-    OBJ_DATA *obj = NULL;
+    Object *obj = NULL;
 
     if (argument[0] != '\0')
     {
-	if (ch->position == POS_FIGHTING)
-	{
-	    send_to_char("Maybe you should finish fighting first?\n\r",ch);
-	    return;
-	}
-	obj = get_obj_list(ch,argument,ch->in_room->contents);
-	if (obj == NULL)
-	{
-	    send_to_char("You don't see that here.\n\r",ch);
-	    return;
-	}
-	if (obj->item_type != ITEM_FURNITURE
-	||  (!IS_SET(obj->value[2],STAND_AT)
-	&&   !IS_SET(obj->value[2],STAND_ON)
-	&&   !IS_SET(obj->value[2],STAND_IN)))
-	{
-	    send_to_char("You can't seem to find a place to stand.\n\r",ch);
-	    return;
-	}
-	if (ch->on != obj && count_users(obj) >= obj->value[0])
-	{
-	    act("There's no room to stand on $p.", ch,obj,NULL,TO_CHAR,POS_DEAD);
-	    return;
-	}
- 	ch->on = obj;
+		if (ch->position == POS_FIGHTING)
+		{
+			send_to_char("Maybe you should finish fighting first?\n\r",ch);
+			return;
+		}
+		
+		obj = ObjectHelper::findInList(ch,argument,ch->in_room->contents);
+		if (obj == NULL)
+		{
+			send_to_char("You don't see that here.\n\r",ch);
+			return;
+		}
+		if (obj->getItemType() != ITEM_FURNITURE
+		||  (!IS_SET(obj->getValues().at(2),STAND_AT)
+		&&   !IS_SET(obj->getValues().at(2),STAND_ON)
+		&&   !IS_SET(obj->getValues().at(2),STAND_IN)))
+		{
+			send_to_char("You can't seem to find a place to stand.\n\r",ch);
+			return;
+		}
+		if (ch->onObject() != obj && count_users(obj) >= obj->getValues().at(0))
+		{
+			act("There's no room to stand on $p.", ch,obj,NULL,TO_CHAR,POS_DEAD);
+			return;
+		}
+		ch->getOntoObject(obj);
     }
     
     switch ( ch->position )
     {
-    case POS_SLEEPING:
-	if ( IS_AFFECTED(ch, AFF_SLEEP) )
-	    { send_to_char( "You can't wake up!\n\r", ch ); return; }
-	
-	if (obj == NULL)
-	{
-	    send_to_char( "You wake and stand up.\n\r", ch );
-	    act( "$n wakes and stands up.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
-	    ch->on = NULL;
-	}
-	else if (IS_SET(obj->value[2],STAND_AT))
-	{
-	   act("You wake and stand at $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
-	   act("$n wakes and stands at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
-	}
-	else if (IS_SET(obj->value[2],STAND_ON))
-	{
-	    act("You wake and stand on $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
-	    act("$n wakes and stands on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
-	}
-	else 
-	{
-	    act("You wake and stand in $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
-	    act("$n wakes and stands in $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
-	}
-	ch->position = POS_STANDING;
-	do_look(ch,(char*)"auto");
-	break;
+		case POS_SLEEPING:
+		if ( IS_AFFECTED(ch, AFF_SLEEP) )
+			{ send_to_char( "You can't wake up!\n\r", ch ); return; }
+		
+		if (obj == NULL)
+		{
+			send_to_char( "You wake and stand up.\n\r", ch );
+			act( "$n wakes and stands up.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
+			ch->getOntoObject(nullptr);
+		}
+		else if (IS_SET(obj->getValues().at(2),STAND_AT))
+		{
+		act("You wake and stand at $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
+		act("$n wakes and stands at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
+		}
+		else if (IS_SET(obj->getValues().at(2),STAND_ON))
+		{
+			act("You wake and stand on $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
+			act("$n wakes and stands on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
+		}
+		else 
+		{
+			act("You wake and stand in $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
+			act("$n wakes and stands in $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
+		}
+		ch->position = POS_STANDING;
+		do_look(ch,(char*)"auto");
+		break;
 
-    case POS_RESTING: case POS_SITTING:
-	if (obj == NULL)
-	{
-	    send_to_char( "You stand up.\n\r", ch );
-	    act( "$n stands up.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
-	    ch->on = NULL;
-	}
-	else if (IS_SET(obj->value[2],STAND_AT))
-	{
-	    act("You stand at $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
-	    act("$n stands at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
-	}
-	else if (IS_SET(obj->value[2],STAND_ON))
-	{
-	    act("You stand on $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
-	    act("$n stands on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
-	}
-	else
-	{
-	    act("You stand in $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
-	    act("$n stands on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
-	}
-	ch->position = POS_STANDING;
-	break;
+		case POS_RESTING: case POS_SITTING:
+		if (obj == NULL)
+		{
+			send_to_char( "You stand up.\n\r", ch );
+			act( "$n stands up.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
+			ch->getOntoObject(nullptr);
+		}
+		else if (IS_SET(obj->getValues().at(2),STAND_AT))
+		{
+			act("You stand at $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+			act("$n stands at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
+		}
+		else if (IS_SET(obj->getValues().at(2),STAND_ON))
+		{
+			act("You stand on $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+			act("$n stands on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
+		}
+		else
+		{
+			act("You stand in $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
+			act("$n stands on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
+		}
+		ch->position = POS_STANDING;
+		break;
 
-    case POS_STANDING:
-	send_to_char( "You are already standing.\n\r", ch );
-	break;
+		case POS_STANDING:
+		send_to_char( "You are already standing.\n\r", ch );
+		break;
 
-    case POS_FIGHTING:
-	send_to_char( "You are already fighting!\n\r", ch );
-	break;
+		case POS_FIGHTING:
+		send_to_char( "You are already fighting!\n\r", ch );
+		break;
     }
 
     return;
@@ -1003,7 +1005,7 @@ void do_stand( Character *ch, char *argument )
 
 void do_rest( Character *ch, char *argument )
 {
-    OBJ_DATA *obj = NULL;
+    Object *obj = NULL;
 
     if (ch->position == POS_FIGHTING)
     {
@@ -1014,33 +1016,33 @@ void do_rest( Character *ch, char *argument )
     /* okay, now that we know we can rest, find an object to rest on */
     if (argument[0] != '\0')
     {
-	obj = get_obj_list(ch,argument,ch->in_room->contents);
+	obj = ObjectHelper::findInList(ch,argument,ch->in_room->contents);
 	if (obj == NULL)
 	{
 	    send_to_char("You don't see that here.\n\r",ch);
 	    return;
 	}
     }
-    else obj = ch->on;
+    else obj = ch->onObject();
 
     if (obj != NULL)
     {
-        if (obj->item_type != ITEM_FURNITURE
-    	||  (!IS_SET(obj->value[2],REST_ON)
-    	&&   !IS_SET(obj->value[2],REST_IN)
-    	&&   !IS_SET(obj->value[2],REST_AT)))
+        if (obj->getItemType() != ITEM_FURNITURE
+    	||  (!IS_SET(obj->getValues().at(2),REST_ON)
+    	&&   !IS_SET(obj->getValues().at(2),REST_IN)
+    	&&   !IS_SET(obj->getValues().at(2),REST_AT)))
     	{
 	    send_to_char("You can't rest on that.\n\r",ch);
 	    return;
     	}
 
-        if (obj != NULL && ch->on != obj && count_users(obj) >= obj->value[0])
+        if (obj != NULL && ch->onObject() != obj && count_users(obj) >= obj->getValues().at(0))
         {
 	    act("There's no more room on $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
 	    return;
     	}
 	
-	ch->on = obj;
+		ch->getOntoObject(obj);
     }
 
     switch ( ch->position )
@@ -1057,13 +1059,13 @@ void do_rest( Character *ch, char *argument )
 	    send_to_char( "You wake up and start resting.\n\r", ch );
 	    act ("$n wakes up and starts resting.",ch,NULL,NULL,TO_ROOM, POS_RESTING);
 	}
-	else if (IS_SET(obj->value[2],REST_AT))
+	else if (IS_SET(obj->getValues().at(2),REST_AT))
 	{
 	    act("You wake up and rest at $p.",
 		    ch,obj,NULL,TO_CHAR,POS_SLEEPING);
 	    act("$n wakes up and rests at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	}
-        else if (IS_SET(obj->value[2],REST_ON))
+        else if (IS_SET(obj->getValues().at(2),REST_ON))
         {
             act("You wake up and rest on $p.",
                     ch,obj,NULL,TO_CHAR,POS_SLEEPING);
@@ -1089,12 +1091,12 @@ void do_rest( Character *ch, char *argument )
 	    send_to_char( "You rest.\n\r", ch );
 	    act( "$n sits down and rests.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
 	}
-        else if (IS_SET(obj->value[2],REST_AT))
+        else if (IS_SET(obj->getValues().at(2),REST_AT))
         {
 	    act("You sit down at $p and rest.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n sits down at $p and rests.",ch,obj,NULL,TO_ROOM, POS_RESTING);
         }
-        else if (IS_SET(obj->value[2],REST_ON))
+        else if (IS_SET(obj->getValues().at(2),REST_ON))
         {
 	    act("You sit on $p and rest.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n sits on $p and rests.",ch,obj,NULL,TO_ROOM, POS_RESTING);
@@ -1113,12 +1115,12 @@ void do_rest( Character *ch, char *argument )
 	    send_to_char("You rest.\n\r",ch);
 	    act("$n rests.",ch,NULL,NULL,TO_ROOM, POS_RESTING);
 	}
-        else if (IS_SET(obj->value[2],REST_AT))
+        else if (IS_SET(obj->getValues().at(2),REST_AT))
         {
 	    act("You rest at $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n rests at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
         }
-        else if (IS_SET(obj->value[2],REST_ON))
+        else if (IS_SET(obj->getValues().at(2),REST_ON))
         {
 	    act("You rest on $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n rests on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
@@ -1139,7 +1141,7 @@ void do_rest( Character *ch, char *argument )
 
 void do_sit (Character *ch, char *argument )
 {
-    OBJ_DATA *obj = NULL;
+    Object *obj = NULL;
 
     if (ch->position == POS_FIGHTING)
     {
@@ -1150,33 +1152,33 @@ void do_sit (Character *ch, char *argument )
     /* okay, now that we know we can sit, find an object to sit on */
     if (argument[0] != '\0')
     {
-	obj = get_obj_list(ch,argument,ch->in_room->contents);
+	obj = ObjectHelper::findInList(ch,argument,ch->in_room->contents);
 	if (obj == NULL)
 	{
 	    send_to_char("You don't see that here.\n\r",ch);
 	    return;
 	}
     }
-    else obj = ch->on;
+    else obj = ch->onObject();
 
     if (obj != NULL)                                                              
     {
-	if (obj->item_type != ITEM_FURNITURE
-	||  (!IS_SET(obj->value[2],SIT_ON)
-	&&   !IS_SET(obj->value[2],SIT_IN)
-	&&   !IS_SET(obj->value[2],SIT_AT)))
+	if (obj->getItemType() != ITEM_FURNITURE
+	||  (!IS_SET(obj->getValues().at(2),SIT_ON)
+	&&   !IS_SET(obj->getValues().at(2),SIT_IN)
+	&&   !IS_SET(obj->getValues().at(2),SIT_AT)))
 	{
 	    send_to_char("You can't sit on that.\n\r",ch);
 	    return;
 	}
 
-	if (obj != NULL && ch->on != obj && count_users(obj) >= obj->value[0])
+	if (obj != NULL && ch->onObject() != obj && count_users(obj) >= obj->getValues().at(0))
 	{
 	    act("There's no more room on $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
 	    return;
 	}
 
-	ch->on = obj;
+	ch->getOntoObject(obj);
     }
     switch (ch->position)
     {
@@ -1192,12 +1194,12 @@ void do_sit (Character *ch, char *argument )
             	send_to_char( "You wake and sit up.\n\r", ch );
             	act( "$n wakes and sits up.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
             }
-            else if (IS_SET(obj->value[2],SIT_AT))
+            else if (IS_SET(obj->getValues().at(2),SIT_AT))
             {
             	act("You wake and sit at $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
             	act("$n wakes and sits at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
             }
-            else if (IS_SET(obj->value[2],SIT_ON))
+            else if (IS_SET(obj->getValues().at(2),SIT_ON))
             {
             	act("You wake and sit on $p.",ch,obj,NULL,TO_CHAR,POS_DEAD);
             	act("$n wakes and sits at $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
@@ -1215,13 +1217,13 @@ void do_sit (Character *ch, char *argument )
 	case POS_RESTING:
 	    if (obj == NULL)
 		send_to_char("You stop resting.\n\r",ch);
-	    else if (IS_SET(obj->value[2],SIT_AT))
+	    else if (IS_SET(obj->getValues().at(2),SIT_AT))
 	    {
 		act("You sit at $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
 		act("$n sits at $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
 	    }
 
-	    else if (IS_SET(obj->value[2],SIT_ON))
+	    else if (IS_SET(obj->getValues().at(2),SIT_ON))
 	    {
 		act("You sit on $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
 		act("$n sits on $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
@@ -1237,12 +1239,12 @@ void do_sit (Character *ch, char *argument )
 		send_to_char("You sit down.\n\r",ch);
     	        act("$n sits down on the ground.",ch,NULL,NULL,TO_ROOM,POS_RESTING);
 	    }
-	    else if (IS_SET(obj->value[2],SIT_AT))
+	    else if (IS_SET(obj->getValues().at(2),SIT_AT))
 	    {
 		act("You sit down at $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
 		act("$n sits down at $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
 	    }
-	    else if (IS_SET(obj->value[2],SIT_ON))
+	    else if (IS_SET(obj->getValues().at(2),SIT_ON))
 	    {
 		act("You sit on $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
 		act("$n sits on $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
@@ -1261,7 +1263,7 @@ void do_sit (Character *ch, char *argument )
 
 void do_sleep( Character *ch, char *argument )
 {
-    OBJ_DATA *obj = NULL;
+    Object *obj = NULL;
 
     switch ( ch->position )
     {
@@ -1272,7 +1274,7 @@ void do_sleep( Character *ch, char *argument )
     case POS_RESTING:
     case POS_SITTING:
     case POS_STANDING: 
-	if (argument[0] == '\0' && ch->on == NULL)
+	if (argument[0] == '\0' && ch->onObject() == NULL)
 	{
 	    send_to_char( "You go to sleep.\n\r", ch );
 	    act( "$n goes to sleep.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
@@ -1281,37 +1283,37 @@ void do_sleep( Character *ch, char *argument )
 	else  /* find an object and sleep on it */
 	{
 	    if (argument[0] == '\0')
-		obj = ch->on;
+		obj = ch->onObject();
 	    else
-	    	obj = get_obj_list( ch, argument,  ch->in_room->contents );
+	    	obj = ObjectHelper::findInList( ch, argument,  ch->in_room->contents );
 
 	    if (obj == NULL)
 	    {
 		send_to_char("You don't see that here.\n\r",ch);
 		return;
 	    }
-	    if (obj->item_type != ITEM_FURNITURE
-	    ||  (!IS_SET(obj->value[2],SLEEP_ON) 
-	    &&   !IS_SET(obj->value[2],SLEEP_IN)
-	    &&	 !IS_SET(obj->value[2],SLEEP_AT)))
+	    if (obj->getItemType() != ITEM_FURNITURE
+	    ||  (!IS_SET(obj->getValues().at(2),SLEEP_ON) 
+	    &&   !IS_SET(obj->getValues().at(2),SLEEP_IN)
+	    &&	 !IS_SET(obj->getValues().at(2),SLEEP_AT)))
 	    {
 		send_to_char("You can't sleep on that!\n\r",ch);
 		return;
 	    }
 
-	    if (ch->on != obj && count_users(obj) >= obj->value[0])
+	    if (ch->onObject() != obj && count_users(obj) >= obj->getValues().at(0))
 	    {
 		act("There is no room on $p for you.", ch,obj,NULL,TO_CHAR,POS_DEAD);
 		return;
 	    }
 
-	    ch->on = obj;
-	    if (IS_SET(obj->value[2],SLEEP_AT))
+	    ch->getOntoObject(obj);
+	    if (IS_SET(obj->getValues().at(2),SLEEP_AT))
 	    {
 		act("You go to sleep at $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
 		act("$n goes to sleep at $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
 	    }
-	    else if (IS_SET(obj->value[2],SLEEP_ON))
+	    else if (IS_SET(obj->getValues().at(2),SLEEP_ON))
 	    {
 	        act("You go to sleep on $p.",ch,obj,NULL,TO_CHAR,POS_RESTING);
 	        act("$n goes to sleep on $p.",ch,obj,NULL,TO_ROOM,POS_RESTING);
@@ -1375,20 +1377,18 @@ void do_sneak( Character *ch, char *argument )
 
     if ( number_percent( ) < get_skill(ch,gsn_sneak))
     {
-	check_improve(ch,gsn_sneak,TRUE,3);
-	af.where     = TO_AFFECTS;
-	af.type      = gsn_sneak;
-	af.level     = ch->level; 
-	af.duration  = ch->level;
-	af.location  = APPLY_NONE;
-	af.modifier  = 0;
-	af.bitvector = AFF_SNEAK;
-	affect_to_char( ch, &af );
-    }
-    else
-	check_improve(ch,gsn_sneak,FALSE,3);
-
-    return;
+		check_improve(ch,gsn_sneak,TRUE,3);
+		af.where     = TO_AFFECTS;
+		af.type      = gsn_sneak;
+		af.level     = ch->level; 
+		af.duration  = ch->level;
+		af.location  = APPLY_NONE;
+		af.modifier  = 0;
+		af.bitvector = AFF_SNEAK;
+		ch->giveAffect( &af );
+    } else {
+		check_improve(ch,gsn_sneak,FALSE,3);
+	}
 }
 
 

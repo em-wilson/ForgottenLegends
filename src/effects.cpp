@@ -14,16 +14,16 @@
  *  benefitting.  We hope that you share your changes too.  What goes      *
  *  around, comes around.                                                  *
  ***************************************************************************/
- 
+
 /***************************************************************************
-*	ROM 2.4 is copyright 1993-1996 Russ Taylor			   *
-*	ROM has been brought to you by the ROM consortium		   *
-*	    Russ Taylor (rtaylor@efn.org)				   *
-*	    Gabrielle Taylor						   *
-*	    Brian Moore (zump@rom.org)					   *
-*	By using this code, you have agreed to follow the terms of the	   *
-*	ROM license, in the file Rom24/doc/rom.license			   *
-***************************************************************************/
+ *	ROM 2.4 is copyright 1993-1996 Russ Taylor							   *
+ *	ROM has been brought to you by the ROM consortium					   *
+ *	    Russ Taylor (rtaylor@efn.org)									   *
+ *	    Gabrielle Taylor												   *
+ *	    Brian Moore (zump@rom.org)										   *
+ *	By using this code, you have agreed to follow the terms of the		   *
+ *	ROM license, in the file Rom24/doc/rom.license						   *
+ ***************************************************************************/
 
 #include <sys/types.h>
 #include <stdio.h>
@@ -31,587 +31,501 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "Object.h"
 #include "recycle.h"
+#include "Room.h"
 
-void acid_effect(void *vo, int level, int dam, int target)
+/* local functions */
+void acid_effect(Object *obj, int level, int dam);
+void cold_effect(Object *obj, int level, int dam);
+void fire_effect(Object *obj, int level, int dam);
+void poison_effect(Object *obj, int level, int dam);
+void shock_effect(Object *obj, int level, int dam);
+
+void acid_effect(ROOM_INDEX_DATA * room, int level, int dam)
 {
-    if (target == TARGET_ROOM) /* nail objects on the floor */
-     {
-	ROOM_INDEX_DATA *room = (ROOM_INDEX_DATA *) vo;
-	OBJ_DATA *obj, *obj_next;
-
-	for (obj = room->contents; obj != NULL; obj = obj_next)
+	for (auto obj : room->contents)
 	{
-	    obj_next = obj->next_content;
-	    acid_effect(obj,level,dam,TARGET_OBJ);
+		acid_effect(obj, level, dam);
 	}
 	return;
-    }
+}
 
-    if (target == TARGET_CHAR)  /* do the effect on a victim */
-    {
-	Character *victim = (Character *) vo;
-	OBJ_DATA *obj, *obj_next;
-	
+void acid_effect(Character *victim, int level, int dam)
+{
 	/* let's toast some gear */
-	for (obj = victim->carrying; obj != NULL; obj = obj_next)
+	for (auto obj : victim->getCarrying())
 	{
-	    obj_next = obj->next_content;
-	    acid_effect(obj,level,dam,TARGET_OBJ);
+		acid_effect(obj, level, dam);
 	}
 	return;
-    }
+}
 
-    if (target == TARGET_OBJ) /* toast an object */
-    {
-	OBJ_DATA *obj = (OBJ_DATA *) vo;
-	OBJ_DATA *t_obj,*n_obj;
+
+void acid_effect(Object *obj, int level, int dam)
+{
 	int chance;
 	char *msg;
 
-	if (IS_OBJ_STAT(obj,ITEM_BURN_PROOF)
-	||  IS_OBJ_STAT(obj,ITEM_NOPURGE)
-	||  number_range(0,4) == 0)
-	    return;
+	if (obj->hasStat(ITEM_BURN_PROOF) || obj->hasStat(ITEM_NOPURGE) || number_range(0, 4) == 0)
+		return;
 
 	chance = level / 4 + dam / 10;
 
 	if (chance > 25)
-	    chance = (chance - 25) / 2 + 25;
-	 if (chance > 50)
-	    chance = (chance - 50) / 2 + 50;
+		chance = (chance - 25) / 2 + 25;
+	if (chance > 50)
+		chance = (chance - 50) / 2 + 50;
 
-	if (IS_OBJ_STAT(obj,ITEM_BLESS))
-	    chance -= 5;
+	if (obj->hasStat(ITEM_BLESS))
+		chance -= 5;
 
-	chance -= obj->level * 2;
+	chance -= obj->getLevel() * 2;
 
-	switch (obj->item_type)
+	switch (obj->getItemType())
 	{
-	    default:
+	default:
 		return;
-	    case ITEM_CONTAINER:
-	    case ITEM_CORPSE_PC:
-	    case ITEM_CORPSE_NPC:
-		msg = (char*)"$p fumes and dissolves.";
+	case ITEM_CONTAINER:
+	case ITEM_CORPSE_PC:
+	case ITEM_CORPSE_NPC:
+		msg = (char *)"$p fumes and dissolves.";
 		break;
-	    case ITEM_ARMOR:
-		msg = (char*)"$p is pitted and etched.";
+	case ITEM_ARMOR:
+		msg = (char *)"$p is pitted and etched.";
 		break;
-	    case ITEM_CLOTHING:
-		msg = (char*)"$p is corroded into scrap.";
-	 	break;
-	    case ITEM_STAFF:
-	    case ITEM_WAND:
+	case ITEM_CLOTHING:
+		msg = (char *)"$p is corroded into scrap.";
+		break;
+	case ITEM_STAFF:
+	case ITEM_WAND:
 		chance -= 10;
-		msg = (char*)"$p corrodes and breaks.";
+		msg = (char *)"$p corrodes and breaks.";
 		break;
-	    case ITEM_SCROLL:
+	case ITEM_SCROLL:
 		chance += 10;
-		msg = (char*)"$p is burned into waste.";
-		break; 
+		msg = (char *)"$p is burned into waste.";
+		break;
 	}
 
-	chance = URANGE(5,chance,95);
+	chance = URANGE(5, chance, 95);
 
 	if (number_percent() > chance)
-	    return;
+		return;
 
-	if (obj->carried_by != NULL)
-	    act(msg,obj->carried_by,obj,NULL,TO_ALL, POS_RESTING);
-	else if (obj->in_room != NULL && obj->in_room->people != NULL)
-	    act(msg,obj->in_room->people,obj,NULL,TO_ALL, POS_RESTING);
+	if (obj->getCarriedBy() != NULL)
+		act(msg, obj->getCarriedBy(), obj, NULL, TO_ALL, POS_RESTING);
+	else if (obj->getInRoom() != NULL && obj->getInRoom()->people != NULL)
+		act(msg, obj->getInRoom()->people, obj, NULL, TO_ALL, POS_RESTING);
 
-	if (obj->item_type == ITEM_ARMOR)  /* etch it */
+	if (obj->getItemType() == ITEM_ARMOR) /* etch it */
 	{
-	    AFFECT_DATA *paf;
-	    bool af_found = FALSE;
-	    int i;
+		bool af_found = FALSE;
+		int i;
 
- 	    affect_enchant(obj);
+		affect_enchant(obj);
 
-	    for ( paf = obj->affected; paf != NULL; paf = paf->next)
-            {
-                if ( paf->location == APPLY_AC)
-                {
-                    af_found = TRUE;
-                    paf->type = -1;
-                    paf->modifier += 1;
-                    paf->level = UMAX(paf->level,level);
-		    break;
-                }
-            }
- 
-            if (!af_found)
-            /* needs a new affect */
-            {
-		paf = new_affect();
- 
-                paf->type       = -1;
-                paf->level      = level;
-                paf->duration   = -1;
-                paf->location   = APPLY_AC;
-                paf->modifier   =  1;
-                paf->bitvector  = 0;
-                paf->next       = obj->affected;
-                obj->affected   = paf;
-            }
- 
-            if (obj->carried_by != NULL && obj->wear_loc != WEAR_NONE)
-                for (i = 0; i < 4; i++)
-                    obj->carried_by->armor[i] += 1;
-            return;
+		for (auto paf : obj->getAffectedBy())
+		{
+			if (paf->location == APPLY_AC)
+			{
+				af_found = TRUE;
+				paf->type = -1;
+				paf->modifier += 1;
+				paf->level = UMAX(paf->level, level);
+				break;
+			}
+		}
+
+		if (!af_found)
+		/* needs a new affect */
+		{
+			AFFECT_DATA *paf = new_affect();
+
+			paf->type = -1;
+			paf->level = level;
+			paf->duration = -1;
+			paf->location = APPLY_AC;
+			paf->modifier = 1;
+			paf->bitvector = 0;
+			obj->addAffect(paf);
+		}
+
+		if (obj->getCarriedBy() != NULL && obj->getWearLocation() != WEAR_NONE)
+			for (i = 0; i < 4; i++)
+				obj->getCarriedBy()->armor[i] += 1;
+		return;
 	}
 
 	/* get rid of the object */
-	if (obj->contains)  /* dump contents */
+	for (auto t_obj : obj->getContents())
 	{
-	    for (t_obj = obj->contains; t_obj != NULL; t_obj = n_obj)
-	    {
-		n_obj = t_obj->next_content;
 		obj_from_obj(t_obj);
-		if (obj->in_room != NULL)
-		    obj_to_room(t_obj,obj->in_room);
-		else if (obj->carried_by != NULL)
-		    obj_to_room(t_obj,obj->carried_by->in_room);
+		if (obj->getInRoom() != NULL)
+			obj_to_room(t_obj, obj->getInRoom());
+		else if (obj->getCarriedBy() != NULL)
+			obj_to_room(t_obj, obj->getCarriedBy()->in_room);
 		else
 		{
-		    extract_obj(t_obj);
-		    continue;
+			extract_obj(t_obj);
+			continue;
 		}
 
-		acid_effect(t_obj,level/2,dam/2,TARGET_OBJ);
-	    }
- 	}
+		acid_effect(t_obj, level / 2, dam / 2);
+	}
 
 	extract_obj(obj);
 	return;
-    }
 }
 
-
-void cold_effect(void *vo, int level, int dam, int target)
+void cold_effect(ROOM_INDEX_DATA *room, int level, int dam)
 {
-    if (target == TARGET_ROOM) /* nail objects on the floor */
-    {
-        ROOM_INDEX_DATA *room = (ROOM_INDEX_DATA *) vo;
-        OBJ_DATA *obj, *obj_next;
- 
-        for (obj = room->contents; obj != NULL; obj = obj_next)
-        {
-            obj_next = obj->next_content;
-            cold_effect(obj,level,dam,TARGET_OBJ);
-        }
-        return;
-    }
-
-    if (target == TARGET_CHAR) /* whack a character */
-    {
-	Character *victim = (Character *) vo;
-	OBJ_DATA *obj, *obj_next;
-	
-	/* chill touch effect */
-	if (!saves_spell(level/4 + dam / 20, victim, DAM_COLD))
+	for (auto obj : room->contents)
 	{
-	    AFFECT_DATA af;
+		cold_effect(obj, level, dam);
+	}
+	return;
+}
 
-            act("$n turns blue and shivers.",victim,NULL,NULL,TO_ROOM, POS_RESTING);
-	    act("A chill sinks deep into your bones.",victim,NULL,NULL,TO_CHAR, POS_RESTING);
-            af.where     = TO_AFFECTS;
-            af.type      = skill_lookup("chill touch");
-            af.level     = level;
-            af.duration  = 6;
-            af.location  = APPLY_STR;
-            af.modifier  = -1;
-            af.bitvector = 0;
-            affect_join( victim, &af );
+void cold_effect(Character *victim, int level, int dam)
+{
+	/* chill touch effect */
+	if (!saves_spell(level / 4 + dam / 20, victim, DAM_COLD))
+	{
+		AFFECT_DATA af;
+
+		act("$n turns blue and shivers.", victim, NULL, NULL, TO_ROOM, POS_RESTING);
+		act("A chill sinks deep into your bones.", victim, NULL, NULL, TO_CHAR, POS_RESTING);
+		af.where = TO_AFFECTS;
+		af.type = skill_lookup("chill touch");
+		af.level = level;
+		af.duration = 6;
+		af.location = APPLY_STR;
+		af.modifier = -1;
+		af.bitvector = 0;
+		affect_join(victim, &af);
 	}
 
 	/* hunger! (warmth sucked out */
 	if (!IS_NPC(victim))
-	    victim->gain_condition(COND_HUNGER,dam/20);
+		victim->gain_condition(COND_HUNGER, dam / 20);
 
 	/* let's toast some gear */
-	for (obj = victim->carrying; obj != NULL; obj = obj_next)
+	for (auto obj : victim->getCarrying())
 	{
-	    obj_next = obj->next_content;
-	    cold_effect(obj,level,dam,TARGET_OBJ);
+		cold_effect(obj, level, dam);
 	}
 	return;
-   }
+}
 
-   if (target == TARGET_OBJ) /* toast an object */
-   {
-	OBJ_DATA *obj = (OBJ_DATA *) vo;
+void cold_effect(Object *obj, int level, int dam)
+{
 	int chance;
 	char *msg;
 
-	if (IS_OBJ_STAT(obj,ITEM_BURN_PROOF)
-	||  IS_OBJ_STAT(obj,ITEM_NOPURGE)
-	||  number_range(0,4) == 0)
-	    return;
+	if (obj->hasStat(ITEM_BURN_PROOF) || obj->hasStat(ITEM_NOPURGE) || number_range(0, 4) == 0)
+		return;
 
 	chance = level / 4 + dam / 10;
 
 	if (chance > 25)
-	    chance = (chance - 25) / 2 + 25;
+		chance = (chance - 25) / 2 + 25;
 	if (chance > 50)
-	    chance = (chance - 50) / 2 + 50;
+		chance = (chance - 50) / 2 + 50;
 
-	if (IS_OBJ_STAT(obj,ITEM_BLESS))
-	    chance -= 5;
+	if (obj->hasStat(ITEM_BLESS))
+		chance -= 5;
 
- 	chance -= obj->level * 2;
+	chance -= obj->getLevel() * 2;
 
-	switch(obj->item_type)
+	switch (obj->getItemType())
 	{
-	    default:
+	default:
 		return;
-	    case ITEM_POTION:
-		msg = (char*)"$p freezes and shatters!";
+	case ITEM_POTION:
+		msg = (char *)"$p freezes and shatters!";
 		chance += 25;
 		break;
-	    case ITEM_DRINK_CON:
-		msg = (char*)"$p freezes and shatters!";
+	case ITEM_DRINK_CON:
+		msg = (char *)"$p freezes and shatters!";
 		chance += 5;
 		break;
 	}
 
-	chance = URANGE(5,chance,95);
+	chance = URANGE(5, chance, 95);
 
 	if (number_percent() > chance)
-	    return;
+		return;
 
-	if (obj->carried_by != NULL)
-	    act(msg,obj->carried_by,obj,NULL,TO_ALL, POS_RESTING);
-	else if (obj->in_room != NULL && obj->in_room->people != NULL)
-	    act(msg,obj->in_room->people,obj,NULL,TO_ALL, POS_RESTING);
+	if (obj->getCarriedBy() != NULL)
+		act(msg, obj->getCarriedBy(), obj, NULL, TO_ALL, POS_RESTING);
+	else if (obj->getInRoom() != NULL && obj->getInRoom()->people != NULL)
+		act(msg, obj->getInRoom()->people, obj, NULL, TO_ALL, POS_RESTING);
 
 	extract_obj(obj);
 	return;
-    }
 }
-   
 
-
-void fire_effect(void *vo, int level, int dam, int target)
+void fire_effect(ROOM_INDEX_DATA *room, int level, int dam)
 {
-    if (target == TARGET_ROOM)  /* nail objects on the floor */
-    {
-	ROOM_INDEX_DATA *room = (ROOM_INDEX_DATA *) vo;
-	OBJ_DATA *obj, *obj_next;
-
-	for (obj = room->contents; obj != NULL; obj = obj_next)
+	for (auto obj : room->contents)
 	{
-	    obj_next = obj->next_content;
-	    fire_effect(obj,level,dam,TARGET_OBJ);
+		fire_effect(obj, level, dam);
 	}
 	return;
-    }
- 
-    if (target == TARGET_CHAR)   /* do the effect on a victim */
-    {
-	Character *victim = (Character *) vo;
-	OBJ_DATA *obj, *obj_next;
+}
 
+void fire_effect(Character *victim, int level, int dam)
+{
 	/* chance of blindness */
-	if (!IS_AFFECTED(victim,AFF_BLIND)
-	&&  !saves_spell(level / 4 + dam / 20, victim,DAM_FIRE))
+	if (!IS_AFFECTED(victim, AFF_BLIND) && !saves_spell(level / 4 + dam / 20, victim, DAM_FIRE))
 	{
-            AFFECT_DATA af;
-            act("$n is blinded by smoke!",victim,NULL,NULL,TO_ROOM, POS_RESTING);
-            act("Your eyes tear up from smoke...you can't see a thing!",
-		victim,NULL,NULL,TO_CHAR, POS_RESTING);
-	 
-            af.where        = TO_AFFECTS;
-            af.type         = skill_lookup("fire breath");
-            af.level        = level;
-            af.duration     = number_range(0,level/10);
-            af.location     = APPLY_HITROLL;
-            af.modifier     = -4;
-            af.bitvector    = AFF_BLIND;
- 
-            affect_to_char(victim,&af);
+		AFFECT_DATA af;
+		act("$n is blinded by smoke!", victim, NULL, NULL, TO_ROOM, POS_RESTING);
+		act("Your eyes tear up from smoke...you can't see a thing!",
+			victim, NULL, NULL, TO_CHAR, POS_RESTING);
+
+		af.where = TO_AFFECTS;
+		af.type = skill_lookup("fire breath");
+		af.level = level;
+		af.duration = number_range(0, level / 10);
+		af.location = APPLY_HITROLL;
+		af.modifier = -4;
+		af.bitvector = AFF_BLIND;
+
+		victim->giveAffect( &af);
 	}
 
 	/* getting thirsty */
 	if (!IS_NPC(victim))
-	    victim->gain_condition(COND_THIRST,dam/20);
+		victim->gain_condition(COND_THIRST, dam / 20);
 
 	/* let's toast some gear! */
-	for (obj = victim->carrying; obj != NULL; obj = obj_next)
+	for (auto obj : victim->getCarrying())
 	{
-	    obj_next = obj->next_content;
-
-	    fire_effect(obj,level,dam,TARGET_OBJ);
-        }
+		fire_effect(obj, level, dam);
+	}
 	return;
-    }
+}
 
-    if (target == TARGET_OBJ)  /* toast an object */
-    {
-	OBJ_DATA *obj = (OBJ_DATA *) vo;
-	OBJ_DATA *t_obj,*n_obj;
+void fire_effect(Object *obj, int level, int dam)
+{
 	int chance;
 	char *msg;
 
-    	if (IS_OBJ_STAT(obj,ITEM_BURN_PROOF)
-        ||  IS_OBJ_STAT(obj,ITEM_NOPURGE)
-	||  number_range(0,4) == 0)
-            return;
- 
-        chance = level / 4 + dam / 10;
- 
-        if (chance > 25)
-            chance = (chance - 25) / 2 + 25;
-        if (chance > 50)
-            chance = (chance - 50) / 2 + 50;
+	if (obj->hasStat(ITEM_BURN_PROOF) || obj->hasStat(ITEM_NOPURGE) || number_range(0, 4) == 0)
+		return;
 
-        if (IS_OBJ_STAT(obj,ITEM_BLESS))
-            chance -= 5;
-        chance -= obj->level * 2;
+	chance = level / 4 + dam / 10;
 
-        switch ( obj->item_type )
-        {
-        default:             
-	    return;
-        case ITEM_CONTAINER:
-            msg = (char*)"$p ignites and burns!";
-            break;
-        case ITEM_POTION:
-            chance += 25;
-            msg = (char*)"$p bubbles and boils!";
-            break;
-        case ITEM_SCROLL:
-            chance += 50;
-            msg = (char*)"$p crackles and burns!";
-            break;
-        case ITEM_STAFF:
-            chance += 10;
-            msg = (char*)"$p smokes and chars!";
-            break;
-        case ITEM_WAND:
-            msg = (char*)"$p sparks and sputters!";
-            break;
-        case ITEM_FOOD:
-            msg = (char*)"$p blackens and crisps!";
-            break;
-        case ITEM_PILL:
-            msg = (char*)"$p melts and drips!";
-            break;
-        }
+	if (chance > 25)
+		chance = (chance - 25) / 2 + 25;
+	if (chance > 50)
+		chance = (chance - 50) / 2 + 50;
 
-        chance = URANGE(5,chance,95);
+	if (obj->hasStat(ITEM_BLESS))
+		chance -= 5;
+	chance -= obj->getLevel() * 2;
 
-        if (number_percent() > chance)
-            return;
- 
-	if (obj->carried_by != NULL)
-            act( msg, obj->carried_by, obj, NULL, TO_ALL, POS_RESTING );
-	else if (obj->in_room != NULL && obj->in_room->people != NULL)
-	    act(msg,obj->in_room->people,obj,NULL,TO_ALL, POS_RESTING);
+	switch (obj->getItemType())
+	{
+	default:
+		return;
+	case ITEM_CONTAINER:
+		msg = (char *)"$p ignites and burns!";
+		break;
+	case ITEM_POTION:
+		chance += 25;
+		msg = (char *)"$p bubbles and boils!";
+		break;
+	case ITEM_SCROLL:
+		chance += 50;
+		msg = (char *)"$p crackles and burns!";
+		break;
+	case ITEM_STAFF:
+		chance += 10;
+		msg = (char *)"$p smokes and chars!";
+		break;
+	case ITEM_WAND:
+		msg = (char *)"$p sparks and sputters!";
+		break;
+	case ITEM_FOOD:
+		msg = (char *)"$p blackens and crisps!";
+		break;
+	case ITEM_PILL:
+		msg = (char *)"$p melts and drips!";
+		break;
+	}
 
-        if (obj->contains)
-        {
-            /* dump the contents */
- 
-            for (t_obj = obj->contains; t_obj != NULL; t_obj = n_obj)
-            {
-                n_obj = t_obj->next_content;
-                obj_from_obj(t_obj);
-		if (obj->in_room != NULL)
-                    obj_to_room(t_obj,obj->in_room);
-		else if (obj->carried_by != NULL)
-		    obj_to_room(t_obj,obj->carried_by->in_room);
+	chance = URANGE(5, chance, 95);
+
+	if (number_percent() > chance)
+		return;
+
+	if (obj->getCarriedBy() != NULL)
+		act(msg, obj->getCarriedBy(), obj, NULL, TO_ALL, POS_RESTING);
+	else if (obj->getInRoom() != NULL && obj->getInRoom()->people != NULL)
+		act(msg, obj->getInRoom()->people, obj, NULL, TO_ALL, POS_RESTING);
+
+	/* dump the contents */
+	for (auto t_obj : obj->getContents())
+	{
+		obj_from_obj(t_obj);
+		if (obj->getInRoom() != NULL)
+			obj_to_room(t_obj, obj->getInRoom());
+		else if (obj->getCarriedBy() != NULL)
+			obj_to_room(t_obj, obj->getCarriedBy()->in_room);
 		else
 		{
-		    extract_obj(t_obj);
-		    continue;
+			extract_obj(t_obj);
+			continue;
 		}
-		fire_effect(t_obj,level/2,dam/2,TARGET_OBJ);
-            }
-        }
- 
-        extract_obj( obj );
-	return;
-    }
-}
-
-void poison_effect(void *vo,int level, int dam, int target)
-{
-    if (target == TARGET_ROOM)  /* nail objects on the floor */
-    {
-        ROOM_INDEX_DATA *room = (ROOM_INDEX_DATA *) vo;
-        OBJ_DATA *obj, *obj_next;
- 
-        for (obj = room->contents; obj != NULL; obj = obj_next)
-        {
-            obj_next = obj->next_content;
-            poison_effect(obj,level,dam,TARGET_OBJ);
-        }
-        return;
-    }
- 
-    if (target == TARGET_CHAR)   /* do the effect on a victim */
-    {
-        Character *victim = (Character *) vo;
-        OBJ_DATA *obj, *obj_next;
-
-	/* chance of poisoning */
-        if (!saves_spell(level / 4 + dam / 20,victim,DAM_POISON))
-        {
-	    AFFECT_DATA af;
-
-            send_to_char("You feel poison coursing through your veins.\n\r",
-                victim);
-            act("$n looks very ill.",victim,NULL,NULL,TO_ROOM, POS_RESTING);
-
-            af.where     = TO_AFFECTS;
-            af.type      = gsn_poison;
-            af.level     = level;
-            af.duration  = level / 2;
-            af.location  = APPLY_STR;
-            af.modifier  = -1;
-            af.bitvector = AFF_POISON;
-            affect_join( victim, &af );
-        }
-
-	/* equipment */
-	for (obj = victim->carrying; obj != NULL; obj = obj_next)
-	{
-	    obj_next = obj->next_content;
-	    poison_effect(obj,level,dam,TARGET_OBJ);
+		fire_effect(t_obj, level / 2, dam / 2);
 	}
-	return;
-    }
-
-    if (target == TARGET_OBJ)  /* do some poisoning */
-    {
-	OBJ_DATA *obj = (OBJ_DATA *) vo;
-	int chance;
-	
-
-	if (IS_OBJ_STAT(obj,ITEM_BURN_PROOF)
-  	||  IS_OBJ_STAT(obj,ITEM_BLESS)
-	||  number_range(0,4) == 0)
-	    return;
-
-	chance = level / 4 + dam / 10;
-	if (chance > 25)
-	    chance = (chance - 25) / 2 + 25;
-	if (chance > 50)
-	    chance = (chance - 50) / 2 + 50;
-
-	chance -= obj->level * 2;
-
-	switch (obj->item_type)
-	{
-	    default:
-		return;
-	    case ITEM_FOOD:
-		break;
-	    case ITEM_DRINK_CON:
-		if (obj->value[0] == obj->value[1])
-		    return;
-		break;
-	}
-
-	chance = URANGE(5,chance,95);
-
-	if (number_percent() > chance)
-	    return;
-
-	obj->value[3] = 1;
-	return;
-    }
-}
-
-
-void shock_effect(void *vo,int level, int dam, int target)
-{
-    if (target == TARGET_ROOM)
-    {
-	ROOM_INDEX_DATA *room = (ROOM_INDEX_DATA *) vo;
-	OBJ_DATA *obj, *obj_next;
-
-	for (obj = room->contents; obj != NULL; obj = obj_next)
-	{
-	    obj_next = obj->next_content;
-	    shock_effect(obj,level,dam,TARGET_OBJ);
-	}
-	return;
-    }
-
-    if (target == TARGET_CHAR)
-    {
-	Character *victim = (Character *) vo;
-	OBJ_DATA *obj, *obj_next;
-
-	/* daze and confused? */
-	if (!saves_spell(level/4 + dam/20,victim,DAM_LIGHTNING))
-	{
-	    send_to_char("Your muscles stop responding.\n\r",victim);
-	    DAZE_STATE(victim,UMAX(12,level/4 + dam/20));
-	}
-
-	/* toast some gear */
-	for (obj = victim->carrying; obj != NULL; obj = obj_next)
-	{
-	    obj_next = obj->next_content;
-	    shock_effect(obj,level,dam,TARGET_OBJ);
-	}
-	return;
-    }
-
-    if (target == TARGET_OBJ)
-    {
-	OBJ_DATA *obj = (OBJ_DATA *) vo;
-	int chance;
-	char *msg;
-
-	if (IS_OBJ_STAT(obj,ITEM_BURN_PROOF)
-	||  IS_OBJ_STAT(obj,ITEM_NOPURGE)
-	||  number_range(0,4) == 0)
-	    return;
-
-	chance = level / 4 + dam / 10;
-
-	if (chance > 25)
-	    chance = (chance - 25) / 2 + 25;
-	if (chance > 50)
-	    chance = (chance - 50) /2 + 50;
-
-	if (IS_OBJ_STAT(obj,ITEM_BLESS))
-	    chance -= 5;
-
- 	chance -= obj->level * 2;
-
-	switch(obj->item_type)
-	{
-	    default:
-		return;
-	   case ITEM_WAND:
-	   case ITEM_STAFF:
-		chance += 10;
-		msg = (char*)"$p overloads and explodes!";
-		break;
-	   case ITEM_JEWELRY:
-		chance -= 10;
-		msg = (char*)"$p is fused into a worthless lump.";
-	}
-	
-	chance = URANGE(5,chance,95);
-
-	if (number_percent() > chance)
-	    return;
-
-	if (obj->carried_by != NULL)
-	    act(msg,obj->carried_by,obj,NULL,TO_ALL, POS_RESTING);
-	else if (obj->in_room != NULL && obj->in_room->people != NULL)
-	    act(msg,obj->in_room->people,obj,NULL,TO_ALL, POS_RESTING);
 
 	extract_obj(obj);
 	return;
-    }
 }
 
+void poison_effect(ROOM_INDEX_DATA *room, int level, int dam)
+{
+	for (auto obj : room->contents)
+	{
+		poison_effect(obj, level, dam);
+	}
+	return;
+}
+
+void poison_effect(Character *victim, int level, int dam)
+{
+	/* chance of poisoning */
+	if (!saves_spell(level / 4 + dam / 20, victim, DAM_POISON))
+	{
+		AFFECT_DATA af;
+
+		send_to_char("You feel poison coursing through your veins.\n\r",
+						victim);
+		act("$n looks very ill.", victim, NULL, NULL, TO_ROOM, POS_RESTING);
+
+		af.where = TO_AFFECTS;
+		af.type = gsn_poison;
+		af.level = level;
+		af.duration = level / 2;
+		af.location = APPLY_STR;
+		af.modifier = -1;
+		af.bitvector = AFF_POISON;
+		affect_join(victim, &af);
+	}
+
+	/* equipment */
+	for (auto obj : victim->getCarrying())
+	{
+		poison_effect(obj, level, dam);
+	}
+}
+
+void poison_effect(Object *obj, int level, int dam)
+{
+	int chance;
+
+	if (obj->hasStat(ITEM_BURN_PROOF) || obj->hasStat(ITEM_BLESS) || number_range(0, 4) == 0)
+		return;
+
+	chance = level / 4 + dam / 10;
+	if (chance > 25)
+		chance = (chance - 25) / 2 + 25;
+	if (chance > 50)
+		chance = (chance - 50) / 2 + 50;
+
+	chance -= obj->getLevel() * 2;
+
+	switch (obj->getItemType())
+	{
+	default:
+		return;
+	case ITEM_FOOD:
+		break;
+	case ITEM_DRINK_CON:
+		if (obj->getValues().at(0) == obj->getValues().at(1))
+			return;
+		break;
+	}
+
+	chance = URANGE(5, chance, 95);
+
+	if (number_percent() > chance)
+		return;
+
+	obj->getValues().at(3) = 1;
+}
+
+void shock_effect(ROOM_INDEX_DATA *room, int level, int dam)
+{
+	for (auto obj : room->contents)
+	{
+		shock_effect(obj, level, dam);
+	}
+}
+
+void shock_effect(Character *victim, int level, int dam)
+{
+	/* daze and confused? */
+	if (!saves_spell(level / 4 + dam / 20, victim, DAM_LIGHTNING))
+	{
+		send_to_char("Your muscles stop responding.\n\r", victim);
+		DAZE_STATE(victim, UMAX(12, level / 4 + dam / 20));
+	}
+
+	/* toast some gear */
+	for (auto obj : victim->getCarrying())
+	{
+		shock_effect(obj, level, dam);
+	}
+}
+
+void shock_effect(Object *obj, int level, int dam)
+{
+	int chance;
+	char *msg;
+
+	if (obj->hasStat(ITEM_BURN_PROOF) || obj->hasStat(ITEM_NOPURGE) || number_range(0, 4) == 0)
+		return;
+
+	chance = level / 4 + dam / 10;
+
+	if (chance > 25)
+		chance = (chance - 25) / 2 + 25;
+	if (chance > 50)
+		chance = (chance - 50) / 2 + 50;
+
+	if (obj->hasStat(ITEM_BLESS))
+		chance -= 5;
+
+	chance -= obj->getLevel() * 2;
+
+	switch (obj->getItemType())
+	{
+	default:
+		return;
+	case ITEM_WAND:
+	case ITEM_STAFF:
+		chance += 10;
+		msg = (char *)"$p overloads and explodes!";
+		break;
+	case ITEM_JEWELRY:
+		chance -= 10;
+		msg = (char *)"$p is fused into a worthless lump.";
+	}
+
+	chance = URANGE(5, chance, 95);
+
+	if (number_percent() > chance)
+		return;
+
+	if (obj->getCarriedBy() != NULL)
+		act(msg, obj->getCarriedBy(), obj, NULL, TO_ALL, POS_RESTING);
+	else if (obj->getInRoom() != NULL && obj->getInRoom()->people != NULL)
+		act(msg, obj->getInRoom()->people, obj, NULL, TO_ALL, POS_RESTING);
+
+	extract_obj(obj);
+}

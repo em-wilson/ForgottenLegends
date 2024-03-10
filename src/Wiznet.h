@@ -2,7 +2,7 @@
 #define WIZNET_H
 
 class Character;
-typedef struct obj_data OBJ_DATA;
+class Object;
 
 #ifndef ASCII_FLAG_CONVERSIONS
 #define ASCII_FLAG_CONVERSIONS
@@ -72,6 +72,6 @@ class Wiznet
 {
 	public:
 		static Wiznet *instance();
-		void report(std::string str, Character *ch, OBJ_DATA *obj, long flag, long flag_skip, int min_level);
+		void report(std::string str, Character *ch, Object *obj, long flag, long flag_skip, int min_level);
 };
 #endif

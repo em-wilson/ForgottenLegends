@@ -3,12 +3,19 @@
 
 #include <list>
 #include <string>
+#include <vector>
 #include <unordered_map>
 #include "clans/Clan.h"
 #include "pc_data.h"
 
+#include "IAffectableEntity.h"
+#include "IObjectContainer.h"
+
 class Character;
+class Object;
+class Portal;
 class Race;
+class ROOM_INDEX_DATA;
 
 #define args( list )			    list
 typedef bool    SPEC_FUN	        args( ( Character *ch ) );
@@ -18,16 +25,24 @@ typedef struct  descriptor_data     DESCRIPTOR_DATA;
 typedef struct  gen_data		    GEN_DATA;
 typedef struct  mem_data            MEM_DATA;
 typedef struct	mob_index_data		MOB_INDEX_DATA;
-typedef struct	obj_data		    OBJ_DATA;
-typedef struct	room_index_data		ROOM_INDEX_DATA;
 
 /*
  * One character (PC or NPC).
  */
-class Character
+class Character : public IAffectableEntity, IObjectContainer
 {
     public:
         virtual ~Character();
+
+        // IObjectContainer
+        void addObject(Object *obj);
+        void removeObject(Object *obj);
+
+        // IAffectableEntity
+        AFFECT_DATA * findAffectBySn(int sn);
+        void removeAffect(AFFECT_DATA *af);
+        virtual void giveAffect( AFFECT_DATA *paf ); // replaces affect_to_char
+        void modifyAffect(AFFECT_DATA *paf, bool fAdd); // replaces affect_modify
 
         Character *		next;
         Character *		next_in_room;
@@ -42,9 +57,8 @@ class Character
         SPEC_FUN *		spec_fun;
         MOB_INDEX_DATA *	pIndexData;
         DESCRIPTOR_DATA *	desc;
-        AFFECT_DATA *	affected;
-        OBJ_DATA *		carrying;
-        OBJ_DATA *		on;
+        std::list<AFFECT_DATA *>	affected;
+        // Object *		on;
         ROOM_INDEX_DATA *	in_room;
         ROOM_INDEX_DATA *	was_in_room;
         AREA_DATA *		zone;
@@ -127,17 +141,25 @@ class Character
         * Advancement stuff.
         */
         void advance_level( bool hide );
+        void affect_check(int where,int vector);
+        bool can_see( Object *obj );
+        bool can_see( Character *victim );
         virtual void gain_exp( int gain );
         virtual int hit_gain( ) = 0;
         virtual int mana_gain( ) = 0;
         virtual int move_gain( ) = 0;
         void gain_condition( int iCond, int value );
+        Object * getEquipment( int iWear );
+        void unequip( Object *obj );
         void setName( string name );
         std::string getName();
         void setDescription( const char * description );
+        std::vector<Object *> getCarrying();
         char * getDescription();
         Race * getRace();
         void setRace(Race * value);
+        void getOntoObject(Object *obj);
+        Object * onObject();
 
         virtual bool isDenied();
         virtual bool isImmortal();
@@ -155,8 +177,10 @@ class Character
         Character();
 
     private:
+        std::list<Object *> _carrying;
         std::string _name;
         std::string _description;
+        Object * _on;
         Race * _race;
 };
 #endif

@@ -3,9 +3,11 @@
 #include "merc.h"
 #include "board.h"
 #include "ILogger.h"
+#include "Object.h"
 #include "PlayerRace.h"
 #include "PlayerCharacter.h"
 #include "RaceManager.h"
+#include "Room.h"
 #include "Wiznet.h"
 
 extern class RaceManager * race_manager;
@@ -147,7 +149,6 @@ bool PlayerCharacter::didJustDie() {
 }
 
 void PlayerCharacter::writeToFile(FILE *fp) {
-        AFFECT_DATA *paf;
         int sn, gn, pos, i;
 
         // If NPC - this should be #MOB
@@ -320,7 +321,7 @@ void PlayerCharacter::writeToFile(FILE *fp) {
                 }
 //        }
 
-        for ( paf = this->affected; paf != NULL; paf = paf->next )
+        for ( auto paf : this->affected )
         {
                 if (paf->type < 0 || paf->type>= MAX_SKILL)
                         continue;
@@ -377,20 +378,20 @@ void PlayerCharacter::update() {
 
         if ( this->level < LEVEL_IMMORTAL )
         {
-                OBJ_DATA *obj;
+                Object *obj;
 
-                if ( ( obj = get_eq_char( this, WEAR_LIGHT ) ) != NULL
-                        &&   obj->item_type == ITEM_LIGHT
-                        &&   obj->value[2] > 0 )
+                if ( ( obj = this->getEquipment( WEAR_LIGHT ) ) != NULL
+                        &&   obj->getItemType() == ITEM_LIGHT
+                        &&   obj->getValues().at(2) > 0 )
                 {
-                        if ( --obj->value[2] == 0 && this->in_room != NULL )
+                        if ( --obj->getValues().at(2) == 0 && this->in_room != NULL )
                         {
                                 --this->in_room->light;
                                 ::act( "$p goes out.", this, obj, NULL, TO_ROOM, POS_RESTING );
                                 ::act( "$p flickers and goes out.", this, obj, NULL, TO_CHAR, POS_RESTING );
                                 extract_obj( obj );
                         }
-                        else if ( obj->value[2] <= 5 && this->in_room != NULL)
+                        else if ( obj->getValues().at(2) <= 5 && this->in_room != NULL)
                                 ::act("$p flickers.",this,obj,NULL,TO_CHAR, POS_RESTING );
                 }
 
@@ -454,8 +455,8 @@ int PlayerCharacter::hit_gain( )
 
         gain = gain * this->in_room->heal_rate / 100;
 
-        if (this->on != NULL && this->on->item_type == ITEM_FURNITURE)
-                gain = gain * this->on->value[3] / 100;
+        if (this->onObject() != NULL && this->onObject()->getItemType() == ITEM_FURNITURE)
+                gain = gain * this->onObject()->getValues().at(3) / 100;
 
         if ( IS_AFFECTED(this, AFF_POISON) )
                 gain /= 4;
@@ -512,8 +513,8 @@ int PlayerCharacter::mana_gain( )
 
         gain = gain * this->in_room->mana_rate / 100;
 
-        if (this->on != NULL && this->on->item_type == ITEM_FURNITURE)
-                gain = gain * this->on->value[4] / 100;
+        if (this->onObject() != NULL && this->onObject()->getItemType() == ITEM_FURNITURE)
+                gain = gain * this->onObject()->getValues().at(4) / 100;
 
         if ( IS_AFFECTED( this, AFF_POISON ) )
                 gain /= 4;
@@ -555,8 +556,8 @@ int PlayerCharacter::move_gain( )
 
         gain = gain * this->in_room->heal_rate/100;
 
-        if (this->on != NULL && this->on->item_type == ITEM_FURNITURE)
-                gain = gain * this->on->value[3] / 100;
+        if (this->onObject() != NULL && this->onObject()->getItemType() == ITEM_FURNITURE)
+                gain = gain * this->onObject()->getValues().at(3) / 100;
 
         if ( IS_AFFECTED(this, AFF_POISON) )
                 gain /= 4;

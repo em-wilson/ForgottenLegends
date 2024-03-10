@@ -43,10 +43,12 @@
 #include <ctype.h>
 #include "merc.h"
 #include "clans/ClanManager.h"
-#include "NonPlayerCharacter.h"
-#include "tables.h"
 #include "lookup.h"
+#include "Object.h"
+#include "NonPlayerCharacter.h"
 #include "RaceManager.h"
+#include "Room.h"
+#include "tables.h"
 
 extern ClanManager * clan_manager;
 extern RaceManager * race_manager;
@@ -254,7 +256,7 @@ Character *get_random_char( Character *mob )
     {
         if ( mob != vch 
         &&   !IS_NPC( vch ) 
-        &&   can_see( mob, vch )
+        &&   mob->can_see( vch )
         &&   ( now = number_percent() ) > highest )
         {
             victim = vch;
@@ -280,7 +282,7 @@ int count_people_room( Character *mob, int iFlag )
 	  || (iFlag == 3 && IS_NPC( mob ) && IS_NPC( vch ) 
 	     && mob->pIndexData->vnum == vch->pIndexData->vnum )
 	  || (iFlag == 4 && is_same_group( mob, vch )) )
-	&& can_see( mob, vch ) ) 
+	&& mob->can_see( vch ) ) 
 	    count++;
     return ( count );
 }
@@ -316,12 +318,13 @@ int get_order( Character *ch )
  */
 bool has_item( Character *ch, sh_int vnum, sh_int item_type, bool fWear )
 {
-    OBJ_DATA *obj;
-    for ( obj = ch->carrying; obj; obj = obj->next_content )
-	if ( ( vnum < 0 || obj->pIndexData->vnum == vnum )
-	&&   ( item_type < 0 || obj->pIndexData->item_type == item_type )
-	&&   ( !fWear || obj->wear_loc != WEAR_NONE ) )
-	    return TRUE;
+    Object *obj;
+    for ( auto obj : ch->getCarrying() ) {
+		if ( ( vnum < 0 || obj->getObjectIndexData()->vnum == vnum )
+		&&   ( item_type < 0 || obj->getObjectIndexData()->item_type == item_type )
+		&&   ( !fWear || obj->getWearLocation() != WEAR_NONE ) )
+			return TRUE;
+	}
     return FALSE;
 }
 
@@ -342,10 +345,11 @@ bool get_mob_vnum_room( Character *ch, sh_int vnum )
  */
 bool get_obj_vnum_room( Character *ch, sh_int vnum )
 {
-    OBJ_DATA *obj;
-    for ( obj = ch->in_room->contents; obj; obj = obj->next_content )
-	if ( obj->pIndexData->vnum == vnum )
-	    return TRUE;
+    Object *obj;
+    for ( auto obj : ch->in_room->contents ) {
+		if ( obj->getObjectIndexData()->vnum == vnum )
+			return TRUE;
+	}
     return FALSE;
 }
 
@@ -367,9 +371,9 @@ int cmd_eval( sh_int vnum, char *line, int check,
 {
     Character *lval_char = mob;
     Character *vch = (Character *) arg2;
-    OBJ_DATA *obj1 = (OBJ_DATA  *) arg1;
-    OBJ_DATA *obj2 = (OBJ_DATA  *) arg2;
-    OBJ_DATA  *lval_obj = NULL;
+    Object *obj1 = (Object  *) arg1;
+    Object *obj2 = (Object  *) arg2;
+    Object  *lval_obj = NULL;
 
     char *original, buf[MAX_INPUT_LENGTH], code;
     int lval = 0, oper = 0, rval = -1;
@@ -518,10 +522,10 @@ int cmd_eval( sh_int vnum, char *line, int check,
                 case 't':
                 case 'r':
 		case 'q':
-	    	    return( lval_char != NULL && can_see( mob, lval_char ) );
+	    	    return( lval_char != NULL && mob->can_see( lval_char ) );
 		case 'o':
 		case 'p':
-	    	    return( lval_obj != NULL && can_see_obj( mob, lval_obj ) );
+	    	    return( lval_obj != NULL && mob->can_see( lval_obj ) );
 	    }
 	case CHK_HASTARGET:
 	    return( lval_char != NULL && lval_char->mprog_target != NULL
@@ -575,7 +579,7 @@ int cmd_eval( sh_int vnum, char *line, int check,
 		    return( lval_char != NULL && is_name( buf, lval_char->getName().c_str() ) );
 		case 'o':
 		case 'p':
-		    return( lval_obj != NULL && is_name( buf, lval_obj->name ) );
+		    return( lval_obj != NULL && is_name( buf, lval_obj->getName().c_str() ) );
 	    }
 	case CHK_POS:
 	    return( lval_char != NULL && lval_char->position == position_lookup( buf ) );
@@ -584,7 +588,7 @@ int cmd_eval( sh_int vnum, char *line, int check,
 	case CHK_RACE:
 	    return( lval_char != NULL && lval_char->getRace() == race_manager->getRaceByName( buf ) );
 	case CHK_OBJTYPE:
-	    return( lval_obj != NULL && lval_obj->item_type == item_lookup( buf ) );
+	    return( lval_obj != NULL && lval_obj->getItemType() == item_lookup( buf ) );
 	default:;
     }
 
@@ -618,7 +622,7 @@ int cmd_eval( sh_int vnum, char *line, int check,
                 case 'o':
                 case 'p':
                      if ( lval_obj != NULL )
-                        lval = lval_obj->pIndexData->vnum;
+                        lval = lval_obj->getObjectIndexData()->vnum;
             }
             break;
 	case CHK_HPCNT:
@@ -636,15 +640,15 @@ int cmd_eval( sh_int vnum, char *line, int check,
 	    if ( lval_char != NULL ) 
 		lval = lval_char->silver + (lval_char->gold * 100); break;
 	case CHK_OBJVAL0:
-            if ( lval_obj != NULL ) lval = lval_obj->value[0]; break;
+            if ( lval_obj != NULL ) lval = lval_obj->getValues().at(0); break;
         case CHK_OBJVAL1:
-            if ( lval_obj != NULL ) lval = lval_obj->value[1]; break;
+            if ( lval_obj != NULL ) lval = lval_obj->getValues().at(1); break;
         case CHK_OBJVAL2: 
-            if ( lval_obj != NULL ) lval = lval_obj->value[2]; break;
+            if ( lval_obj != NULL ) lval = lval_obj->getValues().at(2); break;
         case CHK_OBJVAL3:
-            if ( lval_obj != NULL ) lval = lval_obj->value[3]; break;
+            if ( lval_obj != NULL ) lval = lval_obj->getValues().at(3); break;
 	case CHK_OBJVAL4:
-	    if ( lval_obj != NULL ) lval = lval_obj->value[4]; break;
+	    if ( lval_obj != NULL ) lval = lval_obj->getValues().at(4); break;
 	case CHK_GRPSIZE:
 	    if( lval_char != NULL ) lval = count_people_room( lval_char, 4 ); break;
 	default:
@@ -674,8 +678,8 @@ void expand_arg( char *buf,
  
     char fname[MAX_INPUT_LENGTH];
     Character *vch = (Character *) arg2;
-    OBJ_DATA *obj1 = (OBJ_DATA  *) arg1;
-    OBJ_DATA *obj2 = (OBJ_DATA  *) arg2;
+    Object *obj1 = (Object  *) arg1;
+    Object *obj2 = (Object  *) arg2;
     const char *str;
     const char *i;
     char *point;
@@ -707,31 +711,31 @@ void expand_arg( char *buf,
             case 'I': i = mob->short_descr;                     break;
             case 'n': 
 		i = someone;
-		if ( ch != NULL && can_see( mob, ch ) )
+		if ( ch != NULL && mob->can_see( ch ) )
 		{
             	    one_argument( ch->getName().data(), fname );
 		    i = capitalize(fname);
 		}						break;
             case 'N': 
-	    	i = (ch != NULL && can_see( mob, ch ) )
+	    	i = (ch != NULL && mob->can_see( ch ) )
 		? ( IS_NPC( ch ) ? ch->short_descr : ch->getName().c_str() )
 		: someone;                         		break;
             case 't': 
 		i = someone;
-		if ( vch != NULL && can_see( mob, vch ) )
+		if ( vch != NULL && mob->can_see( vch ) )
 		{
             	     one_argument( vch->getName().data(), fname );
 		     i = capitalize(fname);
 		}						break;
             case 'T': 
-	    	i = (vch != NULL && can_see( mob, vch ))
+	    	i = (vch != NULL && mob->can_see( vch ))
 		? ( IS_NPC( vch ) ? vch->short_descr : vch->getName().c_str() )
 		: someone;                         		break;
             case 'r': 
 		if ( rch == NULL ) 
 		    rch = get_random_char( mob );
 		i = someone;
-		if( rch != NULL && can_see( mob, rch ) )
+		if( rch != NULL && mob->can_see( rch ) )
 		{
                     one_argument( rch->getName().data(), fname );
 		    i = capitalize(fname);
@@ -739,96 +743,96 @@ void expand_arg( char *buf,
             case 'R': 
 		if ( rch == NULL ) 
 		    rch = get_random_char( mob );
-		i  = ( rch != NULL && can_see( mob, rch ) )
+		i  = ( rch != NULL && mob->can_see( rch ) )
 		? ( IS_NPC( ch ) ? ch->short_descr : ch->getName().c_str() )
 		:someone;					break;
 	    case 'q':
 		i = someone;
-		if ( mob->mprog_target != NULL && can_see( mob, mob->mprog_target ) )
+		if ( mob->mprog_target != NULL && mob->can_see( mob->mprog_target ) )
 	        {
 		    one_argument( mob->mprog_target->getName().data(), fname );
 		    i = capitalize( fname );
 		} 						break;
 	    case 'Q':
-	    	i = (mob->mprog_target != NULL && can_see( mob, mob->mprog_target ))
+	    	i = (mob->mprog_target != NULL && mob->can_see( mob->mprog_target ))
 		? ( IS_NPC( mob->mprog_target ) ? mob->mprog_target->short_descr : mob->mprog_target->getName().c_str() )
 		: someone;                         		break;
             case 'j': i = he_she  [URANGE(0, mob->sex, 2)];     break;
             case 'e': 
-	    	i = (ch != NULL && can_see( mob, ch ))
+	    	i = (ch != NULL && mob->can_see( ch ))
 		? he_she  [URANGE(0, ch->sex, 2)]        
 		: someone;					break;
             case 'E': 
-	    	i = (vch != NULL && can_see( mob, vch ))
+	    	i = (vch != NULL && mob->can_see( vch ))
 		? he_she  [URANGE(0, vch->sex, 2)]        
 		: someone;					break;
             case 'J': 
-		i = (rch != NULL && can_see( mob, rch ))
+		i = (rch != NULL && mob->can_see( rch ))
 		? he_she  [URANGE(0, rch->sex, 2)]        
 		: someone;					break;
 	    case 'X':
-		i = (mob->mprog_target != NULL && can_see( mob, mob->mprog_target))
+		i = (mob->mprog_target != NULL && mob->can_see( mob->mprog_target))
 		? he_she  [URANGE(0, mob->mprog_target->sex, 2)]
 		: someone;					break;
             case 'k': i = him_her [URANGE(0, mob->sex, 2)];	break;
             case 'm': 
-	    	i = (ch != NULL && can_see( mob, ch ))
+	    	i = (ch != NULL && mob->can_see( ch ))
 		? him_her [URANGE(0, ch  ->sex, 2)]
 		: someone;        				break;
             case 'M': 
-	    	i = (vch != NULL && can_see( mob, vch ))
+	    	i = (vch != NULL && mob->can_see( vch ))
 		? him_her [URANGE(0, vch ->sex, 2)]        
 		: someone;					break;
             case 'K': 
 		if ( rch == NULL ) 
 		    rch = get_random_char( mob );
-		i = (rch != NULL && can_see( mob, rch ))
+		i = (rch != NULL && mob->can_see( rch ))
 		? him_her [URANGE(0, rch ->sex, 2)]
 		: someone;					break;
             case 'Y': 
-	    	i = (mob->mprog_target != NULL && can_see( mob, mob->mprog_target ))
+	    	i = (mob->mprog_target != NULL && mob->can_see( mob->mprog_target ))
 		? him_her [URANGE(0, mob->mprog_target->sex, 2)]        
 		: someone;					break;
             case 'l': i = his_her [URANGE(0, mob ->sex, 2)];    break;
             case 's': 
-	    	i = (ch != NULL && can_see( mob, ch ))
+	    	i = (ch != NULL && mob->can_see( ch ))
 		? his_her [URANGE(0, ch ->sex, 2)]
 		: someones;					break;
             case 'S': 
-	    	i = (vch != NULL && can_see( mob, vch ))
+	    	i = (vch != NULL && mob->can_see( vch ))
 		? his_her [URANGE(0, vch ->sex, 2)]
 		: someones;					break;
             case 'L': 
 		if ( rch == NULL ) 
 		    rch = get_random_char( mob );
-		i = ( rch != NULL && can_see( mob, rch ) )
+		i = ( rch != NULL && mob->can_see( rch ) )
 		? his_her [URANGE(0, rch ->sex, 2)]
 		: someones;					break;
             case 'Z': 
-	    	i = (mob->mprog_target != NULL && can_see( mob, mob->mprog_target ))
+	    	i = (mob->mprog_target != NULL && mob->can_see( mob->mprog_target ))
 		? his_her [URANGE(0, mob->mprog_target->sex, 2)]
 		: someones;					break;
 	    case 'o':
 		i = something;
-		if ( obj1 != NULL && can_see_obj( mob, obj1 ) )
+		if ( obj1 != NULL && mob->can_see( obj1 ) )
 		{
-            	    one_argument( obj1->name, fname );
+            	    one_argument( obj1->getName().data(), fname );
                     i = fname;
 		} 						break;
             case 'O':
-                i = (obj1 != NULL && can_see_obj( mob, obj1 ))
-                ? obj1->short_descr
+                i = (obj1 != NULL && mob->can_see( obj1 ))
+                ? obj1->getShortDescription().c_str()
                 : something;					break;
             case 'p':
 		i = something;
-		if ( obj2 != NULL && can_see_obj( mob, obj2 ) )
+		if ( obj2 != NULL && mob->can_see( obj2 ) )
 		{
-            	    one_argument( obj2->name, fname );
+            	    one_argument( obj2->getName().data(), fname );
             	    i = fname;
 		} 						break;
             case 'P':
-            	i = (obj2 != NULL && can_see_obj( mob, obj2 ))
-                ? obj2->short_descr
+            	i = (obj2 != NULL && mob->can_see( obj2 ))
+                ? obj2->getShortDescription().c_str()
                 : something;					break;
         }
  
@@ -1168,7 +1172,7 @@ bool mp_exit_trigger( Character *ch, int dir )
 		if ( prg->trig_type == TRIG_EXIT
 		&&  dir == atoi( prg->trig_phrase )
 		&&  mob->position == mob->pIndexData->default_pos
-		&&  can_see( mob, ch ) )
+		&&  mob->can_see( ch ) )
 		{
 		    program_flow( prg->vnum, prg->code, mob, ch, NULL, NULL );
 		    return TRUE;
@@ -1186,7 +1190,7 @@ bool mp_exit_trigger( Character *ch, int dir )
     return FALSE;
 }
 
-void mp_give_trigger( Character *mob, Character *ch, OBJ_DATA *obj )
+void mp_give_trigger( Character *mob, Character *ch, Object *obj )
 {
 
     char        buf[MAX_INPUT_LENGTH], *p;
@@ -1201,7 +1205,7 @@ void mp_give_trigger( Character *mob, Character *ch, OBJ_DATA *obj )
 	     */
 	    if ( is_number( p ) )
 	    {
-		if ( obj->pIndexData->vnum == atoi(p) )
+		if ( obj->getObjectIndexData()->vnum == atoi(p) )
 		{
 		    program_flow(prg->vnum, prg->code, mob, ch, (void *) obj, NULL);
 		    return;
@@ -1216,7 +1220,7 @@ void mp_give_trigger( Character *mob, Character *ch, OBJ_DATA *obj )
 	    	{
 		    p = one_argument( p, buf );
 
-		    if ( is_name( buf, obj->name )
+		    if ( is_name( buf, obj->getName().c_str() )
 		    ||   !str_cmp( "all", buf ) )
 		    {
 		    	program_flow(prg->vnum, prg->code, mob, ch, (void *) obj, NULL);
@@ -1243,7 +1247,7 @@ void mp_greet_trigger( Character *ch )
 	     */
 	    if ( HAS_TRIGGER( mob,TRIG_GREET )
 	    &&   mob->position == mob->pIndexData->default_pos
-	    &&   can_see( mob, ch ) )
+	    &&   mob->can_see( ch ) )
 		mp_percent_trigger( mob, ch, NULL, NULL, TRIG_GREET );
 	    else                 
 	    if ( HAS_TRIGGER( mob, TRIG_GRALL ) )

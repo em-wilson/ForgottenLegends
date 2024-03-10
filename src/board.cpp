@@ -27,6 +27,7 @@
 #include "clans/ClanManager.h"
 #include "ConnectedState.h"
 #include "PlayerCharacter.h"
+#include "Room.h"
 #include "SocketHelper.h"
 
 DECLARE_DO_FUN( do_help                );

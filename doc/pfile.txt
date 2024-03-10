@@ -90,7 +90,7 @@ continue loading.
 
 (1) Add the field to the appropriate structure in 'merc.h'.
 
-(2) Initialize the field in 'create_object' in 'db.c'.
+(2) Initialize the field in 'ObjectHelper::createFromIndex' in 'db.c'.
 
 (3) Initialize the field in 'fread_obj' in 'save.c' if needed.
     Make sure that objects which do not have the field are

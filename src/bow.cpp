@@ -4,6 +4,8 @@
 #include <string.h>
 #include "merc.h"
 #include "NonPlayerCharacter.h"
+#include "Object.h"
+#include "Room.h"
 
 Character * find_target args( ( Character *ch, int dir, char * search ) );
 Character * find_char	args( ( Character *ch, char *search, ROOM_INDEX_DATA *scan_room ) );
@@ -11,8 +13,7 @@ Character * find_char	args( ( Character *ch, char *search, ROOM_INDEX_DATA *scan
 void do_shoot( Character *ch, char *argument )
 {
     Character *victim;
-    OBJ_DATA *bow;
-    OBJ_DATA *arrow;
+    Object *bow;
     bool found_arrow;
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
@@ -24,14 +25,14 @@ void do_shoot( Character *ch, char *argument )
 
     if (get_skill(ch, gsn_bow) < 1)
     {
-	send_to_char("You are not skilled enough at the bow to use this skill.\n\r",ch);
-	return;
+        send_to_char("You are not skilled enough at the bow to use this skill.\n\r",ch);
+        return;
     }
 
-    if ((bow = get_eq_char(ch, WEAR_WIELD)) == NULL || bow->item_type != ITEM_BOW)
+    if ((bow = ch->getEquipment(WEAR_WIELD)) == NULL || bow->getItemType() != ITEM_BOW)
     {
-	send_to_char("You need a bow for this skill.\n\r",ch);
-	return;
+        send_to_char("You need a bow for this skill.\n\r",ch);
+        return;
     }
 
     else if (!str_cmp(arg1, "n") || !str_cmp(arg1, "north")) door = 0;
@@ -64,41 +65,38 @@ void do_shoot( Character *ch, char *argument )
 
     found_arrow = FALSE;
 
-    for ( arrow = ch->carrying; arrow != NULL; arrow = arrow->next_content )
+    for ( auto arrow : ch->getCarrying() )
     {
-	if (arrow->item_type != ITEM_ARROW)
-	    continue;
-	else
-	{
-	    --arrow->value[0];
-	    if (arrow->value[0] < 1)
-	    {
-		send_to_char("You use your final arrow in this quiver.\n\r",ch);
-		obj_from_char( arrow );
-	    }
-	    else
-	    {
-		snprintf(buf, sizeof(buf),"Arrows remaining in this quiver: %d\n\r", arrow->value[0] );
-		send_to_char(buf,ch);
-	    }
+        if (arrow->getItemType() != ITEM_ARROW) {
+            continue;
+        } else {
+            --arrow->getValues().at(0);
+            if (arrow->getValues().at(0) < 1)
+            {
+                send_to_char("You use your final arrow in this quiver.\n\r",ch);
+                obj_from_char( arrow );
+            } else {
+                snprintf(buf, sizeof(buf),"Arrows remaining in this quiver: %d\n\r", arrow->getValues().at(0) );
+                send_to_char(buf,ch);
+            }
 
-	    found_arrow = TRUE;
-	    break;
-	}
+            found_arrow = TRUE;
+            break;
+        }
     }
 
     if (!found_arrow)
     {
-	send_to_char("You have no more free arrows.\n\r",ch);
-	return;
+        send_to_char("You have no more free arrows.\n\r",ch);
+        return;
     }
 
     if ( get_skill(ch, gsn_bow) < number_range( 1, 120 ) )
     {
-	send_to_char("You miss your mark.\n\r", ch );
-	check_improve(ch,gsn_bow,FALSE,2);
-	WAIT_STATE(ch, PULSE_VIOLENCE);
-	return;
+        send_to_char("You miss your mark.\n\r", ch );
+        check_improve(ch,gsn_bow,FALSE,2);
+        WAIT_STATE(ch, PULSE_VIOLENCE);
+        return;
     }
 
     act( "You let loose an arrow at $N!", ch, NULL, victim, TO_CHAR, POS_RESTING);
@@ -110,65 +108,62 @@ void do_shoot( Character *ch, char *argument )
 
     if (IS_NPC(victim) && IS_SET(victim->act, ACT_SENTINEL) && ch->level >= 10)
     {
-	int num;
+        int num;
 
-	/* Create them */
-	for (num = 0; num < (ch->level / 10); num++)
-	{
-	    Character *mob;
+        /* Create them */
+        for (num = 0; num < (ch->level / 10); num++)
+        {
+            Character *mob;
 
-	    mob = new NonPlayerCharacter( get_mob_index( MOB_VNUM_CITYGUARD ) );
-	    char_to_room( mob, victim->in_room );
+            mob = new NonPlayerCharacter( get_mob_index( MOB_VNUM_CITYGUARD ) );
+            char_to_room( mob, victim->in_room );
 
-	    mob->hunting = ch;
-	}
+            mob->hunting = ch;
+        }
 
-	/* Send the message */
-	if (num < 2)
-	    snprintf(buf, sizeof(buf), "$n calls a guard upon $N!");
-	else
-	    snprintf(buf, sizeof(buf), "$n calls %d guards upon $N!", num);
-	act( buf, victim, NULL, ch, TO_ROOM, POS_RESTING );
+        /* Send the message */
+        if (num < 2)
+            snprintf(buf, sizeof(buf), "$n calls a guard upon $N!");
+        else
+            snprintf(buf, sizeof(buf), "$n calls %d guards upon $N!", num);
+        act( buf, victim, NULL, ch, TO_ROOM, POS_RESTING );
 
-	if (num < 2)
-	    snprintf(buf, sizeof(buf), "$n calls a guard upon you!");
-	else
-	    snprintf(buf, sizeof(buf), "$n calls %d guards upon you!", num);
-	act( buf, victim, NULL, ch, TO_VICT, POS_RESTING );
+        if (num < 2)
+            snprintf(buf, sizeof(buf), "$n calls a guard upon you!");
+        else
+            snprintf(buf, sizeof(buf), "$n calls %d guards upon you!", num);
+        act( buf, victim, NULL, ch, TO_VICT, POS_RESTING );
+    } else {
+    	victim->hunting = ch;
     }
-    else
-	victim->hunting = ch;
 
-    damage( ch, victim, dice(bow->value[1], bow->value[2]),
-		gsn_bow, DAM_PIERCE, TRUE );
+    damage( ch, victim, dice(bow->getValues().at(1), bow->getValues().at(2)), gsn_bow, DAM_PIERCE, TRUE );
     return;
 }
 
 Character * find_target( Character *ch, int dir, char * search )
 {
-    Character * victim;
-    OBJ_DATA * bow;
+    Character * victim = NULL;
     ROOM_INDEX_DATA *scan_room;
     EXIT_DATA *pExit;
     sh_int depth;
 
-    victim = NULL;
+    Object * bow = ch->getEquipment(WEAR_WIELD );
 
-    bow = get_eq_char( ch, WEAR_WIELD );
+    if (bow->getItemType() != ITEM_BOW) {
+    	return NULL;
+    }
 
-    if (bow->item_type != ITEM_BOW)
-	return NULL;
-
-    bow->range = bow->value[0];
+    int range = bow->getValues().at(0);
     scan_room = ch->in_room;
 
-    for (depth = 0; depth < bow->range; depth++)
+    for (depth = 0; depth < range; depth++)
     {
-	if ((pExit = scan_room->exit[dir]) != NULL)
-	{
-	    scan_room = pExit->u1.to_room;
-	    victim = find_char( ch, search, scan_room );
-	}
+        if ((pExit = scan_room->exit[dir]) != NULL)
+        {
+            scan_room = pExit->u1.to_room;
+            victim = find_char( ch, search, scan_room );
+        }
     }
     return victim;
 }
@@ -191,11 +186,11 @@ Character * find_char( Character *ch, char *search, ROOM_INDEX_DATA *scan_room )
 	*/
 	if (str_cmp(search, "random"))
 	{
-	    if (is_name( search, rch->getName().c_str() ) && can_see(ch, rch))
+	    if (is_name( search, rch->getName().c_str() ) && ch->can_see( rch))
 		return rch;
 	}
 
-	if (can_see(ch, rch))
+	if (ch->can_see( rch))
 	{
 	    if (number_range(ch->level, MAX_LEVEL) == number_range( ch->level, MAX_LEVEL))
 		victim = rch;

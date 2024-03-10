@@ -143,41 +143,6 @@ void free_gen_data(GEN_DATA *gen)
     gen_data_free = gen;
 } 
 
-/* stuff for recycling extended descs */
-EXTRA_DESCR_DATA *extra_descr_free;
-
-EXTRA_DESCR_DATA *new_extra_descr(void)
-{
-    EXTRA_DESCR_DATA *ed;
-
-    if (extra_descr_free == NULL)
-	ed = (EXTRA_DESCR_DATA *)alloc_perm(sizeof(*ed));
-    else
-    {
-	ed = extra_descr_free;
-	extra_descr_free = extra_descr_free->next;
-    }
-
-    ed->keyword = &str_empty[0];
-    ed->description = &str_empty[0];
-    VALIDATE(ed);
-    return ed;
-}
-
-void free_extra_descr(EXTRA_DESCR_DATA *ed)
-{
-    if (!IS_VALID(ed))
-	return;
-
-    free_string(ed->keyword);
-    free_string(ed->description);
-    INVALIDATE(ed);
-    
-    ed->next = extra_descr_free;
-    extra_descr_free = ed;
-}
-
-
 /* stuff for recycling affects */
 AFFECT_DATA *affect_free;
 
@@ -212,58 +177,7 @@ void free_affect(AFFECT_DATA *af)
 }
 
 /* stuff for recycling objects */
-OBJ_DATA *obj_free;
-
-OBJ_DATA *new_obj(void)
-{
-    static OBJ_DATA obj_zero;
-    OBJ_DATA *obj;
-
-    if (obj_free == NULL)
-	obj = (OBJ_DATA *)alloc_perm(sizeof(*obj));
-    else
-    {
-	obj = obj_free;
-	obj_free = obj_free->next;
-    }
-    *obj = obj_zero;
-    VALIDATE(obj);
-
-    return obj;
-}
-
-void free_obj(OBJ_DATA *obj)
-{
-    AFFECT_DATA *paf, *paf_next;
-    EXTRA_DESCR_DATA *ed, *ed_next;
-
-    if (!IS_VALID(obj))
-	return;
-
-    for (paf = obj->affected; paf != NULL; paf = paf_next)
-    {
-	paf_next = paf->next;
-	free_affect(paf);
-    }
-    obj->affected = NULL;
-
-    for (ed = obj->extra_descr; ed != NULL; ed = ed_next )
-    {
-	ed_next = ed->next;
-	free_extra_descr(ed);
-     }
-     obj->extra_descr = NULL;
-   
-    free_string( obj->name        );
-    free_string( obj->description );
-    free_string( obj->short_descr );
-    free_string( obj->owner     );
-    INVALIDATE(obj);
-
-    obj->next   = obj_free;
-    obj_free    = obj; 
-}
-
+Object *obj_free;
 
 /* stuff for setting ids */
 long	last_mob_id;

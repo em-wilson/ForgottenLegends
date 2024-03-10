@@ -4,7 +4,9 @@
 #include "merc.h"
 #include "recycle.h"
 #include "NonPlayerCharacter.h"
+#include "Object.h"
 #include "RaceManager.h"
+#include "Room.h"
 
 extern RaceManager * race_manager;
 
@@ -147,7 +149,7 @@ NonPlayerCharacter::NonPlayerCharacter(MOB_INDEX_DATA *pMobIndex)
                         af.location  = APPLY_NONE;
                         af.modifier  = 0;
                         af.bitvector = AFF_SANCTUARY;
-                        affect_to_char( this, &af );
+                        this->giveAffect( &af );
                 }
 
                 if (IS_AFFECTED(this,AFF_HASTE))
@@ -160,7 +162,7 @@ NonPlayerCharacter::NonPlayerCharacter(MOB_INDEX_DATA *pMobIndex)
                         af.modifier  = 1 + (this->level >= 18) + (this->level >= 25) +
                                 (this->level >= 32);
                         af.bitvector = AFF_HASTE;
-                        affect_to_char( this, &af );
+                        this->giveAffect( &af );
                 }
 
                 if (IS_AFFECTED(this,AFF_PROTECT_EVIL))
@@ -172,7 +174,7 @@ NonPlayerCharacter::NonPlayerCharacter(MOB_INDEX_DATA *pMobIndex)
                         af.location	 = APPLY_SAVES;
                         af.modifier	 = -1;
                         af.bitvector = AFF_PROTECT_EVIL;
-                        affect_to_char(this,&af);
+                        this->giveAffect(&af);
                 }
 
                 if (IS_AFFECTED(this,AFF_PROTECT_GOOD))
@@ -184,7 +186,7 @@ NonPlayerCharacter::NonPlayerCharacter(MOB_INDEX_DATA *pMobIndex)
                         af.location  = APPLY_SAVES;
                         af.modifier  = -1;
                         af.bitvector = AFF_PROTECT_GOOD;
-                        affect_to_char(this,&af);
+                        this->giveAffect(&af);
                 }
         }
         else /* read in old format and convert */
@@ -281,8 +283,8 @@ int NonPlayerCharacter::hit_gain( )
 
         gain = gain * this->in_room->heal_rate / 100;
 
-        if (this->on != NULL && this->on->item_type == ITEM_FURNITURE)
-                gain = gain * this->on->value[3] / 100;
+        if (this->onObject() != NULL && this->onObject()->getItemType() == ITEM_FURNITURE)
+                gain = gain * this->onObject()->getValues().at(3) / 100;
 
         if ( IS_AFFECTED(this, AFF_POISON) )
                 gain /= 4;
@@ -320,8 +322,8 @@ int NonPlayerCharacter::mana_gain( )
 
         gain = gain * this->in_room->mana_rate / 100;
 
-        if (this->on != NULL && this->on->item_type == ITEM_FURNITURE)
-                gain = gain * this->on->value[4] / 100;
+        if (this->onObject() != NULL && this->onObject()->getItemType() == ITEM_FURNITURE)
+                gain = gain * this->onObject()->getValues().at(4) / 100;
 
         if ( IS_AFFECTED( this, AFF_POISON ) )
                 gain /= 4;
@@ -348,8 +350,8 @@ int NonPlayerCharacter::move_gain( )
 
         gain = gain * this->in_room->heal_rate/100;
 
-        if (this->on != NULL && this->on->item_type == ITEM_FURNITURE)
-                gain = gain * this->on->value[3] / 100;
+        if (this->onObject() != NULL && this->onObject()->getItemType() == ITEM_FURNITURE)
+                gain = gain * this->onObject()->getValues().at(3) / 100;
 
         if ( IS_AFFECTED(this, AFF_POISON) )
                 gain /= 4;

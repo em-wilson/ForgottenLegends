@@ -13,7 +13,7 @@ Wiznet *Wiznet::instance()
 	return _inst;
 }
 
-void Wiznet::report(std::string str, Character *ch, OBJ_DATA *obj,
+void Wiznet::report(std::string str, Character *ch, Object *obj,
 	    long flag, long flag_skip, int min_level) 
 {
     DESCRIPTOR_DATA *d;

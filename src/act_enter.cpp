@@ -16,14 +16,14 @@
  ***************************************************************************/
 
 /***************************************************************************
-*	ROM 2.4 is copyright 1993-1996 Russ Taylor			   *
-*	ROM has been brought to you by the ROM consortium		   *
-*	    Russ Taylor (rtaylor@efn.org)				   *
-*	    Gabrielle Taylor						   *
-*	    Brian Moore (zump@rom.org)					   *
-*	By using this code, you have agreed to follow the terms of the	   *
-*	ROM license, in the file Rom24/doc/rom.license			   *
-***************************************************************************/
+ *	ROM 2.4 is copyright 1993-1996 Russ Taylor			   				   *
+ *	ROM has been brought to you by the ROM consortium		   			   *
+ *	    Russ Taylor (rtaylor@efn.org)									   *
+ *	    Gabrielle Taylor												   *
+ *	    Brian Moore (zump@rom.org)										   *
+ *	By using this code, you have agreed to follow the terms of the		   *
+ *	ROM license, in the file Rom24/doc/rom.license						   *
+ ***************************************************************************/
 
 #include <sys/types.h>
 #include <sys/time.h>
@@ -33,328 +33,205 @@
 #include "merc.h"
 #include "ConnectedState.h"
 #include "NonPlayerCharacter.h"
+#include "Object.h"
+#include "ObjectHelper.h"
 #include "PlayerCharacter.h"
+#include "Portal.h"
+#include "Room.h"
 
-void    raw_kill        args( ( Character *victim ) );
-int     xp_compute      args( ( Character *gch, Character *victim, int
-total_levels ) );
+void raw_kill args((Character * victim));
+int xp_compute args((Character * gch, Character *victim, int total_levels));
 
 /* command procedures needed */
-DECLARE_DO_FUN(do_look		);
-DECLARE_DO_FUN(do_stand		);
+DECLARE_DO_FUN(do_look);
+DECLARE_DO_FUN(do_stand);
 
 /* random room generation procedure */
-ROOM_INDEX_DATA  *get_random_room(Character *ch)
+ROOM_INDEX_DATA *get_random_room(Character *ch)
 {
-    ROOM_INDEX_DATA *room;
+	ROOM_INDEX_DATA *room;
 
-    for ( ; ; )
-    {
-        room = get_room_index( number_range( 0, 65535 ) );
-        if ( room != NULL )
-        if ( can_see_room(ch,room)
-	&&   !room_is_private(room)
-        &&   !IS_SET(room->room_flags, ROOM_PRIVATE)
-        &&   !IS_SET(room->room_flags, ROOM_SOLITARY) 
-	&&   !IS_SET(room->room_flags, ROOM_SAFE) 
-	&&   (IS_NPC(ch) || IS_SET(ch->act,ACT_AGGRESSIVE) 
-	||   !IS_SET(room->room_flags,ROOM_LAW)))
-            break;
-    }
+	for (;;)
+	{
+		room = get_room_index(number_range(0, 65535));
+		if (room != NULL)
+			if (can_see_room(ch, room) && !room_is_private(room) && !IS_SET(room->room_flags, ROOM_PRIVATE) && !IS_SET(room->room_flags, ROOM_SOLITARY) && !IS_SET(room->room_flags, ROOM_SAFE) && (IS_NPC(ch) || IS_SET(ch->act, ACT_AGGRESSIVE) || !IS_SET(room->room_flags, ROOM_LAW)))
+				break;
+	}
 
-    return room;
+	return room;
 }
 
 /* RT Enter portals */
-void do_enter( Character *ch, char *argument)
-{    
-    ROOM_INDEX_DATA *location; 
+void do_enter(Character *ch, char *argument)
+{
+	if (ch->fighting != NULL)
+		return;
 
-    if ( ch->fighting != NULL ) 
-	return;
-
-    /* nifty portal stuff */
-    if (argument[0] != '\0')
-    {
-        ROOM_INDEX_DATA *old_room;
-	OBJ_DATA *portal;
-	Character *fch, *fch_next;
-
-        old_room = ch->in_room;
-
-	portal = get_obj_list( ch, argument,  ch->in_room->contents );
-	
-	if (portal == NULL)
+	/* nifty portal stuff */
+	if (argument[0] != '\0')
 	{
-	    send_to_char("You don't see that here.\n\r",ch);
-	    return;
-	}
+		Character *fch, *fch_next;
 
-	if (portal->item_type != ITEM_PORTAL 
-        ||  (IS_SET(portal->value[1],EX_CLOSED) && !IS_TRUSTED(ch,ANGEL)))
-	{
-	    send_to_char("You can't seem to find a way in.\n\r",ch);
-	    return;
-	}
+		Object *obj = ObjectHelper::findInList(ch, argument, ch->in_room->contents);
 
-	if (!IS_TRUSTED(ch,ANGEL) && !IS_SET(portal->value[2],GATE_NOCURSE)
-	&&  (IS_AFFECTED(ch,AFF_CURSE) 
-	||   IS_SET(old_room->room_flags,ROOM_NO_RECALL)))
-	{
-	    send_to_char("Something prevents you from leaving...\n\r",ch);
-	    return;
-	}
+		if (obj == NULL)
+		{
+			send_to_char("You don't see that here.\n\r", ch);
+			return;
+		}
 
-	if (IS_SET(portal->value[2],GATE_RANDOM) || portal->value[3] == -1)
-	{
-	    location = get_random_room(ch);
-	    portal->value[3] = location->vnum; /* for record keeping :) */
+		if (!obj->isPortal())
+		{
+			send_to_char("You can't seem to find a way in.\n\r", ch);
+			return;
+		}
+
+		auto portal = (Portal *)obj;
+
+		try
+		{
+			portal->enter(ch);
+		}
+		catch (PortalNotTraversableException)
+		{
+			send_to_char("You can't seem to find a way in.\n\r", ch);
+			return;
+		}
+		catch (PortalUeePreventedByCurseException)
+		{
+			send_to_char("Something prevents you from leaving...\n\r", ch);
+			return;
+		}
 	}
-	else if (IS_SET(portal->value[2],GATE_BUGGY) && (number_percent() < 5))
-	    location = get_random_room(ch);
 	else
-	    location = get_room_index(portal->value[3]);
-
-	if (location == NULL
-	||  location == old_room
-	||  !can_see_room(ch,location) 
-	||  (room_is_private(location) && !IS_TRUSTED(ch,IMPLEMENTOR)))
 	{
-	   act("$p doesn't seem to go anywhere.",ch,portal,NULL,TO_CHAR, POS_RESTING);
-	   return;
+		send_to_char("Nope, can't do it.\n\r", ch);
+		return;
 	}
-
-        if (IS_NPC(ch) && IS_SET(ch->act,ACT_AGGRESSIVE)
-        &&  IS_SET(location->room_flags,ROOM_LAW))
-        {
-            send_to_char("Something prevents you from leaving...\n\r",ch);
-            return;
-        }
-
-	act("$n steps into $p.",ch,portal,NULL,TO_ROOM, POS_RESTING);
-	
-	if (IS_SET(portal->value[2],GATE_NORMAL_EXIT))
-	    act("You enter $p.",ch,portal,NULL,TO_CHAR, POS_RESTING);
-	else
-	    act("You walk through $p and find yourself somewhere else...", ch,portal,NULL,TO_CHAR, POS_RESTING); 
-
-	char_from_room(ch);
-	char_to_room(ch, location);
-
-	if (IS_SET(portal->value[2],GATE_GOWITH)) /* take the gate along */
-	{
-	    obj_from_room(portal);
-	    obj_to_room(portal,location);
-	}
-
-	if (IS_SET(portal->value[2],GATE_NORMAL_EXIT))
-	    act("$n has arrived.",ch,portal,NULL,TO_ROOM, POS_RESTING);
-	else
-	    act("$n has arrived through $p.",ch,portal,NULL,TO_ROOM, POS_RESTING);
-
-	do_look(ch,(char*)"auto");
-
-	/* charges */
-	if (portal->value[0] > 0)
-	{
-	    portal->value[0]--;
-	    if (portal->value[0] == 0)
-		portal->value[0] = -1;
-	}
-
-	/* protect against circular follows */
-	if (old_room == location)
-	    return;
-
-    	for ( fch = old_room->people; fch != NULL; fch = fch_next )
-    	{
-            fch_next = fch->next_in_room;
-
-            if (portal == NULL || portal->value[0] == -1) 
-	    /* no following through dead portals */
-                continue;
- 
-            if ( fch->master == ch && IS_AFFECTED(fch,AFF_CHARM)
-            &&   fch->position < POS_STANDING)
-            	do_stand(fch,(char*)"");
-
-            if ( fch->master == ch && fch->position == POS_STANDING)
-            {
- 
-                if (IS_SET(ch->in_room->room_flags,ROOM_LAW)
-                &&  (IS_NPC(fch) && IS_SET(fch->act,ACT_AGGRESSIVE)))
-                {
-                    act("You can't bring $N into the city.", ch,NULL,fch,TO_CHAR, POS_RESTING);
-                    act("You aren't allowed in the city.", fch,NULL,NULL,TO_CHAR, POS_RESTING);
-                    continue;
-            	}
- 
-            	act( "You follow $N.", fch, NULL, ch, TO_CHAR, POS_RESTING );
-		do_enter(fch,argument);
-            }
-    	}
-
- 	if (portal != NULL && portal->value[0] == -1)
-	{
-	    act("$p fades out of existence.",ch,portal,NULL,TO_CHAR, POS_RESTING);
-	    if (ch->in_room == old_room)
-		act("$p fades out of existence.",ch,portal,NULL,TO_ROOM, POS_RESTING);
-	    else if (old_room->people != NULL)
-	    {
-		act("$p fades out of existence.",  old_room->people,portal,NULL,TO_CHAR, POS_RESTING);
-		act("$p fades out of existence.", old_room->people,portal,NULL,TO_ROOM, POS_RESTING);
-	    }
-	    extract_obj(portal);
-	}
-
-	/* 
-	 * If someone is following the char, these triggers get activated
-	 * for the followers before the char, but it's safer this way...
-	 */
-	if ( IS_NPC( ch ) && HAS_TRIGGER( ch, TRIG_ENTRY ) )
-	    mp_percent_trigger( ch, NULL, NULL, NULL, TRIG_ENTRY );
-	if ( !IS_NPC( ch ) )
-	    mp_greet_trigger( ch );
-
-	return;
-    }
-
-    send_to_char("Nope, can't do it.\n\r",ch);
-    return;
 }
 
-void do_detonate( Character *ch, char *argument )
+void do_detonate(Character *ch, char *argument)
 {
-    char buf[MAX_STRING_LENGTH];
-    OBJ_DATA *nuke;
-    Character *victim, *gch;
-    DESCRIPTOR_DATA *d;
-    ROOM_INDEX_DATA *room;
-    int count = 0;
-    int pcount = 0;
-    AREA_DATA *pArea;
-    int vnum;
+	char buf[MAX_STRING_LENGTH];
+	Object *nuke;
+	Character *victim, *gch;
+	DESCRIPTOR_DATA *d;
+	ROOM_INDEX_DATA *room;
+	int count = 0;
+	int pcount = 0;
+	AREA_DATA *pArea;
+	int vnum;
 
-    pArea = ch->in_room->area;
+	pArea = ch->in_room->area;
 
-    if ( ( nuke = get_eq_char(ch,WEAR_BOMB)) == NULL)
-    {
-	send_to_char("You do not have a nuclear weapon.\n\r",ch);
-        return;
-    }
-
-    if (IS_CLANNED(ch))
-    {
-	for ( d = descriptor_list; d; d = d->next )
+	if ((nuke = ch->getEquipment(WEAR_BOMB)) == NULL)
 	{
-	    if ( d->connected == ConnectedState::Playing
-	    && ( victim = d->character ) != NULL
-            && victim != ch
-	    &&   !IS_IMMORTAL(victim)
-	    &&   victim->in_room != NULL
-	    && !is_same_group(victim, ch)
-	    &&   victim->in_room->area == ch->in_room->area )
-	    // Oh boy, lets kick some ass, as a group!
-	    for ( gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room )
-	    {
-	        if ( !is_same_group( gch, ch ) || IS_NPC(gch))
-	            continue;
-	
-		count++;
-		pcount++;
-			if ( !gch->isNPC()) {
-				((PlayerCharacter*)gch)->incrementPlayerKills(1);
-			}
+		send_to_char("You do not have a nuclear weapon.\n\r", ch);
+		return;
+	}
 
-	        gch->xp += xp_compute( gch, victim, 8 );
-	
-		if (!IS_IMMORTAL(victim))
-		raw_kill( victim );        /* dump the flags */
-	        if (ch != victim && !IS_NPC(ch) && !is_same_clan(ch,victim))
-	        {
-	            if (IS_SET(victim->act,PLR_THIEF))
-	                REMOVE_BIT(victim->act,PLR_THIEF);
-	        }
-	    }
-       }
-    }
+	if (IS_CLANNED(ch))
+	{
+		for (d = descriptor_list; d; d = d->next)
+		{
+			if (d->connected == ConnectedState::Playing && (victim = d->character) != NULL && victim != ch && !IS_IMMORTAL(victim) && victim->in_room != NULL && !is_same_group(victim, ch) && victim->in_room->area == ch->in_room->area)
+				// Oh boy, lets kick some ass, as a group!
+				for (gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room)
+				{
+					if (!is_same_group(gch, ch) || IS_NPC(gch))
+						continue;
 
-    // now kill the mobs
-//    for (room = get_room_index( ch->in_room->area->min_vnum ); room->vnum <= ch->in_room->area->max_vnum; room = room->next)
-    for ( vnum = pArea->min_vnum; vnum <= pArea->max_vnum; vnum++ )
-    {
-	room = get_room_index( vnum );
-	if (!room || !room->people)
-	    continue;
+					count++;
+					pcount++;
+					if (!gch->isNPC())
+					{
+						((PlayerCharacter *)gch)->incrementPlayerKills(1);
+					}
 
-       for (victim = room->people; victim != NULL; victim = victim->next_in_room)
-       {
-	    if ( IS_NPC(victim)
-	    &&   victim->in_room != NULL
-	    &&   victim->in_room->area == ch->in_room->area )
-	    // Oh boy, lets kick some ass, as a group!
-	    for ( gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room )
-	    {
-	        OBJ_DATA *obj;
-	        OBJ_DATA *obj_next;
-	
-	        if ( !is_same_group( gch, ch ) || IS_NPC(gch))
-	            continue;
-	
-		count++;
-	        gch->xp += xp_compute( gch, victim, 8 );
-		if (!IS_IMMORTAL(victim))
-		raw_kill( victim );        /* dump the flags */
+					gch->xp += xp_compute(gch, victim, 8);
 
-	
-	        for ( obj = gch->carrying; obj != NULL; obj = obj_next )
-	        {
-	            obj_next = obj->next_content;
-	            if ( obj->wear_loc == WEAR_NONE )
-	                continue;
-	
-	            if ( ( IS_OBJ_STAT(obj, ITEM_ANTI_EVIL)    && IS_EVIL(gch) )
-	            ||   ( IS_OBJ_STAT(obj, ITEM_ANTI_GOOD)    && IS_GOOD(gch) )
-	            ||   ( IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(gch) ) )
-	            {
-	                act( "You are zapped by $p.", gch, obj, NULL, TO_CHAR, POS_RESTING );
-	                act( "$n is zapped by $p.",   gch, obj, NULL, TO_ROOM, POS_RESTING );
-	                obj_from_char( obj );
-	                obj_to_room( obj, gch->in_room );
-	            }
-	        }
-	    }
-       }
-    }
+					if (!IS_IMMORTAL(victim))
+						raw_kill(victim); /* dump the flags */
+					if (ch != victim && !IS_NPC(ch) && !is_same_clan(ch, victim))
+					{
+						if (IS_SET(victim->act, PLR_THIEF))
+							REMOVE_BIT(victim->act, PLR_THIEF);
+					}
+				}
+		}
+	}
 
-    for ( gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room )
-    {
-        if ( !is_same_group( gch, ch ) || IS_NPC(gch) || gch == ch)
-            continue;
+	// now kill the mobs
+	//    for (room = get_room_index( ch->in_room->area->min_vnum ); room->vnum <= ch->in_room->area->max_vnum; room = room->next)
+	for (vnum = pArea->min_vnum; vnum <= pArea->max_vnum; vnum++)
+	{
+		room = get_room_index(vnum);
+		if (!room || !room->people)
+			continue;
 
-        snprintf(buf, sizeof(buf), "%d people have been killed by the bomb blast detonated by %s. (%d PC's)\n\rYou receive %d experience points, before the heat from the bomb incinerates you.\n\r", count, ch->getName().c_str(), pcount, gch->xp);
-        send_to_char( buf, gch );
-        gch->gain_exp( gch->xp );
-		((PlayerCharacter*)gch)->incrementMobKills(count);
-		((PlayerCharacter*)gch)->incrementPlayerKills(pcount);
-        gch->xp = 0;
-	if (!IS_IMMORTAL(gch))
-        raw_kill( gch );
-    }
+		for (victim = room->people; victim != NULL; victim = victim->next_in_room)
+		{
+			if (IS_NPC(victim) && victim->in_room != NULL && victim->in_room->area == ch->in_room->area)
+				// Oh boy, lets kick some ass, as a group!
+				for (gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room)
+				{
+					if (!is_same_group(gch, ch) || IS_NPC(gch))
+						continue;
 
-    snprintf(buf, sizeof(buf), "%d people have been killed by the blast. (%d PC's)\n\rYou receive %d experience points, before the heat from the bomb incinerates you.\n\r", count, pcount, ch->xp );
-    send_to_char( buf, ch );
-    ch->gain_exp( ch->xp );
-	((PlayerCharacter*)ch)->incrementMobKills(count);
-	((PlayerCharacter*)ch)->incrementPlayerKills(pcount);
-    ch->xp = 0;
-    obj_from_char( nuke );
-    if (!IS_IMMORTAL(ch))
-    raw_kill( ch );
+					count++;
+					gch->xp += xp_compute(gch, victim, 8);
+					if (!IS_IMMORTAL(victim))
+						raw_kill(victim); /* dump the flags */
 
-      for ( d = descriptor_list; d != NULL; d = d->next )
-      {
-	if (d->connected == ConnectedState::Playing)
-    send_to_char("You see a mushroom-shaped cloud appear on the horizon.\n\r",d->character);
-      }
+					for (auto obj : gch->getCarrying())
+					{
+						if (obj->getWearLocation() == WEAR_NONE)
+							continue;
+
+						if (
+							(obj->hasStat(ITEM_ANTI_EVIL) && IS_EVIL(gch))
+							|| (obj->hasStat(ITEM_ANTI_GOOD) && IS_GOOD(gch))
+							|| (obj->hasStat(ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(gch)))
+						{
+							act("You are zapped by $p.", gch, obj, NULL, TO_CHAR, POS_RESTING);
+							act("$n is zapped by $p.", gch, obj, NULL, TO_ROOM, POS_RESTING);
+							obj_from_char(obj);
+							obj_to_room(obj, gch->in_room);
+						}
+					}
+				}
+		}
+	}
+
+	for (gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room)
+	{
+		if (!is_same_group(gch, ch) || IS_NPC(gch) || gch == ch)
+			continue;
+
+		snprintf(buf, sizeof(buf), "%d people have been killed by the bomb blast detonated by %s. (%d PC's)\n\rYou receive %d experience points, before the heat from the bomb incinerates you.\n\r", count, ch->getName().c_str(), pcount, gch->xp);
+		send_to_char(buf, gch);
+		gch->gain_exp(gch->xp);
+		((PlayerCharacter *)gch)->incrementMobKills(count);
+		((PlayerCharacter *)gch)->incrementPlayerKills(pcount);
+		gch->xp = 0;
+		if (!IS_IMMORTAL(gch))
+			raw_kill(gch);
+	}
+
+	snprintf(buf, sizeof(buf), "%d people have been killed by the blast. (%d PC's)\n\rYou receive %d experience points, before the heat from the bomb incinerates you.\n\r", count, pcount, ch->xp);
+	send_to_char(buf, ch);
+	ch->gain_exp(ch->xp);
+	((PlayerCharacter *)ch)->incrementMobKills(count);
+	((PlayerCharacter *)ch)->incrementPlayerKills(pcount);
+	ch->xp = 0;
+	obj_from_char(nuke);
+	if (!IS_IMMORTAL(ch))
+		raw_kill(ch);
+
+	for (d = descriptor_list; d != NULL; d = d->next)
+	{
+		if (d->connected == ConnectedState::Playing)
+			send_to_char("You see a mushroom-shaped cloud appear on the horizon.\n\r", d->character);
+	}
 }

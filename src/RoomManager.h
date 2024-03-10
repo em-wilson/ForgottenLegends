@@ -1,7 +1,7 @@
 #ifndef __ROOM_MANAGER_H__
 #define __ROOM_MANAGER_H__
 
-typedef struct	room_index_data		ROOM_INDEX_DATA;
+class ROOM_INDEX_DATA;
 
 class RoomManager {
     public:

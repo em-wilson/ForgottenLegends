@@ -7,6 +7,9 @@
 #include "merc.h"
 #include "interp.h"
 #include "clans/ClanManager.h"
+#include "Object.h"
+#include "ObjectHelper.h"
+#include "Room.h"
 
 DECLARE_DO_FUN( do_bank_change	);
 DECLARE_DO_FUN( do_bank_clan	);
@@ -74,21 +77,21 @@ void do_bank( Character *ch, char *argument)
 void do_bank_balance(Character *ch, char *argument)
 {
     char buf[MAX_STRING_LENGTH];
-    OBJ_DATA *obj;
+    Object *obj;
 
     if ( ( obj = get_obj_carry( ch, (char*)"bank note", ch ) ) == NULL )
     {
-	send_to_char( "You do not own a bank note.\n\r", ch );
-	return;
+        send_to_char( "You do not own a bank note.\n\r", ch );
+        return;
     }
 
-    snprintf(buf, sizeof(buf),"Balance on this note is %d gold and %d silver.\n\r", obj->value[0], obj->value[1]);
+    snprintf(buf, sizeof(buf),"Balance on this note is %d gold and %d silver.\n\r", obj->getValues().at(0), obj->getValues().at(1));
     send_to_char(buf,ch);
 }
 
 void do_bank_close(Character *ch, char *argument)
 {
-    OBJ_DATA *obj;
+    Object *obj;
 
     if ( ( obj = get_obj_carry( ch, (char*)"bank note", ch ) ) == NULL )
     {
@@ -96,8 +99,8 @@ void do_bank_close(Character *ch, char *argument)
 	return;
     }
 
-    ch->gold += obj->value[0];
-    ch->silver += obj->value[1];
+    ch->gold += obj->getValues().at(0);
+    ch->silver += obj->getValues().at(1);
     extract_obj( obj );
     send_to_char("You withdraw all the money from your bank note and return it.\n\r",ch);
     return;
@@ -105,7 +108,7 @@ void do_bank_close(Character *ch, char *argument)
 
 void do_bank_open(Character *ch, char *argument)
 {
-    OBJ_DATA *obj;
+    Object *obj;
     if ( ( obj = get_obj_carry( ch, (char*)"bank note", ch ) ) != NULL )
     {
 	send_to_char( "You already own a bank note.\n\r", ch );
@@ -119,7 +122,7 @@ void do_bank_open(Character *ch, char *argument)
     }
 
     ch->gold -= 10;
-    obj_to_char(create_object(get_obj_index(OBJ_VNUM_BANK_NOTE),0),ch);
+    ch->addObject(ObjectHelper::createFromIndex(get_obj_index(OBJ_VNUM_BANK_NOTE),0));
     send_to_char("Enjoy your bank note.\n\r", ch);
     return;
 }
@@ -129,7 +132,7 @@ void do_bank_withdraw( Character *ch, char *argument )
     char arg[MAX_INPUT_LENGTH];
     char buf[MAX_INPUT_LENGTH];
     int amount;
-    OBJ_DATA *obj;
+    Object *obj;
 
 
     argument = one_argument( argument, arg );
@@ -163,7 +166,7 @@ void do_bank_withdraw( Character *ch, char *argument )
 
 
         amount = atoi(arg);
-        if ( obj->value[1] < amount ) /* is balance - than amount */
+        if ( obj->getValues().at(1) < amount ) /* is balance - than amount */
         {
             send_to_char( "Your account does not have that much silver in it!\n\r", ch );
             return;
@@ -171,7 +174,7 @@ void do_bank_withdraw( Character *ch, char *argument )
 
 
         ch->silver += amount;  
-        obj->value[1] -= amount;
+        obj->getValues().at(1) -= amount;
         act("$n withdraws some silver.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
     return;
     }
@@ -186,7 +189,7 @@ void do_bank_withdraw( Character *ch, char *argument )
         }
                          
         amount = atoi(arg);
-        if ( obj->value[0] < amount ) /* is balance - than amount */
+        if ( obj->getValues().at(0) < amount ) /* is balance - than amount */
         {
             send_to_char( "Your account does not have that much gold in it!\n\r", ch );
             return;
@@ -194,7 +197,7 @@ void do_bank_withdraw( Character *ch, char *argument )
 
 
         ch->gold += amount;  
-        obj->value[0] -= amount;
+        obj->getValues().at(0) -= amount;
         snprintf(buf, sizeof(buf),"You withdraw %d gold.\n\r", amount);
 	send_to_char(buf,ch);
         act("$n withdraws some gold.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
@@ -210,7 +213,7 @@ void do_bank_deposit( Character *ch, char *argument )
     char arg1[MAX_INPUT_LENGTH];
     char buf[MAX_INPUT_LENGTH];
     int amount;
-    OBJ_DATA *obj;
+    Object *obj;
 
 
     argument = one_argument( argument, arg1 );
@@ -236,12 +239,12 @@ void do_bank_deposit( Character *ch, char *argument )
 	}
 
 	/* Lets convert our silver first */
-	obj->value[1] += ch->silver;
-        snprintf(buf, sizeof(buf), "%d", obj->value[1] );
+	obj->getValues().at(1) += ch->silver;
+        snprintf(buf, sizeof(buf), "%d", obj->getValues().at(1) );
         do_bank_change(ch, buf );
 	snprintf(buf, sizeof(buf),"You deposit %ld silver and %ld gold into your bank note.\n\r", ch->silver, ch->gold );
 	send_to_char(buf,ch);
-	obj->value[0] += ch->gold;
+	obj->getValues().at(0) += ch->gold;
 	ch->gold = 0;
 	ch->silver = 0;
 	return;
@@ -264,10 +267,10 @@ void do_bank_deposit( Character *ch, char *argument )
 	}
 
         ch->silver -= amount;  
-        obj->value[1] += amount;
+        obj->getValues().at(1) += amount;
 	snprintf(buf, sizeof(buf),"You deposit %d silver.\n\r", amount);
 	send_to_char(buf,ch);
-	snprintf(buf, sizeof(buf), "%d", obj->value[1] );
+	snprintf(buf, sizeof(buf), "%d", obj->getValues().at(1) );
         do_bank_change(ch, buf );
         act("$n deposits some silver.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
     return;
@@ -289,7 +292,7 @@ void do_bank_deposit( Character *ch, char *argument )
 	}
 
         ch->gold -= amount;  
-        obj->value[0] += amount;
+        obj->getValues().at(0) += amount;
 	snprintf(buf, sizeof(buf), "You deposit %d gold.\n\r", amount);
 	send_to_char(buf,ch);
         act("$n deposits some gold.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
@@ -304,7 +307,7 @@ void do_bank_deposit( Character *ch, char *argument )
 void do_bank_change( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    OBJ_DATA *obj;
+    Object *obj;
     long amount;
     int change;
     change = 0;
@@ -317,7 +320,7 @@ void do_bank_change( Character *ch, char *argument )
 
 	
 	if ( amount < 0 )
-    if ( obj->value[1] < amount )
+    if ( obj->getValues().at(1) < amount )
         return;
 
     if ( amount < 100 )
@@ -326,8 +329,8 @@ void do_bank_change( Character *ch, char *argument )
     }
 
     change = amount/100;
-    obj->value[0] += change;
-    obj->value[1] -= (change * 100);
+    obj->getValues().at(0) += change;
+    obj->getValues().at(1) -= (change * 100);
     return;
 }
 

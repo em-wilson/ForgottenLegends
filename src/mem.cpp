@@ -20,8 +20,10 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "ExtraDescription.h"
 #include "NonPlayerCharacter.h"
 #include "RaceManager.h"
+#include "Room.h"
 
 /*
  * Globals
@@ -37,15 +39,16 @@ extern RaceManager * race_manager;
 
 AREA_DATA		*	area_free;
 EXIT_DATA		*	exit_free;
-ROOM_INDEX_DATA		*	room_index_free;
 OBJ_INDEX_DATA		*	obj_index_free;
 SHOP_DATA		*	shop_free;
 MOB_INDEX_DATA		*	mob_index_free;
 RESET_DATA		*	reset_free;
 
-void	free_extra_descr	args( ( EXTRA_DESCR_DATA *pExtra ) );
 void	free_affect		args( ( AFFECT_DATA *af ) );
 void	free_mprog              args ( ( MPROG_LIST *mp ) );
+
+using std::list;
+using std::vector;
 
 
 RESET_DATA *new_reset_data( void )
@@ -174,78 +177,6 @@ void free_exit( EXIT_DATA *pExit )
 }
 
 
-ROOM_INDEX_DATA *new_room_index( void )
-{
-    ROOM_INDEX_DATA *pRoom;
-    int door;
-
-    if ( !room_index_free )
-    {
-        pRoom           =   (ROOM_INDEX_DATA*)alloc_perm( sizeof(*pRoom) );
-        top_room++;
-    }
-    else
-    {
-        pRoom           =   room_index_free;
-        room_index_free =   room_index_free->next;
-    }
-
-    pRoom->next             =   NULL;
-    pRoom->people           =   NULL;
-    pRoom->contents         =   NULL;
-    pRoom->extra_descr      =   NULL;
-    pRoom->area             =   NULL;
-
-    for ( door=0; door < MAX_DIR; door++ )
-        pRoom->exit[door]   =   NULL;
-
-    pRoom->name             =   &str_empty[0];
-    pRoom->description      =   &str_empty[0];
-    pRoom->owner	    =	&str_empty[0];
-    pRoom->vnum             =   0;
-    pRoom->room_flags       =   0;
-    pRoom->light            =   0;
-    pRoom->sector_type      =   0;
-    pRoom->clan		    =	0;
-    pRoom->heal_rate	    =   100;
-    pRoom->mana_rate	    =   100;
-
-    return pRoom;
-}
-
-
-
-void free_room_index( ROOM_INDEX_DATA *pRoom )
-{
-    int door;
-    EXTRA_DESCR_DATA *pExtra;
-    RESET_DATA *pReset;
-
-    free_string( pRoom->name );
-    free_string( pRoom->description );
-    free_string( pRoom->owner );
-
-    for ( door = 0; door < MAX_DIR; door++ )
-    {
-        if ( pRoom->exit[door] )
-            free_exit( pRoom->exit[door] );
-    }
-
-    for ( pExtra = pRoom->extra_descr; pExtra; pExtra = pExtra->next )
-    {
-        free_extra_descr( pExtra );
-    }
-
-    for ( pReset = pRoom->reset_first; pReset; pReset = pReset->next )
-    {
-        free_reset_data( pReset );
-    }
-
-    pRoom->next     =   room_index_free;
-    room_index_free =   pRoom;
-    return;
-}
-
 extern AFFECT_DATA *affect_free;
 
 
@@ -307,8 +238,8 @@ OBJ_INDEX_DATA *new_obj_index( void )
     }
 
     pObj->next          =   NULL;
-    pObj->extra_descr   =   NULL;
-    pObj->affected      =   NULL;
+    pObj->extra_descr   =   vector<ExtraDescription *>();
+    pObj->affected      =   vector<AFFECT_DATA *>();
     pObj->area          =   NULL;
     pObj->name          =   str_dup( "no name" );
     pObj->short_descr   =   str_dup( "(no short description)" );
@@ -334,22 +265,20 @@ OBJ_INDEX_DATA *new_obj_index( void )
 
 void free_obj_index( OBJ_INDEX_DATA *pObj )
 {
-    EXTRA_DESCR_DATA *pExtra;
-    AFFECT_DATA *pAf;
-
     free_string( pObj->name );
     free_string( pObj->short_descr );
     free_string( pObj->description );
 
-    for ( pAf = pObj->affected; pAf; pAf = pAf->next )
+    for ( auto pAf : pObj->affected )
     {
         free_affect( pAf );
     }
 
-    for ( pExtra = pObj->extra_descr; pExtra; pExtra = pExtra->next )
+    for ( auto pExtra : pObj->extra_descr )
     {
-        free_extra_descr( pExtra );
+        delete pExtra;
     }
+    pObj->extra_descr.clear();
     
     pObj->next              = obj_index_free;
     obj_index_free          = pObj;

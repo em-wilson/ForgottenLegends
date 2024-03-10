@@ -33,8 +33,11 @@
 #include "clans/ClanManager.h"
 #include "ILogger.h"
 #include "NonPlayerCharacter.h"
+#include "Object.h"
+#include "ObjectHelper.h"
 #include "PlayerCharacter.h"
 #include "RaceManager.h"
+#include "Room.h"
 #include "Wiznet.h"
 
 /* command procedures needed */
@@ -51,6 +54,15 @@ DECLARE_DO_FUN(do_get		);
 DECLARE_DO_FUN(do_recall	);
 DECLARE_DO_FUN(do_yell		);
 DECLARE_DO_FUN(do_sacrifice	);
+
+void cold_effect(Character *ch, int level, int dam);
+void cold_effect(Object *obj, int level, int dam);
+
+void fire_effect(Character *ch, int level, int dam);
+void fire_effect(Object *obj, int level, int dam);
+
+void shock_effect(Character *ch, int level, int dam);
+void shock_effect(Object *obj, int level, int dam);
 
 /*
  * Local functions.
@@ -129,7 +141,7 @@ void check_assist(Character *ch,Character *victim)
     {
 	rch_next = rch->next_in_room;
 	
-	if (IS_AWAKE(rch) && rch->fighting == NULL && can_see(rch,victim))
+	if (IS_AWAKE(rch) && rch->fighting == NULL && rch->can_see(victim))
 	{
 
 	    /* quick check for ASSIST_PLAYER */
@@ -186,7 +198,7 @@ void check_assist(Character *ch,Character *victim)
 		    number = 0;
 		    for (vch = ch->in_room->people; vch; vch = vch->next)
 		    {
-			if (can_see(rch,vch)
+			if (rch->can_see(vch)
 			&&  is_same_group(vch,victim)
 			&&  number_range(0,number) == 0)
 			{
@@ -239,7 +251,7 @@ void multi_hit( Character *ch, Character *victim, int dt ) {
     if (ch->fighting != victim || dt == gsn_backstab)
         return;
 
-    if (get_eq_char(ch, WEAR_SECONDARY)) {
+    if (ch->getEquipment(WEAR_SECONDARY)) {
         one_hit(ch, victim, dt, TRUE);
         if (ch->fighting != victim)
             return;
@@ -425,7 +437,7 @@ one_hit(ch,vch,dt, FALSE);
  */
 void one_hit( Character *ch, Character *victim, int dt, bool secondary )
 {
-    OBJ_DATA *wield;
+    Object *wield;
     int victim_ac;
     int thac0;
     int thac0_00;
@@ -453,13 +465,13 @@ void one_hit( Character *ch, Character *victim, int dt, bool secondary )
     /*
      * Figure out the type of damage message.
      */
-    wield = get_eq_char( ch, WEAR_WIELD );
+    wield = ch->getEquipment(WEAR_WIELD );
 
     if ( dt == TYPE_UNDEFINED )
     {
 	dt = TYPE_HIT;
-	if ( wield != NULL && (wield->item_type == ITEM_WEAPON || wield->item_type == ITEM_BOW))
-	    dt += wield->value[3];
+	if ( wield != NULL && (wield->getItemType() == ITEM_WEAPON || wield->getItemType() == ITEM_BOW))
+	    dt += wield->getValues().at(3);
 	else
 	    dt += ch->dam_type;
     }
@@ -467,7 +479,7 @@ void one_hit( Character *ch, Character *victim, int dt, bool secondary )
     if (dt < TYPE_HIT)
     {
     	if (wield != NULL)
-    	    dam_type = attack_table[wield->value[3]].damage;
+    	    dam_type = attack_table[wield->getValues().at(3)].damage;
     	else
     	    dam_type = attack_table[ch->dam_type].damage;
     }
@@ -527,7 +539,7 @@ void one_hit( Character *ch, Character *victim, int dt, bool secondary )
     if (victim_ac < -15)
 	victim_ac = (victim_ac + 15) / 5 - 15;
      
-    if ( !can_see( ch, victim ) )
+    if ( !ch->can_see( victim ) )
 	victim_ac -= 4;
 
     if ( victim->position < POS_FIGHTING)
@@ -572,17 +584,17 @@ void one_hit( Character *ch, Character *victim, int dt, bool secondary )
 	    check_improve(ch,sn,TRUE,5);
 	if ( wield != NULL )
 	{
-	    if (wield->pIndexData->new_format)
-		dam = dice(wield->value[1],wield->value[2]) * skill/100;
+	    if (wield->getObjectIndexData()->new_format)
+		dam = dice(wield->getValues().at(1),wield->getValues().at(2)) * skill/100;
 	    else
-	    	dam = number_range( wield->value[1] * skill/100, 
-				wield->value[2] * skill/100);
+	    	dam = number_range( wield->getValues().at(1) * skill/100, 
+				wield->getValues().at(2) * skill/100);
 
-	    if (get_eq_char(ch,WEAR_SHIELD) == NULL)  /* no shield = more */
+	    if (ch->getEquipment(WEAR_SHIELD) == NULL)  /* no shield = more */
 		dam = dam * 11/10;
 
 	    /* weight counts */
-	    dam += wield->weight / 10;
+	    dam += wield->getWeight() / 10;
 
 	    /* sharpness! */
 	    if (IS_WEAPON_STAT(wield,WEAPON_SHARP))
@@ -617,7 +629,7 @@ void one_hit( Character *ch, Character *victim, int dt, bool secondary )
 
     if ( dt == gsn_backstab && wield != NULL) 
     {
-    	if ( wield->value[0] != 2 )
+    	if ( wield->getValues().at(0) != 2 )
 	    dam *= 2 + (ch->level / 10); 
 	else 
 	    dam *= 2 + (ch->level / 8);
@@ -640,10 +652,11 @@ void one_hit( Character *ch, Character *victim, int dt, bool secondary )
 	    int level;
 	    AFFECT_DATA *poison, af;
 
-	    if ((poison = affect_find(wield->affected,gsn_poison)) == NULL)
-		level = wield->level;
-	    else
-		level = poison->level;
+	    if ((poison = wield->findAffectBySn(gsn_poison)) == NULL) {
+			level = wield->getLevel();
+		} else {
+			level = poison->level;
+		}
 	
 	    if (!saves_spell(level / 2,victim,DAM_POISON)) 
 	    {
@@ -675,7 +688,7 @@ void one_hit( Character *ch, Character *victim, int dt, bool secondary )
 
     	if (ch->fighting == victim && IS_WEAPON_STAT(wield,WEAPON_VAMPIRIC))
 	{
-	    dam = number_range(1, wield->level / 5 + 1);
+	    dam = number_range(1, wield->getLevel() / 5 + 1);
 	    act("$p draws life from $n.",victim,wield,NULL,TO_ROOM, POS_RESTING);
 	    act("You feel $p drawing your life away.", victim,wield,NULL,TO_CHAR, POS_RESTING);
 	    damage_old(ch,victim,dam,0,DAM_NEGATIVE,FALSE);
@@ -685,28 +698,28 @@ void one_hit( Character *ch, Character *victim, int dt, bool secondary )
 
 	if (ch->fighting == victim && IS_WEAPON_STAT(wield,WEAPON_FLAMING))
 	{
-	    dam = number_range(1,wield->level / 4 + 1);
+	    dam = number_range(1,wield->getLevel() / 4 + 1);
 	    act("$n is burned by $p.",victim,wield,NULL,TO_ROOM, POS_RESTING);
 	    act("$p sears your flesh.",victim,wield,NULL,TO_CHAR, POS_RESTING);
-	    fire_effect( (void *) victim,wield->level/2,dam,TARGET_CHAR);
+	    fire_effect( victim,wield->getLevel()/2,dam);
 	    damage(ch,victim,dam,0,DAM_FIRE,FALSE);
 	}
 
 	if (ch->fighting == victim && IS_WEAPON_STAT(wield,WEAPON_FROST))
 	{
-	    dam = number_range(1,wield->level / 6 + 2);
+	    dam = number_range(1,wield->getLevel() / 6 + 2);
 	    act("$p freezes $n.",victim,wield,NULL,TO_ROOM, POS_RESTING);
 	    act("The cold touch of $p surrounds you with ice.", victim,wield,NULL,TO_CHAR, POS_RESTING);
-	    cold_effect(victim,wield->level/2,dam,TARGET_CHAR);
+	    cold_effect(victim,wield->getLevel()/2,dam);
 	    damage(ch,victim,dam,0,DAM_COLD,FALSE);
 	}
 
 	if (ch->fighting == victim && IS_WEAPON_STAT(wield,WEAPON_SHOCKING))
 	{
-	    dam = number_range(1,wield->level/5 + 2);
+	    dam = number_range(1,wield->getLevel()/5 + 2);
 	    act("$n is struck by lightning from $p.",victim,wield,NULL,TO_ROOM, POS_RESTING);
 	    act("You are shocked by $p.",victim,wield,NULL,TO_CHAR, POS_RESTING);
-	    shock_effect(victim,wield->level/2,dam,TARGET_CHAR);
+	    shock_effect(victim,wield->getLevel()/2,dam);
 	    damage(ch,victim,dam,0,DAM_LIGHTNING,FALSE);
 	}
     }
@@ -716,33 +729,33 @@ void one_hit( Character *ch, Character *victim, int dt, bool secondary )
 
 
 void perform_autoloot(Character *ch) {
-	OBJ_DATA *corpse = NULL;
+	Object *corpse = NULL;
 
     if (IS_NPC(ch) && IS_SET(ch->act,ACT_PET) && ch->master != NULL) {
         // The master should be doing this
         perform_autoloot(ch->master);
     } else if (!IS_NPC(ch)
-        &&  (corpse = get_obj_list(ch,(char*)"corpse",ch->in_room->contents)) != NULL
-        &&  corpse->item_type == ITEM_CORPSE_NPC && can_see_obj(ch,corpse))
+        &&  (corpse = ObjectHelper::findInList(ch,(char*)"corpse",ch->in_room->contents)) != NULL
+        &&  corpse->getItemType() == ITEM_CORPSE_NPC && ch->can_see(corpse))
     {
-        OBJ_DATA *coins;
+        Object *coins;
 
-        corpse = get_obj_list( ch, (char*)"corpse", ch->in_room->contents );
+        corpse = ObjectHelper::findInList( ch, (char*)"corpse", ch->in_room->contents );
 
         if ( IS_SET(ch->act, PLR_AUTOLOOT) &&
-             corpse && corpse->contains) /* exists and not empty */
+             corpse && !corpse->getContents().empty() ) /* exists and not empty */
             do_get( ch, (char*)"all corpse" );
 
         if (IS_SET(ch->act,PLR_AUTOGOLD) &&
-            corpse && corpse->contains  && /* exists and not empty */
+            corpse && !corpse->getContents().empty()  && /* exists and not empty */
             !IS_SET(ch->act,PLR_AUTOLOOT))
-            if ((coins = get_obj_list(ch,(char*)"gcash",corpse->contains))
+            if ((coins = ObjectHelper::findInList(ch,(char*)"gcash",corpse->getContents()))
                 != NULL)
                 do_get(ch, (char*)"all.gcash corpse");
 
         if ( IS_SET(ch->act, PLR_AUTOSAC) )
         {
-            if ( IS_SET(ch->act,PLR_AUTOLOOT) && corpse && corpse->contains) {
+            if ( IS_SET(ch->act,PLR_AUTOLOOT) && corpse && !corpse->getContents().empty()) {
                 return;  /* leave if corpse has treasure */
             } else {
                 do_sacrifice(ch, (char *) "corpse");
@@ -772,8 +785,8 @@ bool damage(Character *ch,Character *victim,int dam,int dt,int dam_type,
 	dam = 1200;
 	if (!IS_IMMORTAL(ch))
 	{
-	    OBJ_DATA *obj;
-	    obj = get_eq_char( ch, WEAR_WIELD );
+	    Object *obj;
+	    obj = ch->getEquipment(WEAR_WIELD );
 	    send_to_char("You really shouldn't cheat.\n\r",ch);
 	    if (obj != NULL)
 	    	extract_obj(obj);
@@ -1097,8 +1110,8 @@ dam_type, bool show ) {
         dam = 1200;
         if (!IS_IMMORTAL(ch))
         {
-            OBJ_DATA *obj;
-            obj = get_eq_char( ch, WEAR_WIELD );
+            Object *obj;
+            obj = ch->getEquipment(WEAR_WIELD );
             send_to_char("You really shouldn't cheat.\n\r",ch);
             if (obj != NULL)
                 extract_obj(obj);
@@ -1677,7 +1690,7 @@ bool check_parry( Character *ch, Character *victim )
 
     chance = get_skill(victim,gsn_parry) / 2;
 
-    if ( get_eq_char( victim, WEAR_WIELD ) == NULL )
+    if ( victim->getEquipment(WEAR_WIELD ) == NULL )
     {
 	if (IS_NPC(victim))
 	    chance /= 2;
@@ -1685,7 +1698,7 @@ bool check_parry( Character *ch, Character *victim )
 	    return FALSE;
     }
 
-    if (!can_see(ch,victim))
+    if (!ch->can_see(victim))
 	chance /= 2;
 
     if ( number_percent( ) >= chance + victim->level - ch->level )
@@ -1711,7 +1724,7 @@ bool check_shield_block( Character *ch, Character *victim )
     chance = get_skill(victim,gsn_shield_block) / 5 + 3;
 
 
-    if ( get_eq_char( victim, WEAR_SHIELD ) == NULL )
+    if ( victim->getEquipment(WEAR_SHIELD ) == NULL )
         return FALSE;
 
     if ( number_percent( ) >= chance + victim->level - ch->level )
@@ -1736,7 +1749,7 @@ bool check_dodge( Character *ch, Character *victim )
 
     chance = get_skill(victim,gsn_dodge) / 2;
 
-    if (!can_see(victim,ch))
+    if (!victim->can_see(ch))
 	chance /= 2;
 
     if ( number_percent( ) >= chance + victim->level - ch->level )
@@ -1833,105 +1846,100 @@ void stop_fighting( Character *ch, bool fBoth )
 void make_corpse( Character *ch )
 {
     char buf[MAX_STRING_LENGTH];
-    OBJ_DATA *corpse;
-    OBJ_DATA *obj;
-    OBJ_DATA *obj_next;
+    Object *corpse;
+    Object *obj;
+    Object *obj_next;
     string name;
 
     if ( IS_NPC(ch) )
     {
-	name		= ch->short_descr;
-	corpse		= create_object(get_obj_index(OBJ_VNUM_CORPSE_NPC), 0);
-	corpse->timer	= number_range( 3, 6 );
-	if ( ch->gold > 0 )
-	{
-	    obj_to_obj( create_money( ch->gold, ch->silver ), corpse );
-	    ch->gold = 0;
-	    ch->silver = 0;
-	}
-	corpse->cost = 0;
+		name		= ch->short_descr;
+		corpse		= ObjectHelper::createFromIndex(get_obj_index(OBJ_VNUM_CORPSE_NPC), 0);
+		corpse->setTimer(number_range( 3, 6 ) );
+		if ( ch->gold > 0 )
+		{
+			corpse->addObject( create_money( ch->gold, ch->silver ) );
+			ch->gold = 0;
+			ch->silver = 0;
+		}
+		corpse->setCost(0);
     }
     else
     {
-	name		= ch->getName();
-	corpse		= create_object(get_obj_index(OBJ_VNUM_CORPSE_PC), 0);
-	corpse->timer	= number_range( 25, 40 );
-	REMOVE_BIT(ch->act,PLR_CANLOOT);
-	if (!IS_CLANNED(ch))
-	    corpse->owner = str_dup(ch->getName().c_str());
-	else
-	{
-	    corpse->owner = NULL;
-	    if (ch->gold > 1 || ch->silver > 1)
-	    {
-		obj_to_obj(create_money(ch->gold / 2, ch->silver/2), corpse);
-		ch->gold -= ch->gold/2;
-		ch->silver -= ch->silver/2;
-	    }
-	}
-		
-	corpse->cost = 0;
+		name		= ch->getName();
+		corpse		= ObjectHelper::createFromIndex(get_obj_index(OBJ_VNUM_CORPSE_PC), 0);
+		corpse->setTimer(number_range( 25, 40 ));
+		REMOVE_BIT(ch->act,PLR_CANLOOT);
+		if (!IS_CLANNED(ch))
+			corpse->setOwner(ch->getName());
+		else
+		{
+			if (ch->gold > 1 || ch->silver > 1)
+			{
+			corpse->addObject(create_money(ch->gold / 2, ch->silver/2));
+			ch->gold -= ch->gold/2;
+			ch->silver -= ch->silver/2;
+			}
+		}
+			
+		corpse->setCost(0);
     }
 
-    corpse->level = ch->level;
+    corpse->setLevel(ch->level);
+	
 
-    snprintf(buf, sizeof(buf), corpse->short_descr, name.c_str() );
-    free_string( corpse->short_descr );
-    corpse->short_descr = str_dup( buf );
+    snprintf(buf, sizeof(buf), corpse->getShortDescription().c_str(), name.c_str() );
+	corpse->setShortDescription(buf);
 
-    snprintf(buf, sizeof(buf), corpse->description, name.c_str() );
-    free_string( corpse->description );
-    corpse->description = str_dup( buf );
+    snprintf(buf, sizeof(buf), corpse->getDescription().c_str(), name.c_str() );
+	corpse->setDescription(buf);
 
-    for ( obj = ch->carrying; obj != NULL; obj = obj_next )
+    for ( auto obj : ch->getCarrying() )
     {
-	bool floating = FALSE;
+		bool floating = FALSE;
 
-	obj_next = obj->next_content;
-	if (obj->wear_loc == WEAR_FLOAT)
-	    floating = TRUE;
-	obj_from_char( obj );
-	if (obj->item_type == ITEM_POTION)
-	    obj->timer = number_range(500,1000);
-	if (obj->item_type == ITEM_SCROLL)
-	    obj->timer = number_range(1000,2500);
-	if (IS_SET(obj->extra_flags,ITEM_ROT_DEATH) && !floating)
-	{
-	    obj->timer = number_range(5,10);
-	    REMOVE_BIT(obj->extra_flags,ITEM_ROT_DEATH);
-	}
-	REMOVE_BIT(obj->extra_flags,ITEM_VIS_DEATH);
-
-	if ( IS_SET( obj->extra_flags, ITEM_INVENTORY ) )
-	    extract_obj( obj );
-	else if (floating)
-	{
-	    if (IS_OBJ_STAT(obj,ITEM_ROT_DEATH)) /* get rid of it! */
-	    { 
-		if (obj->contains != NULL)
+		if (obj->getWearLocation() == WEAR_FLOAT)
+			floating = TRUE;
+		obj_from_char( obj );
+		if (obj->getItemType() == ITEM_POTION)
+			obj->setTimer(number_range(500,1000));
+		if (obj->getItemType() == ITEM_SCROLL)
+			obj->setTimer(number_range(1000,2500));
+		if (IS_SET(obj->getExtraFlags(),ITEM_ROT_DEATH) && !floating)
 		{
-		    OBJ_DATA *in, *in_next;
+			obj->setTimer(number_range(5,10));
+			obj->removeExtraFlag(ITEM_ROT_DEATH);
+		}
+		obj->removeExtraFlag(ITEM_VIS_DEATH);
 
-		    act("$p evaporates,scattering its contents.", ch,obj,NULL,TO_ROOM, POS_RESTING);
-		    for (in = obj->contains; in != NULL; in = in_next)
-		    {
-			in_next = in->next_content;
-			obj_from_obj(in);
-			obj_to_room(in,ch->in_room);
-		    }
-		 }
-		 else
-		    act("$p evaporates.", ch,obj,NULL,TO_ROOM, POS_RESTING);
-		 extract_obj(obj);
-	    }
-	    else
-	    {
-			act("$p falls to the floor.",ch,obj,NULL,TO_ROOM, POS_RESTING);
-			obj_to_room(obj,ch->in_room);
-	    }
-	}
-	else
-	    obj_to_obj( obj, corpse );
+		if ( IS_SET( obj->getExtraFlags(), ITEM_INVENTORY ) ) {
+			extract_obj( obj );
+		} else if (floating) {
+			if (obj->hasStat(ITEM_ROT_DEATH)) /* get rid of it! */
+			{ 
+				if (obj->getContents().empty())
+				{
+					act("$p evaporates.", ch,obj,NULL,TO_ROOM, POS_RESTING);
+				} else {
+					Object *in, *in_next;
+
+					act("$p evaporates,scattering its contents.", ch,obj,NULL,TO_ROOM, POS_RESTING);
+					for (auto in : obj->getContents())
+					{
+						obj_from_obj(in);
+						obj_to_room(in,ch->in_room);
+					}
+				}
+				extract_obj(obj);
+			}
+			else
+			{
+				act("$p falls to the floor.",ch,obj,NULL,TO_ROOM, POS_RESTING);
+				obj_to_room(obj,ch->in_room);
+			}
+		} else {
+			corpse->addObject( obj );
+		}
     }
 
     obj_to_room( corpse, ch->in_room );
@@ -2010,27 +2018,25 @@ void death_cry( Character *ch )
     if ( vnum != 0 )
     {
 	char buf[MAX_STRING_LENGTH];
-	OBJ_DATA *obj;
+	Object *obj;
 	string name;
 
 	name		= ch->isNPC() ? ch->short_descr : ch->getName();
-	obj		= create_object( get_obj_index( vnum ), 0 );
-	obj->timer	= number_range( 4, 7 );
+	obj		= ObjectHelper::createFromIndex( get_obj_index( vnum ), 0 );
+	obj->setTimer(number_range( 4, 7 ));
 
-	snprintf(buf, sizeof(buf), obj->short_descr, name.c_str() );
-	free_string( obj->short_descr );
-	obj->short_descr = str_dup( buf );
+	snprintf(buf, sizeof(buf), obj->getShortDescription().c_str(), name.c_str() );
+	obj->setShortDescription(buf);
 
-	snprintf(buf, sizeof(buf), obj->description, name.c_str() );
-	free_string( obj->description );
-	obj->description = str_dup( buf );
+	snprintf(buf, sizeof(buf), obj->getDescription().c_str(), name.c_str() );
+	obj->setDescription( buf );
 
-	if (obj->item_type == ITEM_FOOD)
+	if (obj->getItemType() == ITEM_FOOD)
 	{
 	    if (IS_SET(ch->form,FORM_POISON))
-		obj->value[3] = 1;
+		obj->getValues().at(3) = 1;
 	    else if (!IS_SET(ch->form,FORM_EDIBLE))
-		obj->item_type = ITEM_TRASH;
+		obj->setItemType(ITEM_TRASH);
 	}
 
 	obj_to_room( obj, ch->in_room );
@@ -2078,8 +2084,9 @@ void raw_kill( Character *victim )
     }
 
     extract_char( victim, FALSE );
-    while ( victim->affected )
-	affect_remove( victim, victim->affected );
+    while ( auto af = victim->affected.back() ) {
+		victim->removeAffect( af );
+	}
     victim->affected_by	= victim->getRace()->getAffectFlags();
     for (i = 0; i < 4; i++)
     	victim->armor[i]= 100;
@@ -2132,49 +2139,44 @@ void group_gain( Character *ch, Character *victim )
 
     for ( gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room )
     {
-	OBJ_DATA *obj;
-	OBJ_DATA *obj_next;
+		Object *obj;
+		Object *obj_next;
 
-	if ( !is_same_group( gch, ch ) || IS_NPC(gch))
-	    continue;
+		if ( !is_same_group( gch, ch ) || IS_NPC(gch))
+			continue;
 
-	if ( gch->level - lch->level >= 5 )
-	{
-	    send_to_char( "You are too high for this group.\n\r", gch );
-	    continue;
-	}
+		if ( gch->level - lch->level >= 5 )
+		{
+			send_to_char( "You are too high for this group.\n\r", gch );
+			continue;
+		}
 
-	if ( gch->level - lch->level <= -5 )
-	{
-	    send_to_char( "You are too low for this group.\n\r", gch );
-	    continue;
-	}
+		if ( gch->level - lch->level <= -5 )
+		{
+			send_to_char( "You are too low for this group.\n\r", gch );
+			continue;
+		}
 
-	xp = xp_compute( gch, victim, group_levels );  
-	snprintf(buf, sizeof(buf), "You receive %d experience points.\n\r", xp );
-	send_to_char( buf, gch );
-	gch->gain_exp( xp );
+		xp = xp_compute( gch, victim, group_levels );  
+		snprintf(buf, sizeof(buf), "You receive %d experience points.\n\r", xp );
+		send_to_char( buf, gch );
+		gch->gain_exp( xp );
 
-	for ( obj = gch->carrying; obj != NULL; obj = obj_next )
-	{
-	    obj_next = obj->next_content;
-	    if ( obj->wear_loc == WEAR_NONE )
-		continue;
+		for ( auto obj : gch->getCarrying() )
+		{
+			if ( obj->getWearLocation() == WEAR_NONE )
+			continue;
 
-/*
- * No need for anti-good eq
- * Removed by Blizzard
-	    if ( ( IS_OBJ_STAT(obj, ITEM_ANTI_EVIL)    && IS_EVIL(gch) )
-	    ||   ( IS_OBJ_STAT(obj, ITEM_ANTI_GOOD)    && IS_GOOD(gch) )
-	    ||   ( IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(gch) ) )
-	    {
-		act( "You are zapped by $p.", gch, obj, NULL, TO_CHAR, POS_RESTING );
-		act( "$n is zapped by $p.",   gch, obj, NULL, TO_ROOM, POS_RESTING );
-		obj_from_char( obj );
-		obj_to_room( obj, gch->in_room );
-	    }
-*/
-	}
+			if ( ( obj->hasStat(ITEM_ANTI_EVIL)    && IS_EVIL(gch) )
+			||   ( obj->hasStat(ITEM_ANTI_GOOD)    && IS_GOOD(gch) )
+			||   ( obj->hasStat(ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(gch) ) )
+			{
+				act( "You are zapped by $p.", gch, obj, NULL, TO_CHAR, POS_RESTING );
+				act( "$n is zapped by $p.",   gch, obj, NULL, TO_ROOM, POS_RESTING );
+				obj_from_char( obj );
+				obj_to_room( obj, gch->in_room );
+			}
+		}
     }
 
     return;
@@ -2393,12 +2395,12 @@ void dam_message( Character *ch, Character *victim,int dam,int dt,bool immune )
  */
 void disarm( Character *ch, Character *victim )
 {
-    OBJ_DATA *obj;
+    Object *obj;
 
-    if ( ( obj = get_eq_char( victim, WEAR_WIELD ) ) == NULL )
+    if ( ( obj = victim->getEquipment(WEAR_WIELD ) ) == NULL )
 	return;
 
-    if ( IS_OBJ_STAT(obj,ITEM_NOREMOVE))
+    if ( obj->hasStat(ITEM_NOREMOVE))
     {
 	act("$S weapon won't budge!",ch,NULL,victim,TO_CHAR, POS_RESTING);
 	act("$n tries to disarm you, but your weapon won't budge!", ch,NULL,victim,TO_VICT, POS_RESTING);
@@ -2411,13 +2413,13 @@ void disarm( Character *ch, Character *victim )
     act( "$n disarms $N!",  ch, NULL, victim, TO_NOTVICT, POS_RESTING );
 
     obj_from_char( obj );
-    if ( IS_OBJ_STAT(obj,ITEM_NODROP) || IS_OBJ_STAT(obj,ITEM_INVENTORY) )
-	obj_to_char( obj, victim );
-    else
-    {
-	obj_to_room( obj, victim->in_room );
-	if (IS_NPC(victim) && victim->wait == 0 && can_see_obj(victim,obj))
-	    get_obj(victim,obj,NULL);
+    if ( obj->hasStat(ITEM_NODROP) || obj->hasStat(ITEM_INVENTORY) ) {
+		victim->addObject( obj );
+	} else {
+		obj_to_room( obj, victim->in_room );
+		if (IS_NPC(victim) && victim->wait == 0 && victim->can_see(obj)) {
+			get_obj(victim,obj,NULL);
+		}
     }
 
     return;
@@ -2489,14 +2491,14 @@ void do_berserk( Character *ch, char *argument)
 	af.bitvector 	= AFF_BERSERK;
 
 	af.location	= APPLY_HITROLL;
-	affect_to_char(ch,&af);
+	ch->giveAffect(&af);
 
 	af.location	= APPLY_DAMROLL;
-	affect_to_char(ch,&af);
+	ch->giveAffect(&af);
 
 	af.modifier	= UMAX(10,10 * (ch->level/5));
 	af.location	= APPLY_AC;
-	affect_to_char(ch,&af);
+	ch->giveAffect(&af);
     }
 
     else
@@ -2758,7 +2760,7 @@ void do_dirt( Character *ch, char *argument )
 		af.modifier	= -4;
 		af.bitvector 	= AFF_BLIND;
 
-		affect_to_char(victim,&af);
+		victim->giveAffect(&af);
     }
     else
     {
@@ -3018,7 +3020,7 @@ void do_backstab( Character *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     Character *victim;
-    OBJ_DATA *obj;
+    Object *obj;
 
     one_argument( argument, arg );
 
@@ -3057,7 +3059,7 @@ void do_backstab( Character *ch, char *argument )
         return;
     }
 
-    if ( ( obj = get_eq_char( ch, WEAR_WIELD ) ) == NULL)
+    if ( ( obj = ch->getEquipment(WEAR_WIELD ) ) == NULL)
     {
 	send_to_char( "You need to wield a weapon to backstab.\n\r", ch );
 	return;
@@ -3286,7 +3288,7 @@ void do_kick( Character *ch, char *argument ) {
 void do_disarm( Character *ch, char *argument )
 {
     Character *victim;
-    OBJ_DATA *obj;
+    Object *obj;
     int chance,hth,ch_weapon,vict_weapon,ch_vict_weapon;
 
     hth = 0;
@@ -3297,7 +3299,7 @@ void do_disarm( Character *ch, char *argument )
 	return;
     }
 
-    if ( get_eq_char( ch, WEAR_WIELD ) == NULL 
+    if ( ch->getEquipment(WEAR_WIELD ) == NULL 
     &&   ((hth = get_skill(ch,gsn_hand_to_hand)) == 0
     ||    (IS_NPC(ch) && !IS_SET(ch->off_flags,OFF_DISARM))))
     {
@@ -3311,7 +3313,7 @@ void do_disarm( Character *ch, char *argument )
 	return;
     }
 
-    if ( ( obj = get_eq_char( victim, WEAR_WIELD ) ) == NULL )
+    if ( ( obj = victim->getEquipment(WEAR_WIELD ) ) == NULL )
     {
 	send_to_char( "Your opponent is not wielding a weapon.\n\r", ch );
 	return;
@@ -3325,7 +3327,7 @@ void do_disarm( Character *ch, char *argument )
     /* modifiers */
 
     /* skill */
-    if ( get_eq_char(ch,WEAR_WIELD) == NULL)
+    if ( ch->getEquipment(WEAR_WIELD) == NULL)
 	chance = chance * hth/150;
     else
 	chance = chance * ch_weapon/100;
@@ -3506,7 +3508,7 @@ void do_breath( Character *ch, char *argument )
 	    return;
 	}
     }
-    else if ((victim = get_char_room(ch, argument)) == NULL || !can_see(victim, ch))
+    else if ((victim = get_char_room(ch, argument)) == NULL || !victim->can_see( ch))
     {
 	send_to_char("They are not here.\n\r",ch);
 	return;
@@ -3582,7 +3584,7 @@ void do_endure(Character *ch, char *arg)
   af.modifier = -1 * (get_skill(ch,gsn_endure) / 10); 
   af.bitvector = 0;
 
-  affect_to_char(ch,&af);
+  ch->giveAffect(&af);
 
   send_to_char("You prepare yourself for magical encounters.\n\r",ch);
   act("$n concentrates for a moment, then resumes $s position.", ch,NULL,NULL,TO_ROOM, POS_RESTING);
@@ -3706,15 +3708,15 @@ void do_assassinate( Character *ch, char *argument )
 	return;
     }
  
-    if ( (get_eq_char( ch, WEAR_WIELD ) != NULL) ||
-	 (get_eq_char( ch, WEAR_HOLD  ) != NULL) )  {
+    if ( (ch->getEquipment(WEAR_WIELD ) != NULL) ||
+	 (ch->getEquipment(WEAR_HOLD  ) != NULL) )  {
 	send_to_char( 
 	"You need both hands free to assassinate somebody.\n\r", ch );
 	return;
     }
  
     if ( (victim->hit < victim->max_hit) && 
-	 (can_see(victim, ch)) &&
+	 (victim->can_see( ch)) &&
 	 (IS_AWAKE(victim) ) )
     {
 		act( "$N is hurt and suspicious ... you can't sneak up.", ch, NULL, victim, TO_CHAR, POS_RESTING );
@@ -3742,7 +3744,7 @@ void do_assassinate( Character *ch, char *argument )
     if (!(IS_NPC(victim)) && !(IS_NPC(ch))
 	&& victim->position == POS_FIGHTING)
       {
-	if (!can_see(victim, ch))
+	if (!victim->can_see( ch))
 	  do_yell(victim, (char*)"Help! Someone tried to assassinate me!");
 	else
 	  {
@@ -3815,7 +3817,7 @@ void do_strangle(Character *ch, char *argument)
 
 	damage(ch,victim,0,gsn_strangle,DAM_NONE, TRUE);
 	check_improve(ch,gsn_strangle,FALSE,1);
-	if (!can_see(victim, ch))
+	if (!victim->can_see( ch))
 	  do_yell(victim, (char*)"Help! I'm being strangled by someone!");
 	else
 	  {
@@ -3868,7 +3870,7 @@ void do_blackjack(Character *ch, char *argument)
 
     chance = 0.5 * get_skill(ch,gsn_blackjack);
     chance += URANGE( 0, (get_curr_stat(ch,STAT_DEX)-20)*2, 10);
-    chance += can_see(victim, ch) ? 0 : 5;
+    chance += victim->can_see( ch) ? 0 : 5;
     if ( IS_NPC(victim) )
 	if ( victim->pIndexData->pShop != NULL )
 	   chance -= 40;
@@ -3901,7 +3903,7 @@ void do_blackjack(Character *ch, char *argument)
 	check_improve(ch,gsn_blackjack,FALSE,1);
 	if (!IS_NPC(victim))  
 	{
-	if (!can_see(victim, ch))
+	if (!victim->can_see( ch))
 	  do_yell(victim, (char*)"Help! I'm being blackjacked by someone!");
 	else
 	  {

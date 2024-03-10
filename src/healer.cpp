@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "magic.h"
+#include "Room.h"
 
 void do_heal(Character *ch, char *argument)
 {

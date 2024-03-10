@@ -34,6 +34,7 @@
 #include "magic.h"
 #include "RaceManager.h"
 #include "recycle.h"
+#include "Room.h"
 #include "tables.h"
 
 /* command procedures needed */
@@ -62,7 +63,7 @@ void do_gain(Character *ch, char *argument)
 	if (IS_NPC(trainer) && IS_SET(trainer->act,ACT_GAIN))
 	    break;
 
-    if (trainer == NULL || !can_see(ch,trainer))
+    if (trainer == NULL || !ch->can_see(trainer))
     {
 	send_to_char("You can't do that here.\n\r",ch);
 	return;

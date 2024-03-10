@@ -30,6 +30,7 @@
 #include <time.h>
 #include "merc.h"
 #include "tables.h"
+#include "Object.h"
 #include "PlayerCharacter.h"
 
 int flag_lookup (const char *name, const struct flag_type *flag_table)
@@ -133,7 +134,6 @@ int liq_lookup (const char *name)
 
 int nw_lookup( PlayerCharacter *ch )
 {
-    OBJ_DATA *obj;
     long nw;
 
     /* First, monetary value */
@@ -147,15 +147,15 @@ int nw_lookup( PlayerCharacter *ch )
     nw -= 100 * (ch->getKilledByMobCount() * 5);
 
     /* Next, lets get their item costs */
-    for (obj = ch->carrying; obj != NULL; obj = obj->next_content)
+    for (auto obj : ch->getCarrying())
     {
-	if (obj->item_type == ITEM_BANKNOTE)
-	{
-	    nw += obj->value[0] * 100;
-	    nw += obj->value[1];
-	}
-	else
-	nw += obj->cost;
+        if (obj->getItemType() == ITEM_BANKNOTE)
+        {
+            nw += obj->getValues().at(0) * 100;
+            nw += obj->getValues().at(1);
+        } else {
+            nw += obj->getCost();
+        }
     }
 
     return nw /= 100;

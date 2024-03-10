@@ -44,6 +44,8 @@ struct board_data
 
 typedef struct board_data BOARD_DATA;
 
+class ROOM_INDEX_DATA;
+
 
 /* External variables */
 

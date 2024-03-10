@@ -41,12 +41,16 @@
 #include "clans/ClanWriter.h"
 #include "db.h"
 #include "EquipmentListGenerator.h"
+#include "ExtraDescription.h"
 #include "interfaces/ILogger.h"
 #include "lookup.h"
 #include "music.h"
 #include "NonPlayerCharacter.h"
+#include "Object.h"
+#include "ObjectHelper.h"
 #include "RaceManager.h"
 #include "recycle.h"
+#include "Room.h"
 #include "RoomManager.h"
 #include "tables.h"
 #include "Wiznet.h"
@@ -69,7 +73,7 @@ time_t time(time_t *tloc);
 
 
 /* externals for counting purposes */
-extern	OBJ_DATA	*obj_free;
+extern	Object	*obj_free;
 extern  DESCRIPTOR_DATA *descriptor_free;
 extern	PC_DATA		*pcdata_free;
 extern  AFFECT_DATA	*affect_free;
@@ -94,7 +98,7 @@ std::list<Character *> char_list;
 char *			help_greeting;
 char			log_buf		[2*MAX_INPUT_LENGTH];
 KILL_DATA		kill_table	[MAX_LEVEL];
-OBJ_DATA *		object_list;
+std::list<Object *> object_list;
 TIME_INFO_DATA		time_info;
 WEATHER_DATA		weather_info;
 
@@ -858,11 +862,11 @@ void load_rooms( FILE *fp )
 	}
 	fBootDb = TRUE;
 
-	pRoomIndex			= (ROOM_INDEX_DATA*)alloc_perm( sizeof(*pRoomIndex) );
+	pRoomIndex			= new ROOM_INDEX_DATA();
 	pRoomIndex->owner		= str_dup("");
 	pRoomIndex->people		= NULL;
-	pRoomIndex->contents		= NULL;
-	pRoomIndex->extra_descr		= NULL;
+	pRoomIndex->contents		= std::list<Object *>();
+	pRoomIndex->extra_descr		= std::vector<ExtraDescription *>();
 	pRoomIndex->area		= area_last;
 	sec				= pRoomIndex->area->security;
 	pRoomIndex->vnum		= vnum;
@@ -947,14 +951,11 @@ void load_rooms( FILE *fp )
 	    }
 	    else if ( letter == 'E' )
 	    {
-		EXTRA_DESCR_DATA *ed;
-
-		ed			= (EXTRA_DESCR_DATA*)alloc_perm( sizeof(*ed) );
-		ed->keyword		= fread_string( fp );
-		ed->description		= fread_string( fp );
-		ed->next		= pRoomIndex->extra_descr;
-		pRoomIndex->extra_descr	= ed;
-		top_ed++;
+            ExtraDescription *ed = new ExtraDescription();
+            ed->setKeyword(fread_string( fp ) );
+            ed->setDescription(fread_string( fp ));
+            pRoomIndex->extra_descr.push_back(ed);
+            top_ed++;
 	    }
 
 	    else if (letter == 'O')
@@ -1268,9 +1269,9 @@ void reset_room( ROOM_INDEX_DATA *pRoom )
     RESET_DATA  *pReset;
     Character   *pMob;
     Character	*mob;
-    OBJ_DATA    *pObj;
+    Object    *pObj;
     Character   *LastMob = NULL;
-    OBJ_DATA    *LastObj = NULL;
+    Object    *LastObj = NULL;
     int iExit;
     int level = 0;
     bool last;
@@ -1388,15 +1389,15 @@ void reset_room( ROOM_INDEX_DATA *pRoom )
             }
 
             if ( pRoom->area->nplayer > 0
-              || count_obj_list( pObjIndex, pRoom->contents ) > 0 )
+              || ObjectHelper::countInList( pObjIndex, pRoom->contents ) > 0 )
 	    {
 		last = FALSE;
 		break;
 	    }
 
-            pObj = create_object( pObjIndex,              /* UMIN - ROM OLC */
+            pObj = ObjectHelper::createFromIndex( pObjIndex,              /* UMIN - ROM OLC */
 				  UMIN(number_fuzzy( level ), LEVEL_HERO -1) );
-            pObj->cost = 0;
+            pObj->setCost(0);
             obj_to_room( pObj, pRoom );
 	    last = TRUE;
             break;
@@ -1423,9 +1424,9 @@ void reset_room( ROOM_INDEX_DATA *pRoom )
 
             if ( pRoom->area->nplayer > 0
               || ( LastObj = get_obj_type( pObjToIndex ) ) == NULL
-              || ( LastObj->in_room == NULL && !last)
+              || ( LastObj->getInRoom() == NULL && !last)
               || ( pObjIndex->count >= limit /* && number_range(0,4) != 0 */ )
-              || ( count = count_obj_list( pObjIndex, LastObj->contains ) ) > pReset->arg4  )
+              || ( count = ObjectHelper::countInList( pObjIndex, LastObj->getContents() ) ) > pReset->arg4  )
 	    {
 		last = FALSE;
 		break;
@@ -1434,15 +1435,15 @@ void reset_room( ROOM_INDEX_DATA *pRoom )
 
 	    while (count < pReset->arg4)
 	    {
-            pObj = create_object( pObjIndex, number_fuzzy( LastObj->level ) );
-            obj_to_obj( pObj, LastObj );
-		count++;
-		if (pObjIndex->count >= limit)
-		    break;
+            pObj = ObjectHelper::createFromIndex( pObjIndex, number_fuzzy( LastObj->getLevel() ) );
+            LastObj->addObject( pObj );
+            count++;
+            if (pObjIndex->count >= limit)
+                break;
 	    }
 
 	    /* fix object lock state! */
-	    LastObj->value[1] = LastObj->pIndexData->value[1];
+	    LastObj->getValues().at(1) = LastObj->getObjectIndexData()->value[1];
 	    last = TRUE;
             break;
 
@@ -1497,27 +1498,13 @@ void reset_room( ROOM_INDEX_DATA *pRoom )
                 case ITEM_STAFF:        olevel = number_range( 15, 25 ); break;
                 case ITEM_ARMOR:        olevel = number_range(  5, 15 ); break;
                 /* ROM patch weapon, treasure */
-		case ITEM_WEAPON:       olevel = number_range(  5, 15 ); break;
-		case ITEM_TREASURE:     olevel = number_range( 10, 20 ); break;
-
-#if 0 /* envy version */
-                case ITEM_WEAPON:       if ( pReset->command == 'G' )
-                                            olevel = number_range( 5, 15 );
-                                        else
-                                            olevel = number_fuzzy( level );
-#endif /* envy version */
-
+                case ITEM_WEAPON:       olevel = number_range(  5, 15 ); break;
+                case ITEM_TREASURE:     olevel = number_range( 10, 20 ); break;
                   break;
                 }
 
-                pObj = create_object( pObjIndex, olevel );
-		SET_BIT( pObj->extra_flags, ITEM_INVENTORY );  /* ROM OLC */
-
-#if 0 /* envy version */
-                if ( pReset->command == 'G' )
-                    SET_BIT( pObj->extra_flags, ITEM_INVENTORY );
-#endif /* envy version */
-
+                pObj = ObjectHelper::createFromIndex( pObjIndex, olevel );
+                pObj->addExtraFlag( ITEM_INVENTORY );  /* ROM OLC */
             }
 	    else   /* ROM OLC else version */
 	    {
@@ -1531,20 +1518,20 @@ void reset_room( ROOM_INDEX_DATA *pRoom )
 
 		if ( pObjIndex->count < limit || number_range(0,4) == 0 )
 		{
-		    pObj = create_object( pObjIndex, 
+		    pObj = ObjectHelper::createFromIndex( pObjIndex, 
 			   UMIN( number_fuzzy( level ), LEVEL_HERO - 1 ) );
 		    /* error message if it is too high */
-		    if (pObj->level > LastMob->level + 3) {
+		    if (pObj->getLevel() > LastMob->level + 3) {
 				fprintf(stderr,
 						"Err: obj %s (%d) -- %d, mob %s (%d) -- %d (obj level > mob + 3 )\n",
-						pObj->short_descr,pObj->pIndexData->vnum,pObj->level,
+						pObj->getShortDescription().c_str(),pObj->getObjectIndexData()->vnum,pObj->getLevel(),
 						LastMob->short_descr,LastMob->pIndexData->vnum,LastMob->level);
-			} else if (pObj->item_type == ITEM_WEAPON
+			} else if (pObj->getItemType() == ITEM_WEAPON
 		    &&   pReset->command == 'E' 
-		    &&   pObj->level < LastMob->level -5 && pObj->level < 45) {
+		    &&   pObj->getLevel() < LastMob->level -5 && pObj->getLevel() < 45) {
 				fprintf(stderr,
 						"Err: obj %s (%d) -- %d, mob %s (%d) -- %d (weapon level 5 or less than mob)\n",
-						pObj->short_descr,pObj->pIndexData->vnum,pObj->level,
+						pObj->getShortDescription().c_str(),pObj->getObjectIndexData()->vnum,pObj->getLevel(),
 						LastMob->short_descr,LastMob->pIndexData->vnum,LastMob->level);
 			}
 		}
@@ -1555,11 +1542,11 @@ void reset_room( ROOM_INDEX_DATA *pRoom )
 #if 0 /* envy else version */
             else
             {
-                pObj = create_object( pObjIndex, number_fuzzy( level ) );
+                pObj = ObjectHelper::createFromIndex( pObjIndex, number_fuzzy( level ) );
             }
 #endif /* envy else version */
 
-            obj_to_char( pObj, LastMob );
+            LastMob->addObject( pObj );
             if ( pReset->command == 'E' )
                 equip_char( LastMob, pObj, pReset->arg3 );
             last = TRUE;
@@ -1616,7 +1603,6 @@ void reset_area( AREA_DATA *pArea )
 void clone_mobile(Character *parent, Character *clone)
 {
     int i;
-    AFFECT_DATA *paf;
 
     if ( parent == NULL || clone == NULL || !IS_NPC(parent))
 	return;
@@ -1682,225 +1668,9 @@ void clone_mobile(Character *parent, Character *clone)
 	clone->damage[i]	= parent->damage[i];
 
     /* now add the affects */
-    for (paf = parent->affected; paf != NULL; paf = paf->next)
-        affect_to_char(clone,paf);
-
-}
-
-
-
-
-/*
- * Create an instance of an object.
- */
-OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex, int level )
-{
-    AFFECT_DATA *paf;
-    OBJ_DATA *obj;
-    int i;
-
-    if ( pObjIndex == NULL )
-    {
-	bug( "Create_object: NULL pObjIndex.", 0 );
-	exit( 1 );
+    for (auto paf : parent->affected) {
+        clone->giveAffect(paf);
     }
-
-    obj = new_obj();
-
-    obj->pIndexData	= pObjIndex;
-    obj->in_room	= NULL;
-    obj->enchanted	= FALSE;
-
-    if (pObjIndex->new_format)
-	obj->level = pObjIndex->level;
-    else
-	obj->level		= UMAX(0,level);
-    obj->wear_loc	= -1;
-
-    obj->name		= str_dup( pObjIndex->name );           /* OLC */
-    obj->short_descr	= str_dup( pObjIndex->short_descr );    /* OLC */
-    obj->description	= str_dup( pObjIndex->description );    /* OLC */
-    obj->material	= str_dup(pObjIndex->material);
-    obj->item_type	= pObjIndex->item_type;
-    obj->extra_flags	= pObjIndex->extra_flags;
-    obj->wear_flags	= pObjIndex->wear_flags;
-    obj->value[0]	= pObjIndex->value[0];
-    obj->value[1]	= pObjIndex->value[1];
-    obj->value[2]	= pObjIndex->value[2];
-    obj->value[3]	= pObjIndex->value[3];
-    obj->value[4]	= pObjIndex->value[4];
-    obj->weight		= pObjIndex->weight;
-    obj->min_stat	= pObjIndex->min_stat;
-
-    if (level == -1 || pObjIndex->new_format)
-	obj->cost	= pObjIndex->cost;
-    else
-    	obj->cost	= number_fuzzy( 10 )
-			* number_fuzzy( level ) * number_fuzzy( level );
-
-    /*
-     * Mess with object properties.
-     */
-    switch ( obj->item_type )
-    {
-    default:
-	bug( "Read_object: vnum %d bad type.", pObjIndex->vnum );
-	break;
-
-    case ITEM_LIGHT:
-	if (obj->value[2] == 999)
-		obj->value[2] = -1;
-	break;
-
-    case ITEM_FURNITURE:
-    case ITEM_TRASH:
-    case ITEM_CONTAINER:
-    case ITEM_DRINK_CON:
-    case ITEM_KEY:
-    case ITEM_FOOD:
-    case ITEM_BOAT:
-    case ITEM_CORPSE_NPC:
-    case ITEM_CORPSE_PC:
-    case ITEM_FOUNTAIN:
-    case ITEM_MAP:
-    case ITEM_CLOTHING:
-    case ITEM_PORTAL:
-	if (!pObjIndex->new_format)
-	    obj->cost /= 5;
-	break;
-
-    case ITEM_NUKE:
-    case ITEM_ARROW:
-    case ITEM_BOW:
-    case ITEM_BANKNOTE:
-    case ITEM_TREASURE:
-    case ITEM_WARP_STONE:
-    case ITEM_ROOM_KEY:
-    case ITEM_GEM:
-    case ITEM_JEWELRY:
-    case ITEM_WINDOW:
-	break;
-
-    case ITEM_JUKEBOX:
-	for (i = 0; i < 5; i++)
-	   obj->value[i] = -1;
-	break;
-
-    case ITEM_SCROLL:
-	if (level != -1 && !pObjIndex->new_format)
-	    obj->value[0]	= number_fuzzy( obj->value[0] );
-	break;
-
-    case ITEM_WAND:
-    case ITEM_STAFF:
-	if (level != -1 && !pObjIndex->new_format)
-	{
-	    obj->value[0]	= number_fuzzy( obj->value[0] );
-	    obj->value[1]	= number_fuzzy( obj->value[1] );
-	    obj->value[2]	= obj->value[1];
-	}
-	if (!pObjIndex->new_format)
-	    obj->cost *= 2;
-	break;
-
-    case ITEM_WEAPON:
-	if (level != -1 && !pObjIndex->new_format)
-	{
-	    obj->value[1] = number_fuzzy( number_fuzzy( 1 * level / 4 + 2 ) );
-	    obj->value[2] = number_fuzzy( number_fuzzy( 3 * level / 4 + 6 ) );
-	}
-	break;
-
-    case ITEM_ARMOR:
-	if (level != -1 && !pObjIndex->new_format)
-	{
-	    obj->value[0]	= number_fuzzy( level / 5 + 3 );
-	    obj->value[1]	= number_fuzzy( level / 5 + 3 );
-	    obj->value[2]	= number_fuzzy( level / 5 + 3 );
-	}
-	break;
-
-    case ITEM_POTION:
-    case ITEM_PILL:
-	if (level != -1 && !pObjIndex->new_format)
-	    obj->value[0] = number_fuzzy( number_fuzzy( obj->value[0] ) );
-	break;
-
-    case ITEM_MONEY:
-	if (!pObjIndex->new_format)
-	    obj->value[0]	= obj->cost;
-	break;
-    }
-  
-    for (paf = pObjIndex->affected; paf != NULL; paf = paf->next) 
-	if ( paf->location == APPLY_SPELL_AFFECT )
-	    affect_to_obj(obj,paf);
-  
-    obj->next		= object_list;
-    object_list		= obj;
-    pObjIndex->count++;
-
-    return obj;
-}
-
-/* duplicate an object exactly -- except contents */
-void clone_object(OBJ_DATA *parent, OBJ_DATA *clone)
-{
-    int i;
-    AFFECT_DATA *paf;
-    EXTRA_DESCR_DATA *ed,*ed_new;
-
-    if (parent == NULL || clone == NULL)
-	return;
-
-    /* start fixing the object */
-    clone->name 	= str_dup(parent->name);
-    clone->short_descr 	= str_dup(parent->short_descr);
-    clone->description	= str_dup(parent->description);
-    clone->item_type	= parent->item_type;
-    clone->extra_flags	= parent->extra_flags;
-    clone->wear_flags	= parent->wear_flags;
-    clone->weight	= parent->weight;
-    clone->cost		= parent->cost;
-    clone->level	= parent->level;
-    clone->condition	= parent->condition;
-    clone->material	= str_dup(parent->material);
-    clone->timer	= parent->timer;
-
-    for (i = 0;  i < 5; i ++)
-	clone->value[i]	= parent->value[i];
-
-    /* affects */
-    clone->enchanted	= parent->enchanted;
-  
-    for (paf = parent->affected; paf != NULL; paf = paf->next) 
-	affect_to_obj(clone,paf);
-
-    /* extended desc */
-    for (ed = parent->extra_descr; ed != NULL; ed = ed->next)
-    {
-        ed_new                  = new_extra_descr();
-        ed_new->keyword    	= str_dup( ed->keyword);
-        ed_new->description     = str_dup( ed->description );
-        ed_new->next           	= clone->extra_descr;
-        clone->extra_descr  	= ed_new;
-    }
-
-}
-
-
-
-/*
- * Get an extra description from a list.
- */
-char *get_extra_descr( const char *name, EXTRA_DESCR_DATA *ed )
-{
-    for ( ; ed != NULL; ed = ed->next )
-    {
-	if ( is_name( (char *) name, ed->keyword ) )
-	    return ed->description;
-    }
-    return NULL;
 }
 
 
@@ -2562,12 +2332,10 @@ void do_dump( Character *ch, char *argument )
     int count,count2,aff_count;
     Character *fch;
     MOB_INDEX_DATA *pMobIndex;
-    OBJ_DATA *obj;
     OBJ_INDEX_DATA *pObjIndex;
     ROOM_INDEX_DATA *room;
     EXIT_DATA *exit;
     DESCRIPTOR_DATA *d;
-    AFFECT_DATA *af;
     FILE *fp;
     int vnum,nMatch = 0;
 
@@ -2587,9 +2355,10 @@ void do_dump( Character *ch, char *argument )
     for (std::list<Character*>::iterator it = char_list.begin(); it != char_list.end(); it++)
     {
     	fch = *it;
-	count++;
-	for (af = fch->affected; af != NULL; af = af->next)
-	    aff_count++;
+        count++;
+        for (auto af : fch->affected) {
+            aff_count++;
+        }
     }
 
     fprintf(fp,"Mobs	%4d (%8ld bytes)\n",
@@ -2609,8 +2378,7 @@ void do_dump( Character *ch, char *argument )
     for ( vnum = 0; nMatch < top_obj_index; vnum++ )
         if ( ( pObjIndex = get_obj_index( vnum ) ) != NULL )
         {
-	    for (af = pObjIndex->affected; af != NULL; af = af->next)
-		aff_count++;
+            aff_count += pObjIndex->affected.size();
             nMatch++;
         }
 
@@ -2620,22 +2388,21 @@ void do_dump( Character *ch, char *argument )
 
     /* objects */
     count = 0;  count2 = 0;
-    for (obj = object_list; obj != NULL; obj = obj->next)
+    for (auto obj : object_list)
     {
-	count++;
-	for (af = obj->affected; af != NULL; af = af->next)
-	    aff_count++;
+        count++;
+        aff_count += obj->getAffectedBy().size();
     }
-    for (obj = obj_free; obj != NULL; obj = obj->next)
-	count2++;
 
-    fprintf(fp,"Objs	%4d (%8ld bytes), %2d free (%ld bytes)\n",
-	count, count * (sizeof(*obj)), count2, count2 * (sizeof(*obj)));
+    fprintf(fp,"Objs	%4d (%8ld bytes)\n",
+	count, count * (sizeof(object_list.front())));
 
     /* affects */
     count = 0;
-    for (af = affect_free; af != NULL; af = af->next)
-	count++;
+    AFFECT_DATA * af;
+    for (af = affect_free; af != NULL; af = af->next) {
+    	count++;
+    }
 
     fprintf(fp,"Affects	%4d (%8ld bytes), %2d free (%ld bytes)\n",
 	aff_count, aff_count * (sizeof(*af)), count, count * (sizeof(*af)));

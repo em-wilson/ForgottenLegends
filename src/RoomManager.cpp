@@ -1,4 +1,6 @@
 #include "merc.h"
+#include "Object.h"
+#include "Room.h"
 #include "RoomManager.h"
 
 /*
@@ -6,7 +8,7 @@
  */
 void RoomManager::char_from_room( Character *ch )
 {
-    OBJ_DATA *obj;
+    Object *obj;
 
     if ( ch->in_room == NULL )
     {
@@ -17,9 +19,9 @@ void RoomManager::char_from_room( Character *ch )
     if ( !IS_NPC(ch) )
 	--ch->in_room->area->nplayer;
 
-    if ( ( obj = get_eq_char( ch, WEAR_LIGHT ) ) != NULL
-    &&   obj->item_type == ITEM_LIGHT
-    &&   obj->value[2] != 0
+    if ( ( obj = ch->getEquipment(WEAR_LIGHT ) ) != NULL
+    &&   obj->getItemType() == ITEM_LIGHT
+    &&   obj->getValues().at(2) != 0
     &&   ch->in_room->light > 0 )
 	--ch->in_room->light;
 
@@ -46,7 +48,7 @@ void RoomManager::char_from_room( Character *ch )
 
     ch->in_room      = NULL;
     ch->next_in_room = NULL;
-    ch->on 	     = NULL;  /* sanity check! */
+    ch->getOntoObject(nullptr);
     return;
 }
 
@@ -55,7 +57,7 @@ void RoomManager::char_from_room( Character *ch )
  */
 void RoomManager::char_to_room( Character *ch, ROOM_INDEX_DATA *pRoomIndex )
 {
-    OBJ_DATA *obj;
+    Object *obj;
 
     if ( pRoomIndex == NULL )
     {
@@ -83,9 +85,9 @@ void RoomManager::char_to_room( Character *ch, ROOM_INDEX_DATA *pRoomIndex )
 	++ch->in_room->area->nplayer;
     }
 
-    if ( ( obj = get_eq_char( ch, WEAR_LIGHT ) ) != NULL
-    &&   obj->item_type == ITEM_LIGHT
-    &&   obj->value[2] != 0 )
+    if ( ( obj = ch->getEquipment(WEAR_LIGHT ) ) != NULL
+    &&   obj->getItemType() == ITEM_LIGHT
+    &&   obj->getValues().at(2) != 0 )
 	++ch->in_room->light;
 	
     if (IS_AFFECTED(ch,AFF_PLAGUE))
@@ -93,7 +95,7 @@ void RoomManager::char_to_room( Character *ch, ROOM_INDEX_DATA *pRoomIndex )
         AFFECT_DATA *af, plague;
         Character *vch;
         
-        for ( af = ch->affected; af != NULL; af = af->next )
+        for ( auto af : ch->affected)
         {
             if (af->type == gsn_plague)
                 break;
@@ -108,7 +110,7 @@ void RoomManager::char_to_room( Character *ch, ROOM_INDEX_DATA *pRoomIndex )
         if (af->level == 1)
             return;
         
-	plague.where		= TO_AFFECTS;
+	    plague.where		= TO_AFFECTS;
         plague.type 		= gsn_plague;
         plague.level 		= af->level - 1; 
         plague.duration 	= number_range(1,2 * plague.level);

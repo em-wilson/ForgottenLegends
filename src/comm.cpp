@@ -62,7 +62,10 @@
 #include "clans/ClanManager.h"
 #include "IConnectedStateHandler.h"
 #include "ILogger.h"
+#include "Object.h"
+#include "ObjectHelper.h"
 #include "RaceManager.h"
+#include "Room.h"
 #include "SocketHelper.h"
 #include "Wiznet.h"
 
@@ -229,17 +232,12 @@ void game_loop_unix(Game *game, int control)
 				{
 					show_string(d, d->incomm);
 				}
-				else if (d->pString)
-				{
-					string_add(d->character, d->incomm);
-				}
 				else
 				{
 					switch (d->connected)
 					{
 					case ConnectedState::Playing:
-						if (!run_olc_editor(d))
-							substitute_alias(d, d->incomm);
+						substitute_alias(d, d->incomm);
 						break;
 					default:
 						nanny(game, d, d->incomm);
@@ -600,7 +598,7 @@ bool process_output(DESCRIPTOR_DATA *d, bool fPrompt)
 			ch = d->character;
 
 			/* battle prompt */
-			if ((victim = ch->fighting) != NULL && can_see(ch, victim))
+			if ((victim = ch->fighting) != NULL && ch->can_see( victim))
 			{
 				int percent;
 				char wound[100];
@@ -840,14 +838,6 @@ void bust_a_prompt(Character *ch)
 			break;
 		case '%':
 			snprintf(buf2, sizeof(buf2), "%%");
-			i = buf2;
-			break;
-		case 'o':
-			snprintf(buf2, sizeof(buf2), "%s", olc_ed_name(ch));
-			i = buf2;
-			break;
-		case 'O':
-			snprintf(buf2, sizeof(buf2), "%s", olc_ed_vnum(ch));
 			i = buf2;
 			break;
 		}
@@ -1282,7 +1272,7 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 			set_title(ch, buf);
 
 			do_outfit(ch, (char *)"");
-			obj_to_char(create_object(get_obj_index(OBJ_VNUM_MAP), 0), ch);
+			ch->addObject(ObjectHelper::createFromIndex(get_obj_index(OBJ_VNUM_MAP), 0));
 
 			char_to_room(ch, get_room_index(ROOM_VNUM_SCHOOL));
 			send_to_char("\n\r", ch);
@@ -1361,7 +1351,7 @@ void send_to_char_bw(const char *txt, Character *ch)
 /*
  * Write to one char, new colour version, by Lope.
  */
-void send_to_char(const char *txt, Character *ch)
+void send_to_char(string txt, Character *ch)
 {
 	const char *point;
 	char *point2;
@@ -1370,11 +1360,11 @@ void send_to_char(const char *txt, Character *ch)
 
 	buf[0] = '\0';
 	point2 = buf;
-	if (txt && ch->desc)
+	if (!txt.empty() && ch->desc)
 	{
 		if (IS_SET(ch->act, PLR_COLOUR))
 		{
-			for (point = txt; *point; point++)
+			for (point = txt.c_str(); *point; point++)
 			{
 				if (*point == '{')
 				{
@@ -1392,7 +1382,7 @@ void send_to_char(const char *txt, Character *ch)
 		}
 		else
 		{
-			for (point = txt; *point; point++)
+			for (point = txt.c_str(); *point; point++)
 			{
 				if (*point == '{')
 				{
@@ -1431,7 +1421,7 @@ void page_to_char_bw(const char *txt, Character *ch)
 /*
  * Page to one char, new colour version, by Lope.
  */
-void page_to_char(const char *txt, Character *ch)
+void page_to_char(const string txt, Character *ch)
 {
 	const char *point;
 	char *point2;
@@ -1440,11 +1430,11 @@ void page_to_char(const char *txt, Character *ch)
 
 	buf[0] = '\0';
 	point2 = buf;
-	if (txt && ch->desc)
+	if (!txt.empty() && ch->desc)
 	{
 		if (IS_SET(ch->act, PLR_COLOUR))
 		{
-			for (point = txt; *point; point++)
+			for (point = txt.c_str(); *point; point++)
 			{
 				if (*point == '{')
 				{
@@ -1465,7 +1455,7 @@ void page_to_char(const char *txt, Character *ch)
 		}
 		else
 		{
-			for (point = txt; *point; point++)
+			for (point = txt.c_str(); *point; point++)
 			{
 				if (*point == '{')
 				{
@@ -1544,7 +1534,7 @@ void fix_sex(Character *ch)
 		ch->sex = IS_NPC(ch) ? 0 : ch->pcdata->true_sex;
 }
 
-void act_string(const char *format, Character *to, Character *ch, Character *vch, OBJ_DATA *obj1, OBJ_DATA *obj2, const void *arg1, const void *arg2)
+void act_string(const char *format, Character *to, Character *ch, Character *vch, Object *obj1, Object *obj2, const void *arg1, const void *arg2)
 {
 	static char *const he_she[] = {(char *)"it", (char *)"he", (char *)"she"};
 	static char *const him_her[] = {(char *)"it", (char *)"him", (char *)"her"};
@@ -1615,14 +1605,14 @@ void act_string(const char *format, Character *to, Character *ch, Character *vch
 				break;
 
 			case 'p':
-				i = can_see_obj(to, obj1)
-						? obj1->short_descr
+				i = to->can_see( obj1)
+						? obj1->getShortDescription().c_str()
 						: (char *)"something";
 				break;
 
 			case 'P':
-				i = can_see_obj(to, obj2)
-						? obj2->short_descr
+				i = to->can_see( obj2)
+						? obj2->getShortDescription().c_str()
 						: (char *)"something";
 				break;
 
@@ -1671,8 +1661,8 @@ void act(const char *format, Character *ch, const void *arg1,
 {
 	Character *to;
 	Character *vch = (Character *)arg2;
-	OBJ_DATA *obj1 = (OBJ_DATA *)arg1;
-	OBJ_DATA *obj2 = (OBJ_DATA *)arg2;
+	Object *obj1 = (Object *)arg1;
+	Object *obj2 = (Object *)arg2;
 
 	/*
 	 * Discard null and zero-length messages.

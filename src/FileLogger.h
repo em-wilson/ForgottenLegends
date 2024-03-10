@@ -5,8 +5,8 @@
 
 class FileLogger : public ILogger {
     public:
-        void log_string( const char *str );
-        void log_stringf(const char *fmt, ...);
+        void log_string( const std::string str );
+        void log_stringf(const std::string fmt, ...);
 };
 
 #endif

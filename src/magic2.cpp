@@ -32,6 +32,9 @@
 #include <time.h>
 #include "merc.h"
 #include "magic.h"
+#include "Object.h"
+#include "ObjectHelper.h"
+#include "Room.h"
 
 
 DECLARE_DO_FUN(do_scan);
@@ -53,7 +56,7 @@ void spell_farsight( int sn, int level, bool succesful_cast, Character *ch, void
 void spell_portal( int sn, int level, bool succesful_cast, Character *ch, void *vo,int target)
 {
     Character *victim;
-    OBJ_DATA *portal, *stone;
+    Object *portal, *stone;
 
         if ( ( victim = get_char_world( ch, target_name ) ) == NULL
     ||   victim == ch
@@ -74,24 +77,24 @@ void spell_portal( int sn, int level, bool succesful_cast, Character *ch, void *
         return;
     }   
 
-    stone = get_eq_char(ch,WEAR_HOLD);
+    stone = ch->getEquipment(WEAR_HOLD);
     if (!IS_IMMORTAL(ch) 
-    &&  (stone == NULL || stone->item_type != ITEM_WARP_STONE))
+    &&  (stone == NULL || stone->getItemType() != ITEM_WARP_STONE))
     {
 	send_to_char("You lack the proper component for this spell.\n\r",ch);
 	return;
     }
 
-    if (stone != NULL && stone->item_type == ITEM_WARP_STONE)
+    if (stone != NULL && stone->getItemType() == ITEM_WARP_STONE)
     {
      	act("You draw upon the power of $p.",ch,stone,NULL,TO_CHAR, POS_RESTING );
      	act("It flares brightly and vanishes!",ch,stone,NULL,TO_CHAR, POS_RESTING );
      	extract_obj(stone);
     }
 
-    portal = create_object(get_obj_index(OBJ_VNUM_PORTAL),0);
-    portal->timer = 2 + level / 25; 
-    portal->value[3] = victim->in_room->vnum;
+    portal = ObjectHelper::createFromIndex(get_obj_index(OBJ_VNUM_PORTAL),0);
+    portal->setTimer( 2 + level / 25 );
+    portal->getValues().at(3) = victim->in_room->vnum;
 
     obj_to_room(portal,ch->in_room);
 
@@ -102,7 +105,7 @@ void spell_portal( int sn, int level, bool succesful_cast, Character *ch, void *
 void spell_nexus( int sn, int level, bool succesful_cast, Character *ch, void *vo, int target)
 {
     Character *victim;
-    OBJ_DATA *portal, *stone;
+    Object *portal, *stone;
     ROOM_INDEX_DATA *to_room, *from_room;
 
     from_room = ch->in_room;
@@ -127,15 +130,15 @@ void spell_nexus( int sn, int level, bool succesful_cast, Character *ch, void *v
         return;
     }   
  
-    stone = get_eq_char(ch,WEAR_HOLD);
+    stone = ch->getEquipment(WEAR_HOLD);
     if (!IS_IMMORTAL(ch)
-    &&  (stone == NULL || stone->item_type != ITEM_WARP_STONE))
+    &&  (stone == NULL || stone->getItemType() != ITEM_WARP_STONE))
     {
         send_to_char("You lack the proper component for this spell.\n\r",ch);
         return;
     }
  
-    if (stone != NULL && stone->item_type == ITEM_WARP_STONE)
+    if (stone != NULL && stone->getItemType() == ITEM_WARP_STONE)
     {
         act("You draw upon the power of $p.",ch,stone,NULL,TO_CHAR, POS_RESTING );
         act("It flares brightly and vanishes!",ch,stone,NULL,TO_CHAR, POS_RESTING );
@@ -143,9 +146,9 @@ void spell_nexus( int sn, int level, bool succesful_cast, Character *ch, void *v
     }
 
     /* portal one */ 
-    portal = create_object(get_obj_index(OBJ_VNUM_PORTAL),0);
-    portal->timer = 1 + level / 10;
-    portal->value[3] = to_room->vnum;
+    portal = ObjectHelper::createFromIndex(get_obj_index(OBJ_VNUM_PORTAL),0);
+    portal->setTimer( 1 + level / 10 );
+    portal->getValues().at(3) = to_room->vnum;
  
     obj_to_room(portal,from_room);
  
@@ -157,9 +160,9 @@ void spell_nexus( int sn, int level, bool succesful_cast, Character *ch, void *v
 	return;
 
     /* portal two */
-    portal = create_object(get_obj_index(OBJ_VNUM_PORTAL),0);
-    portal->timer = 1 + level/10;
-    portal->value[3] = from_room->vnum;
+    portal = ObjectHelper::createFromIndex(get_obj_index(OBJ_VNUM_PORTAL),0);
+    portal->setTimer( 1 + level/10 );
+    portal->getValues().at(3) = from_room->vnum;
 
     obj_to_room(portal,to_room);
 

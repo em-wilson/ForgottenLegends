@@ -8509,7 +8509,7 @@ The following symbols rest on the road here.
     number = number_argument( argument, arg );
     count  = 0;
     for ( obj = object_list; obj != NULL; obj = obj->next )
-    {      if (can_see_obj( ch, obj ) && is_name( arg, obj->name ) )        
+    {      if (ch->can_see( obj ) && is_name( arg, obj->getName() ) )        
      {   if (++count == number )
           return obj;
      }

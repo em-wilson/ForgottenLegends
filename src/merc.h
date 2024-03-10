@@ -71,18 +71,15 @@ typedef struct	area_data		AREA_DATA;
 typedef struct	ban_data		BAN_DATA;
 typedef struct 	buf_type	 	BUFFER;
 typedef struct	exit_data		EXIT_DATA;
-typedef struct	extra_descr_data	EXTRA_DESCR_DATA;
 typedef struct	help_data		HELP_DATA;
 typedef struct	help_area_data		HELP_AREA;
 typedef struct	kill_data		KILL_DATA;
 typedef struct	mem_data		MEM_DATA;
 typedef struct	mob_index_data		MOB_INDEX_DATA;
 typedef struct  web_index_data          WEB_INDEX_DATA;
-typedef struct	obj_data		OBJ_DATA;
 typedef struct	obj_index_data		OBJ_INDEX_DATA;
 typedef struct  gen_data		GEN_DATA;
 typedef struct	reset_data		RESET_DATA;
-typedef struct	room_index_data		ROOM_INDEX_DATA;
 typedef struct	shop_data		SHOP_DATA;
 typedef struct	time_info_data		TIME_INFO_DATA;
 typedef struct	weather_data		WEATHER_DATA;
@@ -90,7 +87,9 @@ typedef struct  mprog_list		MPROG_LIST;
 typedef struct  mprog_code		MPROG_CODE;
 
 class Character;
+class ExtraDescription;
 class ILogger;
+class Object;
 class PlayerCharacter;
 
 extern ILogger * logger;
@@ -1320,26 +1319,13 @@ struct	liq_type
 
 
 /*
- * Extra description data for a room or object.
- */
-struct	extra_descr_data
-{
-    EXTRA_DESCR_DATA *next;	/* Next in list                     */
-    bool valid;
-    char *keyword;              /* Keyword in look/examine          */
-    char *description;          /* What to see                      */
-};
-
-
-
-/*
  * Prototype for an object.
  */
 struct	obj_index_data
 {
     OBJ_INDEX_DATA *	next;
-    EXTRA_DESCR_DATA *	extra_descr;
-    AFFECT_DATA *	affected;
+    std::vector<ExtraDescription *>	extra_descr;
+    std::vector<AFFECT_DATA *>	affected;
     AREA_DATA *		area;		/* OLC */
     bool		new_format;
     char *		name;
@@ -1357,47 +1343,7 @@ struct	obj_index_data
     sh_int		weight;
     int			cost;
     int			value[5];
-    int			min_stat;
 };
-
-
-
-/*
- * One object.
- */
-struct	obj_data
-{
-    OBJ_DATA *		next;
-    OBJ_DATA *		next_content;
-    OBJ_DATA *		contains;
-    OBJ_DATA *		in_obj;
-    OBJ_DATA *		on;
-    Character *		carried_by;
-    EXTRA_DESCR_DATA *	extra_descr;
-    AFFECT_DATA *	affected;
-    OBJ_INDEX_DATA *	pIndexData;
-    ROOM_INDEX_DATA *	in_room;
-    bool		valid;
-    bool		enchanted;
-    char *	        owner;
-    char *		name;
-    char *		short_descr;
-    char *		description;
-    sh_int		item_type;
-    int			extra_flags;
-    int			wear_flags;
-    sh_int		wear_loc;
-    sh_int		weight;
-    int			cost;
-    sh_int		level;
-    sh_int 		condition;
-    char *		material;
-    sh_int		timer;
-    sh_int		range;
-    int			value	[5];
-    int			min_stat;
-};
-
 
 
 
@@ -1473,33 +1419,6 @@ struct	area_data
     int			vnum;		/* OLC */ /* Area vnum  */
     int			area_flags;	/* OLC */
     int			security;	/* OLC */ /* Value 1-9  */
-};
-
-
-
-/*
- * Room type.
- */
-struct	room_index_data
-{
-    ROOM_INDEX_DATA *	next;
-    Character *		people;
-    OBJ_DATA *		contents;
-    EXTRA_DESCR_DATA *	extra_descr;
-    AREA_DATA *		area;
-    EXIT_DATA *		exit	[6];
-    RESET_DATA *	reset_first;	/* OLC */
-    RESET_DATA *	reset_last;	/* OLC */
-    char *		name;
-    char *		description;
-    char *		owner;
-    sh_int		vnum;
-    int			room_flags;
-    sh_int		light;
-    sh_int		sector_type;
-    sh_int		heal_rate;
-    sh_int 		mana_rate;
-    Clan *		clan;
 };
 
 
@@ -1800,18 +1719,16 @@ do                                                              \
 /*
  * Object macros.
  */
-#define CAN_WEAR(obj, part)	(IS_SET((obj)->wear_flags,  (part)))
-#define IS_OBJ_STAT(obj, stat)	(IS_SET((obj)->extra_flags, (stat)))
-#define IS_WEAPON_STAT(obj,stat)(IS_SET((obj)->value[4],(stat)))
-#define WEIGHT_MULT(obj)	((obj)->item_type == ITEM_CONTAINER ? \
-	(obj)->value[4] : 100)
+#define IS_WEAPON_STAT(obj,stat)(IS_SET((obj)->getValues().at(4),(stat)))
+#define WEIGHT_MULT(obj)	((obj)->getItemType() == ITEM_CONTAINER ? \
+	(obj)->getValues().at(4) : 100)
 
 
 
 /*
  * Description macros.
  */
-#define PERS(ch, looker)	( can_see( looker, (ch) ) ?		\
+#define PERS(ch, looker)	( looker->can_see( (ch) ) ?		\
 				( IS_NPC(ch) ? (ch)->short_descr	\
 				: (ch)->getName().c_str() ) : "someone" )
 
@@ -1870,7 +1787,7 @@ extern		SHOP_DATA	  *	shop_first;
 
 extern      std::list<Character *> char_list;
 extern		DESCRIPTOR_DATA   *	descriptor_list;
-extern		OBJ_DATA	  *	object_list;
+extern      std::list<Object *> object_list;
 
 extern		MPROG_CODE	  *	mprog_list;
 
@@ -1882,7 +1799,6 @@ extern		KILL_DATA		kill_table	[];
 extern		char			log_buf		[];
 extern		TIME_INFO_DATA		time_info;
 extern		WEATHER_DATA		weather_info;
-extern          OBJ_DATA          *     obj_free;
 extern		bool			MOBtrigger;
 
 /*
@@ -1938,7 +1854,7 @@ extern		bool			MOBtrigger;
  */
 #define CD	Character
 #define MID	MOB_INDEX_DATA
-#define OD	OBJ_DATA
+#define OD	Object
 #define OID	OBJ_INDEX_DATA
 #define RID	ROOM_INDEX_DATA
 #define SF	SPEC_FUN
@@ -1958,18 +1874,17 @@ bool	is_same_group	args( ( Character *ach, Character *bch ) );
 RID  *get_random_room   args ( (Character *ch) );
 
 /* act_info.c */
-const char *eq_worn(Character *ch, int iWear);
+std::string eq_worn(Character *ch, int iWear);
 void	set_title	args( ( Character *ch, char *title ) );
-void	look_window	args( ( Character *ch, OBJ_DATA *obj ) );
+void	look_window	args( ( Character *ch, OD *obj ) );
 
 /* act_move.c */
 void	move_char	args( ( Character *ch, int door, bool follow ) );
 
 /* act_obj.c */
-bool can_loot		args( (Character *ch, OBJ_DATA *obj) );
-void	wear_obj	args( (Character *ch, OBJ_DATA *obj, bool fReplace) );
-void    get_obj         args( ( Character *ch, OBJ_DATA *obj,
-                            OBJ_DATA *container ) );
+bool can_loot		args( (Character *ch, OD *obj) );
+void	wear_obj	args( (Character *ch, OD *obj, bool fReplace) );
+void    get_obj         args( ( Character *ch, OD *obj, OD *container ) );
 
 /* act_wiz.c */
 void	copyover_recover   args( ( void ) );
@@ -1985,8 +1900,8 @@ bool	check_ban	args( ( char *site, int type) );
 int     strlen_color    args( (char *argument)  );
 void	show_string	args( ( struct descriptor_data *d, char *input) );
 void printf_to_char  args( ( Character *ch, const char *fmt, ...) ) __attribute__ ((format(printf, 2,3)));
-void	send_to_char	args( ( const char *txt, Character *ch ) );
-void	page_to_char	args( ( const char *txt, Character *ch ) );
+void	send_to_char	args( ( std::string txt, Character *ch ) );
+void	page_to_char	args( ( const std::string txt, Character *ch ) );
 void	act		args( ( const char *format, Character *ch, 
 			    const void *arg1, const void *arg2, int type,
 			    int min_pos) );
@@ -2006,9 +1921,6 @@ char *	print_flags	args( ( int flag ));
 void	boot_db		args( ( void ) );
 void	area_update	args( ( void ) );
 void	clone_mobile	args( ( Character *parent, Character *clone) );
-OD *	create_object	args( ( OBJ_INDEX_DATA *pObjIndex, int level ) );
-void	clone_object	args( ( OBJ_DATA *parent, OBJ_DATA *clone ) );
-char *	get_extra_descr	args( ( const char *name, EXTRA_DESCR_DATA *ed ) );
 MID *	get_mob_index	args( ( int vnum ) );
 OID *	get_obj_index	args( ( int vnum ) );
 RID *	get_room_index	args( ( int vnum ) );
@@ -2044,14 +1956,6 @@ void	log_string	args( ( const char *str ) );
 void	tail_chain	args( ( void ) );
 char *	fread_string_nohash	args( ( FILE *fp ) );
 
-/* effect.c */
-void	acid_effect	args( (void *vo, int level, int dam, int target) );
-void	cold_effect	args( (void *vo, int level, int dam, int target) );
-void	fire_effect	args( (void *vo, int level, int dam, int target) );
-void	poison_effect	args( (void *vo, int level, int dam, int target) );
-void	shock_effect	args( (void *vo, int level, int dam, int target) );
-
-
 /* fight.c */
 bool 	is_safe		args( (Character *ch, Character *victim ) );
 bool 	is_safe_spell	args( (Character *ch, Character *victim, bool area ) );
@@ -2066,11 +1970,9 @@ void	stop_fighting	args( ( Character *ch, bool fBoth ) );
 void	check_killer	args( ( Character *ch, Character *victim) );
 
 /* handler.c */
-AD  	*affect_find args( (AFFECT_DATA *paf, int sn));
-void	affect_check	args( (Character *ch, int where, int vector) );
-int	count_users	args( (OBJ_DATA *obj) );
+int	count_users	args( (OD *obj) );
 void 	deduct_cost	args( (Character *ch, int cost) );
-void	affect_enchant	args( (OBJ_DATA *obj) );
+void	affect_enchant	args( (OD *obj) );
 int 	check_immune	args( (Character *ch, int dam_type) );
 int 	material_lookup args( ( const char *name) );
 int	weapon_lookup	args( ( const char *name) );
@@ -2094,53 +1996,38 @@ int	can_carry_w	args( ( Character *ch ) );
 bool	is_name		args( ( const char *str, const char *namelist ) );
 bool    is_full_name    args( ( const char *str, char *namelist ) );
 bool	is_exact_name	args( ( char *str, char *namelist ) );
-void	affect_to_char	args( ( Character *ch, AFFECT_DATA *paf ) );
-void	affect_to_obj	args( ( OBJ_DATA *obj, AFFECT_DATA *paf ) );
-AFFECT_DATA * affect_get args( ( Character *ch, int sn ) );
-void	affect_remove	args( ( Character *ch, AFFECT_DATA *paf ) );
-void	affect_remove_obj args( (OBJ_DATA *obj, AFFECT_DATA *paf ) );
 void	affect_strip	args( ( Character *ch, int sn ) );
 bool	is_affected	args( ( Character *ch, int sn ) );
 void	affect_join	args( ( Character *ch, AFFECT_DATA *paf ) );
-void    affect_remove args( ( Character *ch, AFFECT_DATA *paf ) );
 void	char_from_room	args( ( Character *ch ) );
 void	char_to_room	args( ( Character *ch, ROOM_INDEX_DATA *pRoomIndex ) );
-void	obj_to_char	args( ( OBJ_DATA *obj, Character *ch ) );
-void	obj_from_char	args( ( OBJ_DATA *obj ) );
-int	apply_ac	args( ( OBJ_DATA *obj, int iWear, int type ) );
-OD *	get_eq_char	args( ( Character *ch, int iWear ) );
-void	equip_char	args( ( Character *ch, OBJ_DATA *obj, int iWear ) );
-void	unequip_char	args( ( Character *ch, OBJ_DATA *obj ) );
-int	count_obj_list	args( ( OBJ_INDEX_DATA *obj, OBJ_DATA *list ) );
-void	obj_from_room	args( ( OBJ_DATA *obj ) );
-void	obj_to_room	args( ( OBJ_DATA *obj, ROOM_INDEX_DATA *pRoomIndex ) );
-void	obj_to_obj	args( ( OBJ_DATA *obj, OBJ_DATA *obj_to ) );
-void	obj_from_obj	args( ( OBJ_DATA *obj ) );
-void	extract_obj	args( ( OBJ_DATA *obj ) );
+void	obj_from_char	args( ( Object *obj ) );
+int	apply_ac	args( ( Object *obj, int iWear, int type ) );
+void	equip_char	args( ( Character *ch, Object *obj, int iWear ) );
+void	obj_from_room	args( ( Object *obj ) );
+void	obj_to_room	args( ( Object *obj, ROOM_INDEX_DATA *pRoomIndex ) );
+void	obj_from_obj	args( ( Object *obj ) );
+void	extract_obj	args( ( Object *obj ) );
 void	extract_char	args( ( Character *ch, bool fPull ) );
 CD *	get_char_room	args( ( Character *ch, char *argument ) );
 CD *	get_char_world	args( ( Character *ch, char *argument ) );
 OD *	get_obj_type	args( ( OBJ_INDEX_DATA *pObjIndexData ) );
-OD *	get_obj_list	args( ( Character *ch, char *argument,
-			    OBJ_DATA *list ) );
 OD *	get_obj_carry	args( ( Character *ch, char *argument, 
 			    Character *viewer ) );
 OD *	get_obj_wear	args( ( Character *ch, char *argument ) );
 OD *	get_obj_here	args( ( Character *ch, char *argument ) );
 OD *	get_obj_world	args( ( Character *ch, char *argument ) );
 OD *	create_money	args( ( int gold, int silver ) );
-int	get_obj_number	args( ( OBJ_DATA *obj ) );
-int	get_obj_weight	args( ( OBJ_DATA *obj ) );
-int	get_true_weight	args( ( OBJ_DATA *obj ) );
+int	get_obj_number	args( ( Object *obj ) );
+int	get_obj_weight	args( ( Object *obj ) );
+int	get_true_weight	args( ( Object *obj ) );
 int	advatoi		args( ( const char *s) );
 int	parsebet	args( ( const int currentbet, const char *argument ) );
 bool	room_is_dark	args( ( ROOM_INDEX_DATA *pRoomIndex ) );
 bool	is_room_owner	args( ( Character *ch, ROOM_INDEX_DATA *room) );
 bool	room_is_private	args( ( ROOM_INDEX_DATA *pRoomIndex ) );
-bool	can_see		args( ( Character *ch, Character *victim ) );
-bool	can_see_obj	args( ( Character *ch, OBJ_DATA *obj ) );
 bool	can_see_room	args( ( Character *ch, ROOM_INDEX_DATA *pRoomIndex) );
-bool	can_drop_obj	args( ( Character *ch, OBJ_DATA *obj ) );
+bool	can_drop_obj	args( ( Character *ch, Object *obj ) );
 const char *	affect_loc_name	args( ( int location ) );
 char *	affect_bit_name	args( ( int vector ) );
 char *	extra_bit_name	args( ( int extra_flags ) );
@@ -2170,7 +2057,7 @@ int	skill_lookup	args( ( const char *name ) );
 int	slot_lookup	args( ( int slot ) );
 bool	saves_spell	args( ( int level, Character *victim, int dam_type ) );
 void	obj_cast_spell	args( ( int sn, int level, bool succesful_cast, Character *ch,
-				    Character *victim, OBJ_DATA *obj ) );
+				    Character *victim, Object *obj ) );
 
 /* mob_prog.c */
 void	program_flow	args( ( sh_int vnum, char *source, Character *mob, Character *ch,
@@ -2181,7 +2068,7 @@ bool	mp_percent_trigger args( ( Character *mob, Character *ch,
 				const void *arg1, const void *arg2, int type ) );
 void	mp_bribe_trigger  args( ( Character *mob, Character *ch, int amount ) );
 bool	mp_exit_trigger   args( ( Character *ch, int dir ) );
-void	mp_give_trigger   args( ( Character *mob, Character *ch, OBJ_DATA *obj ) );
+void	mp_give_trigger   args( ( Character *mob, Character *ch, Object *obj ) );
 void 	mp_greet_trigger  args( ( Character *ch ) );
 void	mp_hprct_trigger  args( ( Character *mob, Character *ch ) );
 
@@ -2226,16 +2113,10 @@ void	update_handler	args( ( void ) );
 void	string_edit	args( ( Character *ch, char **pString ) );
 void    string_append   args( ( Character *ch, char **pString ) );
 char *	string_replace	args( ( char * orig, char * old, char * new_string ) );
-void    string_add      args( ( Character *ch, char *argument ) );
 char *  format_string   args( ( char *oldstring /*, bool fSpace */ ) );
 char *  first_arg       args( ( char *argument, char *arg_first, bool fCase ) );
 char *	string_unpad	args( ( char * argument ) );
 char *	string_proper	args( ( char * argument ) );
-
-/* olc.c */
-bool	run_olc_editor	args( ( DESCRIPTOR_DATA *d ) );
-char	*olc_ed_name	args( ( Character *ch ) );
-char	*olc_ed_vnum	args( ( Character *ch ) );
 
 /* lookup.c */
 int	morph_lookup	args( ( const char *name) );

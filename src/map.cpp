@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "merc.h"
+#include "Room.h"
 
 #define MAX_MAP 90
 #define MAX_MAP_DIR 4

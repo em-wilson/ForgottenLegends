@@ -41,6 +41,9 @@
 #include "mob_cmds.h"
 #include "ConnectedState.h"
 #include "NonPlayerCharacter.h"
+#include "Object.h"
+#include "ObjectHelper.h"
+#include "Room.h"
 
 DECLARE_DO_FUN( do_look 	);
 extern ROOM_INDEX_DATA *find_location( Character *, char * );
@@ -397,8 +400,8 @@ void do_mpassist( Character *ch, char *argument )
 void do_mpjunk( Character *ch, char *argument )
 {
     char      arg[ MAX_INPUT_LENGTH ];
-    OBJ_DATA *obj;
-    OBJ_DATA *obj_next;
+    Object *obj;
+    Object *obj_next;
 
     one_argument( argument, arg );
 
@@ -409,7 +412,7 @@ void do_mpjunk( Character *ch, char *argument )
     {
     	if ( ( obj = get_obj_wear( ch, arg ) ) != NULL )
       	{
-      	    unequip_char( ch, obj );
+      	    ch->unequip( obj );
 	    extract_obj( obj );
     	    return;
       	}
@@ -418,14 +421,14 @@ void do_mpjunk( Character *ch, char *argument )
 	extract_obj( obj );
     }
     else
-      	for ( obj = ch->carrying; obj != NULL; obj = obj_next )
+      	for ( auto obj : ch->getCarrying() )
       	{
-            obj_next = obj->next_content;
-	    if ( arg[3] == '\0' || is_name( &arg[4], obj->name ) )
+    	    if ( arg[3] == '\0' || is_name( &arg[4], obj->getName().c_str() ) )
             {
-          	if ( obj->wear_loc != WEAR_NONE)
-	    	unequip_char( ch, obj );
-          	extract_obj( obj );
+              	if ( obj->getWearLocation() != WEAR_NONE) {
+        	    	ch->unequip( obj );
+                }
+              	extract_obj( obj );
             } 
       	}
 
@@ -529,7 +532,7 @@ void do_mpoload( Character *ch, char *argument )
     char arg2[ MAX_INPUT_LENGTH ];
     char arg3[ MAX_INPUT_LENGTH ];
     OBJ_INDEX_DATA *pObjIndex;
-    OBJ_DATA       *obj;
+    Object       *obj;
     int             level;
     bool            fToroom = FALSE, fWear = FALSE;
 
@@ -586,10 +589,10 @@ void do_mpoload( Character *ch, char *argument )
 	return;
     }
 
-    obj = create_object( pObjIndex, level );
-    if ( (fWear || !fToroom) && CAN_WEAR(obj, ITEM_TAKE) )
+    obj = ObjectHelper::createFromIndex( pObjIndex, level );
+    if ( (fWear || !fToroom) && obj->canWear( ITEM_TAKE) )
     {
-	obj_to_char( obj, ch );
+	ch->addObject( obj );
 	if ( fWear )
 	    wear_obj( ch, obj, TRUE );
     }
@@ -612,7 +615,7 @@ void do_mppurge( Character *ch, char *argument )
 {
     char       arg[ MAX_INPUT_LENGTH ];
     Character *victim;
-    OBJ_DATA  *obj;
+    Object  *obj;
 
     one_argument( argument, arg );
 
@@ -620,24 +623,22 @@ void do_mppurge( Character *ch, char *argument )
     {
         /* 'purge' */
         Character *vnext;
-        OBJ_DATA  *obj_next;
 
-	for ( victim = ch->in_room->people; victim != NULL; victim = vnext )
-	{
-	    vnext = victim->next_in_room;
-	    if ( IS_NPC( victim ) && victim != ch 
-	    &&   !IS_SET(victim->act, ACT_NOPURGE) )
-		extract_char( victim, TRUE );
-	}
+        for ( victim = ch->in_room->people; victim != NULL; victim = vnext )
+        {
+            vnext = victim->next_in_room;
+            if ( IS_NPC( victim ) && victim != ch 
+            &&   !IS_SET(victim->act, ACT_NOPURGE) )
+            extract_char( victim, TRUE );
+        }
 
-	for ( obj = ch->in_room->contents; obj != NULL; obj = obj_next )
-	{
-	    obj_next = obj->next_content;
-	    if ( !IS_SET(obj->extra_flags, ITEM_NOPURGE) )
-		extract_obj( obj );
-	}
+        for ( auto obj : ch->in_room->contents )
+        {
+            if ( !IS_SET(obj->getExtraFlags(), ITEM_NOPURGE) )
+            extract_obj( obj );
+        }
 
-	return;
+        return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == NULL )
@@ -710,7 +711,7 @@ void do_mpat( Character *ch, char *argument )
     ROOM_INDEX_DATA *location;
     ROOM_INDEX_DATA *original;
     Character       *wch;
-    OBJ_DATA 	    *on;
+    Object 	    *on;
 
     argument = one_argument( argument, arg );
 
@@ -729,7 +730,7 @@ void do_mpat( Character *ch, char *argument )
     }
 
     original = ch->in_room;
-    on = ch->on;
+    on = ch->onObject();
     char_from_room( ch );
     char_to_room( ch, location );
     interpret( ch, argument );
@@ -745,7 +746,7 @@ void do_mpat( Character *ch, char *argument )
 	{
 	    char_from_room( ch );
 	    char_to_room( ch, original );
-	    ch->on = on;
+	    ch->getOntoObject(on);
 	    break;
 	}
     }
@@ -894,7 +895,7 @@ void do_mpforce( Character *ch, char *argument )
 
 	    if ( vch->in_room == ch->in_room
 		&& vch->getTrust() < ch->getTrust() 
-		&& can_see( ch, vch ) )
+		&& ch->can_see( vch ) )
 	    {
 		interpret( vch, argument );
 	    }
@@ -1005,7 +1006,7 @@ void do_mpvforce( Character *ch, char *argument )
 void do_mpcast( Character *ch, char *argument )
 {
     Character *vch;
-    OBJ_DATA *obj;
+    Object *obj;
     void *victim = NULL;
     char spell[ MAX_INPUT_LENGTH ],
 	 target[ MAX_INPUT_LENGTH ];
@@ -1201,7 +1202,7 @@ void do_mpcall( Character *ch, char *argument )
 {
     char arg[ MAX_INPUT_LENGTH ];
     Character *vch;
-    OBJ_DATA *obj1, *obj2;
+    Object *obj1, *obj2;
     MPROG_CODE *prg;
     extern void program_flow( sh_int, char *, Character *, Character *, const void *, const void * );
 
@@ -1274,7 +1275,7 @@ void do_mpflee( Character *ch, char *argument )
  */
 void do_mpotransfer( Character *ch, char *argument )
 {
-    OBJ_DATA *obj;
+    Object *obj;
     ROOM_INDEX_DATA *location;
     char arg[ MAX_INPUT_LENGTH ];
     char buf[ MAX_INPUT_LENGTH ];
@@ -1295,12 +1296,12 @@ void do_mpotransfer( Character *ch, char *argument )
     }
     if ( (obj = get_obj_here( ch, arg )) == NULL )
 	return;
-    if ( obj->carried_by == NULL )
+    if ( obj->getCarriedBy() == NULL )
 	obj_from_room( obj );
     else
     {
-	if ( obj->wear_loc != WEAR_NONE )
-	    unequip_char( ch, obj );
+	if ( obj->getWearLocation() != WEAR_NONE )
+	    ch->unequip( obj );
 	obj_from_char( obj );
     }
     obj_to_room( obj, location );
@@ -1315,7 +1316,7 @@ void do_mpotransfer( Character *ch, char *argument )
 void do_mpremove( Character *ch, char *argument )
 {
     Character *victim;
-    OBJ_DATA *obj, *obj_next;
+    Object *obj, *obj_next;
     sh_int vnum = 0;
     bool fAll = FALSE;
     char arg[ MAX_INPUT_LENGTH ];
@@ -1336,15 +1337,14 @@ void do_mpremove( Character *ch, char *argument )
     else
 	vnum = atoi( arg );
 
-    for ( obj = victim->carrying; obj; obj = obj_next )
+    for ( auto obj : victim->getCarrying() )
     {
-	obj_next = obj->next_content;
-	if ( fAll || obj->pIndexData->vnum == vnum )
-	{
-	     unequip_char( ch, obj );
-	     obj_from_char( obj );
-	     extract_obj( obj );
-	}
+        if ( fAll || obj->getObjectIndexData()->vnum == vnum )
+        {
+            ch->unequip( obj );
+            obj_from_char( obj );
+            extract_obj( obj );
+        }
     }
 }
 

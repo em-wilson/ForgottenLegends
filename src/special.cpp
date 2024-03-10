@@ -32,6 +32,8 @@
 #include <time.h>
 #include "merc.h"
 #include "magic.h"
+#include "Object.h"
+#include "Room.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_yell		);
@@ -281,7 +283,7 @@ bool spec_cast_adept( Character *ch )
     for ( victim = ch->in_room->people; victim != NULL; victim = v_next )
     {
 	v_next = victim->next_in_room;
-	if ( victim != ch && can_see( ch, victim ) && number_bits( 1 ) == 0 
+	if ( victim != ch && ch->can_see( victim ) && number_bits( 1 ) == 0 
 	     && !IS_NPC(victim) && victim->level < 11)
 	    break;
     }
@@ -532,7 +534,7 @@ bool spec_executioner( Character *ch )
 	v_next = victim->next_in_room;
 
 	if ( !IS_NPC(victim) && IS_SET(victim->act, PLR_THIEF) 
-	&&   can_see(ch,victim))
+	&&   ch->can_see(victim))
 	    { crime = (char*)"THIEF"; break; }
     }
 
@@ -551,29 +553,27 @@ bool spec_executioner( Character *ch )
 
 bool spec_fido( Character *ch )
 {
-    OBJ_DATA *corpse;
-    OBJ_DATA *c_next;
-    OBJ_DATA *obj;
-    OBJ_DATA *obj_next;
+    Object *corpse;
+    Object *c_next;
+    Object *obj;
+    Object *obj_next;
 
     if ( !IS_AWAKE(ch) )
 	return FALSE;
 
-    for ( corpse = ch->in_room->contents; corpse != NULL; corpse = c_next )
+    for ( auto corpse : ch->in_room->contents )
     {
-	c_next = corpse->next_content;
-	if ( corpse->item_type != ITEM_CORPSE_NPC )
-	    continue;
+        if ( corpse->getItemType() != ITEM_CORPSE_NPC )
+            continue;
 
-	act( "$n savagely devours a corpse.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
-	for ( obj = corpse->contains; obj; obj = obj_next )
-	{
-	    obj_next = obj->next_content;
-	    obj_from_obj( obj );
-	    obj_to_room( obj, ch->in_room );
-	}
-	extract_obj( corpse );
-	return TRUE;
+        act( "$n savagely devours a corpse.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
+        for ( auto obj : corpse->getContents() )
+        {
+            obj_from_obj( obj );
+            obj_to_room( obj, ch->in_room );
+        }
+        extract_obj( corpse );
+        return TRUE;
     }
 
     return FALSE;
@@ -602,7 +602,7 @@ bool spec_guard( Character *ch )
 	v_next = victim->next_in_room;
 
 	if ( !IS_NPC(victim) && IS_SET(victim->act, PLR_THIEF) 
-	&&   can_see(ch,victim))
+	&&   ch->can_see(victim))
 	    { crime = (char*)"THIEF"; break; }
 
 	if ( victim->fighting != NULL
@@ -639,26 +639,25 @@ bool spec_guard( Character *ch )
 
 bool spec_janitor( Character *ch )
 {
-    OBJ_DATA *trash;
-    OBJ_DATA *trash_next;
+    Object *trash;
+    Object *trash_next;
 
     if ( !IS_AWAKE(ch) )
 	return FALSE;
 
-    for ( trash = ch->in_room->contents; trash != NULL; trash = trash_next )
+    for ( auto trash : ch->in_room->contents )
     {
-	trash_next = trash->next_content;
-	if ( !IS_SET( trash->wear_flags, ITEM_TAKE ) || !can_loot(ch,trash))
-	    continue;
-	if ( trash->item_type == ITEM_DRINK_CON
-	||   trash->item_type == ITEM_TRASH
-	||   trash->cost < 10 )
-	{
-	    act( "$n picks up some trash.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
-	    obj_from_room( trash );
-	    obj_to_char( trash, ch );
-	    return TRUE;
-	}
+        if ( !trash->canWear( ITEM_TAKE ) || !can_loot(ch,trash))
+            continue;
+        if ( trash->getItemType() == ITEM_DRINK_CON
+        ||   trash->getItemType() == ITEM_TRASH
+        ||   trash->getCost() < 10 )
+        {
+            act( "$n picks up some trash.", ch, NULL, NULL, TO_ROOM, POS_RESTING );
+            obj_from_room( trash );
+            ch->addObject( trash );
+            return TRUE;
+        }
     }
 
     return FALSE;
@@ -802,7 +801,7 @@ bool spec_thief( Character *ch )
 	if ( IS_NPC(victim)
 	||   victim->level >= LEVEL_IMMORTAL
 	||   number_bits( 5 ) != 0 
-	||   !can_see(ch,victim))
+	||   !ch->can_see(victim))
 	    continue;
 
 	if ( IS_AWAKE(victim) && number_range( 0, ch->level ) == 0 )

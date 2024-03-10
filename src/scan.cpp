@@ -31,6 +31,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "Room.h"
 
 const char *const distance[4]=
 {
@@ -99,7 +100,7 @@ void scan_list(ROOM_INDEX_DATA *scan_room, Character *ch, sh_int depth,
    {
       if (rch == ch) continue;
       if (!IS_NPC(rch) && rch->invis_level > ch->getTrust()) continue;
-      if (can_see(ch, rch)) scan_char(rch, ch, depth, door);
+      if (ch->can_see( rch)) scan_char(rch, ch, depth, door);
    }
    return;
 }
