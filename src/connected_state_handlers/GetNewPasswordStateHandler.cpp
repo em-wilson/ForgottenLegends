@@ -4,6 +4,7 @@
 #include "ConnectedState.h"
 #include "Descriptor.h"
 #include "GetNewPasswordStateHandler.h"
+#include "PlayerCharacter.h"
 #include "SocketHelper.h"
 
 void free_string( char *pstr );
@@ -14,7 +15,7 @@ GetNewPasswordStateHandler::GetNewPasswordStateHandler() : AbstractStateHandler(
 GetNewPasswordStateHandler::~GetNewPasswordStateHandler() { }
 
 void GetNewPasswordStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
-    Character *ch = d->character;
+    PlayerCharacter *ch = (PlayerCharacter*) d->character;
     SocketHelper::write_to_buffer(d, "\n\r", 2);
 
     if (strlen(argument) < 5)
@@ -37,7 +38,7 @@ void GetNewPasswordStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
         }
     }
 
-    ch->pcdata->setPassword(pwdnew);
+    ch->setPassword(pwdnew);
     SocketHelper::write_to_buffer(d, "Please retype password: ", 0);
     d->connected = ConnectedState::ConfirmNewPassword;
 }

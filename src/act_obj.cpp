@@ -35,6 +35,7 @@
 #include "NonPlayerCharacter.h"
 #include "Object.h"
 #include "ObjectHelper.h"
+#include "PlayerCharacter.h"
 #include "Room.h"
 #include "ShopKeeper.h"
 #include "Wiznet.h"
@@ -91,7 +92,7 @@ bool can_loot(Character *ch, Object *obj)
     if (!IS_NPC(owner) && IS_SET(owner->act,PLR_CANLOOT))
 	return TRUE;
 
-    if (is_same_group(ch,owner))
+    if (ch->isSameGroup(owner))
 	return TRUE;
 
     return FALSE;
@@ -177,7 +178,7 @@ void get_obj( Character *ch, Object *obj, Object *container )
     	  members = 0;
     	  for (gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room )
     	  {
-            if (!IS_AFFECTED(gch,AFF_CHARM) && is_same_group( gch, ch ) )
+            if (!IS_AFFECTED(gch,AFF_CHARM) && gch->isSameGroup( ch ) )
               members++;
     	  }
 
@@ -1181,7 +1182,7 @@ void do_drink( Character *ch, char *argument )
 		}
     }
 
-    if ( !IS_NPC(ch) && ch->pcdata->condition[COND_DRUNK] > 10 )
+    if ( !ch->isNPC() && ((PlayerCharacter*)ch)->condition[COND_DRUNK] > 10 )
     {
 	send_to_char( "You fail to reach your mouth.  *Hic*\n\r", ch );
 	return;
@@ -1219,8 +1220,8 @@ void do_drink( Character *ch, char *argument )
         amount = UMIN(amount, obj->getValues().at(1));
 	break;
      }
-    if (!IS_NPC(ch) && !IS_IMMORTAL(ch) 
-    &&  ch->pcdata->condition[COND_FULL] > 45)
+    if (!ch->isNPC() && !IS_IMMORTAL(ch) 
+    &&  ((PlayerCharacter*)ch)->condition[COND_FULL] > 45)
     {
 	send_to_char("You're too full to drink more.\n\r",ch);
 	return;
@@ -1236,11 +1237,11 @@ void do_drink( Character *ch, char *argument )
     ch->gain_condition( COND_THIRST, amount * liq_table[liquid].liq_affect[COND_THIRST] / 10 );
     ch->gain_condition( COND_HUNGER, amount * liq_table[liquid].liq_affect[COND_HUNGER] / 2 );
 
-    if ( !IS_NPC(ch) && ch->pcdata->condition[COND_DRUNK]  > 10 )
+    if ( !ch->isNPC() && ((PlayerCharacter*)ch)->condition[COND_DRUNK]  > 10 )
 	send_to_char( "You feel drunk.\n\r", ch );
-    if ( !IS_NPC(ch) && ch->pcdata->condition[COND_FULL]   > 40 )
+    if ( !ch->isNPC() && ((PlayerCharacter*)ch)->condition[COND_FULL]   > 40 )
 	send_to_char( "You are full.\n\r", ch );
-    if ( !IS_NPC(ch) && ch->pcdata->condition[COND_THIRST] > 40 )
+    if ( !ch->isNPC() && ((PlayerCharacter*)ch)->condition[COND_THIRST] > 40 )
 	send_to_char( "Your thirst is quenched.\n\r", ch );
 	
     if ( obj->getValues().at(3) != 0 )
@@ -1294,7 +1295,7 @@ void do_eat( Character *ch, char *argument )
 	    return;
 	}
 
-	if ( !IS_NPC(ch) && ch->pcdata->condition[COND_FULL] > 40 )
+	if ( !ch->isNPC() && ((PlayerCharacter*)ch)->condition[COND_FULL] > 40 )
 	{   
 	    send_to_char( "You are too full to eat more.\n\r", ch );
 	    return;
@@ -1308,16 +1309,16 @@ void do_eat( Character *ch, char *argument )
     {
 
     case ITEM_FOOD:
-	if ( !IS_NPC(ch) )
+	if ( !ch->isNPC() )
 	{
 	    int condition;
 
-	    condition = ch->pcdata->condition[COND_HUNGER];
+	    condition = ((PlayerCharacter*)ch)->condition[COND_HUNGER];
 	    ch->gain_condition( COND_FULL, obj->getValues().at(0) );
 	    ch->gain_condition( COND_HUNGER, obj->getValues().at(1));
-	    if ( condition == 0 && ch->pcdata->condition[COND_HUNGER] > 0 )
+	    if ( condition == 0 && ((PlayerCharacter*)ch)->condition[COND_HUNGER] > 0 )
 		send_to_char( "You are no longer hungry.\n\r", ch );
-	    else if ( ch->pcdata->condition[COND_FULL] > 40 )
+	    else if ( ((PlayerCharacter*)ch)->condition[COND_FULL] > 40 )
 		send_to_char( "You are full.\n\r", ch );
 	}
 
@@ -1623,7 +1624,7 @@ void wear_obj( Character *ch, Object *obj, bool fReplace )
 	if ( !remove_obj( ch, WEAR_WIELD, fReplace ) )
 	    return;
 
-	if ( !IS_NPC(ch) 
+	if ( !ch->isNPC() 
 	&& get_obj_weight(obj) > (str_app[get_curr_stat(ch,STAT_STR)].wield  
 		* 10))
 	{
@@ -1631,7 +1632,7 @@ void wear_obj( Character *ch, Object *obj, bool fReplace )
 	    return;
 	}
 
-	if (!IS_NPC(ch) && ch->size < SIZE_LARGE 
+	if (!ch->isNPC() && ch->size < SIZE_LARGE 
 	&&  IS_WEAPON_STAT(obj,WEAPON_TWO_HANDS)
  	&&  ch->getEquipment(WEAR_SHIELD) != NULL)
 	{
@@ -1916,7 +1917,7 @@ void do_sacrifice( Character *ch, char *argument )
     	members = 0;
 	for (gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room )
     	{
-    	    if ( is_same_group( gch, ch ) )
+    	    if ( gch->isSameGroup( ch ) )
             members++;
     	}
 
@@ -2093,12 +2094,12 @@ void do_brandish( Character *ch, char *argument )
 		break;
 
 	    case TAR_CHAR_OFFENSIVE:
-		if ( IS_NPC(ch) ? IS_NPC(vch) : !IS_NPC(vch) )
+		if ( ch->isNPC() ? IS_NPC(vch) : !IS_NPC(vch) )
 		    continue;
 		break;
 		
 	    case TAR_CHAR_DEFENSIVE:
-		if ( IS_NPC(ch) ? !IS_NPC(vch) : IS_NPC(vch) )
+		if ( ch->isNPC() ? !IS_NPC(vch) : IS_NPC(vch) )
 		    continue;
 		break;
 
@@ -2268,9 +2269,9 @@ void do_steal( Character *ch, char *argument )
 	percent += 50;
 
     if ( ((ch->level + 7 < victim->level || ch->level -7 > victim->level) 
-    && !IS_NPC(victim) && !IS_NPC(ch) )
-    || ( !IS_NPC(ch) && percent > get_skill(ch,gsn_steal))
-    || ( !IS_NPC(ch) && !IS_CLANNED(ch)) )
+    && !IS_NPC(victim) && !ch->isNPC() )
+    || ( !ch->isNPC() && percent > get_skill(ch,gsn_steal))
+    || ( !ch->isNPC() && !ch->isClanned()) )
     {
 	/*
 	 * Failure.
@@ -2301,7 +2302,7 @@ void do_steal( Character *ch, char *argument )
             do_wake(victim,(char*)"");
 	if (IS_AWAKE(victim))
 	    do_yell( victim, buf );
-	if ( !IS_NPC(ch) )
+	if ( !ch->isNPC() )
 	{
 	    if ( IS_NPC(victim) )
 	    {
@@ -2411,7 +2412,7 @@ void do_buy( Character *ch, char *argument )
 
 	smash_tilde(argument);
 
-	if ( IS_NPC(ch) )
+	if ( ch->isNPC() )
 	    return;
 
 	argument = one_argument(argument,arg);
@@ -2660,7 +2661,7 @@ void do_auction (Character *ch, char *argument)
 
     argument = one_argument (argument, arg1);
 
-	if (IS_NPC(ch)) /* NPC can be extracted at any time and thus can't auction! */
+	if (ch->isNPC()) /* NPC can be extracted at any time and thus can't auction! */
 		return;
 
 }

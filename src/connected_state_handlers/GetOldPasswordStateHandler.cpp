@@ -2,10 +2,10 @@
 #include <sys/time.h>
 #include <unistd.h> // crypt
 #include "GetOldPasswordStateHandler.h"
-#include "Character.h"
 #include "ConnectedState.h"
 #include "Descriptor.h"
 #include "ILogger.h"
+#include "PlayerCharacter.h"
 #include "telnet.h"
 #include "SocketHelper.h"
 #include "Wiznet.h"
@@ -48,11 +48,11 @@ bool GetOldPasswordStateHandler::check_playing(DESCRIPTOR_DATA *d, string name)
 
 void GetOldPasswordStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 	char log_buf[2*MAX_INPUT_LENGTH];
-    Character *ch = d->character;
+    PlayerCharacter *ch = (PlayerCharacter*) d->character;
 
     SocketHelper::write_to_buffer(d, "\n\r", 2);
 
-    if (string(crypt(argument, ch->pcdata->getPassword().c_str())) != ch->pcdata->getPassword())
+    if (string(crypt(argument, ch->getPassword().c_str())) != ch->getPassword())
     {
         SocketHelper::write_to_buffer(d, "Wrong password.\n\r", 0);
         SocketHelper::close_socket(d);

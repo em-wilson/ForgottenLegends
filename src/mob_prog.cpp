@@ -281,7 +281,7 @@ int count_people_room( Character *mob, int iFlag )
 	  || (iFlag == 2 && IS_NPC( vch ))
 	  || (iFlag == 3 && IS_NPC( mob ) && IS_NPC( vch ) 
 	     && mob->pIndexData->vnum == vch->pIndexData->vnum )
-	  || (iFlag == 4 && is_same_group( mob, vch )) )
+	  || (iFlag == 4 && mob->isSameGroup( vch )) )
 	&& mob->can_see( vch ) ) 
 	    count++;
     return ( count );
@@ -297,7 +297,7 @@ int get_order( Character *ch )
     Character *vch;
     int i;
 
-    if ( !IS_NPC(ch) )
+    if ( !ch->isNPC() )
 	return 0;
     for ( i = 0, vch = ch->in_room->people; vch; vch = vch->next_in_room )
     {
@@ -584,7 +584,7 @@ int cmd_eval( sh_int vnum, char *line, int check,
 	case CHK_POS:
 	    return( lval_char != NULL && lval_char->position == position_lookup( buf ) );
 	case CHK_CLAN:
-	    return( lval_char != NULL && lval_char->pcdata->clan == clan_manager->get_clan( buf ) );
+	    return( lval_char != NULL && lval_char->getClan() == clan_manager->get_clan( buf ) );
 	case CHK_RACE:
 	    return( lval_char != NULL && lval_char->getRace() == race_manager->getRaceByName( buf ) );
 	case CHK_OBJTYPE:

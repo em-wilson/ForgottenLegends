@@ -4,7 +4,7 @@
 #include "ConfirmNewPasswordStateHandler.h"
 #include "ConnectedState.h"
 #include "Descriptor.h"
-#include "pc_data.h"
+#include "PlayerCharacter.h"
 #include "Race.h"
 #include "RaceManager.h"
 #include "SocketHelper.h"
@@ -20,10 +20,10 @@ ConfirmNewPasswordStateHandler::~ConfirmNewPasswordStateHandler() { }
 
 
 void ConfirmNewPasswordStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
-    Character *ch = d->character;
+    PlayerCharacter *ch = (PlayerCharacter*) d->character;
     SocketHelper::write_to_buffer(d, "\n\r", 2);
 
-    if (string(crypt(argument, ch->pcdata->getPassword().c_str())) != ch->pcdata->getPassword())
+    if (string(crypt(argument, ch->getPassword().c_str())) != ch->getPassword())
     {
         SocketHelper::write_to_buffer(d, "Passwords don't match.\n\rRetype password: ",
                         0);

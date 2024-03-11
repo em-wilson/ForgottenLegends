@@ -127,7 +127,6 @@ typedef void SPELL_FUN	args( ( int sn, int level, bool succesful_cast, Character
 #define MAX_DRACONIAN		   15
 #define MAX_GROUP		   35
 #define MAX_IN_GROUP		   15
-#define MAX_ALIAS		    5           // Temporary - if updating this, also update pc_data.h
 #define MAX_CLASS		   12           // Temporary - if updating this, also update race.h
 #define MAX_PC_RACE		    4
 #define MAX_DAMAGE_MESSAGE	   42
@@ -1639,20 +1638,20 @@ do                                                              \
 						      (ch)->gold * 2 / 5)
 #define HAS_TRIGGER(ch,trig)	(IS_SET((ch)->pIndexData->mprog_flags,(trig)))
 #define IS_SWITCHED( ch )       ( ch->desc && ch->desc->original )
-#define IS_BUILDER(ch, Area)	( !IS_NPC(ch) && !IS_SWITCHED( ch ) &&	  \
+#define IS_BUILDER(ch, Area)	( !ch->isNPC() && !IS_SWITCHED( ch ) &&	  \
 				( ch->pcdata->security >= Area->security  \
 				|| strstr( Area->builders, ch->getName().c_str() )	  \
 				|| strstr( Area->builders, "All" ) ) )
-#define IS_CLANNED(ch)          (!IS_NPC(ch)                             \
-                                && ch->pcdata->clan != NULL)
+#define IS_CLANNED( ch )          (!ch->isNPC()                             \
+                                && ch->getClan() != NULL)
 
 /* Class macros by Blizzard */
 #define IS_MAGE( ch )		( ch->class_num == class_lookup("mage") )
 #define IS_THIEF( ch )		( ch->class_num == class_lookup("thief") )
 #define IS_CLERIC( ch )		( ch->class_num == class_lookup("cleric") )
 #define IS_WARRIOR( ch )	( ch->class_num == class_lookup("warrior") )
-#define IS_ARCHER( ch )		( ( !IS_NPC(ch) && ch->class_num == class_lookup("warrior") ) \
-				    || (IS_NPC(ch) && IS_SET(ch->act, ACT_ARCHER)))
+#define IS_ARCHER( ch )		( ( !ch->isNPC() && ch->class_num == class_lookup("warrior") ) \
+				    || (ch->isNPC() && IS_SET(ch->act, ACT_ARCHER)))
 
 /* Werefolk macros by Blizzard */
 #define IS_BUNNY( ch )		(  ch->getRace() == race_manager->getRaceByName("werefolk")	    \
@@ -1673,7 +1672,7 @@ do                                                              \
  * Description macros.
  */
 #define PERS(ch, looker)	( looker->can_see( (ch) ) ?		\
-				( IS_NPC(ch) ? (ch)->short_descr	\
+				( ch->isNPC() ? (ch)->short_descr	\
 				: (ch)->getName().c_str() ) : "someone" )
 
 /*
@@ -1806,13 +1805,11 @@ extern		bool			MOBtrigger;
 #define MPC	MPROG_CODE
 
 /* act_comm.c */
-void	talk_auction	args( ( char *argument ) );
 void  	check_sex	args( ( Character *ch) );
 void	add_follower	args( ( Character *ch, Character *master ) );
 void	stop_follower	args( ( Character *ch ) );
 void 	nuke_pets	args( ( Character *ch ) );
 void	die_follower	args( ( Character *ch ) );
-bool	is_same_group	args( ( Character *ach, Character *bch ) );
 
 /* act_enter.c */
 RID  *get_random_room   args ( (Character *ch) );
@@ -1926,7 +1923,6 @@ const char	*item_name	args( ( int item_type) );
 int	attack_lookup	args( ( const char *name) );
 long	wiznet_lookup	args( ( const char *name) );
 int	class_lookup	args( ( const char *name) );
-bool	is_same_clan	args( (Character *ch, Character *victim));
 bool	is_old_mob	args ( (Character *ch) );
 int	get_skill	args( ( Character *ch, int sn ) );
 int	get_weapon_sn	args( ( Character *ch ) );
@@ -1955,6 +1951,7 @@ void	extract_obj	args( ( Object *obj ) );
 void	extract_char	args( ( Character *ch, bool fPull ) );
 CD *	get_char_room	args( ( Character *ch, char *argument ) );
 CD *	get_char_world	args( ( Character *ch, char *argument ) );
+PlayerCharacter *	get_player_world	args( ( Character *ch, char *argument ) );
 OD *	get_obj_type	args( ( OBJ_INDEX_DATA *pObjIndexData ) );
 OD *	get_obj_carry	args( ( Character *ch, char *argument, 
 			    Character *viewer ) );

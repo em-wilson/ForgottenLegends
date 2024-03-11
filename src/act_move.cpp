@@ -34,6 +34,7 @@
 #include "NonPlayerCharacter.h"
 #include "Object.h"
 #include "ObjectHelper.h"
+#include "PlayerCharacter.h"
 #include "RaceManager.h"
 #include "Room.h"
 
@@ -87,7 +88,7 @@ void move_char( Character *ch, int door, bool follow )
     /*
      * Exit trigger, if activated, bail out. Only PCs are triggered.
      */
-    if ( !IS_NPC(ch) && mp_exit_trigger( ch, door ) )
+    if ( !ch->isNPC() && mp_exit_trigger( ch, door ) )
 	return;
 
     in_room = ch->in_room;
@@ -121,7 +122,7 @@ void move_char( Character *ch, int door, bool follow )
 	return;
     }
 
-    if ( !IS_NPC(ch) )
+    if ( !ch->isNPC() )
     {
 	int iClass, iGuild;
 	int move;
@@ -797,7 +798,7 @@ void do_pick( Character *ch, char *argument )
 	}
     }
 
-    if ( !IS_NPC(ch) && number_percent( ) > get_skill(ch,gsn_pick_lock))
+    if ( !ch->isNPC() && number_percent( ) > get_skill(ch,gsn_pick_lock))
     {
 	send_to_char( "You failed.\n\r", ch);
 	check_improve(ch,gsn_pick_lock,FALSE,2);
@@ -1435,7 +1436,7 @@ void do_recall( Character *ch, char *argument ) {
     char buf[MAX_STRING_LENGTH];
     ROOM_INDEX_DATA *location;
 
-    if (IS_NPC(ch) && !IS_SET(ch->act, ACT_PET)) {
+    if (ch->isNPC() && !IS_SET(ch->act, ACT_PET)) {
         send_to_char("Only players can recall.\n\r", ch);
         return;
     }
@@ -1496,7 +1497,7 @@ void do_recall( Character *ch, char *argument ) {
 
 
 
-void do_train( Character *ch, char *arguments ) {
+void do_train( Character *caller, char *arguments ) {
     char buf[MAX_STRING_LENGTH];
     Character *mob;
     sh_int stat = -1;
@@ -1504,8 +1505,10 @@ void do_train( Character *ch, char *arguments ) {
     char argument[MAX_STRING_LENGTH];
     int cost;
 
-    if (IS_NPC(ch))
+    if (caller->isNPC())
         return;
+
+	PlayerCharacter *ch = (PlayerCharacter*)caller;
 
     /*
      * Check for trainer.
@@ -1590,7 +1593,7 @@ void do_train( Character *ch, char *arguments ) {
         }
 
         ch->train -= cost;
-        ch->pcdata->perm_hit += 10;
+        ch->perm_hit += 10;
         ch->max_hit += 10;
         ch->hit += 10;
         act("Your durability increases!", ch, NULL, NULL, TO_CHAR, POS_RESTING);
@@ -1605,7 +1608,7 @@ void do_train( Character *ch, char *arguments ) {
         }
 
         ch->train -= cost;
-        ch->pcdata->perm_mana += 10;
+        ch->perm_mana += 10;
         ch->max_mana += 10;
         ch->mana += 10;
         act("Your power increases!", ch, NULL, NULL, TO_CHAR, POS_RESTING);

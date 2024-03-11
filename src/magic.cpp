@@ -31,16 +31,20 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "clans/ClanManager.h"
 #include "magic.h"
 #include "recycle.h"
 #include "NonPlayerCharacter.h"
 #include "Object.h"
 #include "ObjectHelper.h"
+#include "PlayerCharacter.h"
 #include "Room.h"
 
 /* command procedures needed */
 DECLARE_DO_FUN(do_look);
 DECLARE_DO_FUN(do_say);
+
+extern ClanManager * clan_manager;
 
 /*
  * Local functions.
@@ -83,7 +87,7 @@ int find_spell(Character *ch, const char *name)
     /* finds a spell the character can cast if possible */
     int sn, found = -1;
 
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return skill_lookup(name);
 
     for (sn = 0; sn < MAX_SKILL; sn++)
@@ -94,7 +98,7 @@ int find_spell(Character *ch, const char *name)
         {
             if (found == -1)
                 found = sn;
-            if (ch->level >= ch->pcdata->sk_level[sn] && ch->pcdata->learned[sn] > 0)
+            if (ch->level >= ((PlayerCharacter*)ch)->sk_level[sn] && ((PlayerCharacter*)ch)->learned[sn] > 0)
                 return sn;
         }
     }
@@ -327,7 +331,7 @@ void do_cast(Character *ch, char *argument)
     /*
      * Switched NPC's can cast spells, but others can't.
      */
-    if (IS_NPC(ch) && ch->desc == NULL)
+    if (ch->isNPC() && ch->desc == NULL)
         return;
 
     target_name = one_argument(argument, arg1);
@@ -339,7 +343,7 @@ void do_cast(Character *ch, char *argument)
         return;
     }
 
-    if ((sn = find_spell(ch, arg1)) < 1 || skill_table[sn].spell_fun == spell_null || (!IS_NPC(ch) && (ch->level < ch->pcdata->sk_level[sn] || ch->pcdata->learned[sn] == 0)))
+    if ((sn = find_spell(ch, arg1)) < 1 || skill_table[sn].spell_fun == spell_null || (!ch->isNPC() && (ch->level < ((PlayerCharacter*)ch)->sk_level[sn] || ((PlayerCharacter*)ch)->learned[sn] == 0)))
     {
         send_to_char("You don't know any spells of that name.\n\r", ch);
         return;
@@ -351,12 +355,12 @@ void do_cast(Character *ch, char *argument)
         return;
     }
 
-    if (ch->level + 2 == ch->pcdata->sk_level[sn])
+    if (ch->level + 2 == ((PlayerCharacter*)ch)->sk_level[sn])
         mana = 50;
     else
         mana = UMAX(
             skill_table[sn].min_mana,
-            100 / (2 + ch->level - ch->pcdata->sk_level[sn]));
+            100 / (2 + ch->level - ((PlayerCharacter*)ch)->sk_level[sn]));
 
     /*
      * Locate targets.
@@ -400,7 +404,7 @@ void do_cast(Character *ch, char *argument)
                 }
         */
 
-        if (!IS_NPC(ch))
+        if (!ch->isNPC())
         {
 
             if (is_safe(ch, victim) && victim != ch)
@@ -499,7 +503,7 @@ void do_cast(Character *ch, char *argument)
                 return;
             }
 
-            if (!IS_NPC(ch))
+            if (!ch->isNPC())
                 check_killer(ch, victim);
 
             vo = (void *)victim;
@@ -540,7 +544,7 @@ void do_cast(Character *ch, char *argument)
         break;
     }
 
-    if (!IS_NPC(ch) && ch->mana < mana)
+    if (!ch->isNPC() && ch->mana < mana)
     {
         send_to_char("You don't have enough mana.\n\r", ch);
         return;
@@ -557,7 +561,7 @@ void do_cast(Character *ch, char *argument)
     if (successful_cast)
     {
         ch->mana -= mana;
-        if (IS_NPC(ch) || class_table[ch->class_num].fMana)
+        if (ch->isNPC() || class_table[ch->class_num].fMana)
         {
             /* class has spells */
             (*skill_table[sn].spell_fun)(sn, ch->level, successful_cast, ch, vo, target);
@@ -926,7 +930,7 @@ void spell_call_lightning(int sn, int level, bool succesful_cast, Character *ch,
             continue;
         if (vch->in_room == ch->in_room)
         {
-            if (vch != ch && (IS_NPC(ch) ? !IS_NPC(vch) : IS_NPC(vch)))
+            if (vch != ch && (ch->isNPC() ? !IS_NPC(vch) : IS_NPC(vch)))
                 damage_old(ch, vch, saves_spell(level, vch, DAM_LIGHTNING) ? dam / 2 : dam, sn, DAM_LIGHTNING, TRUE);
             continue;
         }
@@ -1010,9 +1014,9 @@ void spell_cancellation(int sn, int level, bool succesful_cast, Character *ch, v
 
     level += 2;
 
-    if ((!IS_NPC(ch) && IS_NPC(victim) &&
+    if ((!ch->isNPC() && IS_NPC(victim) &&
          !(IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim)) ||
-        (IS_NPC(ch) && !IS_NPC(victim)))
+        (ch->isNPC() && !IS_NPC(victim)))
     {
         send_to_char("You failed, try dispel magic.\n\r", ch);
         return;
@@ -1708,7 +1712,7 @@ void spell_demonfire(int sn, int level, bool succesful_cast, Character *ch, void
     Character *victim = (Character *)vo;
     int dam;
 
-    if (!IS_NPC(ch) && !IS_EVIL(ch))
+    if (!ch->isNPC() && !IS_EVIL(ch))
     {
         victim = ch;
         send_to_char("The demons turn upon you!\n\r", ch);
@@ -1888,7 +1892,7 @@ void spell_dispel_evil(int sn, int level, bool succesful_cast, Character *ch, vo
     Character *victim = (Character *)vo;
     int dam;
 
-    if (!IS_NPC(ch) && IS_EVIL(ch))
+    if (!ch->isNPC() && IS_EVIL(ch))
         victim = ch;
 
     if (IS_GOOD(victim))
@@ -1918,7 +1922,7 @@ void spell_dispel_good(int sn, int level, bool succesful_cast, Character *ch, vo
     Character *victim = (Character *)vo;
     int dam;
 
-    if (!IS_NPC(ch) && IS_GOOD(ch))
+    if (!ch->isNPC() && IS_GOOD(ch))
         victim = ch;
 
     if (IS_EVIL(victim))
@@ -2783,7 +2787,7 @@ void spell_gate(int sn, int level, bool succesful_cast, Character *ch, void *vo,
     Character *victim;
     bool gate_pet;
 
-    if ((victim = get_char_world(ch, target_name)) == NULL || victim == ch || victim->in_room == NULL || !can_see_room(ch, victim->in_room) || IS_SET(victim->in_room->room_flags, ROOM_SAFE) || IS_SET(victim->in_room->room_flags, ROOM_PRIVATE) || IS_SET(victim->in_room->room_flags, ROOM_SOLITARY) || IS_SET(victim->in_room->room_flags, ROOM_NO_RECALL) || IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL) || victim->level >= level + 3 || (IS_CLANNED(victim) && !is_same_clan(ch, victim)) || (!IS_NPC(victim) && victim->level >= LEVEL_HERO) /* NOT trust */
+    if ((victim = get_char_world(ch, target_name)) == NULL || victim == ch || victim->in_room == NULL || !can_see_room(ch, victim->in_room) || IS_SET(victim->in_room->room_flags, ROOM_SAFE) || IS_SET(victim->in_room->room_flags, ROOM_PRIVATE) || IS_SET(victim->in_room->room_flags, ROOM_SOLITARY) || IS_SET(victim->in_room->room_flags, ROOM_NO_RECALL) || IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL) || victim->level >= level + 3 || (victim->isClanned() && !clan_manager->isSameClan(ch, victim)) || (!IS_NPC(victim) && victim->level >= LEVEL_HERO) /* NOT trust */
         || (IS_NPC(victim) && IS_SET(victim->imm_flags, IMM_SUMMON)) || (IS_NPC(victim) && saves_spell(level, victim, DAM_OTHER)))
     {
         send_to_char("You failed.\n\r", ch);
@@ -3565,8 +3569,8 @@ void spell_mass_healing(int sn, int level, bool succesful_cast, Character *ch, v
 
     for (gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room)
     {
-        if ((IS_NPC(ch) && IS_NPC(gch)) ||
-            (!IS_NPC(ch) && !IS_NPC(gch)))
+        if ((ch->isNPC() && IS_NPC(gch)) ||
+            (!ch->isNPC() && !IS_NPC(gch)))
         {
             spell_heal(heal_num, level, succesful_cast, ch, (void *)gch, TARGET_CHAR);
             spell_refresh(refresh_num, level, succesful_cast, ch, (void *)gch, TARGET_CHAR);
@@ -3581,7 +3585,7 @@ void spell_mass_invis(int sn, int level, bool successful_cast, Character *ch, vo
 
     for (gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room)
     {
-        if (!is_same_group(gch, ch) || IS_AFFECTED(gch, AFF_INVISIBLE))
+        if (!gch->isSameGroup( ch) || IS_AFFECTED(gch, AFF_INVISIBLE))
             continue;
         act("$n slowly fades out of existence.", gch, NULL, NULL, TO_ROOM, POS_RESTING);
         send_to_char("You slowly fade out of existence.\n\r", gch);
@@ -4188,7 +4192,7 @@ void spell_teleport(int sn, int level, bool succesful_cast, Character *ch, void 
     Character *victim = (Character *)vo;
     ROOM_INDEX_DATA *pRoomIndex;
 
-    if (victim->in_room == NULL || IS_SET(victim->in_room->room_flags, ROOM_NO_RECALL) || (victim != ch && IS_SET(victim->imm_flags, IMM_SUMMON)) || (!IS_NPC(ch) && victim->fighting != NULL) || (victim != ch && (saves_spell(level - 5, victim, DAM_OTHER))))
+    if (victim->in_room == NULL || IS_SET(victim->in_room->room_flags, ROOM_NO_RECALL) || (victim != ch && IS_SET(victim->imm_flags, IMM_SUMMON)) || (!ch->isNPC() && victim->fighting != NULL) || (victim != ch && (saves_spell(level - 5, victim, DAM_OTHER))))
     {
         send_to_char("You failed.\n\r", ch);
         return;
@@ -4344,7 +4348,7 @@ void spell_fire_breath(int sn, int level, bool succesful_cast, Character *ch, vo
     {
         vch_next = vch->next_in_room;
 
-        if (is_safe_spell(ch, vch, TRUE) || (IS_NPC(vch) && IS_NPC(ch) && (ch->fighting != vch || vch->fighting != ch)))
+        if (is_safe_spell(ch, vch, TRUE) || (IS_NPC(vch) && ch->isNPC() && (ch->fighting != vch || vch->fighting != ch)))
             continue;
 
         if (vch == victim) /* full damage */
@@ -4398,7 +4402,7 @@ void spell_frost_breath(int sn, int level, bool succesful_cast, Character *ch, v
     {
         vch_next = vch->next_in_room;
 
-        if (is_safe_spell(ch, vch, TRUE) || (IS_NPC(vch) && IS_NPC(ch) && (ch->fighting != vch || vch->fighting != ch)))
+        if (is_safe_spell(ch, vch, TRUE) || (IS_NPC(vch) && ch->isNPC() && (ch->fighting != vch || vch->fighting != ch)))
             continue;
 
         if (vch == victim) /* full damage */
@@ -4450,7 +4454,7 @@ void spell_gas_breath(int sn, int level, bool succesful_cast, Character *ch, voi
     {
         vch_next = vch->next_in_room;
 
-        if (is_safe_spell(ch, vch, TRUE) || (IS_NPC(ch) && IS_NPC(vch) && (ch->fighting == vch || vch->fighting == ch)))
+        if (is_safe_spell(ch, vch, TRUE) || (ch->isNPC() && IS_NPC(vch) && (ch->fighting == vch || vch->fighting == ch)))
             continue;
 
         if (saves_spell(level, vch, DAM_POISON))

@@ -8,6 +8,7 @@
 #include "ConnectedState.h"
 #include "Descriptor.h"
 #include "ILogger.h"
+#include "PlayerCharacter.h"
 #include "RoomManager.h"
 #include "SocketHelper.h"
 #include "Wiznet.h"
@@ -36,38 +37,39 @@ bool SocketHelper::check_reconnect(DESCRIPTOR_DATA *d, bool fConn)
 	{
 		if (!ch->isNPC() && (!fConn || !ch->desc) && d->character->getName() == ch->getName())
 		{
+			PlayerCharacter *pch = (PlayerCharacter*)ch;
 			if (!fConn)
 			{
-                d->character->pcdata->setPassword(ch->pcdata->getPassword());
+                ((PlayerCharacter*)d->character)->setPassword(pch->getPassword());
 			}
 			else
 			{
 				delete d->character;
-				d->character = ch;
-				ch->desc = d;
-				ch->timer = 0;
+				d->character = pch;
+				pch->desc = d;
+				pch->timer = 0;
 				send_to_char(
-					"Reconnecting. Type replay to see missed tells.\n\r", ch);
+					"Reconnecting. Type replay to see missed tells.\n\r", pch);
 
 				/* We don't want them showing up in the note room */
-				if (is_note_room(ch->in_room))
+				if (is_note_room(pch->in_room))
 				{
-					room_manager->char_from_room(ch);
-					room_manager->char_to_room(ch, room_manager->get_limbo_room());
+					room_manager->char_from_room(pch);
+					room_manager->char_to_room(pch, room_manager->get_limbo_room());
 				}
 
-				act("$n has reconnected.", ch, NULL, NULL, ActionTarget::ToRoom, POS_RESTING);
+				act("$n has reconnected.", pch, NULL, NULL, ActionTarget::ToRoom, POS_RESTING);
 
-				snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s reconnected.", ch->getName().c_str(), d->host);
+				snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s reconnected.", pch->getName().c_str(), d->host);
 				logger->log_string(log_buf);
 				Wiznet::instance()->report((char *)"$N groks the fullness of $S link.",
-										   ch, NULL, WIZ_LINKS, 0, 0);
+										   pch, NULL, WIZ_LINKS, 0, 0);
 				d->connected = ConnectedState::Playing;
 				/* Inform the character of a note in progress and the possbility
 				 * of continuation!
 				 */
-				if (ch->pcdata->in_progress)
-					send_to_char("You have a note in progress. Type NOTE WRITE to continue it.\n\r", ch);
+				if (pch->in_progress)
+					send_to_char("You have a note in progress. Type NOTE WRITE to continue it.\n\r", pch);
 			}
 			return true;
 		}

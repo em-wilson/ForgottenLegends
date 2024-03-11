@@ -900,7 +900,7 @@ void do_asave( Character *ch, char *argument )
 
     if ( !ch )       /* Do an autosave */
 	sec = 9;
-    else if ( !IS_NPC(ch) )
+    else if ( !ch->isNPC() )
     	sec = ch->pcdata->security;
     else
     	sec = 0;

@@ -30,6 +30,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "PlayerCharacter.h"
 
 /* does aliasing and other fun stuff */
 void substitute_alias(DESCRIPTOR_DATA *d, char *argument)
@@ -41,7 +42,7 @@ void substitute_alias(DESCRIPTOR_DATA *d, char *argument)
 
     ch = d->original ? d->original : d->character;
 
-    if (IS_NPC(ch) || ch->pcdata->alias[0] == NULL
+    if (ch->isNPC() || ((PlayerCharacter*)ch)->alias[0] == NULL
     ||	!str_prefix("alias",argument) || !str_prefix("una",argument) 
     ||  !str_prefix("prefix",argument)) 
     {
@@ -53,16 +54,16 @@ void substitute_alias(DESCRIPTOR_DATA *d, char *argument)
 
     for (alias = 0; alias < MAX_ALIAS; alias++)	 /* go through the aliases */
     {
-	if (ch->pcdata->alias[alias] == NULL)
+	if (((PlayerCharacter*)ch)->alias[alias] == NULL)
 	    break;
 
-	if (!str_prefix(ch->pcdata->alias[alias],argument))
+	if (!str_prefix(((PlayerCharacter*)ch)->alias[alias],argument))
 	{
 	    point = one_argument(argument,name);
-	    if (!strcmp(ch->pcdata->alias[alias],name))
+	    if (!strcmp(((PlayerCharacter*)ch)->alias[alias],name))
 	    {
 		buf[0] = '\0';
-		strcat(buf,ch->pcdata->alias_sub[alias]);
+		strcat(buf,((PlayerCharacter*)ch)->alias_sub[alias]);
 		strcat(buf," ");
 		strcat(buf,point);
 		break;
@@ -105,7 +106,7 @@ void do_alias(Character *ch, char *argument)
     if (arg[0] == '\0')
     {
 
-	if (rch->pcdata->alias[0] == NULL)
+	if (((PlayerCharacter*)rch)->alias[0] == NULL)
 	{
 	    send_to_char("You have no aliases defined.\n\r",ch);
 	    return;
@@ -114,12 +115,12 @@ void do_alias(Character *ch, char *argument)
 
 	for (pos = 0; pos < MAX_ALIAS; pos++)
 	{
-	    if (rch->pcdata->alias[pos] == NULL
-	    ||	rch->pcdata->alias_sub[pos] == NULL)
+	    if (((PlayerCharacter*)rch)->alias[pos] == NULL
+	    ||	((PlayerCharacter*)rch)->alias_sub[pos] == NULL)
 		break;
 
-	    snprintf(buf, sizeof(buf),"    %s:  %s\n\r",rch->pcdata->alias[pos],
-		    rch->pcdata->alias_sub[pos]);
+	    snprintf(buf, sizeof(buf),"    %s:  %s\n\r",((PlayerCharacter*)rch)->alias[pos],
+		    ((PlayerCharacter*)rch)->alias_sub[pos]);
 	    send_to_char(buf,ch);
 	}
 	return;
@@ -135,14 +136,14 @@ void do_alias(Character *ch, char *argument)
     {
 	for (pos = 0; pos < MAX_ALIAS; pos++)
 	{
-	    if (rch->pcdata->alias[pos] == NULL
-	    ||	rch->pcdata->alias_sub[pos] == NULL)
+	    if (((PlayerCharacter*)rch)->alias[pos] == NULL
+	    ||	((PlayerCharacter*)rch)->alias_sub[pos] == NULL)
 		break;
 
-	    if (!str_cmp(arg,rch->pcdata->alias[pos]))
+	    if (!str_cmp(arg,((PlayerCharacter*)rch)->alias[pos]))
 	    {
-		snprintf(buf, sizeof(buf),"%s aliases to '%s'.\n\r",rch->pcdata->alias[pos],
-			rch->pcdata->alias_sub[pos]);
+		snprintf(buf, sizeof(buf),"%s aliases to '%s'.\n\r",((PlayerCharacter*)rch)->alias[pos],
+			((PlayerCharacter*)rch)->alias_sub[pos]);
 		send_to_char(buf,ch);
 		return;
 	    }
@@ -166,13 +167,13 @@ void do_alias(Character *ch, char *argument)
 
     for (pos = 0; pos < MAX_ALIAS; pos++)
     {
-	if (rch->pcdata->alias[pos] == NULL)
+	if (((PlayerCharacter*)rch)->alias[pos] == NULL)
 	    break;
 
-	if (!str_cmp(arg,rch->pcdata->alias[pos])) /* redefine an alias */
+	if (!str_cmp(arg,((PlayerCharacter*)rch)->alias[pos])) /* redefine an alias */
 	{
-	    free_string(rch->pcdata->alias_sub[pos]);
-	    rch->pcdata->alias_sub[pos] = str_dup(argument);
+	    free_string(((PlayerCharacter*)rch)->alias_sub[pos]);
+	    ((PlayerCharacter*)rch)->alias_sub[pos] = str_dup(argument);
 	    snprintf(buf, sizeof(buf),"%s is now realiased to '%s'.\n\r",arg,argument);
 	    send_to_char(buf,ch);
 	    return;
@@ -186,8 +187,8 @@ void do_alias(Character *ch, char *argument)
      }
   
      /* make a new alias */
-     rch->pcdata->alias[pos]		= str_dup(arg);
-     rch->pcdata->alias_sub[pos]	= str_dup(argument);
+     ((PlayerCharacter*)rch)->alias[pos]		= str_dup(arg);
+     ((PlayerCharacter*)rch)->alias_sub[pos]	= str_dup(argument);
      snprintf(buf, sizeof(buf),"%s is now aliased to '%s'.\n\r",arg,argument);
      send_to_char(buf,ch);
 }
@@ -218,25 +219,25 @@ void do_unalias(Character *ch, char *argument)
 
     for (pos = 0; pos < MAX_ALIAS; pos++)
     {
-	if (rch->pcdata->alias[pos] == NULL)
+	if (((PlayerCharacter*)rch)->alias[pos] == NULL)
 	    break;
 
 	if (found)
 	{
-	    rch->pcdata->alias[pos-1]		= rch->pcdata->alias[pos];
-	    rch->pcdata->alias_sub[pos-1]	= rch->pcdata->alias_sub[pos];
-	    rch->pcdata->alias[pos]		= NULL;
-	    rch->pcdata->alias_sub[pos]		= NULL;
+	    ((PlayerCharacter*)rch)->alias[pos-1]		= ((PlayerCharacter*)rch)->alias[pos];
+	    ((PlayerCharacter*)rch)->alias_sub[pos-1]	= ((PlayerCharacter*)rch)->alias_sub[pos];
+	    ((PlayerCharacter*)rch)->alias[pos]		= NULL;
+	    ((PlayerCharacter*)rch)->alias_sub[pos]		= NULL;
 	    continue;
 	}
 
-	if(!strcmp(arg,rch->pcdata->alias[pos]))
+	if(!strcmp(arg,((PlayerCharacter*)rch)->alias[pos]))
 	{
 	    send_to_char("Alias removed.\n\r",ch);
-	    free_string(rch->pcdata->alias[pos]);
-	    free_string(rch->pcdata->alias_sub[pos]);
-	    rch->pcdata->alias[pos] = NULL;
-	    rch->pcdata->alias_sub[pos] = NULL;
+	    free_string(((PlayerCharacter*)rch)->alias[pos]);
+	    free_string(((PlayerCharacter*)rch)->alias_sub[pos]);
+	    ((PlayerCharacter*)rch)->alias[pos] = NULL;
+	    ((PlayerCharacter*)rch)->alias_sub[pos] = NULL;
 	    found = TRUE;
 	}
     }

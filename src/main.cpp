@@ -20,9 +20,13 @@
 #include "connected_state_handlers/ConfirmNewNameStateHandler.h"
 #include "connected_state_handlers/ConfirmNewPasswordStateHandler.h"
 #include "connected_state_handlers/GetNameStateHandler.h"
+#include "connected_state_handlers/GetNewClassStateHandler.h"
 #include "connected_state_handlers/GetNewPasswordStateHandler.h"
 #include "connected_state_handlers/GetNewRaceStateHandler.h"
+#include "connected_state_handlers/GetNewSexStateHandler.h"
 #include "connected_state_handlers/GetOldPasswordStateHandler.h"
+#include "connected_state_handlers/GetReclassStateHandler.h"
+#include "connected_state_handlers/ReadMotdStateHandler.h"
 
 
 /* Needs to be global because of do_copyover */
@@ -111,9 +115,13 @@ int main( int argc, char **argv )
     csm.addHandler(new ConfirmNewNameStateHandler());
     csm.addHandler(new ConfirmNewPasswordStateHandler(race_manager));
     csm.addHandler(new GetNameStateHandler(&ban_manager, clan_manager));
-    csm.addHandler(new GetOldPasswordStateHandler());
+    csm.addHandler(new GetNewClassStateHandler(logger, race_manager));
     csm.addHandler(new GetNewPasswordStateHandler());
     csm.addHandler(new GetNewRaceStateHandler(race_manager));
+    csm.addHandler(new GetNewSexStateHandler());
+    csm.addHandler(new GetOldPasswordStateHandler());
+    csm.addHandler(new GetReclassStateHandler(logger));
+    csm.addHandler(new ReadMotdStateHandler());
     game.setConnectedStateManager(&csm);
 
     try {

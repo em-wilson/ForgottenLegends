@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include "merc.h"
 #include "magic.h"
+#include "PlayerCharacter.h"
 #include "RaceManager.h"
 #include "recycle.h"
 #include "Room.h"
@@ -52,7 +53,7 @@ void do_gain(Character *ch, char *argument)
 	Character *trainer;
 	int gn = 0, sn = 0;
 
-	if (IS_NPC(ch))
+	if (ch->isNPC())
 		return;
 
 	/* find a trainer */
@@ -91,7 +92,7 @@ void do_gain(Character *ch, char *argument)
 			if (group_table[gn].name == NULL)
 				break;
 
-			if (!ch->pcdata->group_known[gn] && group_table[gn].rating[ch->class_num] > 0)
+			if (!((PlayerCharacter*)ch)->group_known[gn] && group_table[gn].rating[ch->class_num] > 0)
 			{
 				snprintf(buf, sizeof(buf), "%-18s %-5d ",
 						 group_table[gn].name, group_table[gn].rating[ch->class_num]);
@@ -116,7 +117,7 @@ void do_gain(Character *ch, char *argument)
 			if (skill_table[sn].name == NULL)
 				break;
 
-			if (!ch->pcdata->learned[sn] && skill_rating(ch, sn) > 0 && skill_table[sn].spell_fun == spell_null)
+			if (!((PlayerCharacter*)ch)->learned[sn] && skill_rating(ch, sn) > 0 && skill_table[sn].spell_fun == spell_null)
 			{
 				snprintf(buf, sizeof(buf), "%-18s %-5d ",
 						 skill_table[sn].name, skill_rating(ch, sn));
@@ -155,7 +156,7 @@ void do_gain(Character *ch, char *argument)
 			return;
 		}
 
-		if (ch->pcdata->points <= 40)
+		if (((PlayerCharacter*)ch)->points <= 40)
 		{
 			act("$N tells you 'There would be no point in that.'",
 				ch, NULL, trainer, TO_CHAR, POS_RESTING);
@@ -166,8 +167,8 @@ void do_gain(Character *ch, char *argument)
 			ch, NULL, trainer, TO_CHAR, POS_RESTING);
 
 		ch->train -= 2;
-		ch->pcdata->points -= 1;
-		ch->exp = exp_per_level(ch, ch->pcdata->points) * ch->level;
+		((PlayerCharacter*)ch)->points -= 1;
+		ch->exp = exp_per_level(ch, ((PlayerCharacter*)ch)->points) * ch->level;
 		return;
 	}
 
@@ -176,7 +177,7 @@ void do_gain(Character *ch, char *argument)
 	gn = group_lookup(argument);
 	if (gn > 0)
 	{
-		if (ch->pcdata->group_known[gn])
+		if (((PlayerCharacter*)ch)->group_known[gn])
 		{
 			act("$N tells you 'You already know that group!'",
 				ch, NULL, trainer, TO_CHAR, POS_RESTING);
@@ -215,7 +216,7 @@ void do_gain(Character *ch, char *argument)
 			return;
 		}
 
-		if (ch->pcdata->learned[sn])
+		if (((PlayerCharacter*)ch)->learned[sn])
 		{
 			act("$N tells you 'You already know that skill!'",
 				ch, NULL, trainer, TO_CHAR, POS_RESTING);
@@ -237,9 +238,9 @@ void do_gain(Character *ch, char *argument)
 		}
 
 		/* add the skill */
-		ch->pcdata->learned[sn] = 1;
-		ch->pcdata->sk_level[sn] = skill_level(ch, sn);
-		ch->pcdata->sk_rating[sn] = skill_rating(ch, sn);
+		((PlayerCharacter*)ch)->learned[sn] = 1;
+		((PlayerCharacter*)ch)->sk_level[sn] = skill_level(ch, sn);
+		((PlayerCharacter*)ch)->sk_rating[sn] = skill_rating(ch, sn);
 		act("$N trains you in the art of $t",
 			ch, skill_table[sn].name, trainer, TO_CHAR, POS_RESTING);
 		ch->train -= skill_rating(ch, sn);
@@ -261,7 +262,7 @@ void do_spells(Character *ch, char *argument)
 	bool fAll = FALSE, found = FALSE;
 	char buf[MAX_STRING_LENGTH];
 
-	if (IS_NPC(ch))
+	if (ch->isNPC())
 		return;
 
 	if (argument[0] != '\0')
@@ -325,10 +326,10 @@ void do_spells(Character *ch, char *argument)
 		if (skill_table[sn].name == NULL)
 			break;
 
-		if ((level = ch->pcdata->sk_level[sn]) < LEVEL_HERO + 1 && (fAll || level <= ch->level) && level >= min_lev && level <= max_lev && skill_table[sn].spell_fun != spell_null && ch->pcdata->learned[sn] > 0)
+		if ((level = ((PlayerCharacter*)ch)->sk_level[sn]) < LEVEL_HERO + 1 && (fAll || level <= ch->level) && level >= min_lev && level <= max_lev && skill_table[sn].spell_fun != spell_null && ((PlayerCharacter*)ch)->learned[sn] > 0)
 		{
 			found = TRUE;
-			level = ch->pcdata->sk_level[sn];
+			level = ((PlayerCharacter*)ch)->sk_level[sn];
 			if (ch->level < level)
 				snprintf(buf, sizeof(buf), "%-18s n/a      ", skill_table[sn].name);
 			else
@@ -376,7 +377,7 @@ void do_skills(Character *ch, char *argument)
 	bool fAll = FALSE, found = FALSE;
 	char buf[MAX_STRING_LENGTH];
 
-	if (IS_NPC(ch))
+	if (ch->isNPC())
 		return;
 
 	if (argument[0] != '\0')
@@ -440,15 +441,15 @@ void do_skills(Character *ch, char *argument)
 		if (skill_table[sn].name == NULL)
 			break;
 
-		if ((level = ch->pcdata->sk_level[sn]) < LEVEL_HERO + 1 && (fAll || level <= ch->level) && level >= min_lev && level <= max_lev && skill_table[sn].spell_fun == spell_null && ch->pcdata->learned[sn] > 0)
+		if ((level = ((PlayerCharacter*)ch)->sk_level[sn]) < LEVEL_HERO + 1 && (fAll || level <= ch->level) && level >= min_lev && level <= max_lev && skill_table[sn].spell_fun == spell_null && ((PlayerCharacter*)ch)->learned[sn] > 0)
 		{
 			found = TRUE;
-			level = ch->pcdata->sk_level[sn];
+			level = ((PlayerCharacter*)ch)->sk_level[sn];
 			if (ch->level < level)
 				snprintf(buf, sizeof(buf), "%-18s n/a      ", skill_table[sn].name);
 			else
 				snprintf(buf, sizeof(buf), "%-18s %3d%%      ", skill_table[sn].name,
-						 ch->pcdata->learned[sn]);
+						 ((PlayerCharacter*)ch)->learned[sn]);
 
 			if (skill_list[level][0] == '\0')
 				snprintf(skill_list[level], MAX_STRING_LENGTH, "\n\rLevel %2d: %s", level, buf);
@@ -484,7 +485,7 @@ void list_group_costs(Character *ch)
 	char buf[100];
 	int gn, sn, col;
 
-	if (IS_NPC(ch))
+	if (ch->isNPC())
 		return;
 
 	col = 0;
@@ -497,7 +498,7 @@ void list_group_costs(Character *ch)
 		if (group_table[gn].name == NULL)
 			break;
 
-		if (!ch->gen_data->group_chosen[gn] && !ch->pcdata->group_known[gn] && group_table[gn].rating[ch->class_num] > 0)
+		if (!ch->gen_data->group_chosen[gn] && !((PlayerCharacter*)ch)->group_known[gn] && group_table[gn].rating[ch->class_num] > 0)
 		{
 			snprintf(buf, sizeof(buf), "%-18s %-5d ", group_table[gn].name,
 					 group_table[gn].rating[ch->class_num]);
@@ -520,7 +521,7 @@ void list_group_costs(Character *ch)
 		if (skill_table[sn].name == NULL)
 			break;
 
-		if (!ch->gen_data->skill_chosen[sn] && ch->pcdata->learned[sn] == 0 && skill_table[sn].spell_fun == spell_null && skill_rating(ch, sn) > 0)
+		if (!ch->gen_data->skill_chosen[sn] && ((PlayerCharacter*)ch)->learned[sn] == 0 && skill_table[sn].spell_fun == spell_null && skill_rating(ch, sn) > 0)
 		{
 			snprintf(buf, sizeof(buf), "%-18s %-5d ", skill_table[sn].name,
 					 skill_rating(ch, sn));
@@ -533,7 +534,7 @@ void list_group_costs(Character *ch)
 		send_to_char("\n\r", ch);
 	send_to_char("\n\r", ch);
 
-	snprintf(buf, sizeof(buf), "Creation points: %d\n\r", ch->pcdata->points);
+	snprintf(buf, sizeof(buf), "Creation points: %d\n\r", ((PlayerCharacter*)ch)->points);
 	send_to_char(buf, ch);
 	snprintf(buf, sizeof(buf), "Experience per level: %d\n\r",
 			 exp_per_level(ch, ch->gen_data->points_chosen));
@@ -546,7 +547,7 @@ void list_group_chosen(Character *ch)
 	char buf[100];
 	int gn, sn, col;
 
-	if (IS_NPC(ch))
+	if (ch->isNPC())
 		return;
 
 	col = 0;
@@ -650,7 +651,7 @@ bool parse_gen_groups(Character *ch, char *argument)
 		gn = group_lookup(argument);
 		if (gn != -1)
 		{
-			if (ch->gen_data->group_chosen[gn] || ch->pcdata->group_known[gn])
+			if (ch->gen_data->group_chosen[gn] || ((PlayerCharacter*)ch)->group_known[gn])
 			{
 				send_to_char("You already know that group!\n\r", ch);
 				return TRUE;
@@ -667,14 +668,14 @@ bool parse_gen_groups(Character *ch, char *argument)
 			ch->gen_data->group_chosen[gn] = TRUE;
 			ch->gen_data->points_chosen += group_table[gn].rating[ch->class_num];
 			gn_add(ch, gn);
-			ch->pcdata->points += group_table[gn].rating[ch->class_num];
+			((PlayerCharacter*)ch)->points += group_table[gn].rating[ch->class_num];
 			return TRUE;
 		}
 
 		sn = skill_lookup(argument);
 		if (sn != -1)
 		{
-			if (ch->gen_data->skill_chosen[sn] || ch->pcdata->learned[sn] > 0)
+			if (ch->gen_data->skill_chosen[sn] || ((PlayerCharacter*)ch)->learned[sn] > 0)
 			{
 				send_to_char("You already know that skill!\n\r", ch);
 				return TRUE;
@@ -689,10 +690,10 @@ bool parse_gen_groups(Character *ch, char *argument)
 			send_to_char(buf, ch);
 			ch->gen_data->skill_chosen[sn] = TRUE;
 			ch->gen_data->points_chosen += skill_rating(ch, sn);
-			ch->pcdata->learned[sn] = 1;
-			ch->pcdata->sk_level[sn] = skill_level(ch, sn);
-			ch->pcdata->sk_rating[sn] = skill_rating(ch, sn);
-			ch->pcdata->points += skill_rating(ch, sn);
+			((PlayerCharacter*)ch)->learned[sn] = 1;
+			((PlayerCharacter*)ch)->sk_level[sn] = skill_level(ch, sn);
+			((PlayerCharacter*)ch)->sk_rating[sn] = skill_rating(ch, sn);
+			((PlayerCharacter*)ch)->points += skill_rating(ch, sn);
 			return TRUE;
 		}
 
@@ -720,7 +721,7 @@ bool parse_gen_groups(Character *ch, char *argument)
 				if (ch->gen_data->group_chosen[gn])
 					gn_add(ch, gn);
 			}
-			ch->pcdata->points -= group_table[gn].rating[ch->class_num];
+			((PlayerCharacter*)ch)->points -= group_table[gn].rating[ch->class_num];
 			return TRUE;
 		}
 
@@ -730,8 +731,8 @@ bool parse_gen_groups(Character *ch, char *argument)
 			send_to_char("Skill dropped.\n\r", ch);
 			ch->gen_data->skill_chosen[sn] = FALSE;
 			ch->gen_data->points_chosen -= skill_rating(ch, sn);
-			ch->pcdata->learned[sn] = 0;
-			ch->pcdata->points -= skill_rating(ch, sn);
+			((PlayerCharacter*)ch)->learned[sn] = 0;
+			((PlayerCharacter*)ch)->points -= skill_rating(ch, sn);
 			return TRUE;
 		}
 
@@ -772,7 +773,7 @@ void do_groups(Character *ch, char *argument)
 	char buf[100];
 	int gn, sn, col;
 
-	if (IS_NPC(ch))
+	if (ch->isNPC())
 		return;
 
 	col = 0;
@@ -784,7 +785,7 @@ void do_groups(Character *ch, char *argument)
 		{
 			if (group_table[gn].name == NULL)
 				break;
-			if (ch->pcdata->group_known[gn])
+			if (((PlayerCharacter*)ch)->group_known[gn])
 			{
 				snprintf(buf, sizeof(buf), "%-20s ", group_table[gn].name);
 				send_to_char(buf, ch);
@@ -794,7 +795,7 @@ void do_groups(Character *ch, char *argument)
 		}
 		if (col % 3 != 0)
 			send_to_char("\n\r", ch);
-		snprintf(buf, sizeof(buf), "Creation points: %d\n\r", ch->pcdata->points);
+		snprintf(buf, sizeof(buf), "Creation points: %d\n\r", ((PlayerCharacter*)ch)->points);
 		send_to_char(buf, ch);
 		return;
 	}
@@ -844,10 +845,10 @@ void check_improve(Character *ch, int sn, bool success, int multiplier)
 	int chance;
 	char buf[100];
 
-	if (IS_NPC(ch))
+	if (ch->isNPC())
 		return;
 
-	if (ch->level < skill_level(ch, sn) || ch->pcdata->learned[sn] == 0 || ch->pcdata->learned[sn] == 100)
+	if (ch->level < skill_level(ch, sn) || ((PlayerCharacter*)ch)->learned[sn] == 0 || ((PlayerCharacter*)ch)->learned[sn] == 100)
 		return; /* skill is not known */
 
 	/* check to see if the character has a chance to learn */
@@ -856,7 +857,7 @@ void check_improve(Character *ch, int sn, bool success, int multiplier)
 	chance += ch->level;
 
 	// Improved odds at lower levels
-	chance += 100 - ch->pcdata->learned[sn];
+	chance += 100 - ((PlayerCharacter*)ch)->learned[sn];
 
 	if (number_range(1, 750) > chance)
 		return;
@@ -865,33 +866,33 @@ void check_improve(Character *ch, int sn, bool success, int multiplier)
 
 	if (success)
 	{
-		chance = URANGE(5, 100 - ch->pcdata->learned[sn], 95);
+		chance = URANGE(5, 100 - ((PlayerCharacter*)ch)->learned[sn], 95);
 		if (number_percent() < chance)
 		{
 			snprintf(buf, sizeof(buf), "{BYou have become better at %s!{x\n\r",
 					 skill_table[sn].name);
 			send_to_char(buf, ch);
-			ch->pcdata->learned[sn]++;
+			((PlayerCharacter*)ch)->learned[sn]++;
 			ch->gain_exp(2 + skill_rating(ch, sn));
 			ch->gain_exp(number_range(25, 40) * skill_rating(ch, sn));
 		}
 	}
 	else
 	{
-		chance = URANGE(5, ch->pcdata->learned[sn] / 2, 30);
+		chance = URANGE(5, ((PlayerCharacter*)ch)->learned[sn] / 2, 30);
 		if (number_percent() < chance)
 		{
 			snprintf(buf, sizeof(buf),
 					 "{BYou learn from your mistakes, and your %s skill improves.{x\n\r",
 					 skill_table[sn].name);
 			send_to_char(buf, ch);
-			ch->pcdata->learned[sn] += number_range(1, 3);
-			ch->pcdata->learned[sn] = UMIN(ch->pcdata->learned[sn], 100);
+			((PlayerCharacter*)ch)->learned[sn] += number_range(1, 3);
+			((PlayerCharacter*)ch)->learned[sn] = UMIN(((PlayerCharacter*)ch)->learned[sn], 100);
 			ch->gain_exp(number_range(15, 30) * skill_rating(ch, sn));
 		}
 	}
 
-	if (ch->pcdata->learned[sn] == 100)
+	if (((PlayerCharacter*)ch)->learned[sn] == 100)
 	{
 		snprintf(buf, sizeof(buf), "{YYou have mastered %s!{x\n\r", skill_table[sn].name);
 	}
@@ -918,7 +919,7 @@ void gn_add(Character *ch, int gn)
 {
 	int i;
 
-	ch->pcdata->group_known[gn] = TRUE;
+	((PlayerCharacter*)ch)->group_known[gn] = TRUE;
 	for (i = 0; i < MAX_IN_GROUP; i++)
 	{
 		if (group_table[gn].spells[i] == NULL)
@@ -932,7 +933,7 @@ void gn_remove(Character *ch, int gn)
 {
 	int i;
 
-	ch->pcdata->group_known[gn] = FALSE;
+	((PlayerCharacter*)ch)->group_known[gn] = FALSE;
 
 	for (i = 0; i < MAX_IN_GROUP; i++)
 	{
@@ -947,20 +948,20 @@ void group_add(Character *ch, const char *name, bool deduct)
 {
 	int sn, gn;
 
-	if (IS_NPC(ch)) /* NPCs do not have skills */
+	if (ch->isNPC()) /* NPCs do not have skills */
 		return;
 
 	sn = skill_lookup(name);
 
 	if (sn != -1)
 	{
-		if (ch->pcdata->learned[sn] == 0) /* i.e. not known */
+		if (((PlayerCharacter*)ch)->learned[sn] == 0) /* i.e. not known */
 		{
-			ch->pcdata->learned[sn] = 1;
-			ch->pcdata->sk_level[sn] = skill_level(ch, sn);
-			ch->pcdata->sk_rating[sn] = skill_rating(ch, sn);
+			((PlayerCharacter*)ch)->learned[sn] = 1;
+			((PlayerCharacter*)ch)->sk_level[sn] = skill_level(ch, sn);
+			((PlayerCharacter*)ch)->sk_rating[sn] = skill_rating(ch, sn);
 			if (deduct)
-				ch->pcdata->points += skill_rating(ch, sn);
+				((PlayerCharacter*)ch)->points += skill_rating(ch, sn);
 		}
 		return;
 	}
@@ -971,11 +972,11 @@ void group_add(Character *ch, const char *name, bool deduct)
 
 	if (gn != -1)
 	{
-		if (ch->pcdata->group_known[gn] == FALSE)
+		if (((PlayerCharacter*)ch)->group_known[gn] == FALSE)
 		{
-			ch->pcdata->group_known[gn] = TRUE;
+			((PlayerCharacter*)ch)->group_known[gn] = TRUE;
 			if (deduct)
-				ch->pcdata->points += group_table[gn].rating[ch->class_num];
+				((PlayerCharacter*)ch)->points += group_table[gn].rating[ch->class_num];
 		}
 		gn_add(ch, gn); /* make sure all skills in the group are known */
 	}
@@ -991,7 +992,7 @@ void group_remove(Character *ch, const char *name)
 
 	if (sn != -1)
 	{
-		ch->pcdata->learned[sn] = 0;
+		((PlayerCharacter*)ch)->learned[sn] = 0;
 		return;
 	}
 
@@ -999,9 +1000,9 @@ void group_remove(Character *ch, const char *name)
 
 	gn = group_lookup(name);
 
-	if (gn != -1 && ch->pcdata->group_known[gn] == TRUE)
+	if (gn != -1 && ((PlayerCharacter*)ch)->group_known[gn] == TRUE)
 	{
-		ch->pcdata->group_known[gn] = FALSE;
+		((PlayerCharacter*)ch)->group_known[gn] = FALSE;
 		gn_remove(ch, gn); /* be sure to call gn_add on all remaining groups */
 	}
 }

@@ -30,7 +30,6 @@ Character::Character()
     this->in_room = NULL;
     this->was_in_room = NULL;
     this->zone = NULL;
-    this->pcdata = NULL;
     this->gen_data = NULL;
     this->valid = false;
     this->confirm_reclass = false;
@@ -130,11 +129,6 @@ Character::~Character()
         this->removeAffect(paf);
     }
 
-    if (this->pcdata != NULL) {
-        delete this->pcdata;
-        this->pcdata = NULL;
-    }
-
     if ( this->desc ) {
         this->desc = NULL;
     }
@@ -165,109 +159,6 @@ void Character::setDescription( const char * description )
 char * Character::getDescription()
 {
     return _description.empty() ? NULL : (char*)_description.c_str();
-}
-
-/*
- * Advancement stuff.
- */
-void Character::advance_level( bool hide )
-{
-    char buf[MAX_STRING_LENGTH];
-    int add_hp, add_mana, add_move, dracnum, add_prac;
-
-    this->pcdata->last_level = 
-    ( this->played + (int) (current_time - this->logon) ) / 3600;
-
-/*
-    snprintf(buf, sizeof(buf), "the %s",
-    title_table [this->class_num] [this->level] [this->sex == SEX_FEMALE ? 1 : 0] );
-    set_title( this, buf );
-*/
-
-    add_hp  = con_app[get_curr_stat(this,STAT_CON)].hitp + number_range(
-            class_table[this->class_num].hp_min,
-            class_table[this->class_num].hp_max );
-    add_mana    = number_range(2,(2*get_curr_stat(this,STAT_INT)
-                  + get_curr_stat(this,STAT_WIS))/5);
-    if (!class_table[this->class_num].fMana)
-    add_mana /= 2;
-    add_move    = number_range( 1, (get_curr_stat(this,STAT_CON)
-                  + get_curr_stat(this,STAT_DEX))/6 );
-    add_prac    = wis_app[get_curr_stat(this,STAT_WIS)].practice;
-
-    // high exp characters get a cumulative bonus
-    add_hp += this->exp / 10000;
-    add_mana += this->exp / 10000;
-    add_move += this->exp / 10000;
-
-    add_hp = add_hp * 9/10;
-    add_mana = add_mana * 9/10;
-    add_move = add_move * 9/10;
-
-    add_hp  = UMAX(  2, add_hp   );
-    add_mana    = UMAX(  2, add_mana );
-    add_move    = UMAX(  6, add_move );
-
-    this->max_hit     += add_hp;
-    this->max_mana    += add_mana;
-    this->max_move    += add_move;
-    // Refresh your health
-    this->hit          = UMAX(this->hit, this->max_hit);
-    this->mana          = UMAX(this->mana, this->max_mana);
-    this->move          = UMAX(this->move, this->max_move);
-    this->practice    += add_prac;
-    this->train       += 1;
-
-    this->pcdata->perm_hit    += add_hp;
-    this->pcdata->perm_mana   += add_mana;
-    this->pcdata->perm_move   += add_move;
-
-    for (int sn = 0; sn < MAX_SKILL; sn++) {
-        if (skill_table[sn].name == NULL)
-            break;
-
-        if (this->pcdata->learned[sn] > 0
-            && this->pcdata->learned[sn] < 100
-            && this->pcdata->sk_level[sn] < this->level ) {
-            this->pcdata->learned[sn]++;
-        }
-    }
-
-    if (this->level == 10 && (this->getRace()->getName() == "draconian"))
-    {
-/*
-    if (this->alignment > 500)
-        dracnum = number_range(0, 4);
-    else if (this->alignment < 500)
-        dracnum = number_range(10, 14);
-    else
-        dracnum = number_range(5, 9);
-*/
-    dracnum = number_range(0,14);
-    this->drac = dracnum;
-    snprintf(buf, sizeof(buf), "You scream in agony as %s scales pierce your tender skin!\n\r", draconian_table[this->drac].colour);
-    send_to_char(buf,this);
-    if (this->perm_stat[STAT_STR] < 25)
-        this->perm_stat[STAT_STR]++;
-    else
-        this->train++;
-
-    if (this->perm_stat[draconian_table[this->drac].attr_prime] < 25)
-        this->perm_stat[draconian_table[this->drac].attr_prime]++;
-    else
-        this->train++;
-    }
-
-    if (!hide)
-    {
-        snprintf(buf, sizeof(buf),
-        "{BYou have leveled!{x\n\r"
-        "You gain %d hit point%s, %d mana, %d move, and %d practice%s.\n\r",
-        add_hp, add_hp == 1 ? "" : "s", add_mana, add_move,
-        add_prac, add_prac == 1 ? "" : "s");
-    send_to_char( buf, this );
-    }
-    return;
 }
 
 /*
@@ -354,40 +245,6 @@ bool Character::can_see( Object *obj )
 }
 
 
-
-void Character::gain_condition( int iCond, int value )
-{
-    int condition;
-
-    if ( value == 0 || IS_NPC(this) || this->level >= LEVEL_IMMORTAL)
-    return;
-
-    condition               = this->pcdata->condition[iCond];
-    if (condition == -1)
-        return;
-    this->pcdata->condition[iCond]    = URANGE( 0, condition + value, 48 );
-
-    if ( this->pcdata->condition[iCond] == 0 )
-    {
-    switch ( iCond )
-    {
-    case COND_HUNGER:
-        send_to_char( "You are hungry.\n\r",  this );
-        break;
-
-    case COND_THIRST:
-        send_to_char( "You are thirsty.\n\r", this );
-        break;
-
-    case COND_DRUNK:
-        if ( condition != 0 )
-        send_to_char( "You are sober.\n\r", this );
-        break;
-    }
-    }
-
-    return;
-}
 
 int Character::getRange() {
     return 0;
@@ -927,4 +784,21 @@ void Character::unequip( Object *obj )
 	--this->in_room->light;
 
     return;
+}
+
+/*
+ * It is very important that this be an equivalence relation:
+ * (1) A ~ A
+ * (2) if A ~ B then B ~ A
+ * (3) if A ~ B  and B ~ C, then A ~ C
+ */
+bool Character::isSameGroup( Character *bch )
+{
+    auto ach = this;
+    if ( ach == NULL || bch == NULL)
+	return FALSE;
+
+    if ( ach->leader != NULL ) ach = ach->leader;
+    if ( bch->leader != NULL ) bch = bch->leader;
+    return ach == bch;
 }

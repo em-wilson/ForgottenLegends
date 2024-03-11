@@ -37,6 +37,7 @@
 #include "NonPlayerCharacter.h"
 #include "Object.h"
 #include "ObjectHelper.h"
+#include "PlayerCharacter.h"
 #include "PlayerRace.h"
 #include "RaceManager.h"
 #include "recycle.h"
@@ -54,11 +55,11 @@ extern RaceManager * race_manager;
 /* friend stuff -- for NPC's mostly */
 bool is_friend(Character *ch,Character *victim)
 {
-    if (is_same_group(ch,victim))
+    if (ch->isSameGroup(victim))
 	return TRUE;
 
     
-    if (!IS_NPC(ch))
+    if (!ch->isNPC())
 	return FALSE;
 
     if (!IS_NPC(victim))
@@ -286,14 +287,6 @@ int check_immune(Character *ch, int dam_type)
       	return immune;
 }
 
-bool is_same_clan(Character *ch, Character *victim)
-{
-   if (IS_NPC(ch) || IS_NPC(victim))
-	return FALSE;
-
-   else return (ch->pcdata->clan == victim->pcdata->clan);
-}
-
 /* checks mob format */
 bool is_old_mob(Character *ch)
 {
@@ -320,12 +313,12 @@ int get_skill(Character *ch, int sn)
 	skill = 0;
     }
 
-    else if (!IS_NPC(ch))
+    else if (!ch->isNPC())
     {
-	if (ch->level < ch->pcdata->sk_level[sn])
+	if (ch->level < ((PlayerCharacter*)ch)->sk_level[sn])
 	    skill = 0;
 	else
-	    skill = ch->pcdata->learned[sn];
+	    skill = ((PlayerCharacter*)ch)->learned[sn];
     }
 
     else /* mobiles */
@@ -404,7 +397,7 @@ int get_skill(Character *ch, int sn)
 	    skill = 2 * skill / 3;
     }
 
-    if ( !IS_NPC(ch) && ch->pcdata->condition[COND_DRUNK]  > 10 )
+    if ( !ch->isNPC() && ((PlayerCharacter*)ch)->condition[COND_DRUNK]  > 10 )
 	skill = 9 * skill / 10;
 
     return URANGE(0,skill,100);
@@ -439,7 +432,7 @@ int get_weapon_skill(Character *ch, int sn)
      int skill;
 
      /* -1 is exotic */
-    if (IS_NPC(ch))
+    if (ch->isNPC())
     {
 	if (sn == -1)
 	    skill = 3 * ch->level;
@@ -454,7 +447,7 @@ int get_weapon_skill(Character *ch, int sn)
 	if (sn == -1)
 	    skill = 3 * ch->level;
 	else
-	    skill = ch->pcdata->learned[sn];
+	    skill = ((PlayerCharacter*)ch)->learned[sn];
     }
 
     return URANGE(0,skill,100);
@@ -462,20 +455,22 @@ int get_weapon_skill(Character *ch, int sn)
 
 
 /* used to de-screw characters */
-void reset_char(Character *ch)
+void reset_char(Character *caller)
 {
      int loc,mod,stat;
      Object *obj;
      AFFECT_DATA *af;
      int i;
 
-     if (IS_NPC(ch))
+     if (caller->isNPC())
 	return;
 
-    if (ch->pcdata->perm_hit == 0 
-    ||	ch->pcdata->perm_mana == 0
-    ||  ch->pcdata->perm_move == 0
-    ||	ch->pcdata->last_level == 0)
+    PlayerCharacter * ch = (PlayerCharacter*)caller;
+
+    if (ch->perm_hit == 0 
+    ||	ch->perm_mana == 0
+    ||  ch->perm_move == 0
+    ||	ch->last_level == 0)
     {
     /* do a FULL reset */
 	for (loc = 0; loc < MAX_WEAR; loc++)
@@ -491,9 +486,9 @@ void reset_char(Character *ch)
             {
                 case APPLY_SEX:	ch->sex		-= mod;
                         if (ch->sex < 0 || ch->sex >2)
-                            ch->sex = IS_NPC(ch) ?
+                            ch->sex = ch->isNPC() ?
                             0 :
-                            ch->pcdata->true_sex;
+                            ch->true_sex;
                                         break;
                 case APPLY_MANA:	ch->max_mana	-= mod;		break;
                 case APPLY_HIT:	ch->max_hit	-= mod;		break;
@@ -514,16 +509,16 @@ void reset_char(Character *ch)
             }
 	}
 	/* now reset the permanent stats */
-	ch->pcdata->perm_hit 	= ch->max_hit;
-	ch->pcdata->perm_mana 	= ch->max_mana;
-	ch->pcdata->perm_move	= ch->max_move;
-	ch->pcdata->last_level	= ch->played/3600;
-	if (ch->pcdata->true_sex < 0 || ch->pcdata->true_sex > 2)
+	ch->perm_hit 	= ch->max_hit;
+	ch->perm_mana 	= ch->max_mana;
+	ch->perm_move	= ch->max_move;
+	ch->last_level	= ch->played/3600;
+	if (ch->true_sex < 0 || ch->true_sex > 2)
 	{
 		if (ch->sex > 0 && ch->sex < 3)
-	    	    ch->pcdata->true_sex	= ch->sex;
+	    	    ch->true_sex	= ch->sex;
 		else
-		    ch->pcdata->true_sex 	= 0;
+		    ch->true_sex 	= 0;
 	}
     }
 
@@ -531,12 +526,12 @@ void reset_char(Character *ch)
     for (stat = 0; stat < MAX_STATS; stat++)
 	ch->mod_stat[stat] = 0;
 
-    if (ch->pcdata->true_sex < 0 || ch->pcdata->true_sex > 2)
-	ch->pcdata->true_sex = 0; 
-    ch->sex		= ch->pcdata->true_sex;
-    ch->max_hit 	= ch->pcdata->perm_hit;
-    ch->max_mana	= ch->pcdata->perm_mana;
-    ch->max_move	= ch->pcdata->perm_move;
+    if (ch->true_sex < 0 || ch->true_sex > 2)
+	ch->true_sex = 0; 
+    ch->sex		= ch->true_sex;
+    ch->max_hit 	= ch->perm_hit;
+    ch->max_mana	= ch->perm_mana;
+    ch->max_move	= ch->perm_move;
    
     for (i = 0; i < 4; i++)
     	ch->armor[i]	= 100;
@@ -654,7 +649,7 @@ void reset_char(Character *ch)
 
     /* make sure sex is RIGHT!!!! */
     if (ch->sex < 0 || ch->sex > 2)
-	ch->sex = ch->pcdata->true_sex;
+	ch->sex = ch->true_sex;
 }
 
 
@@ -671,7 +666,7 @@ int get_curr_stat( Character *ch, int stat )
 {
     int max;
 
-    if (IS_NPC(ch) || ch->level > LEVEL_IMMORTAL)
+    if (ch->isNPC() || ch->level > LEVEL_IMMORTAL)
 	max = 25;
 
     else
@@ -695,7 +690,7 @@ int get_max_train( Character *ch, int stat )
 {
     int max;
 
-    if (IS_NPC(ch) || ch->level > LEVEL_IMMORTAL)
+    if (ch->isNPC() || ch->level > LEVEL_IMMORTAL)
 	return 25;
 
     max = ch->getRace()->getPlayerRace()->getMaxStats().at(stat);
@@ -715,10 +710,10 @@ int get_max_train( Character *ch, int stat )
  */
 int can_carry_n( Character *ch )
 {
-    if ( !IS_NPC(ch) && ch->level >= LEVEL_IMMORTAL )
+    if ( !ch->isNPC() && ch->level >= LEVEL_IMMORTAL )
 	return 1000;
 
-    if ( IS_NPC(ch) && IS_SET(ch->act, ACT_PET) )
+    if ( ch->isNPC() && IS_SET(ch->act, ACT_PET) )
 	return 0;
 
     return MAX_WEAR +  2 * get_curr_stat(ch,STAT_DEX) + ch->level;
@@ -731,10 +726,10 @@ int can_carry_n( Character *ch )
  */
 int can_carry_w( Character *ch )
 {
-    if ( !IS_NPC(ch) && ch->level >= LEVEL_IMMORTAL )
+    if ( !ch->isNPC() && ch->level >= LEVEL_IMMORTAL )
 	return 10000000;
 
-    if ( IS_NPC(ch) && IS_SET(ch->act, ACT_PET) )
+    if ( ch->isNPC() && IS_SET(ch->act, ACT_PET) )
 	return 0;
 
     return str_app[get_curr_stat(ch,STAT_STR)].carry * 10 + ch->level * 25;
@@ -901,7 +896,7 @@ void char_from_room( Character *ch )
 	return;
     }
 
-    if ( !IS_NPC(ch) )
+    if ( !ch->isNPC() )
 	--ch->in_room->area->nplayer;
 
     if ( ( obj = ch->getEquipment(WEAR_LIGHT ) ) != NULL
@@ -962,7 +957,7 @@ void char_to_room( Character *ch, ROOM_INDEX_DATA *pRoomIndex )
     ch->next_in_room	= pRoomIndex->people;
     pRoomIndex->people	= ch;
 
-    if ( !IS_NPC(ch) )
+    if ( !ch->isNPC() )
     {
 	if (ch->in_room->area->empty)
 	{
@@ -1245,22 +1240,22 @@ void extract_char( Character *ch, bool fPull )
         char_from_room( ch );
 
     /* Death room is set in the clan tabe now */
-    if ( !fPull && IS_CLANNED(ch))
+    if ( !fPull && ch->isClanned())
     {
-        if (get_room_index(ch->pcdata->clan->getDeathRoomVnum())) {
-            char_to_room(ch,get_room_index(ch->pcdata->clan->getDeathRoomVnum()));
+        if (get_room_index(ch->getClan()->getDeathRoomVnum())) {
+            char_to_room(ch,get_room_index(ch->getClan()->getDeathRoomVnum()));
         } else {
             char_to_room(ch,get_room_index(ROOM_VNUM_ALTAR));
         }
         return;
     }
-    else if ( !fPull && !IS_CLANNED(ch))
+    else if ( !fPull && !ch->isClanned())
     {
 	char_to_room(ch,get_room_index(ROOM_VNUM_ALTAR));
 	return;
     }
 
-    if ( IS_NPC(ch) )
+    if ( ch->isNPC() )
 	--ch->pIndexData->count;
 
     if ( ch->desc != NULL && ch->desc->original != NULL )
@@ -1315,6 +1310,13 @@ Character *get_char_room( Character *ch, char *argument )
 }
 
 
+PlayerCharacter * get_player_world( Character *ch, char *argument) {
+    auto f = get_char_world(ch, argument);
+    if (f && !f->isNPC()) {
+        return (PlayerCharacter*)f;
+    }
+    return nullptr;
+}
 
 
 /*
@@ -1698,10 +1700,10 @@ bool can_see_room( Character *ch, ROOM_INDEX_DATA *pRoomIndex )
     &&  ch->level > 5 && !IS_IMMORTAL(ch))
 	return FALSE;
 
-    if (IS_NPC(ch) && pRoomIndex->clan)
+    if (ch->isNPC() && pRoomIndex->clan)
 	return FALSE;
 
-    if (!IS_IMMORTAL(ch) && pRoomIndex->clan && ch->pcdata->clan != pRoomIndex->clan)
+    if (!IS_IMMORTAL(ch) && pRoomIndex->clan && ch->getClan() != pRoomIndex->clan)
 	return FALSE;
 
     return TRUE;
@@ -1717,7 +1719,7 @@ bool can_drop_obj( Character *ch, Object *obj )
     if ( !IS_SET(obj->getExtraFlags(), ITEM_NODROP) )
 	return TRUE;
 
-    if ( !IS_NPC(ch) && ch->level >= LEVEL_IMMORTAL )
+    if ( !ch->isNPC() && ch->level >= LEVEL_IMMORTAL )
 	return TRUE;
 
     return FALSE;

@@ -10,6 +10,8 @@ public:
     NonPlayerCharacter(MOB_INDEX_DATA *pMobIndex);
     ~NonPlayerCharacter();
 
+    bool isClanned() override;
+    Clan * getClan() override;
     bool isNPC() override;
 
     virtual int getTrust() override;
@@ -17,6 +19,10 @@ public:
     virtual int mana_gain( ) override;
     virtual int move_gain( ) override;
     virtual void update() override;
+
+
+    virtual void perform_autoloot() override;
+    void gain_condition( int iCond, int value ) override;
 };
 
 /*

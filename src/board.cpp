@@ -415,7 +415,7 @@ bool is_note_to (Character *ch, Note *note)
 		
 	/* Allow clan notes */
 	if ( (IS_IMMORTAL(ch) && clan_manager->get_clan(note->to_list) )
-		|| (IS_CLANNED(ch) && is_full_name(ch->pcdata->clan->getName().c_str(), note->to_list)))
+		|| (ch->isClanned() && is_full_name(ch->getClan()->getName().c_str(), note->to_list)))
 		return TRUE;
 
 	return FALSE;
@@ -432,7 +432,7 @@ int unread_notes (Character *ch, BOARD_DATA *board)
 	if (board->read_level > ch->getTrust())
 		return BOARD_NOACCESS;
 		
-	last_read = ch->pcdata->last_note_read.at(board_number(board));
+	last_read = ((PlayerCharacter*)ch)->last_note_read.at(board_number(board));
 	
 	for (note = board->note_first; note; note = note->next)
 		if (is_note_to(ch, note) && ((long)last_read < (long)note->date_stamp))
@@ -462,32 +462,32 @@ static void do_nwrite (Character *caller, char *argument)
 	    return;
 	}
 
-	if (ch->getTrust() < ch->pcdata->board->write_level)
+	if (ch->getTrust() < ((PlayerCharacter*)ch)->board->write_level)
 	{
 		send_to_char ("You cannot post notes on this board.\n\r",ch);
 		return;
 	}
 	
 	/* continue previous note, if any text was written*/ 
-	if (ch->pcdata->in_progress && (ch->pcdata->in_progress->getText().empty()))
+	if (((PlayerCharacter*)ch)->in_progress && (((PlayerCharacter*)ch)->in_progress->getText().empty()))
 	{
 		send_to_char ("Note in progress cancelled because you did not manage to write any text \n\r"
 		              "before losing link.\n\r\n\r",ch);
-		delete ch->pcdata->in_progress;
-		ch->pcdata->in_progress = NULL;
+		delete ((PlayerCharacter*)ch)->in_progress;
+		((PlayerCharacter*)ch)->in_progress = NULL;
 	}
 	
 	
-	if (!ch->pcdata->in_progress)
+	if (!((PlayerCharacter*)ch)->in_progress)
 	{
-		ch->pcdata->in_progress = new Note();
-		ch->pcdata->in_progress->sender = str_dup (ch->getName().c_str());
+		((PlayerCharacter*)ch)->in_progress = new Note();
+		((PlayerCharacter*)ch)->in_progress->sender = str_dup (ch->getName().c_str());
 
 		/* convert to ascii. ctime returns a string which last character is \n, so remove that */	
 		strtime = ctime (&current_time);
 		strtime[strlen(strtime)-1] = '\0';
 	
-		ch->pcdata->in_progress->date = str_dup (strtime);
+		((PlayerCharacter*)ch)->in_progress->date = str_dup (strtime);
 	}
 
 	act ("{G$n starts writing a note.{x", ch, NULL, NULL, TO_ROOM, POS_RESTING);
@@ -504,29 +504,29 @@ static void do_nwrite (Character *caller, char *argument)
 	/* Begin writing the note ! */
 	snprintf(buf, sizeof(buf), "You are now %s a new note on the %s board.\n\r"
 	              "If you are using tintin, type #verbose to turn off alias expansion!\n\r\n\r",
-	               ch->pcdata->in_progress->getText().empty() ? "posting" : "continuing",
-	               ch->pcdata->board->short_name);
+	               ((PlayerCharacter*)ch)->in_progress->getText().empty() ? "posting" : "continuing",
+	               ((PlayerCharacter*)ch)->board->short_name);
 	send_to_char (buf,ch);
 	
 	snprintf(buf, sizeof(buf), "{YFrom{x:    %s\n\r\n\r", ch->getName().c_str());
 	send_to_char (buf,ch);
 
-	if (ch->pcdata->in_progress->getText().empty()) /* Are we continuing an old note or not? */
+	if (((PlayerCharacter*)ch)->in_progress->getText().empty()) /* Are we continuing an old note or not? */
 	{
-		switch (ch->pcdata->board->force_type)
+		switch (((PlayerCharacter*)ch)->board->force_type)
 		{
 		case DEF_NORMAL:
 			snprintf(buf, sizeof(buf), "If you press Return, default recipient \"%s\" will be chosen.\n\r",
-					  ch->pcdata->board->names);
+					  ((PlayerCharacter*)ch)->board->names);
 			break;
 		case DEF_INCLUDE:
 			snprintf(buf, sizeof(buf), "The recipient list MUST include \"%s\". If not, it will be added automatically.\n\r",
-						   ch->pcdata->board->names);
+						   ((PlayerCharacter*)ch)->board->names);
 			break;
 	
 		case DEF_EXCLUDE:
 			snprintf(buf, sizeof(buf), "The recipient of this note must NOT include: \"%s\".",
-						   ch->pcdata->board->names);
+						   ((PlayerCharacter*)ch)->board->names);
 	
 			break;
 		}			
@@ -543,12 +543,12 @@ static void do_nwrite (Character *caller, char *argument)
 		snprintf(buf, sizeof(buf), "{YTo{x: %s\n\r"
 		              "{YExpires{x: %s\n\r"
 		              "{YSubject{x: %s\n\r", 
-		               ch->pcdata->in_progress->to_list,
-		               ctime(&ch->pcdata->in_progress->expire),
-		               ch->pcdata->in_progress->subject);
+		               ((PlayerCharacter*)ch)->in_progress->to_list,
+		               ctime(&((PlayerCharacter*)ch)->in_progress->expire),
+		               ((PlayerCharacter*)ch)->in_progress->subject);
 		send_to_char (buf,ch);
 		send_to_char ("{GYour note so far:{x\n\r",ch);
-		send_to_char (ch->pcdata->in_progress->getText().c_str(),ch);
+		send_to_char (((PlayerCharacter*)ch)->in_progress->getText().c_str(),ch);
 		
 		send_to_char ("\n\rEnter text. Type ~ or END on an empty line to end note.\n\r"
 		                    "=======================================================\n\r",ch);
@@ -566,7 +566,7 @@ static void do_nread (Character *ch, char *argument)
 {
 	Note *p;
 	int count = 0, number;
-	time_t *last_note = &ch->pcdata->last_note_read.at(board_number(ch->pcdata->board));
+	time_t *last_note = &((PlayerCharacter*)ch)->last_note_read.at(board_number(((PlayerCharacter*)ch)->board));
 	
 	if (!str_cmp(argument, "again"))
 	{ /* read last note again */
@@ -576,7 +576,7 @@ static void do_nread (Character *ch, char *argument)
 	{
 		number = atoi(argument);
 		
-		for (p = ch->pcdata->board->note_first; p; p = p->next)
+		for (p = ((PlayerCharacter*)ch)->board->note_first; p; p = p->next)
 			if (++count == number)
 				break;
 		
@@ -593,7 +593,7 @@ static void do_nread (Character *ch, char *argument)
 		char buf[200];
 		
 		count = 1;
-		for (p = ch->pcdata->board->note_first; p ; p = p->next, count++)
+		for (p = ((PlayerCharacter*)ch)->board->note_first; p ; p = p->next, count++)
 			if ((p->date_stamp > *last_note) && is_note_to(ch,p))
 			{
 				show_note_to_char (ch,p,count);
@@ -606,7 +606,7 @@ static void do_nread (Character *ch, char *argument)
 		
 		if (next_board (ch))
 			{
-			snprintf(buf, sizeof(buf), "Changed to next board, {M%s{x.\n\r", ch->pcdata->board->short_name);
+			snprintf(buf, sizeof(buf), "Changed to next board, {M%s{x.\n\r", ((PlayerCharacter*)ch)->board->short_name);
                         send_to_char(buf, ch);
                         do_nread (ch, (char*)"");
                         return;
@@ -634,7 +634,7 @@ static void do_nremove (Character *ch, char *argument)
 		return;
 	}
 
-	p = find_note (ch, ch->pcdata->board, atoi(argument));
+	p = find_note (ch, ((PlayerCharacter*)ch)->board, atoi(argument));
 	if (!p)
 	{
 		send_to_char ("No such note.\n\r",ch);
@@ -647,11 +647,11 @@ static void do_nremove (Character *ch, char *argument)
 		return;
 	}
 	
-	unlink_note (ch->pcdata->board,p);
+	unlink_note (((PlayerCharacter*)ch)->board,p);
 	delete p;
 	send_to_char ("Note removed!\n\r",ch);
 	
-	save_board(ch->pcdata->board); /* save the board */
+	save_board(((PlayerCharacter*)ch)->board); /* save the board */
 }
 
 
@@ -669,7 +669,7 @@ static void do_nlist (Character *ch, char *argument)
 	{
 		show = atoi(argument);
 		
-		for (p = ch->pcdata->board->note_first; p; p = p->next)
+		for (p = ((PlayerCharacter*)ch)->board->note_first; p; p = p->next)
 			if (is_note_to(ch,p))
 				count++;
 	}
@@ -677,9 +677,9 @@ static void do_nlist (Character *ch, char *argument)
 	send_to_char ("Notes on this board:\n\r"
 	              "{rNum{x> Author        Subject\n\r",ch);
 	              
-	last_note = ch->pcdata->last_note_read.at(board_number (ch->pcdata->board) );
+	last_note = ((PlayerCharacter*)ch)->last_note_read.at(board_number (((PlayerCharacter*)ch)->board) );
 	
-	for (p = ch->pcdata->board->note_first; p; p = p->next)
+	for (p = ((PlayerCharacter*)ch)->board->note_first; p; p = p->next)
 	{
 		num++;
 		if (is_note_to(ch,p))
@@ -704,13 +704,13 @@ static void do_ncatchup (Character *ch, char *argument)
 	Note *p;
 
 	/* Find last note */	
-	for (p = ch->pcdata->board->note_first; p && p->next; p = p->next);
+	for (p = ((PlayerCharacter*)ch)->board->note_first; p && p->next; p = p->next);
 	
 	if (!p)
 		send_to_char ("Alas, there are no notes in that board.\n\r",ch);
 	else
 	{
-		ch->pcdata->last_note_read.emplace(board_number(ch->pcdata->board), p->date_stamp);
+		((PlayerCharacter*)ch)->last_note_read.emplace(board_number(((PlayerCharacter*)ch)->board), p->date_stamp);
 		send_to_char ("All mesages skipped.\n\r",ch);
 	}
 }
@@ -720,7 +720,7 @@ void do_note (Character *ch, char *argument)
 {
 	char arg[MAX_INPUT_LENGTH];
 
-	if (IS_NPC(ch))
+	if (ch->isNPC())
 		return;
 	
 	argument = one_argument (argument, arg);
@@ -757,7 +757,7 @@ void do_board (Character *ch, char *argument)
 	int i, count, number;
 	char buf[200];
 	
-	if (IS_NPC(ch))
+	if (ch->isNPC())
 		return;
 	
 	if (!argument[0]) /* show boards */
@@ -781,13 +781,13 @@ void do_board (Character *ch, char *argument)
 			
 		} /* for each board */
 		
-		snprintf(buf, sizeof(buf), "\n\rYou current board is %s.\n\r", ch->pcdata->board->short_name);
+		snprintf(buf, sizeof(buf), "\n\rYou current board is %s.\n\r", ((PlayerCharacter*)ch)->board->short_name);
 		send_to_char (buf,ch);
 
 		/* Inform of rights */		
-		if (ch->pcdata->board->read_level > ch->getTrust())
+		if (((PlayerCharacter*)ch)->board->read_level > ch->getTrust())
 			send_to_char ("You cannot read nor write notes on this board.\n\r",ch);
-		else if (ch->pcdata->board->write_level > ch->getTrust())
+		else if (((PlayerCharacter*)ch)->board->write_level > ch->getTrust())
 			send_to_char ("You can only read notes from this board.\n\r",ch);
 		else
 			send_to_char ("You can both read and write on this board.\n\r",ch);
@@ -795,7 +795,7 @@ void do_board (Character *ch, char *argument)
 		return;			
 	} /* if empty argument */
 	
-    if (ch->pcdata->in_progress)
+    if (((PlayerCharacter*)ch)->in_progress)
     {
     	send_to_char ("Please finish your interrupted note first.\n\r",ch);
         return;
@@ -813,7 +813,7 @@ void do_board (Character *ch, char *argument)
 		
 		if (count == number) /* found the board.. change to it */
 		{
-			ch->pcdata->board = &boards[i];
+			((PlayerCharacter*)ch)->board = &boards[i];
 			snprintf(buf, sizeof(buf), "Current board changed to %s. %s.\n\r",boards[i].short_name,
 			              (ch->getTrust() < boards[i].write_level) 
 			              ? "You can only read here" 
@@ -845,7 +845,7 @@ void do_board (Character *ch, char *argument)
 		return;
 	}
 	
-	ch->pcdata->board = &boards[i];
+	((PlayerCharacter*)ch)->board = &boards[i];
 	snprintf(buf, sizeof(buf), "Current board changed to %s. %s.\n\r",boards[i].short_name,
 	              (ch->getTrust() < boards[i].write_level) 
 	              ? "You can only read here" 
@@ -902,7 +902,7 @@ void make_note (const char* board_name, const char *sender, const char *to, cons
 /* tries to change to the next accessible board */
 static bool next_board (Character *ch)
 {
-	int i = board_number (ch->pcdata->board) + 1;
+	int i = board_number (((PlayerCharacter*)ch)->board) + 1;
 	
 	while ((i < MAX_BOARD) && (unread_notes(ch,&boards[i]) == BOARD_NOACCESS))
 		i++;
@@ -911,7 +911,7 @@ static bool next_board (Character *ch)
 		return FALSE;
 	else
 	{
-		ch->pcdata->board = &boards[i];
+		((PlayerCharacter*)ch)->board = &boards[i];
 		return TRUE;
 	}
 }
@@ -921,7 +921,7 @@ void handle_ConnectedStateNoteTo (DESCRIPTOR_DATA *d, char * argument)
 	char buf [MAX_INPUT_LENGTH];
 	Character *ch = d->character;
 
-	if (!ch->pcdata->in_progress)
+	if (!((PlayerCharacter*)ch)->in_progress)
 	{
 		d->connected = ConnectedState::Playing;
 		bug ("nanny: In ConnectedState::NoteTo, but no note in progress",0);
@@ -931,34 +931,34 @@ void handle_ConnectedStateNoteTo (DESCRIPTOR_DATA *d, char * argument)
 	strcpy (buf, argument);
 	smash_tilde (buf); /* change ~ to - as we save this field as a string later */
 
-	switch (ch->pcdata->board->force_type)
+	switch (((PlayerCharacter*)ch)->board->force_type)
 	{
 		case DEF_NORMAL: /* default field */
 			if (!buf[0]) /* empty string? */
 			{
-				ch->pcdata->in_progress->to_list = str_dup (ch->pcdata->board->names);
-				snprintf(buf, sizeof(buf), "Assumed default recipient: %s\n\r", ch->pcdata->board->names);
+				((PlayerCharacter*)ch)->in_progress->to_list = str_dup (((PlayerCharacter*)ch)->board->names);
+				snprintf(buf, sizeof(buf), "Assumed default recipient: %s\n\r", ((PlayerCharacter*)ch)->board->names);
 				send_to_char(buf, ch);
 			}
 			else
-				ch->pcdata->in_progress->to_list = str_dup (buf);
+				((PlayerCharacter*)ch)->in_progress->to_list = str_dup (buf);
 				
 			break;
 		
 		case DEF_INCLUDE: /* forced default */
-			if (!is_full_name (ch->pcdata->board->names, buf))
+			if (!is_full_name (((PlayerCharacter*)ch)->board->names, buf))
 			{
 				strcat (buf, " ");
-				strcat (buf, ch->pcdata->board->names);
-				ch->pcdata->in_progress->to_list = str_dup(buf);
+				strcat (buf, ((PlayerCharacter*)ch)->board->names);
+				((PlayerCharacter*)ch)->in_progress->to_list = str_dup(buf);
 
 				snprintf(buf, sizeof(buf), "\n\rYou did not specify %s as recipient, so it was automatically added.\n\r"
 				         "{YNew To{x:  %s\n\r",
-						 ch->pcdata->board->names, ch->pcdata->in_progress->to_list);
+						 ((PlayerCharacter*)ch)->board->names, ((PlayerCharacter*)ch)->in_progress->to_list);
 				send_to_char(buf,ch);
 			}
 			else
-				ch->pcdata->in_progress->to_list = str_dup (buf);
+				((PlayerCharacter*)ch)->in_progress->to_list = str_dup (buf);
 			break;
 		
 		case DEF_EXCLUDE: /* forced exclude */
@@ -969,15 +969,15 @@ void handle_ConnectedStateNoteTo (DESCRIPTOR_DATA *d, char * argument)
 				return;
 			}
 			
-			if (is_full_name (ch->pcdata->board->names, buf))
+			if (is_full_name (((PlayerCharacter*)ch)->board->names, buf))
 			{
 				snprintf(buf, sizeof(buf), "You are not allowed to send notes to %s on this board. Try again.\n\r"
-				         "{YTo{x:      ", ch->pcdata->board->names);
+				         "{YTo{x:      ", ((PlayerCharacter*)ch)->board->names);
 				send_to_char(buf,ch);
 				return; /* return from nanny, not changing to the next state! */
 			}
 			else
-				ch->pcdata->in_progress->to_list = str_dup (buf);
+				((PlayerCharacter*)ch)->in_progress->to_list = str_dup (buf);
 			break;
 		
 	}		
@@ -992,7 +992,7 @@ void handle_ConnectedStateNoteSubject (DESCRIPTOR_DATA *d, char * argument)
 	char buf [MAX_INPUT_LENGTH];
 	Character *ch = d->character;
 
-	if (!ch->pcdata->in_progress)
+	if (!((PlayerCharacter*)ch)->in_progress)
 	{
 		d->connected = ConnectedState::Playing;
 		bug ("nanny: In ConnectedState::NoteSubject, but no note in progress",0);
@@ -1018,21 +1018,21 @@ void handle_ConnectedStateNoteSubject (DESCRIPTOR_DATA *d, char * argument)
 	else
 	/* advance to next stage */
 	{
-		ch->pcdata->in_progress->subject = str_dup(buf);
+		((PlayerCharacter*)ch)->in_progress->subject = str_dup(buf);
 		if (IS_IMMORTAL(ch)) /* immortals get to choose number of expire days */
 		{
 			snprintf(buf, sizeof(buf),"\n\rHow many days do you want this note to expire in?\n\r"
 			             "Press Enter for default value for this board, %d days.\n\r"
            				 "{YExpire{x:  ",
-		                 ch->pcdata->board->purge_days);
+		                 ((PlayerCharacter*)ch)->board->purge_days);
 			send_to_char(buf,ch);
 			d->connected = ConnectedState::NoteExpire;
 		}
 		else
 		{
-			ch->pcdata->in_progress->expire = 
-				current_time + ch->pcdata->board->purge_days * 24L * 3600L;				
-			snprintf(buf, sizeof(buf), "This note will expire %s\r",ctime(&ch->pcdata->in_progress->expire));
+			((PlayerCharacter*)ch)->in_progress->expire = 
+				current_time + ((PlayerCharacter*)ch)->board->purge_days * 24L * 3600L;				
+			snprintf(buf, sizeof(buf), "This note will expire %s\r",ctime(&((PlayerCharacter*)ch)->in_progress->expire));
 			SocketHelper::write_to_buffer (d,buf,0);
 			snprintf(buf, sizeof(buf), "\n\rEnter text. Type ~ or END on an empty line to end note.\n\r"
 			                    "=======================================================\n\r");
@@ -1049,7 +1049,7 @@ void handle_ConnectedStateNoteExpire(DESCRIPTOR_DATA *d, char * argument)
 	time_t expire;
 	int days;
 
-	if (!ch->pcdata->in_progress)
+	if (!((PlayerCharacter*)ch)->in_progress)
 	{
 		d->connected = ConnectedState::Playing;
 		bug ("nanny: In ConnectedState::NoteExpire, but no note in progress",0);
@@ -1059,7 +1059,7 @@ void handle_ConnectedStateNoteExpire(DESCRIPTOR_DATA *d, char * argument)
 	/* Numeric argument. no tilde smashing */
 	strcpy (buf, argument);
 	if (!buf[0]) /* assume default expire */
-		days = 	ch->pcdata->board->purge_days;
+		days = 	((PlayerCharacter*)ch)->board->purge_days;
 	else /* use this expire */
 		if (!is_number(buf))
 		{
@@ -1083,7 +1083,7 @@ void handle_ConnectedStateNoteExpire(DESCRIPTOR_DATA *d, char * argument)
 			
 	expire = current_time + (days*24L*3600L); /* 24 hours, 3600 seconds */
 
-	ch->pcdata->in_progress->expire = expire;
+	((PlayerCharacter*)ch)->in_progress->expire = expire;
 	
 	/* note that ctime returns XXX\n so we only need to add an \r */
 
@@ -1102,7 +1102,7 @@ void handle_ConnectedStateNoteText (DESCRIPTOR_DATA *d, char * argument)
 	char buf[MAX_STRING_LENGTH];
 	char letter[4*MAX_STRING_LENGTH];
 	
-	if (!ch->pcdata->in_progress)
+	if (!((PlayerCharacter*)ch)->in_progress)
 	{
 		d->connected = ConnectedState::Playing;
 		bug ("nanny: In ConnectedState::NoteText, but no note in progress",0);
@@ -1134,10 +1134,10 @@ void handle_ConnectedStateNoteText (DESCRIPTOR_DATA *d, char * argument)
 	/* Not end of note. Copy current text into temp buffer, add new line, and copy back */
 
 	/* How would the system react to strcpy( , NULL) ? */		
-	if (!ch->pcdata->in_progress->getText().empty())
+	if (!((PlayerCharacter*)ch)->in_progress->getText().empty())
 	{
-		strcpy (letter, ch->pcdata->in_progress->getText().c_str());
-		ch->pcdata->in_progress->setText("");
+		strcpy (letter, ((PlayerCharacter*)ch)->in_progress->getText().c_str());
+		((PlayerCharacter*)ch)->in_progress->setText("");
 	}
 	else
 		strcpy (letter, "");
@@ -1147,8 +1147,8 @@ void handle_ConnectedStateNoteText (DESCRIPTOR_DATA *d, char * argument)
 	if ((strlen(letter) + strlen (buf)) > MAX_NOTE_TEXT)
 	{ /* Note too long, take appropriate steps */
 		SocketHelper::write_to_buffer (d, "Note too long!\n\r", 0);
-		delete ch->pcdata->in_progress;
-		ch->pcdata->in_progress = NULL;			/* important */
+		delete ((PlayerCharacter*)ch)->in_progress;
+		((PlayerCharacter*)ch)->in_progress = NULL;			/* important */
 		d->connected = ConnectedState::Playing;
 		return;			
 	}
@@ -1159,7 +1159,7 @@ void handle_ConnectedStateNoteText (DESCRIPTOR_DATA *d, char * argument)
 	strcat (letter, "\r\n"); /* new line. \r first to make note files better readable */
 
 	/* allocate dynamically */		
-	ch->pcdata->in_progress->setText(letter);
+	((PlayerCharacter*)ch)->in_progress->setText(letter);
 }
 
 void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
@@ -1167,7 +1167,7 @@ void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 	char buf[MSL];
 	PlayerCharacter *ch = (PlayerCharacter*)d->character;
 	
-		if (!ch->pcdata->in_progress)
+		if (!((PlayerCharacter*)ch)->in_progress)
 		{
 			d->connected = ConnectedState::Playing;
 			bug ("nanny: In ConnectedState::NoteFinish, but no note in progress",0);
@@ -1182,11 +1182,11 @@ void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 				break;
 
 			case 'v': /* view note so far */
-				if (!ch->pcdata->in_progress->getText().empty())
+				if (!((PlayerCharacter*)ch)->in_progress->getText().empty())
 				{
 					snprintf(buf, sizeof(buf), "{gYour note so far:{x\n\r");
 					send_to_char(buf,ch);
-					send_to_char(ch->pcdata->in_progress->getText().c_str(), ch);
+					send_to_char(((PlayerCharacter*)ch)->in_progress->getText().c_str(), ch);
 				}
 				else
 					SocketHelper::write_to_buffer (d,"You haven't written a thing!\n\r\n\r",0);
@@ -1195,7 +1195,7 @@ void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 				break;
 
 			case 'p': /* post note */
-				finish_note (ch->pcdata->board, ch->pcdata->in_progress);
+				finish_note (((PlayerCharacter*)ch)->board, ((PlayerCharacter*)ch)->in_progress);
 				SocketHelper::write_to_buffer (d, "Note posted.\n\r",0);
 				d->connected = ConnectedState::Playing;
 
@@ -1206,14 +1206,14 @@ void handle_ConnectedStateNoteFinish (DESCRIPTOR_DATA *d, char * argument)
 				char_from_room(ch);
 				char_to_room(ch, ch->getWasNoteRoom());
 
-				ch->pcdata->in_progress = NULL;
+				((PlayerCharacter*)ch)->in_progress = NULL;
 				act ("{G$n finishes $s note.{x", ch, NULL, NULL, TO_ROOM, POS_RESTING);
 				break;
 				
 			case 'f':
 				SocketHelper::write_to_buffer (d, "Note cancelled!\n\r",0);
-				delete ch->pcdata->in_progress;
-				ch->pcdata->in_progress = NULL;
+				delete ((PlayerCharacter*)ch)->in_progress;
+				((PlayerCharacter*)ch)->in_progress = NULL;
 				d->connected = ConnectedState::Playing;
 				/* remove afk status */
 				REMOVE_BIT(ch->comm, COMM_AFK);

@@ -456,7 +456,7 @@ void interpret( Character *ch, char *argument )
     /*
      * Implement freeze command.
      */
-    if ( !IS_NPC(ch) && IS_SET(ch->act, PLR_FREEZE) )
+    if ( !ch->isNPC() && IS_SET(ch->act, PLR_FREEZE) )
     {
 	send_to_char( "You're totally frozen!\n\r", ch );
 	return;
@@ -503,7 +503,7 @@ void interpret( Character *ch, char *argument )
     if ( cmd_table[cmd].log == LOG_NEVER )
 	strcpy( logline, "" );
 
-    if ( ( !IS_NPC(ch) && IS_SET(ch->act, PLR_LOG) )
+    if ( ( !ch->isNPC() && IS_SET(ch->act, PLR_LOG) )
     ||   fLogAll
     ||   cmd_table[cmd].log == LOG_ALWAYS )
     {
@@ -601,7 +601,7 @@ bool check_social( Character *ch, char *command, char *argument )
     if ( !found )
 	return FALSE;
 
-    if ( !IS_NPC(ch) && IS_SET(ch->comm, COMM_NOEMOTE) )
+    if ( !ch->isNPC() && IS_SET(ch->comm, COMM_NOEMOTE) )
     {
 	send_to_char( "You are anti-social!\n\r", ch );
 	return TRUE;
@@ -656,7 +656,7 @@ bool check_social( Character *ch, char *command, char *argument )
 	act( social_table[cmd].char_found,    ch, NULL, victim, TO_CHAR, POS_RESTING    );
 	act( social_table[cmd].vict_found,    ch, NULL, victim, TO_VICT, POS_RESTING    );
 
-	if ( !IS_NPC(ch) && IS_NPC(victim)
+	if ( !ch->isNPC() && IS_NPC(victim)
 	&&   !IS_AFFECTED(victim, AFF_CHARM)
 	&&   IS_AWAKE(victim) 
 	&&   victim->desc == NULL)

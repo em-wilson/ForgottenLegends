@@ -16,7 +16,7 @@ void RoomManager::char_from_room( Character *ch )
 	return;
     }
 
-    if ( !IS_NPC(ch) )
+    if ( !ch->isNPC() )
 	--ch->in_room->area->nplayer;
 
     if ( ( obj = ch->getEquipment(WEAR_LIGHT ) ) != NULL
@@ -75,7 +75,7 @@ void RoomManager::char_to_room( Character *ch, ROOM_INDEX_DATA *pRoomIndex )
     ch->next_in_room	= pRoomIndex->people;
     pRoomIndex->people	= ch;
 
-    if ( !IS_NPC(ch) )
+    if ( !ch->isNPC() )
     {
 	if (ch->in_room->area->empty)
 	{

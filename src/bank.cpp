@@ -138,7 +138,7 @@ void do_bank_withdraw( Character *ch, char *argument )
     argument = one_argument( argument, arg );
 
 
-    if ( IS_NPC(ch) )
+    if ( ch->isNPC() )
     {
         send_to_char( "Mobs don't have bank accounts!\n\r", ch );
         return;
@@ -218,7 +218,7 @@ void do_bank_deposit( Character *ch, char *argument )
 
     argument = one_argument( argument, arg1 );
 
-    if ( IS_NPC(ch) )
+    if ( ch->isNPC() )
     {
         send_to_char( "Mobs don't have bank accounts!\n\r", ch );
         return;
@@ -344,7 +344,7 @@ void do_bank_clan(Character *ch, char *argument)
 
     argument = one_argument( argument, arg1 );
     argument = one_argument( argument, arg2 );
-    if (!IS_CLANNED(ch) && !IS_IMMORTAL(ch))
+    if (!ch->isClanned() && !IS_IMMORTAL(ch))
     {
 	send_to_char("You are not in a clan.\n\r",ch);
 	return;
@@ -381,7 +381,7 @@ void do_bank_clan(Character *ch, char *argument)
     }
     else
     {
-        if (ch->pcdata->clan->getLeader() != ch->getName() )
+        if (ch->getClan()->getLeader() != ch->getName() )
         {
             send_to_char("Only your clan leader may access the clan account.\n\r", ch);
             return;
@@ -404,7 +404,7 @@ void do_bank_clan(Character *ch, char *argument)
             return;
         }
 
-        if ( amount < 0 && amount * -1 > ch->pcdata->clan->getMoney() )
+        if ( amount < 0 && amount * -1 > ch->getClan()->getMoney() )
         {
             send_to_char("You cannot withdraw more than your clan has.\n\r", ch);
             return;
@@ -428,8 +428,8 @@ void do_bank_clan(Character *ch, char *argument)
 
         }
         
-        ch->pcdata->clan->creditMoney(amount);
-        clan_manager->save_clan(ch->pcdata->clan);
+        ch->getClan()->creditMoney(amount);
+        clan_manager->save_clan(ch->getClan());
 
         if ( amount < 0 )
         {

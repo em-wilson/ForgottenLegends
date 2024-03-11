@@ -88,7 +88,7 @@ static Object *rgObjNest[MAX_NEST];
 void fwrite_obj args((Character * ch, Object *obj,
 					  FILE *fp, int iNest));
 void fwrite_pet args((Character * pet, FILE *fp));
-void fread_char args((Character * ch, FILE *fp));
+void fread_char args((PlayerCharacter * ch, FILE *fp));
 void fread_pet args((Character * ch, FILE *fp));
 void fread_obj args((Character * ch, FILE *fp));
 
@@ -97,16 +97,18 @@ void fread_obj args((Character * ch, FILE *fp));
  * Would be cool to save NPC's too for quest purposes,
  *   some of the infrastructure is provided.
  */
-void save_char_obj(Character *ch)
+void save_char_obj(Character *sch)
 {
 	char strsave[MAX_INPUT_LENGTH];
 	FILE *fp;
 
-	if (IS_NPC(ch))
+	if (sch->isNPC())
 		return;
 
+	PlayerCharacter* ch = (PlayerCharacter*)sch;
+
 	if (ch->desc != NULL && ch->desc->original != NULL)
-		ch = ch->desc->original;
+		ch = (PlayerCharacter*) ch->desc->original;
 
 	/* create god log */
 	if (IS_IMMORTAL(ch) || ch->level >= LEVEL_IMMORTAL)
@@ -120,7 +122,7 @@ void save_char_obj(Character *ch)
 		}
 
 		fprintf(fp, "Lev %2d Trust %2d  %s%s\n",
-				ch->level, ch->getTrust(), ch->getName().c_str(), ch->pcdata->title);
+				ch->level, ch->getTrust(), ch->getName().c_str(), ch->title);
 		fclose(fp);
 		fpReserve = fopen(NULL_FILE, "r");
 	}
@@ -451,7 +453,7 @@ bool load_char_obj(DESCRIPTOR_DATA *d, char *name)
 		group_add(ch, "rom basics", FALSE);
 		group_add(ch, class_table[ch->class_num].base_group, FALSE);
 		group_add(ch, class_table[ch->class_num].default_group, TRUE);
-		ch->pcdata->learned[gsn_recall] = 50;
+		ch->learned[gsn_recall] = 50;
 	}
 
 	/* fix levels */
@@ -559,7 +561,7 @@ bool load_char_obj(DESCRIPTOR_DATA *d, char *name)
 		break;                      \
 	}
 
-void fread_char(Character *ch, FILE *fp)
+void fread_char(PlayerCharacter *ch, FILE *fp)
 {
 	char buf[MAX_STRING_LENGTH];
 	char *word;
@@ -599,8 +601,8 @@ void fread_char(Character *ch, FILE *fp)
 					break;
 				}
 
-				ch->pcdata->alias[count] = str_dup(fread_word(fp));
-				ch->pcdata->alias_sub[count] = str_dup(fread_word(fp));
+				ch->alias[count] = str_dup(fread_word(fp));
+				ch->alias_sub[count] = str_dup(fread_word(fp));
 				count++;
 				fMatch = TRUE;
 				break;
@@ -615,8 +617,8 @@ void fread_char(Character *ch, FILE *fp)
 					break;
 				}
 
-				ch->pcdata->alias[count] = str_dup(fread_word(fp));
-				ch->pcdata->alias_sub[count] = fread_string(fp);
+				ch->alias[count] = str_dup(fread_word(fp));
+				ch->alias_sub[count] = fread_string(fp);
 				count++;
 				fMatch = TRUE;
 				break;
@@ -707,10 +709,10 @@ void fread_char(Character *ch, FILE *fp)
 			break;
 
 		case 'B':
-			KEY("Bamfin", ch->pcdata->bamfin, fread_string(fp));
-			KEY("Bamfout", ch->pcdata->bamfout, fread_string(fp));
-			KEY("Bin", ch->pcdata->bamfin, fread_string(fp));
-			KEY("Bout", ch->pcdata->bamfout, fread_string(fp));
+			KEY("Bamfin", ch->bamfin, fread_string(fp));
+			KEY("Bamfout", ch->bamfout, fread_string(fp));
+			KEY("Bin", ch->bamfin, fread_string(fp));
+			KEY("Bout", ch->bamfout, fread_string(fp));
 			KEY("Brea", ch->breathe, fread_number(fp));
 
 			/* Read in board status */
@@ -732,7 +734,7 @@ void fread_char(Character *ch, FILE *fp)
 						fread_number(fp); /* read last_note and skip info */
 					}
 					else /* Save it */
-						ch->pcdata->last_note_read.emplace(i, fread_number(fp));
+						ch->last_note_read.emplace(i, fread_number(fp));
 				} /* for */
 
 				fMatch = TRUE;
@@ -742,22 +744,22 @@ void fread_char(Character *ch, FILE *fp)
 		case 'C':
 			KEY("Class", ch->class_num, fread_number(fp));
 			KEY("Cla", ch->class_num, fread_number(fp));
-			KEY("Clan", ch->pcdata->clan, clan_manager->get_clan(fread_string(fp)));
+			KEYF("Clan", ch->setClan, clan_manager->get_clan(fread_string(fp)));
 
 			if (!str_cmp(word, "Condition") || !str_cmp(word, "Cond"))
 			{
-				ch->pcdata->condition[0] = fread_number(fp);
-				ch->pcdata->condition[1] = fread_number(fp);
-				ch->pcdata->condition[2] = fread_number(fp);
+				ch->condition[0] = fread_number(fp);
+				ch->condition[1] = fread_number(fp);
+				ch->condition[2] = fread_number(fp);
 				fMatch = TRUE;
 				break;
 			}
 			if (!str_cmp(word, "Cnd"))
 			{
-				ch->pcdata->condition[0] = fread_number(fp);
-				ch->pcdata->condition[1] = fread_number(fp);
-				ch->pcdata->condition[2] = fread_number(fp);
-				ch->pcdata->condition[3] = fread_number(fp);
+				ch->condition[0] = fread_number(fp);
+				ch->condition[1] = fread_number(fp);
+				ch->condition[2] = fread_number(fp);
+				ch->condition[3] = fread_number(fp);
 				fMatch = TRUE;
 				break;
 			}
@@ -832,9 +834,9 @@ void fread_char(Character *ch, FILE *fp)
 
 			if (!str_cmp(word, "HpManaMovePerm") || !str_cmp(word, "HMVP"))
 			{
-				ch->pcdata->perm_hit = fread_number(fp);
-				ch->pcdata->perm_mana = fread_number(fp);
-				ch->pcdata->perm_move = fread_number(fp);
+				ch->perm_hit = fread_number(fp);
+				ch->perm_mana = fread_number(fp);
+				ch->perm_move = fread_number(fp);
 				fMatch = TRUE;
 				break;
 			}
@@ -861,8 +863,8 @@ void fread_char(Character *ch, FILE *fp)
 			break;
 
 		case 'L':
-			KEY("LastLevel", ch->pcdata->last_level, fread_number(fp));
-			KEY("LLev", ch->pcdata->last_level, fread_number(fp));
+			KEY("LastLevel", ch->last_level, fread_number(fp));
+			KEY("LLev", ch->last_level, fread_number(fp));
 			KEY("Level", ch->level, fread_number(fp));
 			KEY("Lev", ch->level, fread_number(fp));
 			KEY("Levl", ch->level, fread_number(fp));
@@ -884,12 +886,12 @@ void fread_char(Character *ch, FILE *fp)
 			break;
 
 		case 'P':
-			KEYF("Password", ch->pcdata->setPassword, fread_string(fp));
-			KEYF("Pass", ch->pcdata->setPassword, fread_string(fp));
+			KEYF("Password", ch->setPassword, fread_string(fp));
+			KEYF("Pass", ch->setPassword, fread_string(fp));
 			KEY("Played", ch->played, fread_number(fp));
 			KEY("Plyd", ch->played, fread_number(fp));
-			KEY("Points", ch->pcdata->points, fread_number(fp));
-			KEY("Pnts", ch->pcdata->points, fread_number(fp));
+			KEY("Points", ch->points, fread_number(fp));
+			KEY("Pnts", ch->points, fread_number(fp));
 			KEY("Position", ch->position, fread_number(fp));
 			KEY("Pos", ch->position, fread_number(fp));
 			KEY("Practice", ch->practice, fread_number(fp));
@@ -925,7 +927,6 @@ void fread_char(Character *ch, FILE *fp)
 			KEY("Sex", ch->sex, fread_number(fp));
 			KEY("ShortDescr", ch->short_descr, fread_string(fp));
 			KEY("ShD", ch->short_descr, fread_string(fp));
-			KEY("Sec", ch->pcdata->security, fread_number(fp)); /* OLC */
 			KEY("Silv", ch->silver, fread_number(fp));
 
 			if (!str_cmp(word, "Sk"))
@@ -945,9 +946,9 @@ void fread_char(Character *ch, FILE *fp)
 				}
 				else
 				{
-					ch->pcdata->learned[sn] = value;
-					ch->pcdata->sk_level[sn] = skill_level(ch, sn);
-					ch->pcdata->sk_rating[sn] = skill_rating(ch, sn);
+					ch->learned[sn] = value;
+					ch->sk_level[sn] = skill_level(ch, sn);
+					ch->sk_rating[sn] = skill_rating(ch, sn);
 				}
 				fMatch = TRUE;
 			}
@@ -970,28 +971,28 @@ void fread_char(Character *ch, FILE *fp)
 					bug("Fread_char: unknown skill. ", 0);
 				}
 				else
-					ch->pcdata->learned[sn] = value;
-				ch->pcdata->sk_level[sn] = l_value;
-				ch->pcdata->sk_rating[sn] = r_value;
+					ch->learned[sn] = value;
+				ch->sk_level[sn] = l_value;
+				ch->sk_rating[sn] = r_value;
 				fMatch = TRUE;
 			}
 			break;
 
 		case 'T':
-			KEY("TrueSex", ch->pcdata->true_sex, fread_number(fp));
-			KEY("TSex", ch->pcdata->true_sex, fread_number(fp));
+			KEY("TrueSex", ch->true_sex, fread_number(fp));
+			KEY("TSex", ch->true_sex, fread_number(fp));
 			KEY("Trai", ch->train, fread_number(fp));
 			KEY("Trust", ch->trust, fread_number(fp));
 			KEY("Tru", ch->trust, fread_number(fp));
 
 			if (!str_cmp(word, "Title") || !str_cmp(word, "Titl"))
 			{
-				ch->pcdata->title = fread_string(fp);
-				if (ch->pcdata->title[0] != '.' && ch->pcdata->title[0] != ',' && ch->pcdata->title[0] != '!' && ch->pcdata->title[0] != '?')
+				ch->title = fread_string(fp);
+				if (ch->title[0] != '.' && ch->title[0] != ',' && ch->title[0] != '!' && ch->title[0] != '?')
 				{
-					snprintf(buf, sizeof(buf), " %s", ch->pcdata->title);
-					free_string(ch->pcdata->title);
-					ch->pcdata->title = str_dup(buf);
+					snprintf(buf, sizeof(buf), " %s", ch->title);
+					free_string(ch->title);
+					ch->title = str_dup(buf);
 				}
 				fMatch = TRUE;
 				break;

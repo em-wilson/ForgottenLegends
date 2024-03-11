@@ -181,7 +181,7 @@ void do_guild(Character *ch, char *argument)
 {
     char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
     char buf[MAX_STRING_LENGTH];
-    Character *victim;
+    Character *v;
 
     argument = one_argument(argument, arg1);
     argument = one_argument(argument, arg2);
@@ -191,11 +191,13 @@ void do_guild(Character *ch, char *argument)
         send_to_char("Syntax: guild <char> <cln name>\n\r", ch);
         return;
     }
-    if ((victim = get_char_world(ch, arg1)) == NULL)
+    if ((v = get_char_world(ch, arg1)) == NULL || v->isNPC())
     {
         send_to_char("They aren't playing.\n\r", ch);
         return;
     }
+
+    PlayerCharacter *victim = (PlayerCharacter*)v;
 
     if (!str_prefix(arg2, "none"))
     {
@@ -223,16 +225,18 @@ void do_guild(Character *ch, char *argument)
 }
 
 /* equips a character */
-void do_outfit(Character *ch, char *argument)
+void do_outfit(Character *caller, char *argument)
 {
     Object *obj;
     int i, sn, vnum;
 
-    if (ch->level > 5 || IS_NPC(ch))
+    if (caller->level > 5 || caller->isNPC())
     {
-        send_to_char("Find it yourself!\n\r", ch);
+        send_to_char("Find it yourself!\n\r", caller);
         return;
     }
+
+    PlayerCharacter *ch = (PlayerCharacter*)caller;
 
     if (ch->carry_number + 4 > can_carry_n(ch))
     {
@@ -264,8 +268,8 @@ void do_outfit(Character *ch, char *argument)
 
         for (i = 0; weapon_table[i].name != NULL; i++)
         {
-            if (ch->pcdata->learned[sn] <
-                ch->pcdata->learned[*weapon_table[i].gsn])
+            if (ch->learned[sn] <
+                ch->learned[*weapon_table[i].gsn])
             {
                 sn = *weapon_table[i].gsn;
                 vnum = weapon_table[i].vnum;
@@ -345,7 +349,7 @@ void do_smote(Character *ch, char *argument)
     char last[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
     unsigned int matches = 0;
 
-    if (!IS_NPC(ch) && IS_SET(ch->comm, COMM_NOEMOTE))
+    if (!ch->isNPC() && IS_SET(ch->comm, COMM_NOEMOTE))
     {
         send_to_char("You can't show your emotions.\n\r", ch);
         return;
@@ -434,64 +438,66 @@ void do_smote(Character *ch, char *argument)
     return;
 }
 
-void do_bamfin(Character *ch, char *argument)
+void do_bamfin(Character *caller, char *argument)
 {
     char buf[MAX_STRING_LENGTH];
 
-    if (!IS_NPC(ch))
-    {
-        smash_tilde(argument);
-
-        if (argument[0] == '\0')
-        {
-            snprintf(buf, sizeof(buf), "Your poofin is %s\n\r", ch->pcdata->bamfin);
-            send_to_char(buf, ch);
-            return;
-        }
-
-        if (strstr(argument, ch->getName().c_str()) == NULL)
-        {
-            send_to_char("You must include your name.\n\r", ch);
-            return;
-        }
-
-        free_string(ch->pcdata->bamfin);
-        ch->pcdata->bamfin = str_dup(argument);
-
-        snprintf(buf, sizeof(buf), "Your poofin is now %s\n\r", ch->pcdata->bamfin);
-        send_to_char(buf, ch);
+    if (caller->isNPC()) {
+        return;
     }
-    return;
+
+    PlayerCharacter* ch = (PlayerCharacter*)caller;
+    smash_tilde(argument);
+
+    if (argument[0] == '\0')
+    {
+        snprintf(buf, sizeof(buf), "Your poofin is %s\n\r", ch->bamfin);
+        send_to_char(buf, ch);
+        return;
+    }
+
+    if (strstr(argument, ch->getName().c_str()) == NULL)
+    {
+        send_to_char("You must include your name.\n\r", ch);
+        return;
+    }
+
+    free_string(ch->bamfin);
+    ch->bamfin = str_dup(argument);
+
+    snprintf(buf, sizeof(buf), "Your poofin is now %s\n\r", ch->bamfin);
+    send_to_char(buf, ch);
 }
 
-void do_bamfout(Character *ch, char *argument)
+void do_bamfout(Character *caller, char *argument)
 {
     char buf[MAX_STRING_LENGTH];
 
-    if (!IS_NPC(ch))
-    {
-        smash_tilde(argument);
-
-        if (argument[0] == '\0')
-        {
-            snprintf(buf, sizeof(buf), "Your poofout is %s\n\r", ch->pcdata->bamfout);
-            send_to_char(buf, ch);
-            return;
-        }
-
-        if (strstr(argument, ch->getName().c_str()) == NULL)
-        {
-            send_to_char("You must include your name.\n\r", ch);
-            return;
-        }
-
-        free_string(ch->pcdata->bamfout);
-        ch->pcdata->bamfout = str_dup(argument);
-
-        snprintf(buf, sizeof(buf), "Your poofout is now %s\n\r", ch->pcdata->bamfout);
-        send_to_char(buf, ch);
+    if (caller->isNPC()) {
+        return;
     }
-    return;
+
+    PlayerCharacter* ch = (PlayerCharacter*)caller;
+    smash_tilde(argument);
+
+    if (argument[0] == '\0')
+    {
+        snprintf(buf, sizeof(buf), "Your poofout is %s\n\r", ch->bamfout);
+        send_to_char(buf, ch);
+        return;
+    }
+
+    if (strstr(argument, ch->getName().c_str()) == NULL)
+    {
+        send_to_char("You must include your name.\n\r", ch);
+        return;
+    }
+
+    free_string(ch->bamfout);
+    ch->bamfout = str_dup(argument);
+
+    snprintf(buf, sizeof(buf), "Your poofout is now %s\n\r", ch->bamfout);
+    send_to_char(buf, ch);
 }
 
 void do_deny(Character *ch, char *argument)
@@ -968,8 +974,8 @@ void do_goto(Character *ch, char *argument)
     {
         if (rch->getTrust() >= ch->invis_level)
         {
-            if (ch->pcdata != NULL && ch->pcdata->bamfout[0] != '\0')
-                act("$t", ch, ch->pcdata->bamfout, rch, TO_VICT, POS_RESTING);
+            if (!ch->isNPC() && ((PlayerCharacter*)ch)->bamfout[0] != '\0')
+                act("$t", ch, ((PlayerCharacter*)ch)->bamfout, rch, TO_VICT, POS_RESTING);
             else
                 act("$n leaves in a swirling mist.", ch, NULL, rch, TO_VICT, POS_RESTING);
         }
@@ -990,8 +996,8 @@ void do_goto(Character *ch, char *argument)
     {
         if (rch->getTrust() >= ch->invis_level)
         {
-            if (ch->pcdata != NULL && ch->pcdata->bamfin[0] != '\0')
-                act("$t", ch, ch->pcdata->bamfin, rch, TO_VICT, POS_RESTING);
+            if (!ch->isNPC() && ((PlayerCharacter*)ch)->bamfin[0] != '\0')
+                act("$t", ch, ((PlayerCharacter*)ch)->bamfin, rch, TO_VICT, POS_RESTING);
             else
                 act("$n appears in a swirling mist.", ch, NULL, rch, TO_VICT, POS_RESTING);
         }
@@ -1031,8 +1037,8 @@ void do_violate(Character *ch, char *argument)
     {
         if (rch->getTrust() >= ch->invis_level)
         {
-            if (ch->pcdata != NULL && ch->pcdata->bamfout[0] != '\0')
-                act("$t", ch, ch->pcdata->bamfout, rch, TO_VICT, POS_RESTING);
+            if (!ch->isNPC() && ((PlayerCharacter*)ch)->bamfout[0] != '\0')
+                act("$t", ch, ((PlayerCharacter*)ch)->bamfout, rch, TO_VICT, POS_RESTING);
             else
                 act("$n leaves in a swirling mist.", ch, NULL, rch, TO_VICT, POS_RESTING);
         }
@@ -1053,8 +1059,8 @@ void do_violate(Character *ch, char *argument)
     {
         if (rch->getTrust() >= ch->invis_level)
         {
-            if (ch->pcdata != NULL && ch->pcdata->bamfin[0] != '\0')
-                act("$t", ch, ch->pcdata->bamfin, rch, TO_VICT, POS_RESTING);
+            if (!ch->isNPC() && ((PlayerCharacter*)ch)->bamfin[0] != '\0')
+                act("$t", ch, ((PlayerCharacter*)ch)->bamfin, rch, TO_VICT, POS_RESTING);
             else
                 act("$n appears in a swirling mist.", ch, NULL, rch, TO_VICT, POS_RESTING);
         }
@@ -1678,10 +1684,10 @@ void do_mstat(Character *ch, char *argument)
     {
         snprintf(buf, sizeof(buf),
                  "Thirst: %d  Hunger: %d  Full: %d  Drunk: %d\n\r",
-                 victim->pcdata->condition[COND_THIRST],
-                 victim->pcdata->condition[COND_HUNGER],
-                 victim->pcdata->condition[COND_FULL],
-                 victim->pcdata->condition[COND_DRUNK]);
+                 ((PlayerCharacter*)victim)->condition[COND_THIRST],
+                 ((PlayerCharacter*)victim)->condition[COND_HUNGER],
+                 ((PlayerCharacter*)victim)->condition[COND_FULL],
+                 ((PlayerCharacter*)victim)->condition[COND_DRUNK]);
         send_to_char(buf, ch);
     }
 
@@ -1695,7 +1701,7 @@ void do_mstat(Character *ch, char *argument)
                  "Age: %d  Played: %d  Last Level: %d  Timer: %d\n\r",
                  get_age(victim),
                  (int)(victim->played + current_time - victim->logon) / 3600,
-                 victim->pcdata->last_level,
+                 ((PlayerCharacter*)victim)->last_level,
                  victim->timer);
         send_to_char(buf, ch);
     }
@@ -1749,12 +1755,6 @@ void do_mstat(Character *ch, char *argument)
              victim->leader ? victim->leader->getName().c_str() : "(none)",
              victim->pet ? victim->pet->getName().c_str() : "(none)");
     send_to_char(buf, ch);
-
-    if (!IS_NPC(victim))
-    {
-        snprintf(buf, sizeof(buf), "Security: %d.\n\r", victim->pcdata->security); /* OLC */
-        send_to_char(buf, ch);                                                     /* OLC */
-    }
 
     snprintf(buf, sizeof(buf), "Short description: %s\n\rLong  description: %s",
              victim->short_descr,
@@ -2216,7 +2216,7 @@ void do_snoop(Character *ch, char *argument)
 
     victim->desc->snoop_by = ch->desc;
     snprintf(buf, sizeof(buf), "$N starts snooping on %s",
-             (IS_NPC(ch) ? victim->short_descr : victim->getName().c_str()));
+             (ch->isNPC() ? victim->short_descr : victim->getName().c_str()));
     Wiznet::instance()->report(buf, ch, NULL, WIZ_SNOOPS, WIZ_SECURE, ch->getTrust());
     send_to_char("Ok.\n\r", ch);
     return;
@@ -2651,7 +2651,7 @@ void do_advance(Character *ch, char *argument)
     char buf[MAX_STRING_LENGTH];
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
-    Character *victim;
+    Character *v;
     int level;
     int iLevel;
 
@@ -2664,17 +2664,19 @@ void do_advance(Character *ch, char *argument)
         return;
     }
 
-    if ((victim = get_char_world(ch, arg1)) == NULL)
+    if ((v = get_char_world(ch, arg1)) == NULL)
     {
         send_to_char("That player is not here.\n\r", ch);
         return;
     }
 
-    if (IS_NPC(victim))
+    if (v->isNPC())
     {
         send_to_char("Not on NPC's.\n\r", ch);
         return;
     }
+
+    PlayerCharacter *victim = (PlayerCharacter*)v;
 
     if ((level = atoi(arg2)) < 1 || level > 60)
     {
@@ -2703,7 +2705,7 @@ void do_advance(Character *ch, char *argument)
         send_to_char("**** OOOOHHHHHHHHHH  NNNNOOOO ****\n\r", victim);
         temp_prac = victim->practice;
         victim->level = 1;
-        victim->exp = exp_per_level(victim, victim->pcdata->points);
+        victim->exp = exp_per_level(victim, victim->points);
         victim->max_hit = 10;
         victim->max_mana = 100;
         victim->max_move = 100;
@@ -2727,7 +2729,7 @@ void do_advance(Character *ch, char *argument)
     }
     snprintf(buf, sizeof(buf), "You are now level %d.\n\r", victim->level);
     send_to_char(buf, victim);
-    victim->exp = exp_per_level(victim, victim->pcdata->points) * UMAX(1, victim->level);
+    victim->exp = exp_per_level(victim, victim->points) * UMAX(1, victim->level);
     victim->trust = 0;
     save_char_obj(victim);
     return;
@@ -3262,7 +3264,7 @@ void do_sset(Character *ch, char *argument)
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
     char arg3[MAX_INPUT_LENGTH];
-    Character *victim;
+    PlayerCharacter *victim;
     int value;
     int sn;
     bool fAll;
@@ -3280,15 +3282,9 @@ void do_sset(Character *ch, char *argument)
         return;
     }
 
-    if ((victim = get_char_world(ch, arg1)) == NULL)
+    if ((victim = get_player_world(ch, arg1)) == NULL)
     {
         send_to_char("They aren't here.\n\r", ch);
-        return;
-    }
-
-    if (IS_NPC(victim))
-    {
-        send_to_char("Not on NPC's.\n\r", ch);
         return;
     }
 
@@ -3320,18 +3316,18 @@ void do_sset(Character *ch, char *argument)
     {
         for (sn = 0; sn < MAX_SKILL; sn++)
         {
-            if (skill_table[sn].name != NULL && victim->pcdata->learned[sn] > 0)
-                victim->pcdata->learned[sn] = value;
+            if (skill_table[sn].name != NULL && victim->learned[sn] > 0)
+                victim->learned[sn] = value;
         }
     }
     else
     {
-        if (victim->pcdata->learned[sn] < 1)
+        if (victim->learned[sn] < 1)
         {
             send_to_char("To avoid crashes, you can't set characters with skills they don't have.\n\r", ch);
             return;
         }
-        victim->pcdata->learned[sn] = value;
+        victim->learned[sn] = value;
     }
 
     return;
@@ -3359,7 +3355,7 @@ void do_mset(Character *ch, char *argument)
         send_to_char("    str int wis dex con sex class level\n\r", ch);
         send_to_char("    race group gold silver hp mana move prac\n\r", ch);
         send_to_char("    align train thirst hunger drunk full\n\r", ch);
-        send_to_char("    security were\n\r", ch);
+        send_to_char("    were\n\r", ch);
         return;
     }
 
@@ -3484,38 +3480,6 @@ void do_mset(Character *ch, char *argument)
         return;
     }
 
-    if (!str_cmp(arg2, "security")) /* OLC */
-    {
-        if (IS_NPC(ch))
-        {
-            send_to_char("Not on a MOB.\n\r", ch);
-            return;
-        }
-
-        if (IS_NPC(victim))
-        {
-            send_to_char("Not on NPC's.\n\r", ch);
-            return;
-        }
-
-        if (value > ch->pcdata->security || value < 0)
-        {
-            if (ch->pcdata->security != 0)
-            {
-                snprintf(buf, sizeof(buf), "Valid security is 0-%d.\n\r",
-                         ch->pcdata->security);
-                send_to_char(buf, ch);
-            }
-            else
-            {
-                send_to_char("Valid security is 0 only.\n\r", ch);
-            }
-            return;
-        }
-        victim->pcdata->security = value;
-        return;
-    }
-
     if (!str_cmp(arg2, "int"))
     {
         if (value < 3 || value > get_max_train(victim, STAT_INT))
@@ -3584,7 +3548,7 @@ void do_mset(Character *ch, char *argument)
         }
         victim->sex = value;
         if (!IS_NPC(victim))
-            victim->pcdata->true_sex = value;
+            ((PlayerCharacter*)victim)->true_sex = value;
         return;
     }
 
@@ -3658,7 +3622,7 @@ void do_mset(Character *ch, char *argument)
         }
         victim->max_hit = value;
         if (!IS_NPC(victim))
-            victim->pcdata->perm_hit = value;
+            ((PlayerCharacter*)victim)->perm_hit = value;
         return;
     }
 
@@ -3671,7 +3635,7 @@ void do_mset(Character *ch, char *argument)
         }
         victim->max_mana = value;
         if (!IS_NPC(victim))
-            victim->pcdata->perm_mana = value;
+            ((PlayerCharacter*)victim)->perm_mana = value;
         return;
     }
 
@@ -3684,7 +3648,7 @@ void do_mset(Character *ch, char *argument)
         }
         victim->max_move = value;
         if (!IS_NPC(victim))
-            victim->pcdata->perm_move = value;
+            ((PlayerCharacter*)victim)->perm_move = value;
         return;
     }
 
@@ -3735,7 +3699,7 @@ void do_mset(Character *ch, char *argument)
             return;
         }
 
-        victim->pcdata->condition[COND_THIRST] = value;
+        ((PlayerCharacter*)victim)->condition[COND_THIRST] = value;
         return;
     }
 
@@ -3753,7 +3717,7 @@ void do_mset(Character *ch, char *argument)
             return;
         }
 
-        victim->pcdata->condition[COND_DRUNK] = value;
+        ((PlayerCharacter*)victim)->condition[COND_DRUNK] = value;
         return;
     }
 
@@ -3771,7 +3735,7 @@ void do_mset(Character *ch, char *argument)
             return;
         }
 
-        victim->pcdata->condition[COND_FULL] = value;
+        ((PlayerCharacter*)victim)->condition[COND_FULL] = value;
         return;
     }
 
@@ -3789,7 +3753,7 @@ void do_mset(Character *ch, char *argument)
             return;
         }
 
-        victim->pcdata->condition[COND_HUNGER] = value;
+        ((PlayerCharacter*)victim)->condition[COND_HUNGER] = value;
         return;
     }
 
@@ -4531,7 +4495,7 @@ void do_incognito(Character *ch, char *argument)
 
 void do_holylight(Character *ch, char *argument)
 {
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return;
 
     if (IS_SET(ch->act, PLR_HOLYLIGHT))
@@ -4607,7 +4571,7 @@ void do_copyover(Character *ch, char *argument)
 
             if (IS_CLANNED(och))
             {
-                clan_manager->add_playtime(och->pcdata->clan, current_time - och->logon);
+                clan_manager->add_playtime(och->getClan(), current_time - och->logon);
             }
             save_char_obj(och);
 
@@ -4725,7 +4689,7 @@ void do_giveskill(Character *ch, char *argument)
     char arg4[MAX_INPUT_LENGTH];
     char buf[MAX_STRING_LENGTH];
 
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return;
 
     if (argument[0] == '\0')
@@ -4801,9 +4765,9 @@ void do_giveskill(Character *ch, char *argument)
         return;
     }
 
-    victim->pcdata->sk_level[sn] = atoi(arg3);
-    victim->pcdata->learned[sn] = atoi(arg4);
-    victim->pcdata->sk_rating[sn] = atoi(argument);
+    ((PlayerCharacter*)victim)->sk_level[sn] = atoi(arg3);
+    ((PlayerCharacter*)victim)->learned[sn] = atoi(arg4);
+    ((PlayerCharacter*)victim)->sk_rating[sn] = atoi(argument);
     send_to_char("Done.\n\r", ch);
     return;
 }

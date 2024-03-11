@@ -9,6 +9,7 @@ class Character;
 class Clan;
 class IClanReader;
 class IClanWriter;
+class PlayerCharacter;
 
 class ClanManager
 {
@@ -25,10 +26,11 @@ class ClanManager
         void load_clans();
         void add_clan(Clan *clan);
         std::vector<Clan *> get_all_clans();
-        void add_player(Character *ch, Clan *clan);
+        void add_player(PlayerCharacter *ch, Clan *clan);
         void add_playtime(Clan *ch, int seconds);
-        void remove_player(Character *ch);
+        void remove_player(PlayerCharacter *ch);
         bool isClanLeader(Character *ch);
+        bool isSameClan(Character *ch, Character *wch);
         std::unordered_map<std::string, long> list_clan_nw();
 
     private:

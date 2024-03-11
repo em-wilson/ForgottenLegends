@@ -31,6 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "merc.h"
+#include "clans/ClanManager.h"
 #include "ConnectedState.h"
 #include "NonPlayerCharacter.h"
 #include "Object.h"
@@ -46,6 +47,8 @@ int xp_compute args((Character * gch, Character *victim, int total_levels));
 DECLARE_DO_FUN(do_look);
 DECLARE_DO_FUN(do_stand);
 
+extern ClanManager *clan_manager;
+
 /* random room generation procedure */
 ROOM_INDEX_DATA *get_random_room(Character *ch)
 {
@@ -55,7 +58,7 @@ ROOM_INDEX_DATA *get_random_room(Character *ch)
 	{
 		room = get_room_index(number_range(0, 65535));
 		if (room != NULL)
-			if (can_see_room(ch, room) && !room_is_private(room) && !IS_SET(room->room_flags, ROOM_PRIVATE) && !IS_SET(room->room_flags, ROOM_SOLITARY) && !IS_SET(room->room_flags, ROOM_SAFE) && (IS_NPC(ch) || IS_SET(ch->act, ACT_AGGRESSIVE) || !IS_SET(room->room_flags, ROOM_LAW)))
+			if (can_see_room(ch, room) && !room_is_private(room) && !IS_SET(room->room_flags, ROOM_PRIVATE) && !IS_SET(room->room_flags, ROOM_SOLITARY) && !IS_SET(room->room_flags, ROOM_SAFE) && (ch->isNPC() || IS_SET(ch->act, ACT_AGGRESSIVE) || !IS_SET(room->room_flags, ROOM_LAW)))
 				break;
 	}
 
@@ -131,15 +134,15 @@ void do_detonate(Character *ch, char *argument)
 		return;
 	}
 
-	if (IS_CLANNED(ch))
+	if (ch->isClanned())
 	{
 		for (d = descriptor_list; d; d = d->next)
 		{
-			if (d->connected == ConnectedState::Playing && (victim = d->character) != NULL && victim != ch && !IS_IMMORTAL(victim) && victim->in_room != NULL && !is_same_group(victim, ch) && victim->in_room->area == ch->in_room->area)
+			if (d->connected == ConnectedState::Playing && (victim = d->character) != NULL && victim != ch && !IS_IMMORTAL(victim) && victim->in_room != NULL && !victim->isSameGroup( ch) && victim->in_room->area == ch->in_room->area)
 				// Oh boy, lets kick some ass, as a group!
 				for (gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room)
 				{
-					if (!is_same_group(gch, ch) || IS_NPC(gch))
+					if (!gch->isSameGroup( ch) || IS_NPC(gch))
 						continue;
 
 					count++;
@@ -153,7 +156,7 @@ void do_detonate(Character *ch, char *argument)
 
 					if (!IS_IMMORTAL(victim))
 						raw_kill(victim); /* dump the flags */
-					if (ch != victim && !IS_NPC(ch) && !is_same_clan(ch, victim))
+					if (ch != victim && !ch->isNPC() && !clan_manager->isSameClan(ch, victim))
 					{
 						if (IS_SET(victim->act, PLR_THIEF))
 							REMOVE_BIT(victim->act, PLR_THIEF);
@@ -176,7 +179,7 @@ void do_detonate(Character *ch, char *argument)
 				// Oh boy, lets kick some ass, as a group!
 				for (gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room)
 				{
-					if (!is_same_group(gch, ch) || IS_NPC(gch))
+					if (!gch->isSameGroup( ch) || IS_NPC(gch))
 						continue;
 
 					count++;
@@ -206,7 +209,7 @@ void do_detonate(Character *ch, char *argument)
 
 	for (gch = ch->in_room->people; gch != NULL; gch = gch->next_in_room)
 	{
-		if (!is_same_group(gch, ch) || IS_NPC(gch) || gch == ch)
+		if (!gch->isSameGroup( ch) || IS_NPC(gch) || gch == ch)
 			continue;
 
 		snprintf(buf, sizeof(buf), "%d people have been killed by the bomb blast detonated by %s. (%d PC's)\n\rYou receive %d experience points, before the heat from the bomb incinerates you.\n\r", count, ch->getName().c_str(), pcount, gch->xp);

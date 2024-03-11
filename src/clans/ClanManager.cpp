@@ -4,6 +4,7 @@
 #include "clans/ClanManager.h"
 #include "clans/ClanReader.h"
 #include "clans/ClanWriter.h"
+#include "PlayerCharacter.h"
 
 using std::unordered_map;
 using std::string;
@@ -47,26 +48,28 @@ ClanManager::~ClanManager() {
 }
 
 void ClanManager::handle_player_delete(Character *ch) {
-    remove_player(ch);
+    if (!ch->isNPC()) {
+        remove_player((PlayerCharacter*)ch);
+    }
 }
 
-void ClanManager::add_player(Character *ch, Clan *clan) {
+void ClanManager::add_player(PlayerCharacter *ch, Clan *clan) {
     // Remove from their existing clan
     remove_player(ch);
 
     if (clan) {
         clan->addMember();
-        ch->pcdata->clan = clan;
+        ch->setClan(clan);
         _writer->save_clan(clan);
     }
 }
 
-void ClanManager::remove_player(Character *ch) {
-    if (ch->pcdata->clan)
+void ClanManager::remove_player(PlayerCharacter *ch) {
+    if (ch->getClan())
     {
-		ch->pcdata->clan->removeMember();
-        _writer->save_clan(ch->pcdata->clan);
-        ch->pcdata->clan = NULL;
+		ch->getClan()->removeMember();
+        _writer->save_clan(ch->getClan());
+        ch->setClan(nullptr);
     }
 }
 
@@ -86,24 +89,24 @@ unordered_map<string, long> ClanManager::list_clan_nw() {
 }
 
 void ClanManager::handle_kill(Character *killer, Character *victim) {
-    if (killer->pcdata && killer->pcdata->clan) {
+    if (killer->isClanned()) {
         if (IS_NPC(victim)) {
-            killer->pcdata->clan->incrementMobKills();
-        } else if (victim->pcdata && victim->pcdata->clan != killer->pcdata->clan) {
-            killer->pcdata->clan->incrementPlayerKills();
+            killer->getClan()->incrementMobKills();
+        } else if (!isSameClan(killer, victim)) {
+            killer->getClan()->incrementPlayerKills();
         }
-        _writer->save_clan(killer->pcdata->clan);
+        _writer->save_clan(killer->getClan());
     }
 }
 
 void ClanManager::handle_death(Character *killer, Character *victim) {
-    if (victim->pcdata && victim->pcdata->clan) {
+    if (victim->isClanned()) {
         if (IS_NPC(killer)) {
-            killer->pcdata->clan->incrementMobDeaths();
-        } else if (killer->pcdata && killer->pcdata->clan != victim->pcdata->clan) {
-            killer->pcdata->clan->incrementPlayerDeaths();
+            killer->getClan()->incrementMobDeaths();
+        } else if (!isSameClan(killer, victim)) {
+            killer->getClan()->incrementPlayerDeaths();
         }
-        _writer->save_clan(victim->pcdata->clan);
+        _writer->save_clan(victim->getClan());
     }
 }
 
@@ -140,7 +143,7 @@ void ClanManager::load_clans( )
 bool ClanManager::isClanLeader(Character *ch) {
     Clan * clan;
     
-    if (!(clan = ch->pcdata->clan) ) {
+    if (!(clan = ch->getClan()) ) {
         return false;
     }
 
@@ -157,4 +160,16 @@ bool ClanManager::isClanLeader(Character *ch) {
     }
 
     return false;
+}
+
+bool ClanManager::isSameClan(Character *ch, Character *wch) {
+    if (!ch->isClanned()) {
+        return false;
+    }
+
+    if (!wch->isClanned()) {
+        return false;
+    }
+
+    return ((PlayerCharacter *)ch)->getClan() == ((PlayerCharacter *)wch)->getClan();
 }

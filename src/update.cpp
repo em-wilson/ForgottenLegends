@@ -76,7 +76,7 @@ void mobile_update(void)
 	{
 		ch = *it;
 
-		if (!IS_NPC(ch) || ch->in_room == NULL || IS_AFFECTED(ch, AFF_CHARM))
+		if (!ch->isNPC() || ch->in_room == NULL || IS_AFFECTED(ch, AFF_CHARM))
 			continue;
 
 		if (ch->in_room->area->empty && !IS_SET(ch->act, ACT_UPDATE_ALWAYS))
@@ -545,7 +545,7 @@ void aggr_update(void)
 
 			ch_next = ch->next_in_room;
 
-			if (!IS_NPC(ch) || !IS_SET(ch->act, ACT_AGGRESSIVE) || IS_SET(ch->in_room->room_flags, ROOM_SAFE) || IS_AFFECTED(ch, AFF_CALM) || ch->fighting != NULL || IS_AFFECTED(ch, AFF_CHARM) || !IS_AWAKE(ch) || (IS_SET(ch->act, ACT_WIMPY) && IS_AWAKE(wch)) || !ch->can_see( wch) || number_bits(1) == 0)
+			if (!ch->isNPC() || !IS_SET(ch->act, ACT_AGGRESSIVE) || IS_SET(ch->in_room->room_flags, ROOM_SAFE) || IS_AFFECTED(ch, AFF_CALM) || ch->fighting != NULL || IS_AFFECTED(ch, AFF_CHARM) || !IS_AWAKE(ch) || (IS_SET(ch->act, ACT_WIMPY) && IS_AWAKE(wch)) || !ch->can_see( wch) || number_bits(1) == 0)
 				continue;
 
 			/*

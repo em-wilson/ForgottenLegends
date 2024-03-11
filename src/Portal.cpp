@@ -50,7 +50,7 @@ void Portal::enter(Character *ch)
 		return;
 	}
 
-	if (IS_NPC(ch) && FlagHelper::isSet(ch->act, ACT_AGGRESSIVE) && FlagHelper::isSet(location->room_flags, ROOM_LAW))
+	if (ch->isNPC() && FlagHelper::isSet(ch->act, ACT_AGGRESSIVE) && FlagHelper::isSet(location->room_flags, ROOM_LAW))
 	{
 		send_to_char("Something prevents you from leaving...\n\r", ch);
 		return;
@@ -134,9 +134,9 @@ void Portal::enter(Character *ch)
 	 * If someone is following the char, these triggers get activated
 	 * for the followers before the char, but it's safer this way...
 	 */
-	if (IS_NPC(ch) && HAS_TRIGGER(ch, TRIG_ENTRY))
+	if (ch->isNPC() && HAS_TRIGGER(ch, TRIG_ENTRY))
 		mp_percent_trigger(ch, NULL, NULL, NULL, TRIG_ENTRY);
-	if (!IS_NPC(ch))
+	if (!ch->isNPC())
 		mp_greet_trigger(ch);
 
 	return;

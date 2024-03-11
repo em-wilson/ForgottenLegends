@@ -42,9 +42,13 @@ set(SOURCE_FILES
     src/connected_state_handlers/ConfirmNewNameStateHandler.cpp src/connected_state_handlers/ConfirmNewNameStateHandler.h
     src/connected_state_handlers/ConfirmNewPasswordStateHandler.cpp src/connected_state_handlers/ConfirmNewPasswordStateHandler.h
     src/connected_state_handlers/GetNameStateHandler.cpp src/connected_state_handlers/GetNameStateHandler.h
+    src/connected_state_handlers/GetNewClassStateHandler.cpp src/connected_state_handlers/GetNewClassStateHandler.h
     src/connected_state_handlers/GetNewPasswordStateHandler.cpp src/connected_state_handlers/GetNewPasswordStateHandler.h
     src/connected_state_handlers/GetNewRaceStateHandler.cpp src/connected_state_handlers/GetNewRaceStateHandler.h
+    src/connected_state_handlers/GetNewSexStateHandler.cpp src/connected_state_handlers/GetNewSexStateHandler.h
     src/connected_state_handlers/GetOldPasswordStateHandler.cpp src/connected_state_handlers/GetOldPasswordStateHandler.h
+    src/connected_state_handlers/GetReclassStateHandler.cpp src/connected_state_handlers/GetReclassStateHandler.h
+    src/connected_state_handlers/ReadMotdStateHandler.cpp src/connected_state_handlers/ReadMotdStateHandler.h
     src/comm.cpp
     src/const.cpp
     src/db.cpp src/db.h
@@ -53,7 +57,7 @@ set(SOURCE_FILES
     src/effects.cpp
     src/EquipmentListGenerator.cpp src/EquipmentListGenerator.h
     src/ExtraDescription.cpp src/ExtraDescription.h
-    src/enums/ConnectedState.h
+    src/enums/ActionTarget.h src/enums/ConnectedState.h src/enums/ExitFlag.h src/enums/FlagConversions.h
     src/FileLogger.cpp src/FileLogger.h
     src/fight.cpp
     src/flags.cpp
@@ -79,7 +83,6 @@ set(SOURCE_FILES
     src/Note.cpp src/Note.h
     src/Object.cpp src/Object.h
     src/ObjectHelper.cpp src/ObjectHelper.h
-    src/pc_data.cpp src/pc_data.h
     src/PlayerCharacter.cpp src/PlayerCharacter.h
     src/PlayerRace.cpp src/PlayerRace.h
     src/Portal.cpp src/Portal.h

@@ -31,6 +31,7 @@
 #include <string.h>
 #include <time.h>
 #include "merc.h"
+#include "clans/ClanManager.h"
 #include "magic.h"
 #include "Object.h"
 #include "ObjectHelper.h"
@@ -40,6 +41,7 @@
 DECLARE_DO_FUN(do_scan);
 
 extern char *target_name;
+extern ClanManager * clan_manager;
 
 void spell_farsight( int sn, int level, bool succesful_cast, Character *ch, void *vo,int target)
 {
@@ -71,7 +73,7 @@ void spell_portal( int sn, int level, bool succesful_cast, Character *ch, void *
     ||   (!IS_NPC(victim) && victim->level >= LEVEL_HERO)  /* NOT trust */
     ||   (IS_NPC(victim) && IS_SET(victim->imm_flags,IMM_SUMMON))
     ||   (IS_NPC(victim) && saves_spell( level, victim,DAM_NONE) ) 
-    ||	(IS_CLANNED(victim) && !is_same_clan(ch,victim)))
+    ||	(victim->isClanned() && !clan_manager->isSameClan(ch,victim)))
     {
         send_to_char( "You failed.\n\r", ch );
         return;
@@ -124,7 +126,7 @@ void spell_nexus( int sn, int level, bool succesful_cast, Character *ch, void *v
     ||   (!IS_NPC(victim) && victim->level >= LEVEL_HERO)  /* NOT trust */
     ||   (IS_NPC(victim) && IS_SET(victim->imm_flags,IMM_SUMMON))
     ||   (IS_NPC(victim) && saves_spell( level, victim,DAM_NONE) ) 
-    ||	 (IS_CLANNED(victim) && !is_same_clan(ch,victim)))
+    ||	 (victim->isClanned() && !clan_manager->isSameClan(ch,victim)))
     {
         send_to_char( "You failed.\n\r", ch );
         return;

@@ -158,7 +158,7 @@ void show_list_to_char(vector<Object *> list, Character *ch, bool fShort, bool f
 
             fCombine = FALSE;
 
-            if (IS_NPC(ch) || IS_SET(ch->comm, COMM_COMBINE))
+            if (ch->isNPC() || IS_SET(ch->comm, COMM_COMBINE))
             {
                 /*
                  * Look for duplicates, case sensitive.
@@ -193,7 +193,7 @@ void show_list_to_char(vector<Object *> list, Character *ch, bool fShort, bool f
     {
         auto objName = std::get<0>(it);
         auto objCount = std::get<1>(it);
-        if (IS_NPC(ch) || IS_SET(ch->comm, COMM_COMBINE))
+        if (ch->isNPC() || IS_SET(ch->comm, COMM_COMBINE))
         {
             if (objCount != 1)
             {
@@ -212,7 +212,7 @@ void show_list_to_char(vector<Object *> list, Character *ch, bool fShort, bool f
 
     if (fShowNothing && prgpstrShow.size() == 0)
     {
-        if (IS_NPC(ch) || IS_SET(ch->comm, COMM_COMBINE))
+        if (ch->isNPC() || IS_SET(ch->comm, COMM_COMBINE))
         {
             send_to_char("     ", ch);
         }
@@ -254,8 +254,8 @@ void show_char_to_char_0(Character *victim, Character *ch)
     if (!IS_NPC(victim) && IS_SET(victim->act, PLR_THIEF))
         strcat(buf, "{B({YTHIEF{B){x ");
 
-    if (IS_CLANNED(victim))
-        strcat(buf, victim->pcdata->clan->getWhoname().c_str());
+    if (victim->isClanned())
+        strcat(buf, victim->getClan()->getWhoname().c_str());
     if (victim->position == victim->start_pos && victim->long_descr[0] != '\0')
     {
         strcat(buf, victim->long_descr);
@@ -265,7 +265,7 @@ void show_char_to_char_0(Character *victim, Character *ch)
 
     strcat(buf, PERS(victim, ch));
     if (!IS_NPC(victim) && !IS_SET(ch->comm, COMM_BRIEF) && victim->position == POS_STANDING && ch->onObject() == NULL)
-        strcat(buf, victim->pcdata->title);
+        strcat(buf, ((PlayerCharacter*)victim)->title);
 
     switch (victim->position)
     {
@@ -445,7 +445,7 @@ void show_char_to_char_1(Character *victim, Character *ch)
 
     show_eq_char(victim, ch);
 
-    if (victim != ch && !IS_NPC(ch) && number_percent() < get_skill(ch, gsn_peek))
+    if (victim != ch && !ch->isNPC() && number_percent() < get_skill(ch, gsn_peek))
     {
         send_to_char("\n\rYou peek at the inventory:\n\r", ch);
         check_improve(ch, gsn_peek, TRUE, 4);
@@ -483,7 +483,7 @@ void show_char_to_char(Character *list, Character *ch)
 bool check_blind(Character *ch)
 {
 
-    if (!IS_NPC(ch) && IS_SET(ch->act, PLR_HOLYLIGHT))
+    if (!ch->isNPC() && IS_SET(ch->act, PLR_HOLYLIGHT))
         return TRUE;
 
     if (IS_AFFECTED(ch, AFF_BLIND))
@@ -598,7 +598,7 @@ void do_wizlist(Character *ch, char *argument)
 void do_autolist(Character *ch, char *argument)
 {
     /* lists most player flags */
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return;
 
     send_to_char("   action     status\n\r", ch);
@@ -676,7 +676,7 @@ void do_autolist(Character *ch, char *argument)
 
 void do_autoassist(Character *ch, char *argument)
 {
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return;
 
     if (IS_SET(ch->act, PLR_AUTOASSIST))
@@ -693,7 +693,7 @@ void do_autoassist(Character *ch, char *argument)
 
 void do_autoexit(Character *ch, char *argument)
 {
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return;
 
     if (IS_SET(ch->act, PLR_AUTOEXIT))
@@ -710,7 +710,7 @@ void do_autoexit(Character *ch, char *argument)
 
 void do_autogold(Character *ch, char *argument)
 {
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return;
 
     if (IS_SET(ch->act, PLR_AUTOGOLD))
@@ -727,7 +727,7 @@ void do_autogold(Character *ch, char *argument)
 
 void do_autoloot(Character *ch, char *argument)
 {
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return;
 
     if (IS_SET(ch->act, PLR_AUTOLOOT))
@@ -744,7 +744,7 @@ void do_autoloot(Character *ch, char *argument)
 
 void do_autosac(Character *ch, char *argument)
 {
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return;
 
     if (IS_SET(ch->act, PLR_AUTOSAC))
@@ -761,7 +761,7 @@ void do_autosac(Character *ch, char *argument)
 
 void do_autosplit(Character *ch, char *argument)
 {
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return;
 
     if (IS_SET(ch->act, PLR_AUTOSPLIT))
@@ -872,7 +872,7 @@ void do_combine(Character *ch, char *argument)
 
 void do_noloot(Character *ch, char *argument)
 {
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return;
 
     if (IS_SET(ch->act, PLR_CANLOOT))
@@ -889,7 +889,7 @@ void do_noloot(Character *ch, char *argument)
 
 void do_nofollow(Character *ch, char *argument)
 {
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return;
 
     if (IS_SET(ch->act, PLR_NOFOLLOW))
@@ -907,7 +907,7 @@ void do_nofollow(Character *ch, char *argument)
 
 void do_nosummon(Character *ch, char *argument)
 {
-    if (IS_NPC(ch))
+    if (ch->isNPC())
     {
         if (IS_SET(ch->imm_flags, IMM_SUMMON))
         {
@@ -966,7 +966,7 @@ void do_look(Character *ch, char *argument)
     if (!check_blind(ch))
         return;
 
-    if (!IS_NPC(ch) && !IS_SET(ch->act, PLR_HOLYLIGHT) && room_is_dark(ch->in_room))
+    if (!ch->isNPC() && !IS_SET(ch->act, PLR_HOLYLIGHT) && room_is_dark(ch->in_room))
     {
         send_to_char("It is pitch black ... \n\r", ch);
         show_char_to_char(ch->in_room->people, ch);
@@ -984,7 +984,7 @@ void do_look(Character *ch, char *argument)
         send_to_char("{y", ch);
         send_to_char(ch->in_room->name, ch);
 
-        if ((IS_IMMORTAL(ch) && (IS_NPC(ch) || IS_SET(ch->act, PLR_HOLYLIGHT))) || IS_BUILDER(ch, ch->in_room->area))
+        if ((IS_IMMORTAL(ch) && (ch->isNPC() || IS_SET(ch->act, PLR_HOLYLIGHT))))
         {
             snprintf(buf, sizeof(buf), " [Room %d]", ch->in_room->vnum);
             send_to_char(buf, ch);
@@ -992,14 +992,14 @@ void do_look(Character *ch, char *argument)
 
         send_to_char("{x\n\r", ch);
 
-        if (arg1[0] == '\0' || (!IS_NPC(ch) && !IS_SET(ch->comm, COMM_BRIEF)))
+        if (arg1[0] == '\0' || (!ch->isNPC() && !IS_SET(ch->comm, COMM_BRIEF)))
         {
             send_to_char("{g  ", ch);
             send_to_char(ch->in_room->description, ch);
             send_to_char("{x", ch);
         }
 
-        if (!IS_NPC(ch) && IS_SET(ch->act, PLR_AUTOEXIT))
+        if (!ch->isNPC() && IS_SET(ch->act, PLR_AUTOEXIT))
         {
             send_to_char("\n\r", ch);
             do_exits(ch, (char *)"auto");
@@ -1348,7 +1348,7 @@ void do_worth(Character *ch, char *argument)
 {
     char buf[MAX_STRING_LENGTH];
 
-    if (IS_NPC(ch))
+    if (ch->isNPC())
     {
         snprintf(buf, sizeof(buf), "You have %ld gold and %ld silver.\n\r",
                  ch->gold, ch->silver);
@@ -1356,10 +1356,11 @@ void do_worth(Character *ch, char *argument)
         return;
     }
 
+    PlayerCharacter *pch = (PlayerCharacter *)ch;
     snprintf(buf, sizeof(buf),
              "You have %ld gold, %ld silver, and %d experience (%d exp to level).\n\r",
              ch->gold, ch->silver, ch->exp,
-             (ch->level + 1) * exp_per_level(ch, ch->pcdata->points) - ch->exp);
+             (ch->level + 1) * exp_per_level(ch, pch->points) - ch->exp);
 
     send_to_char(buf, ch);
 
@@ -1374,7 +1375,7 @@ void do_score(Character *ch, char *argument)
     snprintf(buf, sizeof(buf),
              "You are %s%s, level %d, %d years old (%d hours).\n\r",
              ch->getName().c_str(),
-             IS_NPC(ch) ? "" : ch->pcdata->title,
+             ch->isNPC() ? "" : ((PlayerCharacter *)ch)->title,
              ch->level, get_age(ch),
              (ch->played + (int)(current_time - ch->logon)) / 3600);
     send_to_char(buf, ch);
@@ -1390,7 +1391,7 @@ void do_score(Character *ch, char *argument)
              ch->getRace()->getName().c_str(),
              ch->sex == 0 ? "sexless" : ch->sex == 1 ? "male"
                                                      : "female",
-             IS_NPC(ch) ? "mobile" : class_table[ch->class_num].name);
+             ch->isNPC() ? "mobile" : class_table[ch->class_num].name);
     send_to_char(buf, ch);
 
     // if (ch->race == race_lookup("draconian"))
@@ -1449,22 +1450,22 @@ void do_score(Character *ch, char *argument)
     send_to_char(buf, ch);
 
     /* RT shows exp to level */
-    if (!IS_NPC(ch) && ch->level < LEVEL_HERO)
+    if (!ch->isNPC() && ch->level < LEVEL_HERO)
     {
         snprintf(buf, sizeof(buf),
                  "You need %d exp to level.\n\r",
-                 ((ch->level + 1) * exp_per_level(ch, ch->pcdata->points) - ch->exp));
+                 ((ch->level + 1) * exp_per_level(ch, ((PlayerCharacter *)ch)->points) - ch->exp));
         send_to_char(buf, ch);
     }
 
     snprintf(buf, sizeof(buf), "Wimpy set to %d hit points.\n\r", ch->wimpy);
     send_to_char(buf, ch);
 
-    if (!IS_NPC(ch) && ch->pcdata->condition[COND_DRUNK] > 10)
+    if (!ch->isNPC() && ((PlayerCharacter *)ch)->condition[COND_DRUNK] > 10)
         send_to_char("You are drunk.\n\r", ch);
-    if (!IS_NPC(ch) && ch->pcdata->condition[COND_THIRST] == 0)
+    if (!ch->isNPC() && ((PlayerCharacter *)ch)->condition[COND_THIRST] == 0)
         send_to_char("You are thirsty.\n\r", ch);
-    if (!IS_NPC(ch) && ch->pcdata->condition[COND_HUNGER] == 0)
+    if (!ch->isNPC() && ((PlayerCharacter *)ch)->condition[COND_HUNGER] == 0)
         send_to_char("You are hungry.\n\r", ch);
 
     switch (ch->position)
@@ -1869,11 +1870,11 @@ void do_whois(Character *ch, char *argument)
                      wch->level, race.c_str(), class_name,
                      wch->incog_level >= LEVEL_HERO ? "(Incog) " : "",
                      wch->invis_level >= LEVEL_HERO ? "(Wizi) " : "",
-                     IS_CLANNED(wch) && (IS_IMMORTAL(ch) || wch->pcdata->clan == ch->pcdata->clan || wch->in_room == ch->in_room) ? wch->pcdata->clan->getWhoname().c_str() : "",
+                     wch->isClanned() && (IS_IMMORTAL(ch) || clan_manager->isSameClan(wch, ch) || wch->in_room == ch->in_room) ? wch->getClan()->getWhoname().c_str() : "",
                      IS_SET(wch->comm, COMM_AFK) ? "[AFK] " : "",
-                     (IS_CLANNED(ch) && IS_CLANNED(wch) && wch->pcdata->clan->hasFlag(CLAN_PK) && ch->pcdata->clan->hasFlag(CLAN_PK) && wch->level + wch->getRange() >= ch->level) ? "{R({rPK{R){x " : "",
+                     (ch->isClanned() && wch->isClanned() && wch->getClan()->hasFlag(CLAN_PK) && ch->getClan()->hasFlag(CLAN_PK) && wch->level + wch->getRange() >= ch->level) ? "{R({rPK{R){x " : "",
                      IS_SET(wch->act, PLR_THIEF) ? "{B({YTHIEF{B){x " : "",
-                     wch->getName().c_str(), IS_NPC(wch) ? "" : wch->pcdata->title);
+                     wch->getName().c_str(), IS_NPC(wch) ? "" : ((PlayerCharacter *)wch)->title);
             add_buf(output, buf);
         }
     }
@@ -2020,7 +2021,7 @@ void do_who(Character *ch, char *argument)
         if (!ch->can_see( wch))
             continue;
 
-        if (wch->level < iLevelLower || wch->level > iLevelUpper || (fImmortalOnly && wch->level < LEVEL_IMMORTAL) || (fClassRestrict && !rgfClass[wch->class_num]) || (fRaceRestrict && rgfRace.find(wch->getRace()->getName()) == rgfRace.end()) || (fClan && !IS_IMMORTAL(ch) && (!IS_CLANNED(wch) || (wch->pcdata->clan != ch->pcdata->clan && ch->in_room != wch->in_room))) || ((fClanRestrict && !IS_IMMORTAL(ch)) && (wch->pcdata->clan != ch->pcdata->clan && wch->in_room != ch->in_room)))
+        if (wch->level < iLevelLower || wch->level > iLevelUpper || (fImmortalOnly && wch->level < LEVEL_IMMORTAL) || (fClassRestrict && !rgfClass[wch->class_num]) || (fRaceRestrict && rgfRace.find(wch->getRace()->getName()) == rgfRace.end()) || (fClan && !IS_IMMORTAL(ch) && (!wch->isClanned() || (wch->getClan() != ch->getClan() && ch->in_room != wch->in_room))) || ((fClanRestrict && !IS_IMMORTAL(ch)) && (wch->getClan() != ch->getClan() && wch->in_room != ch->in_room)))
             continue;
 
         nMatch++;
@@ -2080,12 +2081,12 @@ void do_who(Character *ch, char *argument)
                  wch->level, race.c_str(), class_name,
                  wch->incog_level >= LEVEL_HERO ? "(Incog) " : "",
                  wch->invis_level >= LEVEL_HERO ? "(Wizi) " : "",
-                 IS_CLANNED(wch) && (IS_IMMORTAL(ch) || wch->pcdata->clan == ch->pcdata->clan || wch->in_room == ch->in_room) ? wch->pcdata->clan->getWhoname().c_str() : "",
+                 wch->isClanned() && (IS_IMMORTAL(ch) || wch->getClan() == ch->getClan() || wch->in_room == ch->in_room) ? wch->getClan()->getWhoname().c_str() : "",
                  IS_SET(wch->comm, COMM_AFK) ? "[AFK] " : "",
-                 (IS_CLANNED(ch) && IS_CLANNED(wch) && wch->pcdata->clan->hasFlag(CLAN_PK) && ch->pcdata->clan->hasFlag(CLAN_PK) && wch->level + wch->getRange() >= ch->level) ? "{R({rPK{R){x " : "",
+                 (ch->isClanned() && wch->isClanned() && wch->getClan()->hasFlag(CLAN_PK) && ch->getClan()->hasFlag(CLAN_PK) && wch->level + wch->getRange() >= ch->level) ? "{R({rPK{R){x " : "",
                  IS_SET(wch->act, PLR_THIEF) ? "{B({YTHIEF{B){x " : "",
                  wch->getName().c_str(),
-                 IS_NPC(wch) ? "" : wch->pcdata->title);
+                 IS_NPC(wch) ? "" : ((PlayerCharacter*)wch)->title);
         add_buf(output, buf);
     }
 
@@ -2334,7 +2335,7 @@ void set_title(Character *ch, char *title)
 {
     char buf[MAX_STRING_LENGTH];
 
-    if (IS_NPC(ch))
+    if (ch->isNPC())
     {
         bug("Set_title: NPC.", 0);
         return;
@@ -2350,14 +2351,14 @@ void set_title(Character *ch, char *title)
         strcpy(buf, title);
     }
 
-    free_string(ch->pcdata->title);
-    ch->pcdata->title = str_dup(buf);
+    free_string(((PlayerCharacter*)ch)->title);
+    ((PlayerCharacter*)ch)->title = str_dup(buf);
     return;
 }
 
 void do_title(Character *ch, char *argument)
 {
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return;
 
     if (argument[0] == '\0')
@@ -2470,13 +2471,15 @@ void do_report(Character *ch, char *argument)
     return;
 }
 
-void do_practice(Character *ch, char *argument)
+void do_practice(Character *caller, char *argument)
 {
     char buf[MAX_STRING_LENGTH];
     int sn;
 
-    if (IS_NPC(ch))
+    if (caller->isNPC())
         return;
+
+    PlayerCharacter *ch = (PlayerCharacter*)caller;
 
     if (argument[0] == '\0')
     {
@@ -2487,11 +2490,11 @@ void do_practice(Character *ch, char *argument)
         {
             if (skill_table[sn].name == NULL)
                 break;
-            if (ch->level < ch->pcdata->sk_level[sn] || ch->pcdata->learned[sn] < 1 /* skill is not known */)
+            if (ch->level < ch->sk_level[sn] || ch->learned[sn] < 1 /* skill is not known */)
                 continue;
 
             snprintf(buf, sizeof(buf), "%-18s %3d%%  ",
-                     skill_table[sn].name, ch->pcdata->learned[sn]);
+                     skill_table[sn].name, ch->learned[sn]);
             send_to_char(buf, ch);
             if (++col % 3 == 0)
                 send_to_char("\n\r", ch);
@@ -2533,16 +2536,16 @@ void do_practice(Character *ch, char *argument)
             return;
         }
 
-        if ((sn = find_spell(ch, argument)) < 0 || (!IS_NPC(ch) && (ch->level < ch->pcdata->sk_level[sn] || ch->pcdata->learned[sn] < 1 /* skill is not known */
-                                                                    || ch->pcdata->sk_rating[sn] == 0)))
+        if ((sn = find_spell(ch, argument)) < 0 || (!ch->isNPC() && (ch->level < ch->sk_level[sn] || ch->learned[sn] < 1 /* skill is not known */
+                                                                    || ch->sk_rating[sn] == 0)))
         {
             send_to_char("You can't practice that.\n\r", ch);
             return;
         }
 
-        adept = IS_NPC(ch) ? 100 : class_table[ch->class_num].skill_adept;
+        adept = ch->isNPC() ? 100 : class_table[ch->class_num].skill_adept;
 
-        if (ch->pcdata->learned[sn] >= adept)
+        if (ch->learned[sn] >= adept)
         {
             snprintf(buf, sizeof(buf), "You are already learned at %s.\n\r",
                      skill_table[sn].name);
@@ -2551,17 +2554,17 @@ void do_practice(Character *ch, char *argument)
         else
         {
             ch->practice--;
-            ch->pcdata->learned[sn] +=
+            ch->learned[sn] +=
                 int_app[get_curr_stat(ch, STAT_INT)].learn /
-                ch->pcdata->sk_rating[sn];
-            if (ch->pcdata->learned[sn] < adept)
+                ch->sk_rating[sn];
+            if (ch->learned[sn] < adept)
             {
                 act("You practice $T.", ch, NULL, skill_table[sn].name, TO_CHAR, POS_RESTING);
                 act("$n practices $T.", ch, NULL, skill_table[sn].name, TO_ROOM, POS_RESTING);
             }
             else
             {
-                ch->pcdata->learned[sn] = adept;
+                ch->learned[sn] = adept;
                 act("You are now learned at $T.", ch, NULL, skill_table[sn].name, TO_CHAR, POS_RESTING);
                 act("$n is now learned at $T.", ch, NULL, skill_table[sn].name, TO_ROOM, POS_RESTING);
             }
@@ -2604,7 +2607,7 @@ void do_wimpy(Character *ch, char *argument)
     return;
 }
 
-void do_password(Character *ch, char *argument)
+void do_password(Character *caller, char *argument)
 {
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
@@ -2613,8 +2616,10 @@ void do_password(Character *ch, char *argument)
     char *p;
     char cEnd;
 
-    if (IS_NPC(ch))
+    if (caller->isNPC())
         return;
+
+    PlayerCharacter * ch = (PlayerCharacter*)caller;
 
     /*
      * Can't use one_argument here because it smashes case.
@@ -2664,7 +2669,7 @@ void do_password(Character *ch, char *argument)
         return;
     }
 
-    if (string(crypt(arg1, ch->pcdata->getPassword().c_str())) != ch->pcdata->getPassword())
+    if (string(crypt(arg1, ch->getPassword().c_str())) != ch->getPassword())
     {
         WAIT_STATE(ch, 40);
         send_to_char("Wrong password.  Wait 10 seconds.\n\r", ch);
@@ -2692,7 +2697,7 @@ void do_password(Character *ch, char *argument)
         }
     }
 
-    ch->pcdata->setPassword(pwdnew);
+    ch->setPassword(pwdnew);
     save_char_obj(ch);
     send_to_char("Ok.\n\r", ch);
     return;
@@ -2719,7 +2724,7 @@ void look_window(Character *ch, Object *obj) /* Voltecs Window code 1998 */
         return;
     }
 
-    if (!IS_NPC(ch))
+    if (!ch->isNPC())
     {
         send_to_char("Looking through the window you can see ", ch);
         send_to_char(window_room->name, ch);
@@ -2735,7 +2740,7 @@ void do_nw(Character *ch, char *argument)
     DESCRIPTOR_DATA *d;
     char buf[MAX_STRING_LENGTH];
 
-    if (IS_NPC(ch))
+    if (ch->isNPC())
         return;
 
     snprintf(buf, sizeof(buf), "%-15s %15s\n\r", "Clan Name", "Net Worth (gold)");

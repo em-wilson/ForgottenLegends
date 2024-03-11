@@ -726,7 +726,7 @@ void bust_a_prompt(Character *ch)
 	if (!str || str[0] == '\0')
 	{
 		snprintf(buf, sizeof(buf), "{c<%d to level>\n\r<%d/%dhp %d/%dm %d/%dmv>{x ",
-				 (ch->level + 1) * exp_per_level(ch, ch->pcdata->points) - ch->exp,
+				 ch->isNPC() ? 0 : (ch->level + 1) * exp_per_level(ch, ((PlayerCharacter*)ch)->points) - ch->exp,
 				 ch->hit, ch->max_hit, ch->mana, ch->max_mana, ch->move,
 				 ch->max_move);
 		send_to_char(buf, ch);
@@ -801,7 +801,7 @@ void bust_a_prompt(Character *ch)
 			i = buf2;
 			break;
 		case 'X':
-			snprintf(buf2, sizeof(buf2), "%d", IS_NPC(ch) ? 0 : (ch->level + 1) * exp_per_level(ch, ch->pcdata->points) - ch->exp);
+			snprintf(buf2, sizeof(buf2), "%d", ch->isNPC() ? 0 : (ch->level + 1) * exp_per_level(ch, ((PlayerCharacter*)ch)->points) - ch->exp);
 			i = buf2;
 			break;
 		case 'g':
@@ -815,7 +815,7 @@ void bust_a_prompt(Character *ch)
 		case 'r':
 			if (ch->in_room != NULL)
 				snprintf(buf2, sizeof(buf2), "%s",
-						 ((!IS_NPC(ch) && IS_SET(ch->act, PLR_HOLYLIGHT)) ||
+						 ((!ch->isNPC() && IS_SET(ch->act, PLR_HOLYLIGHT)) ||
 						  (!IS_AFFECTED(ch, AFF_BLIND) && !room_is_dark(ch->in_room)))
 							 ? ch->in_room->name
 							 : "darkness");
@@ -862,11 +862,8 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 	DESCRIPTOR_DATA *d_old, *d_next;
 	char buf[MAX_STRING_LENGTH];
 	char arg[MAX_INPUT_LENGTH];
-	int must_have;
 	Character *ch;
 	int iClass, race, omorph, i, weapon;
-
-	must_have = 0;
 
 	/* Delete leading spaces UNLESS character is writing a note */
 	if (d->connected != ConnectedState::NoteText)
@@ -987,232 +984,6 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 		d->connected = ConnectedState::GetNewSex;
 		break;
 
-	case ConnectedState::GetNewSex:
-		switch (argument[0])
-		{
-		case 'm':
-		case 'M':
-			ch->sex = SEX_MALE;
-			ch->pcdata->true_sex = SEX_MALE;
-			break;
-		case 'f':
-		case 'F':
-			ch->sex = SEX_FEMALE;
-			ch->pcdata->true_sex = SEX_FEMALE;
-			break;
-		default:
-			SocketHelper::write_to_buffer(d, "That's not a sex.\n\rWhat IS your sex? ", 0);
-			return;
-		}
-
-		strcpy(buf, "Select a class [");
-		for (iClass = 0; iClass < MAX_CLASS; iClass++)
-		{
-			if (!can_be_class(ch, iClass))
-				continue;
-
-			if (iClass > 0)
-				strcat(buf, " ");
-			strcat(buf, class_table[iClass].name);
-		}
-		strcat(buf, "]: ");
-		SocketHelper::write_to_buffer(d, buf, 0);
-		d->connected = ConnectedState::GetNewClass;
-		break;
-
-	case ConnectedState::GetNewClass:
-		iClass = class_lookup(argument);
-
-		if (iClass == -1 || !can_be_class(ch, iClass))
-		{
-			SocketHelper::write_to_buffer(d,
-							"That's not a class.\n\rWhat IS your class? ", 0);
-			return;
-		}
-
-		ch->class_num = iClass;
-		SET_BIT(ch->done, class_table[ch->class_num].flag);
-
-		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s new player.", ch->getName().c_str(), d->host);
-		logger->log_string(log_buf);
-		Wiznet::instance()->report((char *)"Newbie alert!  $N sighted.", ch, NULL, WIZ_NEWBIE, 0, 0);
-		Wiznet::instance()->report(log_buf, NULL, NULL, WIZ_SITES, 0, ch->getTrust());
-
-		SocketHelper::write_to_buffer(d, "\n\r", 0);
-
-		group_add(ch, "rom basics", FALSE);
-		group_add(ch, class_table[ch->class_num].base_group, FALSE);
-		ch->pcdata->learned[gsn_recall] = 50;
-
-		/*
-		** The werefolk have to know what they're doing.
-		** The check looks between 10 and 70 for skill,
-		** so we'll start these guys off at 25
-		*/
-		if (ch->getRace() == race_manager->getRaceByName("werefolk"))
-			ch->pcdata->learned[gsn_morph] = 25;
-
-		SocketHelper::write_to_buffer(d, "Do you wish to customize this character?\n\r", 0);
-		SocketHelper::write_to_buffer(d, "Customization takes time, but allows a wider range of skills and abilities.\n\r", 0);
-		SocketHelper::write_to_buffer(d, "Customize (Y/N)? ", 0);
-		d->connected = ConnectedState::DefaultChoice;
-		break;
-
-	case ConnectedState::GetReclass:
-		iClass = class_lookup(argument);
-
-		if (iClass == -1 || IS_SET(ch->done, class_table[iClass].flag) || !can_be_class(ch, iClass))
-		{
-			SocketHelper::write_to_buffer(d,
-							"That class is not an option.\n\rWhat IS your class? ", 0);
-			return;
-		}
-
-		ch->class_num = iClass;
-		SET_BIT(ch->done, class_table[ch->class_num].flag);
-
-		snprintf(log_buf, 2 * MAX_INPUT_LENGTH, "%s@%s reclasses as the %s class.", ch->getName().c_str(), d->host, class_table[ch->class_num].name);
-		logger->log_string(log_buf);
-		Wiznet::instance()->report((char *)"Reclass alert!  $N sighted.", ch, NULL, WIZ_NEWBIE, 0, 0);
-		Wiznet::instance()->report(log_buf, NULL, NULL, WIZ_SITES, 0, ch->getTrust());
-
-		group_add(ch, class_table[ch->class_num].base_group, FALSE);
-		ch->gen_data = new_gen_data();
-		ch->gen_data->points_chosen = ch->pcdata->points;
-		do_help(ch, (char *)"group header");
-		list_group_costs(ch);
-		SocketHelper::write_to_buffer(d, "You already have the following skills:\n\r", 0);
-		must_have = ch->pcdata->points + 15;
-		do_skills(ch, (char *)"all");
-		do_help(ch, (char *)"menu choice");
-		d->connected = ConnectedState::ReclassCust;
-		break;
-
-	case ConnectedState::ReclassCust:
-		send_to_char("\n\r", ch);
-		if (!str_cmp(argument, "done"))
-		{
-			if (ch->pcdata->points < must_have)
-				ch->pcdata->points = must_have;
-			snprintf(buf, sizeof(buf), "Creation points: %d\n\r", ch->pcdata->points);
-			send_to_char(buf, ch);
-			snprintf(buf, sizeof(buf), "Experience per level: %d\n\r",
-					 exp_per_level(ch, ch->gen_data->points_chosen));
-			ch->exp = exp_per_level(ch, ch->gen_data->points_chosen) * ch->level;
-			free_gen_data(ch->gen_data);
-			ch->gen_data = NULL;
-			send_to_char(buf, ch);
-			char_from_room(ch);
-			char_to_room(ch, ((PlayerCharacter *)ch)->getWasNoteRoom());
-			d->connected = ConnectedState::Playing;
-			break;
-		}
-		if (!parse_gen_groups(ch, argument))
-			send_to_char(
-				"Choices are: list,learned,premise,add,drop,info,help, and done.\n\r", ch);
-
-		do_help(ch, (char *)"menu choice");
-		break;
-
-	case ConnectedState::DefaultChoice:
-		SocketHelper::write_to_buffer(d, "\n\r", 2);
-		switch (argument[0])
-		{
-		case 'y':
-		case 'Y':
-			ch->gen_data = new_gen_data();
-			ch->gen_data->points_chosen = ch->pcdata->points;
-			do_help(ch, (char *)"group header");
-			list_group_costs(ch);
-			SocketHelper::write_to_buffer(d, (char *)"You already have the following skills:\n\r", 0);
-			do_skills(ch, (char *)"all");
-			do_help(ch, (char *)"menu choice");
-			d->connected = ConnectedState::GenGroups;
-			break;
-		case 'n':
-		case 'N':
-			group_add(ch, class_table[ch->class_num].default_group, TRUE);
-			SocketHelper::write_to_buffer(d, "\n\r", 2);
-			SocketHelper::write_to_buffer(d,
-							"Please pick a weapon from the following choices:\n\r", 0);
-			buf[0] = '\0';
-			for (i = 0; weapon_table[i].name != NULL; i++)
-				if (ch->pcdata->learned[*weapon_table[i].gsn] > 0)
-				{
-					strcat(buf, weapon_table[i].name);
-					strcat(buf, " ");
-				}
-			strcat(buf, "\n\rYour choice? ");
-			SocketHelper::write_to_buffer(d, buf, 0);
-			d->connected = ConnectedState::PickWeapon;
-			break;
-		default:
-			SocketHelper::write_to_buffer(d, "Please answer (Y/N)? ", 0);
-			return;
-		}
-		break;
-
-	case ConnectedState::PickWeapon:
-		SocketHelper::write_to_buffer(d, "\n\r", 2);
-		weapon = weapon_lookup(argument);
-		if (weapon == -1 || ch->pcdata->learned[*weapon_table[weapon].gsn] <= 0)
-		{
-			SocketHelper::write_to_buffer(d,
-							"That's not a valid selection. Choices are:\n\r", 0);
-			buf[0] = '\0';
-			for (i = 0; weapon_table[i].name != NULL; i++)
-				if (ch->pcdata->learned[*weapon_table[i].gsn] > 0)
-				{
-					strcat(buf, weapon_table[i].name);
-					strcat(buf, " ");
-				}
-			strcat(buf, "\n\rYour choice? ");
-			SocketHelper::write_to_buffer(d, buf, 0);
-			return;
-		}
-
-		ch->pcdata->learned[*weapon_table[weapon].gsn] = 40;
-		SocketHelper::write_to_buffer(d, "\n\r", 2);
-		do_help(ch, (char *)"motd");
-		d->connected = ConnectedState::ReadMotd;
-		break;
-
-	case ConnectedState::GenGroups:
-		send_to_char("\n\r", ch);
-		if (!str_cmp(argument, "done"))
-		{
-			snprintf(buf, sizeof(buf), "Creation points: %d\n\r", ch->pcdata->points);
-			send_to_char(buf, ch);
-			snprintf(buf, sizeof(buf), "Experience per level: %d\n\r",
-					 exp_per_level(ch, ch->gen_data->points_chosen));
-			if (ch->pcdata->points < 40)
-				ch->train = (40 - ch->pcdata->points + 1) / 2;
-			free_gen_data(ch->gen_data);
-			ch->gen_data = NULL;
-			send_to_char(buf, ch);
-			SocketHelper::write_to_buffer(d, "\n\r", 2);
-			SocketHelper::write_to_buffer(d,
-							"Please pick a weapon from the following choices:\n\r", 0);
-			buf[0] = '\0';
-			for (i = 0; weapon_table[i].name != NULL; i++)
-				if (ch->pcdata->learned[*weapon_table[i].gsn] > 0)
-				{
-					strcat(buf, weapon_table[i].name);
-					strcat(buf, " ");
-				}
-			strcat(buf, "\n\rYour choice? ");
-			SocketHelper::write_to_buffer(d, buf, 0);
-			d->connected = ConnectedState::PickWeapon;
-			break;
-		}
-
-		if (!parse_gen_groups(ch, argument))
-			send_to_char(
-				"Choices are: list,learned,premise,add,drop,info,help, and done.\n\r", ch);
-
-		do_help(ch, (char *)"menu choice");
-		break;
-
 	case ConnectedState::ReadImotd:
 		SocketHelper::write_to_buffer(d, "\n\r", 2);
 		do_help(ch, (char *)"motd");
@@ -1240,86 +1011,6 @@ void nanny(Game *game, DESCRIPTOR_DATA *d, char *argument)
 
 	case ConnectedState::NoteFinish:
 		handle_ConnectedStateNoteFinish(d, argument);
-		break;
-
-	case ConnectedState::ReadMotd:
-		if (ch->pcdata == NULL || ch->pcdata->getPassword().empty())
-		{
-			SocketHelper::write_to_buffer(d, "Warning! Null password!\n\r", 0);
-			SocketHelper::write_to_buffer(d, "Please report old password with bug.\n\r", 0);
-			SocketHelper::write_to_buffer(d,
-							"Type 'password null <new password>' to fix.\n\r", 0);
-		}
-
-		char_list.push_back(ch);
-		d->connected = ConnectedState::Playing;
-		send_to_char("The early bird may get the worm, but it's the second mouse that gets\n\r", ch);
-		send_to_char("the cheese.\n\r\n\r\n\r", ch);
-		reset_char(ch);
-
-		if (ch->level == 0)
-		{
-
-			ch->perm_stat[class_table[ch->class_num].attr_prime] += 3;
-
-			ch->level = 1;
-			ch->exp = exp_per_level(ch, ch->pcdata->points);
-			ch->hit = ch->max_hit;
-			ch->mana = ch->max_mana;
-			ch->move = ch->max_move;
-			ch->train = 5;
-			ch->practice = 5;
-			snprintf(buf, sizeof(buf), "the %s", capitalize(class_table[ch->class_num].name));
-			set_title(ch, buf);
-
-			do_outfit(ch, (char *)"");
-			ch->addObject(ObjectHelper::createFromIndex(get_obj_index(OBJ_VNUM_MAP), 0));
-
-			char_to_room(ch, get_room_index(ROOM_VNUM_SCHOOL));
-			send_to_char("\n\r", ch);
-			do_help(ch, (char *)"NEWBIE INFO");
-			SET_BIT(ch->act, PLR_COLOUR);
-			SET_BIT(ch->act, PLR_AUTOASSIST);
-			SET_BIT(ch->act, PLR_AUTOLOOT);
-			SET_BIT(ch->act, PLR_AUTOSAC);
-			SET_BIT(ch->act, PLR_AUTOGOLD);
-			SET_BIT(ch->act, PLR_AUTOEXIT);
-			send_to_char("\n\r", ch);
-		}
-		else if (ch->in_room != NULL)
-		{
-			char_to_room(ch, ch->in_room);
-		}
-		else if (IS_IMMORTAL(ch))
-		{
-			char_to_room(ch, get_room_index(ROOM_VNUM_CHAT));
-		}
-		else
-		{
-			char_to_room(ch, get_room_index(ROOM_VNUM_TEMPLE));
-		}
-
-		/* We don't want them showing up in the note room */
-		if (ch->in_room == get_room_index(ROOM_VNUM_NOTE))
-		{
-			char_from_room(ch);
-			char_to_room(ch, get_room_index(ROOM_VNUM_LIMBO));
-		}
-
-		act("$n has entered the game.", ch, NULL, NULL, TO_ROOM, POS_RESTING);
-		do_look(ch, (char *)"auto");
-
-		Wiznet::instance()->report((char *)"$N has left real life behind.", ch, NULL,
-								   WIZ_LOGINS, WIZ_SITES, ch->getTrust());
-
-		if (ch->pet != NULL)
-		{
-			char_to_room(ch->pet, ch->in_room);
-			act("$n has entered the game.", ch->pet, NULL, NULL, TO_ROOM, POS_RESTING);
-		}
-
-		send_to_char("\n", ch);
-		do_board(ch, (char *)""); /* Show board status */
 		break;
 	}
 
@@ -1528,13 +1219,6 @@ void show_string(struct descriptor_data *d, char *input)
 	return;
 }
 
-/* quick sex fixer */
-void fix_sex(Character *ch)
-{
-	if (ch->sex < 0 || ch->sex > 2)
-		ch->sex = IS_NPC(ch) ? 0 : ch->pcdata->true_sex;
-}
-
 void act_string(const char *format, Character *to, Character *ch, Character *vch, Object *obj1, Object *obj2, const void *arg1, const void *arg2)
 {
 	static char *const he_she[] = {(char *)"it", (char *)"he", (char *)"she"};
@@ -1734,7 +1418,7 @@ int colour(char type, Character *ch, char *string)
 {
 	char code[20];
 
-	if (IS_NPC(ch))
+	if (ch->isNPC())
 		return (0);
 
 	switch (type)

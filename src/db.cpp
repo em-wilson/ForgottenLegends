@@ -76,7 +76,6 @@ time_t time(time_t *tloc);
 /* externals for counting purposes */
 extern	Object	*obj_free;
 extern  DESCRIPTOR_DATA *descriptor_free;
-extern	PC_DATA		*pcdata_free;
 extern  AFFECT_DATA	*affect_free;
 
 /*
@@ -2785,7 +2784,7 @@ void append_file( Character *ch, const char *file, const char *str )
 {
     FILE *fp;
 
-    if ( IS_NPC(ch) || str[0] == '\0' )
+    if ( ch->isNPC() || str[0] == '\0' )
 	return;
 
     fclose( fpReserve );

@@ -1,6 +1,7 @@
 #include <time.h>
 #include "merc.h"
 #include "ConnectedState.h"
+#include "PlayerCharacter.h"
 #include "PlayerRace.h"
 #include "RaceManager.h"
 #include "tables.h"
@@ -89,7 +90,7 @@ void who_html_update (void)
 	fprintf(fp, "<FONT COLOR=""#FFFFFF"">%s<FONT COLOR=""#C0C0C0"">] ", class_name );
 	fprintf(fp, "%s", wch->getName().c_str());
 	buf[0] = '\0';
-	buf2 = str_dup(wch->pcdata->title);
+	buf2 = str_dup(((PlayerCharacter*)wch)->title);
 //      snprintf(buf2, sizeof(buf2), "%s", wch->pcdata->title);
 
       html_colour(buf2,buf);

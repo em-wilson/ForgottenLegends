@@ -6,7 +6,6 @@
 #include <vector>
 #include <unordered_map>
 #include "clans/Clan.h"
-#include "pc_data.h"
 
 #include "IAffectableEntity.h"
 #include "IObjectContainer.h"
@@ -44,6 +43,11 @@ class Character : public IAffectableEntity, IObjectContainer
         virtual void giveAffect( AFFECT_DATA *paf ); // replaces affect_to_char
         void modifyAffect(AFFECT_DATA *paf, bool fAdd); // replaces affect_modify
 
+        virtual bool isClanned() = 0;
+        virtual Clan * getClan() = 0;
+        bool isSameGroup(Character *ch);
+        virtual void perform_autoloot() = 0;
+
         Character *		next;
         Character *		next_in_room;
         Character *		master;
@@ -62,7 +66,6 @@ class Character : public IAffectableEntity, IObjectContainer
         ROOM_INDEX_DATA *	in_room;
         ROOM_INDEX_DATA *	was_in_room;
         AREA_DATA *		zone;
-        PC_DATA *		pcdata;
         GEN_DATA *		gen_data;
         bool		valid;
         bool		confirm_reclass;
@@ -140,7 +143,6 @@ class Character : public IAffectableEntity, IObjectContainer
         /*
         * Advancement stuff.
         */
-        void advance_level( bool hide );
         void affect_check(int where,int vector);
         bool can_see( Object *obj );
         bool can_see( Character *victim );
@@ -148,7 +150,7 @@ class Character : public IAffectableEntity, IObjectContainer
         virtual int hit_gain( ) = 0;
         virtual int mana_gain( ) = 0;
         virtual int move_gain( ) = 0;
-        void gain_condition( int iCond, int value );
+        virtual void gain_condition( int iCond, int value ) = 0;
         Object * getEquipment( int iWear );
         void unequip( Object *obj );
         void setName( string name );

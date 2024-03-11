@@ -646,7 +646,7 @@ void do_olc( Character *ch, char *argument )
     char command[MAX_INPUT_LENGTH];
     int  cmd;
 
-    if ( IS_NPC(ch) )
+    if ( ch->isNPC() )
     	return;
 
     argument = one_argument( argument, command );
@@ -681,7 +681,7 @@ void do_aedit( Character *ch, char *argument )
     int value;
     char arg[MAX_STRING_LENGTH];
 
-    if ( IS_NPC(ch) )
+    if ( ch->isNPC() )
     	return;
 
     pArea	= ch->in_room->area;
@@ -730,7 +730,7 @@ void do_redit( Character *ch, char *argument )
     ROOM_INDEX_DATA *pRoom;
     char arg1[MAX_STRING_LENGTH];
 
-    if ( IS_NPC(ch) )
+    if ( ch->isNPC() )
     	return;
 
     argument = one_argument( argument, arg1 );
@@ -811,7 +811,7 @@ void do_oedit( Character *ch, char *argument )
     char arg1[MAX_STRING_LENGTH];
     int value;
 
-    if ( IS_NPC(ch) )
+    if ( ch->isNPC() )
 	return;
 
     argument = one_argument( argument, arg1 );
@@ -885,7 +885,7 @@ void do_medit( Character *ch, char *argument )
 
     argument = one_argument( argument, arg1 );
 
-    if ( IS_NPC(ch) )
+    if ( ch->isNPC() )
     	return;
 
     if ( is_number( arg1 ) )

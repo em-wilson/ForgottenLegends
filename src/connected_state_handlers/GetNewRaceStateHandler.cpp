@@ -1,8 +1,8 @@
 #include <string.h>
-#include "Character.h"
 #include "ConnectedState.h"
 #include "Descriptor.h"
 #include "GetNewRaceStateHandler.h"
+#include "PlayerCharacter.h"
 #include "PlayerRace.h"
 #include "Race.h"
 #include "RaceManager.h"
@@ -30,7 +30,7 @@ void GetNewRaceStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
 
     one_argument(argument, arg);
 
-    Character *ch = d->character;
+    PlayerCharacter *ch = (PlayerCharacter*) d->character;
 
     if (!strcmp(arg, "help"))
     {
@@ -80,7 +80,7 @@ void GetNewRaceStateHandler::handle(DESCRIPTOR_DATA *d, char *argument) {
         group_add(ch, skill.c_str(), false);
     }
     /* add cost */
-    ch->pcdata->points = race->getPlayerRace()->getPoints();
+    ch->points = race->getPlayerRace()->getPoints();
     ch->size = race->getPlayerRace()->getSize();
 
     // Werefolk not present currently
