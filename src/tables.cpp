@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "merc.h"
+#include "ExitFlag.h"
 #include "tables.h"
 
 /* for position */
@@ -350,16 +351,16 @@ const struct flag_type sex_flags[] =
 
 const struct flag_type exit_flags[] =
 {
-    {   "door",			EX_ISDOOR,		TRUE    },
-    {	"closed",		EX_CLOSED,		TRUE	},
-    {	"locked",		EX_LOCKED,		TRUE	},
-    {	"pickproof",		EX_PICKPROOF,		TRUE	},
-    {   "nopass",		EX_NOPASS,		TRUE	},
-    {   "easy",			EX_EASY,		TRUE	},
-    {   "hard",			EX_HARD,		TRUE	},
-    {	"infuriating",		EX_INFURIATING,		TRUE	},
-    {	"noclose",		EX_NOCLOSE,		TRUE	},
-    {	"nolock",		EX_NOLOCK,		TRUE	},
+    {   "door",			ExitFlag::ExitIsDoor,		TRUE    },
+    {	"closed",		ExitFlag::ExitClosed,		TRUE	},
+    {	"locked",		ExitFlag::ExitLocked,		TRUE	},
+    {	"pickproof",		ExitFlag::ExitPickProof,		TRUE	},
+    {   "nopass",		ExitFlag::ExitNoPass,		TRUE	},
+    {   "easy",			ExitFlag::ExitEasy,		TRUE	},
+    {   "hard",			ExitFlag::ExitHard,		TRUE	},
+    {	"infuriating",		ExitFlag::ExitInfuriating,		TRUE	},
+    {	"noclose",		ExitFlag::ExitNoClose,		TRUE	},
+    {	"nolock",		ExitFlag::ExitNoLock,		TRUE	},
     {	NULL,			0,			0	}
 };
 

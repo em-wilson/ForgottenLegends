@@ -31,6 +31,7 @@
 #include <time.h>
 #include "merc.h"
 #include "clans/ClanManager.h"
+#include "ExitFlag.h"
 #include "ILogger.h"
 #include "NonPlayerCharacter.h"
 #include "Object.h"
@@ -3116,7 +3117,7 @@ void do_flee( Character *ch, char *argument )
 	door = number_door( );
 	if ( ( pexit = was_in->exit[door] ) == 0
 	||   pexit->u1.to_room == NULL
-	||   IS_SET(pexit->exit_info, EX_CLOSED)
+	||   IS_SET(pexit->exit_info, ExitFlag::ExitClosed)
 	||   number_range(0,ch->daze) != 0
 	|| ( IS_NPC(ch)
 	&&   IS_SET(pexit->u1.to_room->room_flags, ROOM_NO_MOB) ) )

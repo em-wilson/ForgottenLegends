@@ -32,6 +32,7 @@
 #include <vector>
 #include <fstream>
 #include "merc.h"
+#include "ExitFlag.h"
 #include "music.h"
 #include "tables.h"
 #include "recycle.h"
@@ -146,7 +147,7 @@ void mobile_update(void)
 		}
 
 		/* Wander */
-		if (!IS_SET(ch->act, ACT_SENTINEL) && number_bits(3) == 0 && (door = number_bits(5)) <= 5 && (pexit = ch->in_room->exit[door]) != NULL && pexit->u1.to_room != NULL && !IS_SET(pexit->exit_info, EX_CLOSED) && !IS_SET(pexit->u1.to_room->room_flags, ROOM_NO_MOB) && (!IS_SET(ch->act, ACT_STAY_AREA) || pexit->u1.to_room->area == ch->in_room->area) && (!IS_SET(ch->act, ACT_OUTDOORS) || !IS_SET(pexit->u1.to_room->room_flags, ROOM_INDOORS)) && (!IS_SET(ch->act, ACT_INDOORS) || IS_SET(pexit->u1.to_room->room_flags, ROOM_INDOORS)))
+		if (!IS_SET(ch->act, ACT_SENTINEL) && number_bits(3) == 0 && (door = number_bits(5)) <= 5 && (pexit = ch->in_room->exit[door]) != NULL && pexit->u1.to_room != NULL && !IS_SET(pexit->exit_info, ExitFlag::ExitClosed) && !IS_SET(pexit->u1.to_room->room_flags, ROOM_NO_MOB) && (!IS_SET(ch->act, ACT_STAY_AREA) || pexit->u1.to_room->area == ch->in_room->area) && (!IS_SET(ch->act, ACT_OUTDOORS) || !IS_SET(pexit->u1.to_room->room_flags, ROOM_INDOORS)) && (!IS_SET(ch->act, ACT_INDOORS) || IS_SET(pexit->u1.to_room->room_flags, ROOM_INDOORS)))
 		{
 			move_char(ch, door, FALSE);
 		}

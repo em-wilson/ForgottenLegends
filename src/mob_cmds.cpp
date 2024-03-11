@@ -40,6 +40,7 @@
 #include "merc.h"
 #include "mob_cmds.h"
 #include "ConnectedState.h"
+#include "ExitFlag.h"
 #include "NonPlayerCharacter.h"
 #include "Object.h"
 #include "ObjectHelper.h"
@@ -1256,7 +1257,7 @@ void do_mpflee( Character *ch, char *argument )
         door = number_door( );
         if ( ( pexit = was_in->exit[door] ) == 0
         ||   pexit->u1.to_room == NULL
-        ||   IS_SET(pexit->exit_info, EX_CLOSED)
+        ||   IS_SET(pexit->exit_info, ExitFlag::ExitClosed)
         || ( IS_NPC(ch)
         &&   IS_SET(pexit->u1.to_room->room_flags, ROOM_NO_MOB) ) )
             continue;

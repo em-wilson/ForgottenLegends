@@ -13,7 +13,7 @@ class PortalNotTraversableException : public PortalException { };
 
 class Portal : public Object {
     public:
-        Portal(Object *obj);
+        Portal();
         virtual ~Portal();
         void enter(Character *ch);
         bool isPortal() override;

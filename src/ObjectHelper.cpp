@@ -2,6 +2,7 @@
 #include "Character.h"
 #include "Object.h"
 #include "ObjectHelper.h"
+#include "Portal.h"
 
 using std::list;
 using std::string;
@@ -82,7 +83,15 @@ Object * ObjectHelper::createFromIndex(OBJ_INDEX_DATA *pObjIndex, int level)
         exit(1);
     }
 
-    obj = new Object();
+    switch (pObjIndex->item_type) {
+        case ITEM_PORTAL:
+            obj = new Portal();
+            break;
+
+        default:
+            obj = new Object();
+            break;
+    }
     obj->setObjectIndexData(pObjIndex);
 
     obj->setLevel(pObjIndex->new_format ? pObjIndex->level : UMAX(0, level));

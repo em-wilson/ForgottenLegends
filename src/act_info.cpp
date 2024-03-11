@@ -46,6 +46,7 @@
 #include "lookup.h"
 #include "clans/ClanManager.h"
 #include "ConnectedState.h"
+#include "ExitFlag.h"
 #include "ExtraDescription.h"
 #include "ILogger.h"
 #include "Object.h"
@@ -1198,11 +1199,11 @@ void do_look(Character *ch, char *argument)
 
     if (pexit->keyword != NULL && pexit->keyword[0] != '\0' && pexit->keyword[0] != ' ')
     {
-        if (IS_SET(pexit->exit_info, EX_CLOSED))
+        if (IS_SET(pexit->exit_info, ExitFlag::ExitClosed))
         {
             act("The $d is closed.", ch, NULL, pexit->keyword, TO_CHAR, POS_RESTING);
         }
-        else if (IS_SET(pexit->exit_info, EX_ISDOOR))
+        else if (IS_SET(pexit->exit_info, ExitFlag::ExitIsDoor))
         {
             act("The $d is open.", ch, NULL, pexit->keyword, TO_CHAR, POS_RESTING);
         }
@@ -1309,7 +1310,7 @@ void do_exits(Character *ch, char *argument)
     found = FALSE;
     for (door = 0; door <= 5; door++)
     {
-        if ((pexit = ch->in_room->exit[door]) != NULL && pexit->u1.to_room != NULL && can_see_room(ch, pexit->u1.to_room) && !IS_SET(pexit->exit_info, EX_CLOSED))
+        if ((pexit = ch->in_room->exit[door]) != NULL && pexit->u1.to_room != NULL && can_see_room(ch, pexit->u1.to_room) && !IS_SET(pexit->exit_info, ExitFlag::ExitClosed))
         {
             found = TRUE;
             if (fAuto)

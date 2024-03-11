@@ -16,13 +16,13 @@
  ***************************************************************************/
 
 /***************************************************************************
- *	ROM 2.4 is copyright 1993-1996 Russ Taylor			   *
- *	ROM has been brought to you by the ROM consortium		   *
- *	    Russ Taylor (rtaylor@efn.org)				   *
- *	    Gabrielle Taylor						   *
- *	    Brian Moore (zump@rom.org)					   *
- *	By using this code, you have agreed to follow the terms of the	   *
- *	ROM license, in the file Rom24/doc/rom.license			   *
+ *	ROM 2.4 is copyright 1993-1996 Russ Taylor							   *
+ *	ROM has been brought to you by the ROM consortium					   *
+ *	    Russ Taylor (rtaylor@efn.org)									   *
+ *	    Gabrielle Taylor												   *
+ *	    Brian Moore (zump@rom.org)										   *
+ *	By using this code, you have agreed to follow the terms of the	 	   *
+ *	ROM license, in the file Rom24/doc/rom.license						   *
  ***************************************************************************/
 
 #include <sys/types.h>
@@ -135,11 +135,13 @@ void save_char_obj(Character *ch)
 	else
 	{
 		((PlayerCharacter *)ch)->writeToFile(fp);
-		for (auto carrying : ch->getCarrying()) {
+		for (auto carrying : ch->getCarrying())
+		{
 			fwrite_obj(ch, carrying, fp, 0);
 		}
 		/* save the pets */
-		if (ch->pet != NULL && ch->pet->in_room == ch->in_room) {
+		if (ch->pet != NULL && ch->pet->in_room == ch->in_room)
+		{
 			fwrite_pet(ch->pet, fp);
 		}
 		fprintf(fp, "#END\n");
@@ -333,7 +335,8 @@ void fwrite_obj(Character *ch, Object *obj, FILE *fp, int iNest)
 
 	fprintf(fp, "End\n\n");
 
-	for (auto contains : obj->getContents()) {
+	for (auto contains : obj->getContents())
+	{
 		fwrite_obj(ch, contains, fp, iNest + 1);
 	}
 
@@ -1272,7 +1275,7 @@ void fread_obj(Character *ch, FILE *fp)
 
 	if (obj == NULL) /* either not found or old style */
 	{
-		obj = new Object();
+		throw std::runtime_error("Could not load object with no Vnum - index template is required.");
 	}
 
 	fNest = FALSE;
@@ -1411,9 +1414,12 @@ void fread_obj(Character *ch, FILE *fp)
 						obj = ObjectHelper::createFromIndex(obj->getObjectIndexData(), 0);
 						obj->setWearLocation(wear);
 					}
-					if (iNest == 0 || rgObjNest[iNest] == NULL) {
+					if (iNest == 0 || rgObjNest[iNest] == NULL)
+					{
 						ch->addObject(obj);
-					} else {
+					}
+					else
+					{
 						rgObjNest[iNest - 1]->addObject(obj);
 					}
 					return;

@@ -1,5 +1,7 @@
 #include "merc.h"
 #include "Character.h"
+#include "ExitFlag.h"
+#include "FlagHelper.h"
 #include "NonPlayerCharacter.h"
 #include "Portal.h"
 #include "Room.h"
@@ -8,17 +10,14 @@
 void do_look(Character *ch, char *argument);
 void do_stand(Character *ch, char *argument);
 
-Portal::Portal(Object *obj)
-{
-}
-
+Portal::Portal() { }
 Portal::~Portal() {}
 
 bool Portal::isPortal() { return true; }
 
 bool Portal::isTraversableByCharacter(Character *ch)
 {
-	return IS_SET(this->getValues().at(1), EX_CLOSED) && !IS_TRUSTED(ch, ANGEL);
+	return FlagHelper::isSet(this->getValues().at(1), ExitFlag::ExitClosed) && !IS_TRUSTED(ch, ANGEL);
 }
 
 void Portal::enter(Character *ch)
@@ -30,17 +29,17 @@ void Portal::enter(Character *ch)
 		throw PortalNotTraversableException();
 	}
 
-	if (!IS_TRUSTED(ch, ANGEL) && !IS_SET(this->getValues().at(2), GATE_NOCURSE) && (IS_AFFECTED(ch, AFF_CURSE) || IS_SET(ch->in_room->room_flags, ROOM_NO_RECALL)))
+	if (!IS_TRUSTED(ch, ANGEL) && !FlagHelper::isSet(this->getValues().at(2), GATE_NOCURSE) && (IS_AFFECTED(ch, AFF_CURSE) || FlagHelper::isSet(ch->in_room->room_flags, ROOM_NO_RECALL)))
 	{
 		throw PortalUeePreventedByCurseException();
 	}
 
-	if (IS_SET(this->getValues().at(2), GATE_RANDOM) || this->getValues().at(3) == -1)
+	if (FlagHelper::isSet(this->getValues().at(2), GATE_RANDOM) || this->getValues().at(3) == -1)
 	{
 		location = get_random_room(ch);
 		this->getValues().at(3) = location->vnum; /* for record keeping :) */
 	}
-	else if (IS_SET(this->getValues().at(2), GATE_BUGGY) && (number_percent() < 5))
+	else if (FlagHelper::isSet(this->getValues().at(2), GATE_BUGGY) && (number_percent() < 5))
 		location = get_random_room(ch);
 	else
 		location = get_room_index(this->getValues().at(3));
@@ -51,7 +50,7 @@ void Portal::enter(Character *ch)
 		return;
 	}
 
-	if (IS_NPC(ch) && IS_SET(ch->act, ACT_AGGRESSIVE) && IS_SET(location->room_flags, ROOM_LAW))
+	if (IS_NPC(ch) && FlagHelper::isSet(ch->act, ACT_AGGRESSIVE) && FlagHelper::isSet(location->room_flags, ROOM_LAW))
 	{
 		send_to_char("Something prevents you from leaving...\n\r", ch);
 		return;
@@ -59,7 +58,7 @@ void Portal::enter(Character *ch)
 
 	act("$n steps into $p.", ch, this, NULL, TO_ROOM, POS_RESTING);
 
-	if (IS_SET(this->getValues().at(2), GATE_NORMAL_EXIT))
+	if (FlagHelper::isSet(this->getValues().at(2), GATE_NORMAL_EXIT))
 		act("You enter $p.", ch, this, NULL, TO_CHAR, POS_RESTING);
 	else
 		act("You walk through $p and find yourself somewhere else...", ch, this, NULL, TO_CHAR, POS_RESTING);
@@ -67,13 +66,13 @@ void Portal::enter(Character *ch)
 	char_from_room(ch);
 	char_to_room(ch, location);
 
-	if (IS_SET(this->getValues().at(2), GATE_GOWITH)) /* take the gate along */
+	if (FlagHelper::isSet(this->getValues().at(2), GATE_GOWITH)) /* take the gate along */
 	{
 		obj_from_room(this);
 		obj_to_room(this, location);
 	}
 
-	if (IS_SET(this->getValues().at(2), GATE_NORMAL_EXIT))
+	if (FlagHelper::isSet(this->getValues().at(2), GATE_NORMAL_EXIT))
 		act("$n has arrived.", ch, this, NULL, TO_ROOM, POS_RESTING);
 	else
 		act("$n has arrived through $p.", ch, this, NULL, TO_ROOM, POS_RESTING);
@@ -106,7 +105,7 @@ void Portal::enter(Character *ch)
 		if (fch->master == ch && fch->position == POS_STANDING)
 		{
 
-			if (IS_SET(ch->in_room->room_flags, ROOM_LAW) && (IS_NPC(fch) && IS_SET(fch->act, ACT_AGGRESSIVE)))
+			if (FlagHelper::isSet(ch->in_room->room_flags, ROOM_LAW) && (IS_NPC(fch) && FlagHelper::isSet(fch->act, ACT_AGGRESSIVE)))
 			{
 				act("You can't bring $N into the city.", ch, NULL, fch, TO_CHAR, POS_RESTING);
 				act("You aren't allowed in the city.", fch, NULL, NULL, TO_CHAR, POS_RESTING);

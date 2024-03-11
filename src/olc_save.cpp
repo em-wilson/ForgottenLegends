@@ -530,21 +530,21 @@ void save_rooms( FILE *fp, AREA_DATA *pArea )
                           && pExit->u1.to_room )
                     {
 			int locks = 0;
-			if ( IS_SET( pExit->rs_flags, EX_ISDOOR ) 
-			&& ( !IS_SET( pExit->rs_flags, EX_PICKPROOF ) ) 
-		    	&& ( !IS_SET( pExit->rs_flags, EX_NOPASS ) ) )
+			if ( IS_SET( pExit->rs_flags, ExitFlag::ExitIsDoor ) 
+			&& ( !IS_SET( pExit->rs_flags, ExitFlag::ExitPickProof ) ) 
+		    	&& ( !IS_SET( pExit->rs_flags, ExitFlag::ExitNoPass ) ) )
 			    locks = 1;
-			if ( IS_SET( pExit->rs_flags, EX_ISDOOR )
-			&& ( IS_SET( pExit->rs_flags, EX_PICKPROOF ) )
-		        && ( !IS_SET( pExit->rs_flags, EX_NOPASS ) ) )
+			if ( IS_SET( pExit->rs_flags, ExitFlag::ExitIsDoor )
+			&& ( IS_SET( pExit->rs_flags, ExitFlag::ExitPickProof ) )
+		        && ( !IS_SET( pExit->rs_flags, ExitFlag::ExitNoPass ) ) )
 			    locks = 2;
-			if ( IS_SET( pExit->rs_flags, EX_ISDOOR )
-			&& ( !IS_SET( pExit->rs_flags, EX_PICKPROOF ) )
-		        && ( IS_SET( pExit->rs_flags, EX_NOPASS ) ) )
+			if ( IS_SET( pExit->rs_flags, ExitFlag::ExitIsDoor )
+			&& ( !IS_SET( pExit->rs_flags, ExitFlag::ExitPickProof ) )
+		        && ( IS_SET( pExit->rs_flags, ExitFlag::ExitNoPass ) ) )
 			    locks = 3;
-			if ( IS_SET( pExit->rs_flags, EX_ISDOOR )
-			&& ( IS_SET( pExit->rs_flags, EX_PICKPROOF ) )
-		        && ( IS_SET( pExit->rs_flags, EX_NOPASS ) ) )
+			if ( IS_SET( pExit->rs_flags, ExitFlag::ExitIsDoor )
+			&& ( IS_SET( pExit->rs_flags, ExitFlag::ExitPickProof ) )
+		        && ( IS_SET( pExit->rs_flags, ExitFlag::ExitNoPass ) ) )
 			    locks = 4;
 
                         fprintf( fp, "D%d\n",      pExit->orig_door );
@@ -633,23 +633,23 @@ void save_door_resets( FILE *fp, AREA_DATA *pArea )
                 {
                     if ( ( pExit = pRoomIndex->exit[door] )
                           && pExit->u1.to_room 
-                          && ( IS_SET( pExit->rs_flags, EX_CLOSED )
-                          || IS_SET( pExit->rs_flags, EX_LOCKED ) ) )
+                          && ( IS_SET( pExit->rs_flags, ExitFlag::ExitClosed )
+                          || IS_SET( pExit->rs_flags, ExitFlag::ExitLocked ) ) )
 #if defined( VERBOSE )
 			fprintf( fp, "D 0 %d %d %d The %s door of %s is %s\n", 
 				pRoomIndex->vnum,
 				pExit->orig_door,
-				IS_SET( pExit->rs_flags, EX_LOCKED) ? 2 : 1,
+				IS_SET( pExit->rs_flags, ExitFlag::ExitLocked) ? 2 : 1,
 				dir_name[ pExit->orig_door ],
 				pRoomIndex->name,
-				IS_SET( pExit->rs_flags, EX_LOCKED) ? "closed and locked"
+				IS_SET( pExit->rs_flags, ExitFlag::ExitLocked) ? "closed and locked"
 				    : "closed" );
 #endif
 #if !defined( VERBOSE )
 			fprintf( fp, "D 0 %d %d %d\n", 
 				pRoomIndex->vnum,
 				pExit->orig_door,
-				IS_SET( pExit->rs_flags, EX_LOCKED) ? 2 : 1 );
+				IS_SET( pExit->rs_flags, ExitFlag::ExitLocked) ? 2 : 1 );
 #endif
 		}
 	    }

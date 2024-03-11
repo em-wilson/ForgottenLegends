@@ -41,6 +41,7 @@
 #include "clans/ClanWriter.h"
 #include "db.h"
 #include "EquipmentListGenerator.h"
+#include "ExitFlag.h"
 #include "ExtraDescription.h"
 #include "interfaces/ILogger.h"
 #include "lookup.h"
@@ -785,7 +786,7 @@ void load_resets( FILE *fp )
 	    ||   pReset->arg2 > (MAX_DIR - 1)
             || !pRoomIndex
 	    || !( pexit = pRoomIndex->exit[pReset->arg2] )
-	    || !IS_SET( pexit->rs_flags, EX_ISDOOR ) )
+	    || !IS_SET( pexit->rs_flags, ExitFlag::ExitIsDoor ) )
 	    {
 		bug( "Load_resets: 'D': exit %d not door.", pReset->arg2 );
 		exit( 1 );
@@ -796,10 +797,10 @@ void load_resets( FILE *fp )
                 default:
                     bug( "Load_resets: 'D': bad 'locks': %d." , pReset->arg3);
                 case 0: break;
-                case 1: SET_BIT( pexit->rs_flags, EX_CLOSED );
-			SET_BIT( pexit->exit_info, EX_CLOSED ); break;
-                case 2: SET_BIT( pexit->rs_flags, EX_CLOSED | EX_LOCKED );
-                	SET_BIT( pexit->exit_info, EX_CLOSED | EX_LOCKED ); break;
+                case 1: SET_BIT( pexit->rs_flags, ExitFlag::ExitClosed );
+			SET_BIT( pexit->exit_info, ExitFlag::ExitClosed ); break;
+                case 2: SET_BIT( pexit->rs_flags, ExitFlag::ExitClosed | ExitFlag::ExitLocked );
+                	SET_BIT( pexit->exit_info, ExitFlag::ExitClosed | ExitFlag::ExitLocked ); break;
             }
 
 	    break;
@@ -935,14 +936,14 @@ void load_rooms( FILE *fp )
 
 		switch ( locks )
 		{
-		case 1: pexit->exit_info = EX_ISDOOR;               
-			pexit->rs_flags  = EX_ISDOOR;		     break;
-		case 2: pexit->exit_info = EX_ISDOOR | EX_PICKPROOF;
-			pexit->rs_flags  = EX_ISDOOR | EX_PICKPROOF; break;
-		case 3: pexit->exit_info = EX_ISDOOR | EX_NOPASS;    
-			pexit->rs_flags  = EX_ISDOOR | EX_NOPASS;    break;
-		case 4: pexit->exit_info = EX_ISDOOR|EX_NOPASS|EX_PICKPROOF;
-			pexit->rs_flags  = EX_ISDOOR|EX_NOPASS|EX_PICKPROOF;
+		case 1: pexit->exit_info = ExitFlag::ExitIsDoor;               
+			pexit->rs_flags  = ExitFlag::ExitIsDoor;		     break;
+		case 2: pexit->exit_info = ExitFlag::ExitIsDoor | ExitFlag::ExitPickProof;
+			pexit->rs_flags  = ExitFlag::ExitIsDoor | ExitFlag::ExitPickProof; break;
+		case 3: pexit->exit_info = ExitFlag::ExitIsDoor | ExitFlag::ExitNoPass;    
+			pexit->rs_flags  = ExitFlag::ExitIsDoor | ExitFlag::ExitNoPass;    break;
+		case 4: pexit->exit_info = ExitFlag::ExitIsDoor|ExitFlag::ExitNoPass|ExitFlag::ExitPickProof;
+			pexit->rs_flags  = ExitFlag::ExitIsDoor|ExitFlag::ExitNoPass|ExitFlag::ExitPickProof;
 			break;
 		}
 

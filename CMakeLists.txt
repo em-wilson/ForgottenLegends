@@ -60,6 +60,7 @@ set(SOURCE_FILES
     src/Game.cpp src/Game.h
     src/handler.cpp
     src/healer.cpp
+    src/helpers/FlagHelper.cpp src/helpers/FlagHelper.h
     src/helpers/SocketHelper.cpp src/helpers/SocketHelper.h
     src/helpers/StringHelper.cpp src/helpers/StringHelper.h
     src/interfaces/IConnectedStateHandler.h

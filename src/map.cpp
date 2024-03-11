@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "merc.h"
+#include "ExitFlag.h"
 #include "Room.h"
 
 #define MAX_MAP 90
@@ -94,7 +95,7 @@ void MapArea(ROOM_INDEX_DATA *room, Character *ch, int x, int y, int min, int ma
     {
         if (
             (pexit = room->exit[door]) != NULL && pexit->u1.to_room != NULL && can_see_room(ch, pexit->u1.to_room) /* optional */
-            && !IS_SET(pexit->exit_info, EX_CLOSED))
+            && !IS_SET(pexit->exit_info, ExitFlag::ExitClosed))
         { /* if exit there */
 
             prospect_room = pexit->u1.to_room;

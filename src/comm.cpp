@@ -61,6 +61,7 @@
 #include "ConnectedState.h"
 #include "clans/ClanManager.h"
 #include "IConnectedStateHandler.h"
+#include "ExitFlag.h"
 #include "ILogger.h"
 #include "Object.h"
 #include "ObjectHelper.h"
@@ -756,7 +757,7 @@ void bust_a_prompt(Character *ch)
 			doors[0] = '\0';
 			for (door = 0; door < 6; door++)
 			{
-				if ((pexit = ch->in_room->exit[door]) != NULL && pexit->u1.to_room != NULL && (can_see_room(ch, pexit->u1.to_room) || (IS_AFFECTED(ch, AFF_INFRARED) && !IS_AFFECTED(ch, AFF_BLIND))) && !IS_SET(pexit->exit_info, EX_CLOSED))
+				if ((pexit = ch->in_room->exit[door]) != NULL && pexit->u1.to_room != NULL && (can_see_room(ch, pexit->u1.to_room) || (IS_AFFECTED(ch, AFF_INFRARED) && !IS_AFFECTED(ch, AFF_BLIND))) && !IS_SET(pexit->exit_info, ExitFlag::ExitClosed))
 				{
 					found = TRUE;
 					strcat(doors, dir_name[door]);

@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "merc.h"
+#include "ExitFlag.h"
 #include "NonPlayerCharacter.h"
 #include "Object.h"
 #include "ObjectHelper.h"
@@ -98,8 +99,8 @@ void move_char( Character *ch, int door, bool follow )
 	return;
     }
 
-    if (IS_SET(pexit->exit_info, EX_CLOSED)
-    &&  (!IS_AFFECTED(ch, AFF_PASS_DOOR) || IS_SET(pexit->exit_info,EX_NOPASS))
+    if (IS_SET(pexit->exit_info, ExitFlag::ExitClosed)
+    &&  (!IS_AFFECTED(ch, AFF_PASS_DOOR) || IS_SET(pexit->exit_info,ExitFlag::ExitNoPass))
     &&   !IS_TRUSTED(ch,ANGEL))
     {
 		act( "The $d is closed.", ch, NULL, pexit->keyword, TO_CHAR, POS_RESTING );
@@ -334,7 +335,7 @@ int find_door( Character *ch, char *arg )
 	for ( door = 0; door <= 5; door++ )
 	{
 	    if ( ( pexit = ch->in_room->exit[door] ) != NULL
-	    &&   IS_SET(pexit->exit_info, EX_ISDOOR)
+	    &&   IS_SET(pexit->exit_info, ExitFlag::ExitIsDoor)
 	    &&   pexit->keyword != NULL
 	    &&   is_name( arg, pexit->keyword ) )
 		return door;
@@ -349,7 +350,7 @@ int find_door( Character *ch, char *arg )
 		return -1;
     }
 
-    if ( !IS_SET(pexit->exit_info, EX_ISDOOR) )
+    if ( !IS_SET(pexit->exit_info, ExitFlag::ExitIsDoor) )
     {
 	send_to_char( "You can't do that.\n\r", ch );
 	return -1;
@@ -379,25 +380,25 @@ void do_open( Character *ch, char *argument )
  	/* open portal */
 	if (obj->getItemType() == ITEM_PORTAL)
 	{
-	    if (!IS_SET(obj->getValues().at(1), EX_ISDOOR))
+	    if (!IS_SET(obj->getValues().at(1), ExitFlag::ExitIsDoor))
 	    {
 		send_to_char("You can't do that.\n\r",ch);
 		return;
 	    }
 
-	    if (!IS_SET(obj->getValues().at(1), EX_CLOSED))
+	    if (!IS_SET(obj->getValues().at(1), ExitFlag::ExitClosed))
 	    {
 		send_to_char("It's already open.\n\r",ch);
 		return;
 	    }
 
-	    if (IS_SET(obj->getValues().at(1), EX_LOCKED))
+	    if (IS_SET(obj->getValues().at(1), ExitFlag::ExitLocked))
 	    {
 		send_to_char("It's locked.\n\r",ch);
 		return;
 	    }
 
-	    REMOVE_BIT(obj->getValues().at(1), EX_CLOSED);
+	    REMOVE_BIT(obj->getValues().at(1), ExitFlag::ExitClosed);
 	    act("You open $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n opens $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    return;
@@ -427,12 +428,12 @@ void do_open( Character *ch, char *argument )
 	EXIT_DATA *pexit_rev;
 
 	pexit = ch->in_room->exit[door];
-	if ( !IS_SET(pexit->exit_info, EX_CLOSED) )
+	if ( !IS_SET(pexit->exit_info, ExitFlag::ExitClosed) )
 	    { send_to_char( "It's already open.\n\r",      ch ); return; }
-	if (  IS_SET(pexit->exit_info, EX_LOCKED) )
+	if (  IS_SET(pexit->exit_info, ExitFlag::ExitLocked) )
 	    { send_to_char( "It's locked.\n\r",            ch ); return; }
 
-	REMOVE_BIT(pexit->exit_info, EX_CLOSED);
+	REMOVE_BIT(pexit->exit_info, ExitFlag::ExitClosed);
 	act( "$n opens the $d.", ch, NULL, pexit->keyword, TO_ROOM, POS_RESTING );
 	send_to_char( "Ok.\n\r", ch );
 
@@ -443,7 +444,7 @@ void do_open( Character *ch, char *argument )
 	{
 	    Character *rch;
 
-	    REMOVE_BIT( pexit_rev->exit_info, EX_CLOSED );
+	    REMOVE_BIT( pexit_rev->exit_info, ExitFlag::ExitClosed );
 	    for ( rch = to_room->people; rch != NULL; rch = rch->next_in_room )
 		act( "The $d opens.", rch, NULL, pexit_rev->keyword, TO_CHAR, POS_RESTING );
 	}
@@ -474,20 +475,20 @@ void do_close( Character *ch, char *argument )
 	if (obj->getItemType() == ITEM_PORTAL)
 	{
 
-	    if (!IS_SET(obj->getValues().at(1),EX_ISDOOR)
-	    ||   IS_SET(obj->getValues().at(1),EX_NOCLOSE))
+	    if (!IS_SET(obj->getValues().at(1),ExitFlag::ExitIsDoor)
+	    ||   IS_SET(obj->getValues().at(1),ExitFlag::ExitNoClose))
 	    {
 		send_to_char("You can't do that.\n\r",ch);
 		return;
 	    }
 
-	    if (IS_SET(obj->getValues().at(1),EX_CLOSED))
+	    if (IS_SET(obj->getValues().at(1),ExitFlag::ExitClosed))
 	    {
 		send_to_char("It's already closed.\n\r",ch);
 		return;
 	    }
 
-	    SET_BIT(obj->getValues().at(1),EX_CLOSED);
+	    SET_BIT(obj->getValues().at(1),ExitFlag::ExitClosed);
 	    act("You close $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n closes $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    return;
@@ -515,10 +516,10 @@ void do_close( Character *ch, char *argument )
 	EXIT_DATA *pexit_rev;
 
 	pexit	= ch->in_room->exit[door];
-	if ( IS_SET(pexit->exit_info, EX_CLOSED) )
+	if ( IS_SET(pexit->exit_info, ExitFlag::ExitClosed) )
 	    { send_to_char( "It's already closed.\n\r",    ch ); return; }
 
-	SET_BIT(pexit->exit_info, EX_CLOSED);
+	SET_BIT(pexit->exit_info, ExitFlag::ExitClosed);
 	act( "$n closes the $d.", ch, NULL, pexit->keyword, TO_ROOM, POS_RESTING );
 	send_to_char( "Ok.\n\r", ch );
 
@@ -529,7 +530,7 @@ void do_close( Character *ch, char *argument )
 	{
 	    Character *rch;
 
-	    SET_BIT( pexit_rev->exit_info, EX_CLOSED );
+	    SET_BIT( pexit_rev->exit_info, ExitFlag::ExitClosed );
 	    for ( rch = to_room->people; rch != NULL; rch = rch->next_in_room )
 		act( "The $d closes.", rch, NULL, pexit_rev->keyword, TO_CHAR, POS_RESTING );
 	}
@@ -572,19 +573,19 @@ void do_lock( Character *ch, char *argument )
 	/* portal stuff */
 	if (obj->getItemType() == ITEM_PORTAL)
 	{
-	    if (!IS_SET(obj->getValues().at(1),EX_ISDOOR)
-	    ||  IS_SET(obj->getValues().at(1),EX_NOCLOSE))
+	    if (!IS_SET(obj->getValues().at(1),ExitFlag::ExitIsDoor)
+	    ||  IS_SET(obj->getValues().at(1),ExitFlag::ExitNoClose))
 	    {
 		send_to_char("You can't do that.\n\r",ch);
 		return;
 	    }
-	    if (!IS_SET(obj->getValues().at(1),EX_CLOSED))
+	    if (!IS_SET(obj->getValues().at(1),ExitFlag::ExitClosed))
 	    {
 		send_to_char("It's not closed.\n\r",ch);
 	 	return;
 	    }
 
-	    if (obj->getValues().at(4) < 0 || IS_SET(obj->getValues().at(1),EX_NOLOCK))
+	    if (obj->getValues().at(4) < 0 || IS_SET(obj->getValues().at(1),ExitFlag::ExitNoLock))
 	    {
 		send_to_char("It can't be locked.\n\r",ch);
 		return;
@@ -596,13 +597,13 @@ void do_lock( Character *ch, char *argument )
 		return;
 	    }
 
-	    if (IS_SET(obj->getValues().at(1),EX_LOCKED))
+	    if (IS_SET(obj->getValues().at(1),ExitFlag::ExitLocked))
 	    {
 		send_to_char("It's already locked.\n\r",ch);
 		return;
 	    }
 
-	    SET_BIT(obj->getValues().at(1),EX_LOCKED);
+	    SET_BIT(obj->getValues().at(1),ExitFlag::ExitLocked);
 	    act("You lock $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n locks $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    return;
@@ -634,16 +635,16 @@ void do_lock( Character *ch, char *argument )
 	EXIT_DATA *pexit_rev;
 
 	pexit	= ch->in_room->exit[door];
-	if ( !IS_SET(pexit->exit_info, EX_CLOSED) )
+	if ( !IS_SET(pexit->exit_info, ExitFlag::ExitClosed) )
 	    { send_to_char( "It's not closed.\n\r",        ch ); return; }
 	if ( pexit->key < 0 )
 	    { send_to_char( "It can't be locked.\n\r",     ch ); return; }
 	if ( !has_key( ch, pexit->key) )
 	    { send_to_char( "You lack the key.\n\r",       ch ); return; }
-	if ( IS_SET(pexit->exit_info, EX_LOCKED) )
+	if ( IS_SET(pexit->exit_info, ExitFlag::ExitLocked) )
 	    { send_to_char( "It's already locked.\n\r",    ch ); return; }
 
-	SET_BIT(pexit->exit_info, EX_LOCKED);
+	SET_BIT(pexit->exit_info, ExitFlag::ExitLocked);
 	send_to_char( "*Click*\n\r", ch );
 	act( "$n locks the $d.", ch, NULL, pexit->keyword, TO_ROOM, POS_RESTING );
 
@@ -652,7 +653,7 @@ void do_lock( Character *ch, char *argument )
 	&&   ( pexit_rev = to_room->exit[rev_dir[door]] ) != 0
 	&&   pexit_rev->u1.to_room == ch->in_room )
 	{
-	    SET_BIT( pexit_rev->exit_info, EX_LOCKED );
+	    SET_BIT( pexit_rev->exit_info, ExitFlag::ExitLocked );
 	}
     }
 
@@ -680,13 +681,13 @@ void do_unlock( Character *ch, char *argument )
  	/* portal stuff */
 	if (obj->getItemType() == ITEM_PORTAL)
 	{
-	    if (!IS_SET(obj->getValues().at(1),EX_ISDOOR))
+	    if (!IS_SET(obj->getValues().at(1),ExitFlag::ExitIsDoor))
 	    {
 		send_to_char("You can't do that.\n\r",ch);
 		return;
 	    }
 
-	    if (!IS_SET(obj->getValues().at(1),EX_CLOSED))
+	    if (!IS_SET(obj->getValues().at(1),ExitFlag::ExitClosed))
 	    {
 		send_to_char("It's not closed.\n\r",ch);
 		return;
@@ -704,13 +705,13 @@ void do_unlock( Character *ch, char *argument )
 		return;
 	    }
 
-	    if (!IS_SET(obj->getValues().at(1),EX_LOCKED))
+	    if (!IS_SET(obj->getValues().at(1),ExitFlag::ExitLocked))
 	    {
 		send_to_char("It's already unlocked.\n\r",ch);
 		return;
 	    }
 
-	    REMOVE_BIT(obj->getValues().at(1),EX_LOCKED);
+	    REMOVE_BIT(obj->getValues().at(1),ExitFlag::ExitLocked);
 	    act("You unlock $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n unlocks $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    return;
@@ -742,16 +743,16 @@ void do_unlock( Character *ch, char *argument )
 	EXIT_DATA *pexit_rev;
 
 	pexit = ch->in_room->exit[door];
-	if ( !IS_SET(pexit->exit_info, EX_CLOSED) )
+	if ( !IS_SET(pexit->exit_info, ExitFlag::ExitClosed) )
 	    { send_to_char( "It's not closed.\n\r",        ch ); return; }
 	if ( pexit->key < 0 )
 	    { send_to_char( "It can't be unlocked.\n\r",   ch ); return; }
 	if ( !has_key( ch, pexit->key) )
 	    { send_to_char( "You lack the key.\n\r",       ch ); return; }
-	if ( !IS_SET(pexit->exit_info, EX_LOCKED) )
+	if ( !IS_SET(pexit->exit_info, ExitFlag::ExitLocked) )
 	    { send_to_char( "It's already unlocked.\n\r",  ch ); return; }
 
-	REMOVE_BIT(pexit->exit_info, EX_LOCKED);
+	REMOVE_BIT(pexit->exit_info, ExitFlag::ExitLocked);
 	send_to_char( "*Click*\n\r", ch );
 	act( "$n unlocks the $d.", ch, NULL, pexit->keyword, TO_ROOM, POS_RESTING );
 
@@ -760,7 +761,7 @@ void do_unlock( Character *ch, char *argument )
 	&&   ( pexit_rev = to_room->exit[rev_dir[door]] ) != NULL
 	&&   pexit_rev->u1.to_room == ch->in_room )
 	{
-	    REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED );
+	    REMOVE_BIT( pexit_rev->exit_info, ExitFlag::ExitLocked );
 	}
     }
 
@@ -808,13 +809,13 @@ void do_pick( Character *ch, char *argument )
 	/* portal stuff */
 	if (obj->getItemType() == ITEM_PORTAL)
 	{
-	    if (!IS_SET(obj->getValues().at(1),EX_ISDOOR))
+	    if (!IS_SET(obj->getValues().at(1),ExitFlag::ExitIsDoor))
 	    {	
 		send_to_char("You can't do that.\n\r",ch);
 		return;
 	    }
 
-	    if (!IS_SET(obj->getValues().at(1),EX_CLOSED))
+	    if (!IS_SET(obj->getValues().at(1),ExitFlag::ExitClosed))
 	    {
 		send_to_char("It's not closed.\n\r",ch);
 		return;
@@ -826,13 +827,13 @@ void do_pick( Character *ch, char *argument )
 		return;
 	    }
 
-	    if (IS_SET(obj->getValues().at(1),EX_PICKPROOF))
+	    if (IS_SET(obj->getValues().at(1),ExitFlag::ExitPickProof))
 	    {
 		send_to_char("You failed.\n\r",ch);
 		return;
 	    }
 
-	    REMOVE_BIT(obj->getValues().at(1),EX_LOCKED);
+	    REMOVE_BIT(obj->getValues().at(1),ExitFlag::ExitLocked);
 	    act("You pick the lock on $p.",ch,obj,NULL,TO_CHAR, POS_RESTING);
 	    act("$n picks the lock on $p.",ch,obj,NULL,TO_ROOM, POS_RESTING);
 	    check_improve(ch,gsn_pick_lock,TRUE,2);
@@ -870,16 +871,16 @@ void do_pick( Character *ch, char *argument )
 	EXIT_DATA *pexit_rev;
 
 	pexit = ch->in_room->exit[door];
-	if ( !IS_SET(pexit->exit_info, EX_CLOSED) && !IS_IMMORTAL(ch))
+	if ( !IS_SET(pexit->exit_info, ExitFlag::ExitClosed) && !IS_IMMORTAL(ch))
 	    { send_to_char( "It's not closed.\n\r",        ch ); return; }
 	if ( pexit->key < 0 && !IS_IMMORTAL(ch))
 	    { send_to_char( "It can't be picked.\n\r",     ch ); return; }
-	if ( !IS_SET(pexit->exit_info, EX_LOCKED) )
+	if ( !IS_SET(pexit->exit_info, ExitFlag::ExitLocked) )
 	    { send_to_char( "It's already unlocked.\n\r",  ch ); return; }
-	if ( IS_SET(pexit->exit_info, EX_PICKPROOF) && !IS_IMMORTAL(ch))
+	if ( IS_SET(pexit->exit_info, ExitFlag::ExitPickProof) && !IS_IMMORTAL(ch))
 	    { send_to_char( "You failed.\n\r",             ch ); return; }
 
-	REMOVE_BIT(pexit->exit_info, EX_LOCKED);
+	REMOVE_BIT(pexit->exit_info, ExitFlag::ExitLocked);
 	send_to_char( "*Click*\n\r", ch );
 	act( "$n picks the $d.", ch, NULL, pexit->keyword, TO_ROOM, POS_RESTING );
 	check_improve(ch,gsn_pick_lock,TRUE,2);
@@ -889,7 +890,7 @@ void do_pick( Character *ch, char *argument )
 	&&   ( pexit_rev = to_room->exit[rev_dir[door]] ) != NULL
 	&&   pexit_rev->u1.to_room == ch->in_room )
 	{
-	    REMOVE_BIT( pexit_rev->exit_info, EX_LOCKED );
+	    REMOVE_BIT( pexit_rev->exit_info, ExitFlag::ExitLocked );
 	}
     }
 
