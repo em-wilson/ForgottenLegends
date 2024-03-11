@@ -1,6 +1,8 @@
 #ifndef __RACEMANAGER_H__
 #define __RACEMANAGER_H__
 
+#include "IRaceManager.h"
+
 class Race;
 class RaceReader;
 class RaceWriter;
@@ -10,7 +12,7 @@ class InvalidRaceException : public std::runtime_error {
         InvalidRaceException(std::string msg) : std::runtime_error(msg) {};
 };
 
-class RaceManager {
+class RaceManager : public IRaceManager {
     public:
         RaceManager(RaceReader *reader, RaceWriter *writer);
         virtual ~RaceManager();

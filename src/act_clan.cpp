@@ -16,14 +16,14 @@
  ***************************************************************************/
 
 /***************************************************************************
-*	ROM 2.4 is copyright 1993-1996 Russ Taylor			   				               *
-*	ROM has been brought to you by the ROM consortium		 		            	   *
-*	    Russ Taylor (rtaylor@efn.org)				 				                    	   *
-*	    Gabrielle Taylor											                               *
-*	    Brian Moore (zump@rom.org)					                                 *
-*	By using this code, you have agreed to follow the terms of the	         *
-*	ROM license, in the file Rom24/doc/rom.license			                     *
-***************************************************************************/
+ *	ROM 2.4 is copyright 1993-1996 Russ Taylor			   				               *
+ *	ROM has been brought to you by the ROM consortium		 		            	   *
+ *	    Russ Taylor (rtaylor@efn.org)				 				                    	   *
+ *	    Gabrielle Taylor											                               *
+ *	    Brian Moore (zump@rom.org)					                                 *
+ *	By using this code, you have agreed to follow the terms of the	         *
+ *	ROM license, in the file Rom24/doc/rom.license			                     *
+ ***************************************************************************/
 
 #include <sys/time.h>
 #include "merc.h"
@@ -32,7 +32,7 @@
 #include "ConnectedState.h"
 #include "PlayerCharacter.h"
 
-DECLARE_DO_FUN( do_clist	);
+DECLARE_DO_FUN(do_clist);
 
 extern ClanManager *clan_manager;
 
@@ -40,63 +40,69 @@ void show_flag_cmds(Character *ch, const struct flag_type *flag_table);
 int flag_value args((const struct flag_type *flag_table, char *argument));
 char *flag_string args((const struct flag_type *flag_table, int bits));
 
-void do_join( Character *caller, char *argument )
+void do_join(Character *caller, char *argument)
 {
-	if ( caller->isNPC() ) {
-		send_to_char("NPCs may not join clans\n\r", caller);
-		return;
-	}
-
-	PlayerCharacter *ch = (PlayerCharacter*)caller;
-    char buf[MAX_STRING_LENGTH];
-
-    if (argument[0] == '\0')
-    {
-	send_to_char("Clans Available for you to Join:\n\r",ch);
-	send_to_char("================================\n\r",ch);
-
-	do_clist(ch, (char*)"");
-
-	send_to_char("\n\r",ch);
-	return;
-    }
-
-	Clan *join = clan_manager->get_clan(argument);
-    if (!join)
-    {
-	snprintf(buf, sizeof(buf), "%s: that clan does not exist.\n\r",argument);
-	send_to_char(buf,ch);
-	return;
-    }
-
-    ch->setJoin(join);
-    snprintf(buf, sizeof(buf), "You are now eligable to join %s.\n\r",join->getName().c_str());
-    send_to_char(buf,ch);
+  if (caller->isNPC())
+  {
+    send_to_char("NPCs may not join clans\n\r", caller);
     return;
+  }
+
+  PlayerCharacter *ch = (PlayerCharacter *)caller;
+  char buf[MAX_STRING_LENGTH];
+
+  if (argument[0] == '\0')
+  {
+    send_to_char("Clans Available for you to Join:\n\r", ch);
+    send_to_char("================================\n\r", ch);
+
+    do_clist(ch, (char *)"");
+
+    send_to_char("\n\r", ch);
+    return;
+  }
+
+  Clan *join = clan_manager->get_clan(argument);
+  if (!join)
+  {
+    snprintf(buf, sizeof(buf), "%s: that clan does not exist.\n\r", argument);
+    send_to_char(buf, ch);
+    return;
+  }
+
+  ch->setJoin(join);
+  snprintf(buf, sizeof(buf), "You are now eligable to join %s.\n\r", join->getName().c_str());
+  send_to_char(buf, ch);
+  return;
 }
 
-void do_cedit( Character *caller, char *argument )
+void do_cedit(Character *caller, char *argument)
 {
-	if ( caller->isNPC() ) {
-		send_to_char("NPCs may not join clans\n\r", caller);
-		return;
-	}
+  if (caller->isNPC())
+  {
+    send_to_char("NPCs may not join clans\n\r", caller);
+    return;
+  }
 
-	PlayerCharacter *ch = (PlayerCharacter*)caller;
-    if (!IS_CLANNED(ch) || ch->getName() != ch->pcdata->clan->getLeader()) {
-      send_to_char("Only clan leaders may use this command.",ch);
-      return;
-    } else {
-		    send_to_char("Clan Customization Menu:\n\r"
-		    "1: Admin Options (leader only)\n\r"
-		    "2: Room Options\n\r"
-		    "3: Mobile Options\n\r"
-		    "4: Shop Options\n\r"
-		    "5: Exit Editor\n\r", ch);
-	ch->setClanCust(3);
-	ch->desc->connected = ConnectedState::ClanCreate;
-	return;
-    }
+  PlayerCharacter *ch = (PlayerCharacter *)caller;
+  if (!IS_CLANNED(ch) || ch->getName() != ch->pcdata->clan->getLeader())
+  {
+    send_to_char("Only clan leaders may use this command.", ch);
+    return;
+  }
+  else
+  {
+    send_to_char("Clan Customization Menu:\n\r"
+                 "1: Admin Options (leader only)\n\r"
+                 "2: Room Options\n\r"
+                 "3: Mobile Options\n\r"
+                 "4: Shop Options\n\r"
+                 "5: Exit Editor\n\r",
+                 ch);
+    ch->setClanCust(3);
+    ch->desc->connected = ConnectedState::ClanCreate;
+    return;
+  }
 }
 
 /*
@@ -132,7 +138,8 @@ void do_induct(Character *ch, char *argument)
 
   clan = ch->pcdata->clan;
 
-  if (!clan_manager->isClanLeader(ch)) {
+  if (!clan_manager->isClanLeader(ch))
+  {
     send_to_char("Huh?\n\r", ch);
     return;
   }
@@ -203,7 +210,8 @@ void do_outcast(Character *ch, char *argument)
 
   clan = ch->pcdata->clan;
 
-  if (!clan_manager->isClanLeader(ch)) {
+  if (!clan_manager->isClanLeader(ch))
+  {
     send_to_char("Huh?\n\r", ch);
     return;
   }

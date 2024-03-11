@@ -134,7 +134,7 @@ void save_char_obj(Character *ch)
 	}
 	else
 	{
-		((PlayerCharacter *)ch)->writeToFile(fp);
+		((PlayerCharacter *)ch)->writeToFile(fp, race_manager);
 		for (auto carrying : ch->getCarrying())
 		{
 			fwrite_obj(ch, carrying, fp, 0);
@@ -350,7 +350,7 @@ bool load_char_obj(DESCRIPTOR_DATA *d, char *name)
 {
 	char strsave[MAX_INPUT_LENGTH];
 	char buf[100];
-	PlayerCharacter *ch = new PlayerCharacter();
+	PlayerCharacter *ch = new PlayerCharacter(race_manager);
 	FILE *fp;
 	bool found;
 

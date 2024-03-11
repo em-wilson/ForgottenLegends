@@ -1,9 +1,11 @@
 #include "Character.h"
 #include "clans/Clan.h"
 
+class IRaceManager;
+
 class PlayerCharacter : public Character {
 public:
-    PlayerCharacter();
+    PlayerCharacter(IRaceManager * race_manager);
     ~PlayerCharacter();
 
     virtual void gain_exp(int gain) override;
@@ -42,7 +44,7 @@ public:
 
     void incrementKilledByMobCount(int amount);
 
-    void writeToFile(FILE *fp);
+    void writeToFile(FILE *fp, IRaceManager *race_manager);
 
     bool wantsToJoinClan( Clan *clan );
 

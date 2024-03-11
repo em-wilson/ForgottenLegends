@@ -3,6 +3,7 @@
 #include "merc.h"
 #include "board.h"
 #include "ILogger.h"
+#include "IRaceManager.h"
 #include "Object.h"
 #include "PlayerRace.h"
 #include "PlayerCharacter.h"
@@ -10,9 +11,7 @@
 #include "Room.h"
 #include "Wiznet.h"
 
-extern class RaceManager * race_manager;
-
-PlayerCharacter::PlayerCharacter()
+PlayerCharacter::PlayerCharacter(IRaceManager * race_manager)
         : Character() {
         this->pcdata = new PC_DATA();
 
@@ -148,7 +147,7 @@ bool PlayerCharacter::didJustDie() {
         return this->jkilled > 0;
 }
 
-void PlayerCharacter::writeToFile(FILE *fp) {
+void PlayerCharacter::writeToFile(FILE *fp, IRaceManager *race_manager) {
         int sn, gn, pos, i;
 
         // If NPC - this should be #MOB
